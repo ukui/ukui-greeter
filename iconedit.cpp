@@ -1,0 +1,106 @@
+#include "iconedit.h"
+#include <QHBoxLayout>
+#include <QWidget>
+#include <QFile>
+#include <QProxyStyle>
+#include <QKeyEvent>
+#include <QDebug>
+
+
+//////////////////////////// IconButton的成员 ////////////////////////////////////////
+
+IconButton::IconButton(QLineEdit *edit)
+    :QPushButton(edit)
+{
+    m_size = QSize(edit->height(), edit->height());
+
+    this->setMinimumSize(m_size);
+    this->setMaximumSize(m_size);
+    this->setFocusPolicy(Qt::NoFocus);  //得到焦点时不显示虚线框
+    this->setFlat(true);
+    this->setCursor(QCursor(Qt::PointingHandCursor));
+    this->setIconSize(m_size);
+
+    QHBoxLayout *buttonLayout = new QHBoxLayout();
+    buttonLayout->setContentsMargins(1, 1, 1, 1);
+    buttonLayout->addStretch();
+    buttonLayout->addWidget(this);
+    buttonLayout->setDirection(QBoxLayout::LeftToRight);
+    edit->setLayout(buttonLayout);
+
+    // 设置输入框中文件输入区，不让输入的文字在被隐藏在按钮下
+    edit->setTextMargins(1, 1, m_size.width() , 1);
+    edit->setStyleSheet(" QLineEdit { border: 1px solid blue ; lineedit-password-character:9679}");
+    this->setStyleSheet("QPushButton{background:transparent; border:0px}");
+}
+IconButton::IconButton(QLineEdit *edit, const QIcon &icon)
+    :IconButton(edit)
+{
+    this->setIcon(icon);
+}
+void IconButton::resize(const QSize& size)
+{
+    this->setMinimumSize(size);
+    this->setMaximumSize(size);
+}
+
+//////////////////////////// IconEdit的成员 ////////////////////////////////////////
+
+
+IconEdit::IconEdit(QWidget *parent)
+    :QWidget(parent)
+{
+    m_edit = new TipEdit(this);
+    m_iconButton = new IconButton(m_edit);
+    connect(m_iconButton, SIGNAL(clicked(bool)), this, SLOT(clicked_cb()));
+}
+
+IconEdit::IconEdit(const QIcon& icon, QWidget *parent)
+    :IconEdit(parent)
+{
+    m_iconButton->setIcon(icon);
+    m_edit->setEchoMode(QLineEdit::Password);
+}
+void IconEdit::keyReleaseEvent ( QKeyEvent * event )
+{
+    if(event->key() == Qt::Key_Return)
+        return clicked_cb();
+    return QWidget::keyReleaseEvent(event);
+}
+
+void IconEdit::clicked_cb()
+{
+    emit clicked(m_edit->text());
+}
+
+void IconEdit::setIcon(const QString &filename)
+{
+    m_iconButton->setIcon(QIcon(filename));
+}
+
+void IconEdit::setIcon(const QIcon &icon)
+{
+    m_iconButton->setIcon(icon);
+}
+
+void IconEdit::resize(const QSize& size)
+{
+    m_edit->resize(size);
+    m_iconButton->resize(QSize(size.height(), size.height()));
+}
+
+void IconEdit::clear()
+{
+    m_edit->setText("");
+}
+
+void IconEdit::setPrompt(const QString &prompt)
+{
+    m_edit->setInnerTip(prompt);
+}
+
+const QString& IconEdit::text()
+{
+    return m_edit->text();
+}
+

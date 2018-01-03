@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resource/arrow_left_prelight.png</file>
+        <file>resource/arrow_left.png</file>
+        <file>resource/arrow_right.png</file>
+        <file>resource/background.png</file>
+        <file>resource/default_face.png</file>
+        <file>resource/next_highlight.png</file>
+        <file>resource/previous.png</file>
+    </qresource>
+</RCC>
