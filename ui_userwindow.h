@@ -13,10 +13,8 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -24,34 +22,30 @@ QT_BEGIN_NAMESPACE
 class Ui_Form
 {
 public:
-    QWidget *verticalLayoutWidget;
-    QVBoxLayout *m_vlayout;
-    QHBoxLayout *m_hlayout;
+    QWidget *m_userList;
+    QLabel *m_prevLabel;
+    QLabel *m_nextLabel;
     QLabel *m_pageIndicator;
 
     void setupUi(QWidget *Form)
     {
         if (Form->objectName().isEmpty())
             Form->setObjectName(QStringLiteral("Form"));
-        Form->resize(1200, 300);
-        verticalLayoutWidget = new QWidget(Form);
-        verticalLayoutWidget->setObjectName(QStringLiteral("verticalLayoutWidget"));
-        verticalLayoutWidget->setGeometry(QRect(-1, -1, 1201, 311));
-        m_vlayout = new QVBoxLayout(verticalLayoutWidget);
-        m_vlayout->setObjectName(QStringLiteral("m_vlayout"));
-        m_vlayout->setContentsMargins(0, 0, 0, 0);
-        m_hlayout = new QHBoxLayout();
-        m_hlayout->setObjectName(QStringLiteral("m_hlayout"));
-
-        m_vlayout->addLayout(m_hlayout);
-
-        m_pageIndicator = new QLabel(verticalLayoutWidget);
+        Form->resize(1200, 350);
+        Form->setMaximumSize(QSize(1200, 400));
+        m_userList = new QWidget(Form);
+        m_userList->setObjectName(QStringLiteral("m_userList"));
+        m_userList->setGeometry(QRect(150, 25, 901, 251));
+        m_prevLabel = new QLabel(Form);
+        m_prevLabel->setObjectName(QStringLiteral("m_prevLabel"));
+        m_prevLabel->setGeometry(QRect(80, 70, 64, 128));
+        m_nextLabel = new QLabel(Form);
+        m_nextLabel->setObjectName(QStringLiteral("m_nextLabel"));
+        m_nextLabel->setGeometry(QRect(1050, 70, 64, 128));
+        m_pageIndicator = new QLabel(Form);
         m_pageIndicator->setObjectName(QStringLiteral("m_pageIndicator"));
-        m_pageIndicator->setMaximumSize(QSize(1200, 30));
+        m_pageIndicator->setGeometry(QRect(450, 300, 300, 20));
         m_pageIndicator->setAlignment(Qt::AlignCenter);
-
-        m_vlayout->addWidget(m_pageIndicator, 0, Qt::AlignHCenter|Qt::AlignVCenter);
-
 
         retranslateUi(Form);
 
@@ -61,6 +55,8 @@ public:
     void retranslateUi(QWidget *Form)
     {
         Form->setWindowTitle(QApplication::translate("Form", "Form", 0));
+        m_prevLabel->setText(QApplication::translate("Form", "TextLabel", 0));
+        m_nextLabel->setText(QApplication::translate("Form", "TextLabel", 0));
         m_pageIndicator->setText(QApplication::translate("Form", "TextLabel", 0));
     } // retranslateUi
 

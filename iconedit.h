@@ -5,7 +5,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QPixmap>
-#include "tipedit.h"
+
 
 class IconButton : public QPushButton
 {
@@ -18,6 +18,23 @@ public:
 
 private:
     QSize m_size;
+};
+
+class TipEdit : public QLineEdit
+{
+    Q_OBJECT
+    Q_PROPERTY(QString innerTip READ innerTip WRITE setInnerTip)
+public:
+    TipEdit(QWidget *parent=0);
+    void paintEvent(QPaintEvent *);
+
+    void drawTip();
+
+    const QString& innerTip(){ return m_tip; }
+    void setInnerTip(const QString &tip){ m_tip = tip;}
+
+private:
+    QString m_tip;
 };
 
 class IconEdit : public QWidget

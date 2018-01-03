@@ -1,5 +1,4 @@
 #include "loginwindow.h"
-#include "tipedit.h"
 #include <QGridLayout>
 #include <QDebug>
 

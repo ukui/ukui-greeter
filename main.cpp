@@ -9,6 +9,7 @@
 #include <QResource>
 #include "pagelistview.h"
 #include "usersmodel.h"
+#include "userwindow.h"
 
 int main(int argc, char *argv[])
 {
@@ -22,9 +23,7 @@ int main(int argc, char *argv[])
 
 //    GreeterWindow w;
 
-    PageListView *w = new PageListView();
-//    QRect listRect(this->rect().width()/2 - w->width() / 2, this->rect().height()/2 - w->height()/2, w->width(), w->height());
-//    w->setGeometry(listRect);
+/*    PageListView *w = new PageListView();
     UsersModel *model = new UsersModel();
     for(int i = 0; i < 3; i++)
     {
@@ -32,6 +31,8 @@ int main(int argc, char *argv[])
         model->extraRowModel()->appendRow(item);
     }
     w->setModel(model);
+*/
+    GreeterWindow *w = new GreeterWindow();
 
     w->show();
 

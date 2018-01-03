@@ -177,7 +177,7 @@ void PageListView::drawPageLayout()
 {
     if(m_layout == NULL)
     {
-        m_layout = new QHBoxLayout();
+        m_layout = new QHBoxLayout(this);
         m_layout->setSpacing(0);
     }
     m_itemNum = m_model->rowCount() - m_curPage * MAX_NUM_PP > 5 ? 5 : m_model->rowCount() - m_curPage * MAX_NUM_PP;
@@ -221,10 +221,6 @@ void PageListView::destroyPage()
         delete m_itemList[i];
     m_itemList.clear();
 
-    if(/*m_curPage == m_pageNum - 1 && */m_nextLabel != nullptr)
-        delete m_nextLabel;
-    if(/*m_curPage == 0 && */m_preLabel != nullptr)
-        delete m_preLabel;
     if(m_layout)
     {
         delete m_layout;
@@ -241,6 +237,7 @@ void PageListView::pageUp()
         drawPageLayout();
         m_itemList[4]->setFocus();
         m_curItem = 4;
+        emit switchPage(m_curPage);
     }
 }
 
@@ -252,7 +249,7 @@ void PageListView::pageDown()
         ++m_curPage;
         destroyPage();
         drawPageLayout();
-
+        emit switchPage(m_curPage);
     }
 }
 
@@ -265,6 +262,7 @@ void PageListView::goHome()
         m_curPage = 0;
         destroyPage();
         drawPageLayout();
+        emit switchPage(m_curPage);
     }
 }
 
@@ -277,6 +275,7 @@ void PageListView::goEnd()
         m_curPage = m_pageNum - 1;
         destroyPage();
         drawPageLayout();
+        emit switchPage(m_curPage);
     }
 }
 
@@ -311,5 +310,32 @@ void PageListView::onEntryLogin(const QString &name)
 {
     auto iter = std::find_if(m_itemList.begin(), m_itemList.end(), [name](UserEntry *entry){return entry->userName() == name;});
     m_curItem = std::distance(m_itemList.begin(), iter);
-    qDebug() << "login: " << name;
+    emit loggedIn(name);
+//    qDebug() << "login: " << name;
+}
+
+bool PageListView::hasPrev()
+{
+    if(m_curPage > 0)
+        return true;
+    else
+        return false;
+}
+
+bool PageListView::hasNext()
+{
+    if(m_curPage < m_pageNum - 1)
+        return true;
+    else
+        return false;
+}
+
+int PageListView::pageNum()
+{
+    return m_pageNum;
+}
+
+int PageListView::curPage()
+{
+    return m_curPage;
 }

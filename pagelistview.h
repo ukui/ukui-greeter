@@ -12,6 +12,12 @@ class PageListView : public QWidget
 public:
     explicit PageListView(QWidget *parent = 0);
     void setModel(QAbstractItemModel*);
+    void pageUp();      //切换到上一页    留给父窗口通过按钮调用
+    void pageDown();    //切换到下一页
+    bool hasPrev();     //是否有上一页
+    bool hasNext();     //是否有下一页
+    int pageNum();      //页数
+    int curPage();      //当前页 0起
 
 protected:
     void keyReleaseEvent(QKeyEvent *);
@@ -22,8 +28,6 @@ private:
     void drawPage();
     void drawPageLayout();
     void destroyPage();
-    void pageUp();      //切换到上一页
-    void pageDown();    //切换到下一页
     void goHome();      //切换到首页
     void goEnd();       //切换到尾页
     void preItem();     //切换到上一项
@@ -31,6 +35,8 @@ private:
     void switchToUser();    //切换到选中的用户登录界面
 
 signals:
+    void switchPage(int cur_page);  //当翻页的时候发出
+    void loggedIn(const QString &name);    //当选定用户时发出
 
 public slots:
     void onEntryLogin(const QString &name);

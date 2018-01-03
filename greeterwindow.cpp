@@ -22,31 +22,35 @@ GreeterWindow::GreeterWindow(QWidget *parent)
     palette.setBrush(QPalette::Window, QBrush(background));
     this->setPalette(palette);
 
-    PageListView *w = new PageListView(this);
-    QRect listRect(this->rect().width()/2 - w->width() / 2, this->rect().height()/2 - w->height()/2, w->width(), w->height());
-    w->setGeometry(listRect);
-    UsersModel *model = new UsersModel(this);
-    for(int i = 0; i < 3; i++)
-    {
-        QStandardItem *item = new QStandardItem("test" + QString::number(i));
-        model->extraRowModel()->appendRow(item);
-    }
-    w->setModel(model);
+    m_layout = new QStackedLayout(this);
 
-    /*
-    UserWindow *userWindow = new UserWindow(this);
-    QRect userRect(this->rect().width()/2 - 100, this->rect().height()/2 - 125, 200, 250);
-    userWindow->setGeometry(userRect);
-    */
+    m_firstWnd = new QWidget(this);
+    m_firstWnd->setGeometry(screen);
+    m_secondWnd = new QWidget(this);
+    m_secondWnd->setGeometry(screen);
 
-    /*
-    LoginWindow *loginWindow = new LoginWindow(this);
-    QRect loginRect(this->rect().width()/2 - 300, this->rect().height()/2 - 90, 600, 180);
-    loginWindow->setGeometry(loginRect);
-    */
+    m_userWnd = new UserWindow(m_firstWnd);
+    QRect userRect(m_firstWnd->rect().width()/2 - 600, m_firstWnd->rect().height()/2 - 175, 1200, 350);
+    m_userWnd->setGeometry(userRect);
+    connect(m_userWnd, SIGNAL(loggedIn(QString)), this, SLOT(onLoggedIn(QString)));
+
+    m_loginWnd = new LoginWindow(m_secondWnd);
+    QRect loginRect(m_secondWnd->rect().width()/2 - 300, m_secondWnd->rect().height()/2 - 90, 600, 180);
+    m_loginWnd->setGeometry(loginRect);
+
+    m_layout->addWidget(m_firstWnd);
+    m_layout->addWidget(m_secondWnd);
+    m_layout->setCurrentWidget(m_firstWnd);
 }
 
 GreeterWindow::~GreeterWindow()
 {
 
+}
+
+void GreeterWindow::onLoggedIn(const QString &name)
+{
+    delete m_userWnd;
+    m_userWnd = nullptr;
+    m_layout->setCurrentWidget(m_secondWnd);
 }

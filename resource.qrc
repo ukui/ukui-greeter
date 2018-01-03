@@ -5,7 +5,9 @@
         <file>resource/arrow_right.png</file>
         <file>resource/background.png</file>
         <file>resource/default_face.png</file>
-        <file>resource/next_highlight.png</file>
-        <file>resource/previous.png</file>
+        <file>resource/next_hl.png</file>
+        <file>resource/next.png</file>
+        <file>resource/prev_hl.png</file>
+        <file>resource/prev.png</file>
     </qresource>
 </RCC>

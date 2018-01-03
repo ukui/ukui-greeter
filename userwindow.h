@@ -16,14 +16,24 @@ public:
 
     void initUI();
 
+protected:
+    bool eventFilter(QObject *, QEvent *);
+
+private slots:
+    void onSwitchPage(int);
+    void onLoggedIn(const QString &);
+
+signals:
+    void loggedIn(const QString &name);
+
 private:
-    QLightDM::UsersModel *m_model;
-    QVBoxLayout *m_vlayout;
-    QHBoxLayout *m_hlayout;
+//    QLightDM::UsersModel *m_model;
+//    QVBoxLayout *m_vlayout;
+//    QHBoxLayout *m_hlayout;
     QLabel      *m_pageIndicator;
     QLabel      *m_prevLabel;
     QLabel      *m_nextLabel;
-    PageListView *userlist;
+    PageListView *m_userList;
 };
 
 #endif // USERWINDOW_H

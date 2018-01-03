@@ -17,7 +17,6 @@ SOURCES += main.cpp\
     userwindow.cpp \
     loginwindow.cpp \
     iconedit.cpp \
-    tipedit.cpp \
     extrarowproxymodel.cpp \
     usersmodel.cpp \
     userentry.cpp \
@@ -28,7 +27,6 @@ HEADERS  += greeterwindow.h \
     loginwindow.h \
     iconedit.h \
     ui_login.h \
-    tipedit.h \
     extrarowproxymodel.h \
     usersmodel.h \
     userentry.h \
