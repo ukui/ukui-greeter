@@ -8,29 +8,30 @@ QT       += core gui
 
 QT += widgets
 
-TARGET = kylin-greeter
+TARGET = kylin-greeter-qt
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-        greeterwindow.cpp \
-    userwindow.cpp \
-    loginwindow.cpp \
-    iconedit.cpp \
-    extrarowproxymodel.cpp \
-    usersmodel.cpp \
-    userentry.cpp \
-    pagelistview.cpp
+SOURCES += \
+    src/extrarowproxymodel.cpp \
+    src/greeterwindow.cpp \
+    src/iconedit.cpp \
+    src/loginwindow.cpp \
+    src/main.cpp \
+    src/pagelistview.cpp \
+    src/userentry.cpp \
+    src/usersmodel.cpp \
+    src/userwindow.cpp
 
-HEADERS  += greeterwindow.h \
-    userwindow.h \
-    loginwindow.h \
-    iconedit.h \
-    ui_login.h \
-    extrarowproxymodel.h \
-    usersmodel.h \
-    userentry.h \
-    pagelistview.h \
+HEADERS  += \
+    src/extrarowproxymodel.h \
+    src/greeterwindow.h \
+    src/iconedit.h \
+    src/loginwindow.h \
+    src/pagelistview.h \
+    src/userentry.h \
+    src/usersmodel.h \
+    src/userwindow.h
 
 CONFIG += c++11
 QMAKE_CXXFLAGS = -g
@@ -39,15 +40,9 @@ INCLUDEPATH += /usr/include/lightdm-qt5-3
 
 LIBS += /usr/lib/x86_64-linux-gnu/liblightdm-qt5-3.so
 
-RESOURCES += \
-    resource.qrc
-
-FORMS += \
-    login.ui \
-    entry.ui \
-    userwindow.ui
+RESOURCES += src/resource.qrc
 
 INSTALLS += target
-target.path += /usr/sbin
+target.path += /usr/bin
 
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0

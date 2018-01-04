@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QAbstractItemModel>
+#include <QWeakPointer>
 #include "userentry.h"
 
 class PageListView : public QWidget
@@ -24,7 +25,6 @@ protected:
     bool eventFilter(QObject *, QEvent *);
 
 private:
-    void drawPageIndicator();
     void drawPage();
     void drawPageLayout();
     void destroyPage();
@@ -44,12 +44,8 @@ public slots:
 public:
     const int MAX_NUM_PP = 5;   //每页最大的数量
 private:
-    QAbstractItemModel *m_model;
+    QWeakPointer<QAbstractItemModel> m_model;
     QList<UserEntry*>  m_itemList;
-    QLabel  *m_preLabel;
-    QLabel  *m_nextLabel;
-    QLabel  *m_pageIdcLabel;
-
     QHBoxLayout *m_layout;
 
     int m_itemNum;      //每页的项数量

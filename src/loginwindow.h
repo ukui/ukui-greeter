@@ -5,11 +5,11 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
+#include <QAbstractItemModel>
+#include <QWeakPointer>
 #include <QLightDM/Greeter>
 #include <QLightDM/UsersModel>
 #include "iconedit.h"
-#include "ui_login.h"
-
 
 class LoginWindow : public QWidget
 {
@@ -18,12 +18,18 @@ public:
     explicit LoginWindow(QWidget *parent = 0);
     ~LoginWindow(){}
 
+    void addMessage(const QString &);
+//    void setEntry(const QString& name, const QString& facePath, bool islogin);
+    void setModel(QAbstractItemModel *model);
+    bool setIndex(int index);
 private:
     void initUI();
-public:
-    void addMessage(const QString &);
+
+protected:
+    bool eventFilter(QObject *, QEvent *);
 
 signals:
+    void back();
 
 public slots:
 
@@ -35,18 +41,14 @@ public slots:
     void login_cb(const QString &str);
 
 private:
-    Ui::Form *ui;
-
     QLightDM::Greeter *m_greeter;
-    QLightDM::UsersModel *m_usersModel;
+    QWeakPointer<QAbstractItemModel> m_model;
 
-    IconButton *iconButton;
-/*
+    QLabel  *m_backLabel;         //返回用户列表
     QLabel  *m_faceLabel;         //头像
-    QLabel  *m_userLabel;         //用户名
+    QLabel  *m_nameLabel;         //用户名
     QLabel  *m_isLoginLabel;      //提示是否已登录
     QLabel  *m_messageLabel;      //提示信息
-*/
     IconEdit *m_passwordEdit;     //密码
 
 };

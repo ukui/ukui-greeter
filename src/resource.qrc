@@ -9,5 +9,6 @@
         <file>resource/next.png</file>
         <file>resource/prev_hl.png</file>
         <file>resource/prev.png</file>
+        <file>resource/arrow_left_active.png</file>
     </qresource>
 </RCC>

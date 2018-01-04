@@ -1,0 +1,15 @@
+Source: kylin-greeter
+Section: utils 
+Priority: optional
+Maintainer: yanghao <yanghao@kylinos.cn>
+Build-Depends: debhelper (>=9),
+			   qt5-default,
+			   liblightdm-qt5-3-0
+Standards-Version: 3.9.6
+Homepage: http://www.ubuntukylin.com 
+
+Package: kylin-greeter
+Architecture: any
+Depends: qt5-default, 
+		${shlibs:Depends}, ${misc:Depends}
+Description: The greeter for the Kylin desktop rewritten using qt 

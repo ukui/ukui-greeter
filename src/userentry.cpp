@@ -29,23 +29,18 @@ void UserEntry::setupUi()
     m_faceLabel->setAlignment(Qt::AlignCenter);
     m_nameLabel = new QLabel(this);
     m_nameLabel->setObjectName(QString::fromUtf8("m_nameLabel"));
-    m_nameLabel->setGeometry(QRect(30, 185, 130, 20));
+    m_nameLabel->setGeometry(QRect(30, 175, 130, 20));
     m_nameLabel->setAlignment(Qt::AlignCenter);
     m_loginLabel = new QLabel(this);
     m_loginLabel->setObjectName(QString::fromUtf8("m_loginLabel"));
-    m_loginLabel->setGeometry(QRect(30, 210, 130, 20));
+    m_loginLabel->setGeometry(QRect(30, 200, 130, 20));
     m_loginLabel->setAlignment(Qt::AlignCenter);
 
-    retranslateUi();
-}
-
-void UserEntry::retranslateUi()
-{
     m_faceLabel->setPixmap(QPixmap("/usr/share/kylin-greeter/default_face.png"));
     m_faceLabel->setStyleSheet("QLabel{border:2px solid white}");
 
     QPalette plt;
-    plt.setColor(QPalette::WindowText, Qt::black);
+    plt.setColor(QPalette::WindowText, Qt::white);
 
     m_nameLabel->setPalette(plt);
     m_loginLabel->setPalette(plt);
@@ -79,6 +74,12 @@ bool UserEntry::eventFilter(QObject *obj, QEvent *event)
             QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
             if(mouseEvent->button() == Qt::LeftButton){
                 this->setFocus();
+                return true;
+            }
+        }
+        if(event->type() == QEvent::MouseButtonRelease){
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+            if(mouseEvent->button() == Qt::LeftButton){
                 emit clicked(m_name);
                 return true;
             }

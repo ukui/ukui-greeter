@@ -11,7 +11,7 @@
 #include "userentry.h"
 #include <QLightDM/UsersModel>
 
-PageListView::PageListView(QWidget *parent) : QWidget(parent)
+PageListView::PageListView(QWidget *parent) : QWidget(parent), m_layout(NULL)
 {
     resize(900, 250);
 }
@@ -66,12 +66,12 @@ void PageListView::setModel(QAbstractItemModel* model)
 {
     if(!model)
         return;
-    if(!m_model)
+    if(!m_model.isNull())
     {
 
     }
-    m_model = model;
-    m_pageNum = qCeil(m_model->rowCount() * 1.0 / MAX_NUM_PP);
+    m_model = QWeakPointer<QAbstractItemModel>(model);
+    m_pageNum = qCeil(m_model.data()->rowCount() * 1.0 / MAX_NUM_PP);
     m_curPage = 0;
 
 //    drawPage();
@@ -85,92 +85,7 @@ void PageListView::drawPageIndicator()
 
 void PageListView::drawPage()
 {
-    QPoint midPoint(rect().width()/2, rect().height()/2);
 
-    int w = UserEntry::X();
-    int h = UserEntry::Y();
-    m_itemNum = m_model->rowCount() - m_curPage * MAX_NUM_PP > 5 ? 5 : m_model->rowCount() - m_curPage * MAX_NUM_PP;
-
-    //* 创建entry */
-    if(m_itemNum % 2 == 0)
-    {
-        for(int i = 0; i < m_itemNum / 2; i++)
-        {
-            QRect rectL(midPoint.x() - (i + 1) * w, midPoint.y() - h / 2, w, h);
-            UserEntry *entryL = new UserEntry(this);
-            m_itemList.push_front(entryL);
-            entryL->setGeometry(rectL);
-
-            QRect rectR(midPoint.x() + i * w, midPoint.y() - h / 2, w, h);
-            UserEntry *entryR = new UserEntry(this);
-            m_itemList.append(entryR);
-            entryR->setGeometry(rectR);
-        }
-    }
-    else
-    {
-        QRect rectM(midPoint.x() - w / 2, midPoint.y() - h / 2, w, h);
-        UserEntry *entryM = new UserEntry(this);
-        m_itemList.append(entryM);
-        entryM->setGeometry(rectM);
-
-        for(int i = 0; i < m_itemNum / 2; i++)
-        {
-            QRect rectL(midPoint.x() - (i+1+0.5) * w, midPoint.y() - h / 2, w, h);
-            UserEntry *entryL = new UserEntry(this);
-            m_itemList.push_front(entryL);
-            entryL->setGeometry(rectL);
-
-            QRect rectR(midPoint.x() + (i+0.5) * w, midPoint.y() - h / 2, w, h);
-            UserEntry *entryR = new UserEntry(this);
-            m_itemList.append(entryR);
-            entryR->setGeometry(rectR);
-        }
-    }
-    /* 设置entry的属性，并将entry添加到list中，监听click信号 */
-    for(int i = 0; i < m_itemList.length(); i++)
-    {
-        UserEntry *entry = m_itemList[i];
-        entry->setObjectName("Entry"+QString::number(i));
-        connect(entry, SIGNAL(clicked(QString)), this, SLOT(onEntryLogin(QString)));
-
-        QModelIndex index = m_model->index(m_curPage * MAX_NUM_PP + i, 0);
-        QString face = index.data(QLightDM::UsersModel::ImagePathRole).toString();
-        QString name = index.data(Qt::DisplayRole).toString();
-        bool islogin = index.data(QLightDM::UsersModel::LoggedInRole).toBool();
-        entry->setFace(face);
-        entry->setUserName(name);
-        entry->setLogin(islogin);
-        qDebug() << face << " "<< name << " " << islogin;
-    }
-
-    m_itemList[0]->setFocus();
-    m_curItem = 0;
-
-    /* 绘制左翻页键 */
-    if(m_curPage > 0)
-    {
-        m_preLabel = new QLabel(this);
-//        connect(m_preLabel, SIGNAL(clicked()), this, SLOT(pageUp()));
-        int x = 64; //label的宽度
-        double num = MAX_NUM_PP * 1.0 / 2;
-        QRect rect(midPoint.x() - (w * num + x), m_itemList[0]->rect().top() + 100, x, x);
-        m_preLabel->setGeometry(rect);
-        QPixmap pixmap(":/resource/previous.png");
-        m_preLabel->setPixmap(pixmap);
-    }
-    /* 绘制右翻页键 */
-    if(m_curPage < m_pageNum - 1)
-    {
-        m_nextLabel = new QLabel(this);
-//        connect(m_nextLabel, SIGNAL(clicked()), this, SLOT(pageDown()));
-        int x = 64;
-        double num = MAX_NUM_PP * 1.0 / 2;
-        QRect rect(midPoint.x() + (w * num), m_itemList[0]->rect().top() + 100, x, x);
-        m_nextLabel->setGeometry(rect);
-        QPixmap pixmap(":/resource/next.png");
-        m_nextLabel->setPixmap(pixmap);
-    }
 }
 
 void PageListView::drawPageLayout()
@@ -180,7 +95,7 @@ void PageListView::drawPageLayout()
         m_layout = new QHBoxLayout(this);
         m_layout->setSpacing(0);
     }
-    m_itemNum = m_model->rowCount() - m_curPage * MAX_NUM_PP > 5 ? 5 : m_model->rowCount() - m_curPage * MAX_NUM_PP;
+    m_itemNum = m_model.data()->rowCount() - m_curPage * MAX_NUM_PP > 5 ? 5 : m_model.data()->rowCount() - m_curPage * MAX_NUM_PP;
     qDebug()<< "第" << m_curPage<<  "页， 共" <<  m_itemNum << "项";
 
 
@@ -192,7 +107,7 @@ void PageListView::drawPageLayout()
         entry->setObjectName("Entry"+QString::number(i));
         connect(entry, SIGNAL(clicked(QString)), this, SLOT(onEntryLogin(QString)));
 
-        QModelIndex index = m_model->index(m_curPage * MAX_NUM_PP + i, 0);
+        QModelIndex index = m_model.data()->index(m_curPage * MAX_NUM_PP + i, 0);
         QString face = index.data(QLightDM::UsersModel::ImagePathRole).toString();
         QString name = index.data(Qt::DisplayRole).toString();
         bool islogin = index.data(QLightDM::UsersModel::LoggedInRole).toBool();

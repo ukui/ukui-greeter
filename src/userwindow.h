@@ -15,6 +15,7 @@ public:
     explicit UserWindow(QWidget *parent = 0);
 
     void initUI();
+    void setModel(QAbstractItemModel *model);
 
 protected:
     bool eventFilter(QObject *, QEvent *);

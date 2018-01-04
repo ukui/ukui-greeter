@@ -3,18 +3,9 @@
 #include <QMouseEvent>
 #include <QDebug>
 UserWindow::UserWindow(QWidget *parent)
-    : QWidget(parent)
+    : QWidget(parent), m_userList(nullptr)
 {
     initUI();
-
-    UsersModel *model = new UsersModel(this);
-    for(int i = 0; i < 3; i++)
-    {
-        QStandardItem *item = new QStandardItem("test" + QString::number(i));
-        model->extraRowModel()->appendRow(item);
-    }
-    m_userList->setModel(model);
-
 }
 
 void UserWindow::initUI()
@@ -102,6 +93,12 @@ bool UserWindow::eventFilter(QObject *obj, QEvent *event)
         }
     }
     return QWidget::eventFilter(obj, event);
+}
+
+void UserWindow::setModel(QAbstractItemModel *model)
+{
+    if(m_userList)
+        m_userList->setModel(model);
 }
 
 void UserWindow::onSwitchPage(int)

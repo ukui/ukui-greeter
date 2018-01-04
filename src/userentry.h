@@ -26,7 +26,6 @@ protected:
 
 private:
     void setupUi();
-    void retranslateUi();
     void onClicked();
 
 signals:

@@ -1,0 +1,62 @@
+#ifndef PAGELISTVIEW_H
+#define PAGELISTVIEW_H
+
+#include <QWidget>
+#include <QHBoxLayout>
+#include <QAbstractItemModel>
+#include <QWeakPointer>
+#include "userentry.h"
+
+class PageListView : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit PageListView(QWidget *parent = 0);
+    void setModel(QAbstractItemModel*);
+    void pageUp();      //切换到上一页    留给父窗口通过按钮调用
+    void pageDown();    //切换到下一页
+    bool hasPrev();     //是否有上一页
+    bool hasNext();     //是否有下一页
+    int pageNum();      //页数
+    int curPage();      //当前页 0起
+
+protected:
+    void keyReleaseEvent(QKeyEvent *);
+    bool eventFilter(QObject *, QEvent *);
+
+private:
+    void drawPageIndicator();
+    void drawPage();
+    void drawPageLayout();
+    void destroyPage();
+    void goHome();      //切换到首页
+    void goEnd();       //切换到尾页
+    void preItem();     //切换到上一项
+    void nextItem();    //切换到下一项
+    void switchToUser();    //切换到选中的用户登录界面
+
+signals:
+    void switchPage(int cur_page);  //当翻页的时候发出
+    void loggedIn(const QString &name);    //当选定用户时发出
+
+public slots:
+    void onEntryLogin(const QString &name);
+
+public:
+    const int MAX_NUM_PP = 5;   //每页最大的数量
+private:
+    QWeakPointer<QAbstractItemModel> m_model;
+    QList<UserEntry*>  m_itemList;
+    QLabel  *m_preLabel;
+    QLabel  *m_nextLabel;
+    QLabel  *m_pageIdcLabel;
+
+    QHBoxLayout *m_layout;
+
+    int m_itemNum;      //每页的项数量
+    int m_pageNum;      //总页数
+    int m_curPage;      //当前页数
+    int m_curItem;      //当前焦点所在项
+};
+
+#endif // PAGELISTVIEW_H
