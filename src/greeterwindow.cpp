@@ -27,6 +27,7 @@ GreeterWindow::~GreeterWindow()
 void GreeterWindow::initUI()
 {
     QRect screen = QApplication::desktop()->rect();
+    qDebug() <<"screen:" << screen.width() << " "<< screen.height();
     setGeometry(screen);
     this->setAutoFillBackground(true);
     QPalette palette;
