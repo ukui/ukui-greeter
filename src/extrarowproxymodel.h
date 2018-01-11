@@ -13,7 +13,7 @@ class ExtraRowProxyModel : public QAbstractListModel
 public:
     ExtraRowProxyModel(QObject *parent = 0);
     QVariant data(const QModelIndex &index, int role) const;
-    int rowCount(const QModelIndex &parent) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
     void setSourceModel(QAbstractListModel *sourceModel);
     QStandardItemModel* extraRowModel();

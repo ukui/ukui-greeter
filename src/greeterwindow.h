@@ -4,9 +4,11 @@
 #include <QWidget>
 #include <QStackedLayout>
 #include <QStackedWidget>
+#include <QSharedPointer>
 #include "userwindow.h"
 #include "loginwindow.h"
 #include "usersmodel.h"
+#include "greeterwrapper.h"
 
 class GreeterWindow : public QWidget
 {
@@ -20,17 +22,17 @@ private:
     void initUI();
 
 private slots:
-    void onLoggedIn(const QString &);
+    void onLoggedIn(const QModelIndex &);
     void onBack();
 private:
     UserWindow      *m_userWnd;
     LoginWindow     *m_loginWnd;
     QStackedLayout  *m_layout;
-//    QStackedWidget  *m_stackedWnd;
     QWidget         *m_firstWnd;
     QWidget         *m_secondWnd;
 
-    UsersModel *m_model;
+    QSharedPointer<UsersModel> m_model;
+    QSharedPointer<GreeterWrapper> m_greeter;
 };
 
 #endif // GREETERWINDOW_H

@@ -63,7 +63,7 @@ void TipEdit::drawTip()
 {
 
     QRect csRect = cursorRect();
-    QRect tipRect(csRect.right(), rect().top(), rect().right(), rect().bottom());
+    QRect tipRect(csRect.right()-3, rect().top(), rect().right(), rect().bottom());
 
     QPainter painter(this);
     painter.setPen(QColor("#888"));
@@ -91,6 +91,18 @@ IconEdit::IconEdit(const QIcon& icon, QWidget *parent)
     m_iconButton->setIcon(icon);
     m_edit->setEchoMode(QLineEdit::Password);
 }
+void IconEdit::setType(QLineEdit::EchoMode type)
+{
+    m_edit->setEchoMode(type);
+}
+
+void IconEdit::setText(const QString &text)
+{
+    if(m_edit->echoMode() == QLineEdit::Normal){
+        m_edit->setText(text);
+    }
+}
+
 void IconEdit::keyReleaseEvent ( QKeyEvent * event )
 {
     if(event->key() == Qt::Key_Return)

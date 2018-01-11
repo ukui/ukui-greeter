@@ -52,6 +52,8 @@ public:
     void clear();
     void setPrompt(const QString &);
     const QString& text();
+    void setType(QLineEdit::EchoMode type = QLineEdit::Password);
+    void setText(const QString& text);
 
 signals:
     void clicked(const QString &);

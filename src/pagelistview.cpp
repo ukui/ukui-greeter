@@ -11,7 +11,7 @@
 #include "userentry.h"
 #include <QLightDM/UsersModel>
 
-PageListView::PageListView(QWidget *parent) : QWidget(parent), m_layout(NULL)
+PageListView::PageListView(QWidget *parent) : QWidget(parent), m_layout(new QHBoxLayout(this))
 {
     resize(900, 250);
 }
@@ -29,7 +29,6 @@ void PageListView::keyReleaseEvent(QKeyEvent *event)
         {
             qDebug() << "login";
             UserEntry *entry = qobject_cast<UserEntry*>(focusWidget());
-            qDebug() << entry->objectName();
             onEntryLogin(entry->userName());
             break;
         }
@@ -62,30 +61,63 @@ void PageListView::keyReleaseEvent(QKeyEvent *event)
     }
 }
 
-void PageListView::setModel(QAbstractItemModel* model)
+void PageListView::setModel(QSharedPointer<UsersModel> model)
 {
-    if(!model)
+    if(model.isNull())
         return;
     if(!m_model.isNull())
     {
 
     }
-    m_model = QWeakPointer<QAbstractItemModel>(model);
+    m_model = QSharedPointer<UsersModel>(model);
+    m_itemList = QVector<UserEntry*>(m_model.data()->rowCount(), NULL);
+
     m_pageNum = qCeil(m_model.data()->rowCount() * 1.0 / MAX_NUM_PP);
     m_curPage = 0;
 
-//    drawPage();
-    drawPageLayout();
-}
+    m_lastend = -1;
+    m_itemCount = m_model.data()->rowCount();
+    m_end = m_itemCount >= 5 ? 4 : m_itemCount - 1; //每页最多显示5个
+    m_curItem = 0;
+    drawPage();
 
-void PageListView::drawPageIndicator()
-{
-
+//    drawPageLayout();
 }
 
 void PageListView::drawPage()
 {
+    int begin = m_end - (m_itemCount > 5 ? 4 : m_itemCount - 1);
 
+    //从layout中移除之前的entry
+    if(m_lastend > 0)
+    {
+        int lastbegin = m_lastend - (m_itemCount > 5 ? 4 : m_itemCount - 1);
+        for(int i = lastbegin; i <= m_lastend; i++)
+        {
+            m_layout->removeWidget(m_itemList[i]);
+            m_itemList[i]->hide();
+        }
+    }
+//    if(m_itemCount < 5)
+        m_layout->addStretch(5);
+    //如果entry不存在则创建，添加到layout中
+    for(int i = begin; i <= m_end; i++)
+    {
+        if(m_itemList[i] == NULL)
+        {
+            QModelIndex index = m_model.data()->index(i, 0);
+            UserEntry *entry = new UserEntry(index.data(Qt::DisplayRole).toString(),
+                                             index.data(QLightDM::UsersModel::ImagePathRole).toString(),
+                                             index.data(QLightDM::UsersModel::LoggedInRole).toBool(), this);
+            connect(entry, SIGNAL(clicked(QString)), this, SLOT(onEntryLogin(QString)));
+            m_itemList[i] = entry;
+        }
+        m_itemList[i]->show();
+        m_layout->addWidget(m_itemList[i]);
+    }
+//    if(m_itemCount < 5)
+        m_layout->addStretch(5);
+    m_itemList[m_curItem]->setFocus();
 }
 
 void PageListView::drawPageLayout()
@@ -116,7 +148,7 @@ void PageListView::drawPageLayout()
         entry->setUserName(name);
         entry->setLogin(islogin);
 
-        m_itemList.append(entry);
+        m_itemList[i] = entry;
         m_layout->addWidget(entry);
 
     }
@@ -145,88 +177,103 @@ void PageListView::destroyPage()
 
 void PageListView::pageUp()
 {
-    if(m_curPage > 0)
+    if(m_itemCount <= 5 || m_end == 4)  //位于首页
     {
-        --m_curPage;
-        destroyPage();
-        drawPageLayout();
-        m_itemList[4]->setFocus();
-        m_curItem = 4;
-        emit switchPage(m_curPage);
+        m_curItem = 0;
+        m_itemList[m_curItem]->setFocus();
+        return;
     }
+    m_lastend = m_end;
+    m_end -= (m_end-5 >= 4 ? 5 : (m_end-4));
+    m_curItem = m_end - 4;
+    drawPage();
 }
 
 void PageListView::pageDown()
 {
-    qDebug() << "next page";
-    if(m_curPage < m_pageNum - 1)
+    if(m_itemCount <= 5 || m_end == m_itemCount - 1)    //位于尾页
     {
-        ++m_curPage;
-        destroyPage();
-        drawPageLayout();
-        emit switchPage(m_curPage);
+        m_curItem = m_end;
+        m_itemList[m_curItem]->setFocus();
+        return;
     }
+    m_lastend = m_end;
+    m_end += (m_itemCount-1-m_end >= 5 ? 5 : (m_itemCount-1-m_end));
+    m_curItem = m_end;
+    drawPage();
 }
 
 void PageListView::goHome()
 {
-    if(m_curPage == 0)
-        return;
-    else
+    if(m_itemCount <= 5 || m_end == 4)
     {
-        m_curPage = 0;
-        destroyPage();
-        drawPageLayout();
-        emit switchPage(m_curPage);
+        m_curItem = 0;
+        m_itemList[m_curItem]->setFocus();
+        return;
     }
+    m_lastend = m_end;
+    m_end = 4;
+    m_curItem = 0;
+    drawPage();
 }
 
 void PageListView::goEnd()
 {
-    if(m_curPage == m_pageNum - 1)
-        return;
-    else
+    if(m_itemCount <= 5 || m_end == m_itemCount - 1)    //位于尾页
     {
-        m_curPage = m_pageNum - 1;
-        destroyPage();
-        drawPageLayout();
-        emit switchPage(m_curPage);
+        m_curItem = m_end;
+        m_itemList[m_curItem]->setFocus();
+        return;
     }
+    m_lastend = m_end;
+    m_end = m_itemCount - 1;
+    m_curItem = m_end;
+    drawPage();
 }
 
 void PageListView::preItem()
 {
-    if(m_curItem > 0)
+    int begin = m_itemCount > 5 ? m_end - 4 : 0;
+    if(m_curItem - begin > 0)
     {
         --m_curItem;
         m_itemList[m_curItem]->setFocus();
     }
-    else if(m_curItem == 0)
+    else if(m_curItem > 0)
     {
-        pageUp();
-
+        --m_curItem;
+        m_lastend = m_end;
+        --m_end;
+        drawPage();
     }
 }
 
 void PageListView::nextItem()
 {
-    if(m_curItem < m_itemNum - 1)
+    if(m_curItem < m_end)
     {
         ++m_curItem;
         m_itemList[m_curItem]->setFocus();
     }
-    else if(m_curItem == MAX_NUM_PP - 1)
+    else if(m_curItem < m_itemCount - 1)
     {
-        pageDown();
+        ++m_curItem;
+        m_lastend = m_end;
+        ++m_end;
+        drawPage();
     }
 }
 
 void PageListView::onEntryLogin(const QString &name)
 {
-    auto iter = std::find_if(m_itemList.begin(), m_itemList.end(), [name](UserEntry *entry){return entry->userName() == name;});
-    m_curItem = std::distance(m_itemList.begin(), iter);
-    emit loggedIn(name);
-//    qDebug() << "login: " << name;
+    for(int i = 0; i < m_itemList.size(); i++){
+        if(m_itemList[i]!=NULL && m_itemList[i]->userName() == name){
+            m_curItem = i;
+        }
+    }
+//    auto iter = std::find_if(m_itemList.begin(), m_itemList.end(), [name](UserEntry *entry){return entry->userName() == name;});
+//    m_curItem = std::distance(m_itemList.begin(), iter);
+    emit loggedIn(m_model.data()->index(m_curItem, 0));
 }
 
 bool PageListView::hasPrev()

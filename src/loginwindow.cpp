@@ -1,32 +1,21 @@
 #include "loginwindow.h"
 #include <QMouseEvent>
 #include <QDebug>
+#include <QApplication>
 
-LoginWindow::LoginWindow(QWidget *parent)
-    : QWidget(parent), m_greeter(new QLightDM::Greeter(this))
+LoginWindow::LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent)
+    : QWidget(parent), m_greeter(greeter)
 {    
     initUI();
-
-    connect(m_greeter, SIGNAL(showMessage(QString,QLightDM::Greeter::MessageType)),
+    connect(m_greeter.data(), SIGNAL(showMessage(QString,QLightDM::Greeter::MessageType)),
             this, SLOT(showMessage_cb(QString,QLightDM::Greeter::MessageType)));
-    connect(m_greeter, SIGNAL(showPrompt(QString,QLightDM::Greeter::PromptType)),
+    connect(m_greeter.data(), SIGNAL(showPrompt(QString,QLightDM::Greeter::PromptType)),
             this, SLOT(showPrompt_cb(QString,QLightDM::Greeter::PromptType)));
-    connect(m_greeter, SIGNAL(authenticationComplete()),
+    connect(m_greeter.data(), SIGNAL(authenticationComplete()),
             this, SLOT(authenticationComplete_cb()));
-    connect(m_greeter, SIGNAL(autologinTimerExpired()),
+    connect(m_greeter.data(), SIGNAL(autologinTimerExpired()),
             this, SLOT(autologinTimerExpired_cb()));
-    connect(m_greeter, SIGNAL(reset()), this, SLOT(reset_cb()));
-/*
-    if(m_greeter->connectSync())
-        qDebug()<< "connect to daemon";
-    else
-    {
-        qDebug()<< "connect to daemon failed!";
-        exit(1);
-    }
-*/
-    //m_greeter->authenticate(m_nameLabel->text());
-
+    connect(m_greeter.data(), SIGNAL(reset()), this, SLOT(reset_cb()));
 }
 
 void LoginWindow::initUI()
@@ -63,14 +52,14 @@ void LoginWindow::initUI()
     m_messageLabel = new QLabel(this);
     m_messageLabel->setObjectName(QStringLiteral("m_messageLabel"));
     m_messageLabel->setGeometry(QRect(220, 60, 300, 20));
-    m_isLoginLabel->setPalette(plt);
+    plt.setColor(QPalette::WindowText, Qt::red);
+    m_messageLabel->setPalette(plt);
 
     m_passwordEdit = new IconEdit(QIcon(":/resource/arrow_right.png"), this);
     QRect pwdRect(220, 90, 300, 40);
     m_passwordEdit->setGeometry(pwdRect);
     m_passwordEdit->resize(QSize(300, 40));
     connect(m_passwordEdit, SIGNAL(clicked(const QString&)), this, SLOT(login_cb(const QString&)));
-
 }
 
 bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
@@ -85,6 +74,11 @@ bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
         if(event->type() == QEvent::MouseButtonRelease)
         {
             m_backLabel->setPixmap(QPixmap(":/resource/arrow_left.png"));
+            //清空当前连接
+            m_nameLabel->setText("");
+            m_isLoginLabel->setText("");
+            m_messageLabel->setText("");
+            m_passwordEdit->setType(QLineEdit::Password);
             emit back();
             return true;
         }
@@ -92,20 +86,18 @@ bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
     return QWidget::eventFilter(obj, event);
 }
 
-void LoginWindow::setModel(QAbstractItemModel *model)
+void LoginWindow::setModel(QSharedPointer<QAbstractItemModel> model)
 {
-    if(!model)
+    if(model.isNull())
         return;
-    m_model = QWeakPointer<QAbstractItemModel>(model);
-    //#TODO: 连接lightdm
+    m_model = model;
 }
 
-bool LoginWindow::setIndex(int row)
+bool LoginWindow::setIndex(const QModelIndex& index)
 {
-    if(row >= m_model.data()->rowCount())
+    if(!index.isValid()){
         return false;
-
-    QModelIndex index = m_model.data()->index(row, 0);
+    }
     QString name = index.data(Qt::DisplayRole).toString();
     m_nameLabel->setText(name);
 
@@ -121,19 +113,43 @@ bool LoginWindow::setIndex(int row)
 
     bool islogin = index.data(QLightDM::UsersModel::LoggedInRole).toBool();
     m_isLoginLabel->setText(islogin ? tr("logged in") : "");
+
+    //用户认证
+    if(name == tr("Guest")) {                       //游客登录
+        m_greeter->authenticateAsGuest();
+    }
+    else if(name == tr("Login")) {                  //手动输入用户名
+        m_passwordEdit->setPrompt(tr("Username"));
+        m_passwordEdit->setType(QLineEdit::Normal);
+    }
+    else {
+        m_greeter->authenticate(name);
+    }
+
     return true;
 }
 
 void LoginWindow::login_cb(const QString &str)
 {
-    qDebug() << "login: " << str;
-    m_greeter->respond(str);
+    qDebug()<< "login: " << str;
+    QString name = m_nameLabel->text();
+    if(name == tr("Login")) {
+        m_nameLabel->setText(str);
+        m_passwordEdit->setText("");
+        m_passwordEdit->setType(QLineEdit::Password);
+        m_greeter->authenticate(str);
+    }
+    else {
+        m_greeter.data()->respond(str);
+    }
+    m_passwordEdit->setText("");
 }
 
 void LoginWindow::showPrompt_cb(QString text, QLightDM::Greeter::PromptType type)
 {
     qDebug()<< "prompt: "<< text;
     m_passwordEdit->setPrompt(text);
+    update();   //不更新的话，第一次不会显示prompt
 }
 
 void LoginWindow::showMessage_cb(QString text, QLightDM::Greeter::MessageType type)
@@ -145,15 +161,15 @@ void LoginWindow::showMessage_cb(QString text, QLightDM::Greeter::MessageType ty
 void LoginWindow::authenticationComplete_cb()
 {
     qDebug() << "authentication complete";
-    if(m_greeter->isAuthenticated())
+    if(m_greeter.data()->isAuthenticated())
     {
         qDebug()<< "authentication success";
-        m_greeter->startSessionSync("ubuntu");
+        m_greeter.data()->startSessionSync("ubuntu");
         exit(0);
     }
     else
     {
-        m_greeter->authenticate(m_nameLabel->text());
+        m_greeter.data()->authenticate(m_nameLabel->text());
         addMessage("password error, please input again");
         m_passwordEdit->clear();
     }

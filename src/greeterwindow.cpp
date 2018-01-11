@@ -8,9 +8,13 @@
 #include <QDebug>
 
 GreeterWindow::GreeterWindow(QWidget *parent)
-    : QWidget(parent)
+    : QWidget(parent), m_model(new UsersModel(this)),
+      m_greeter(new GreeterWrapper(this))
 {
-    //#TODO: 连接到Lightdm，获取hint
+    if(m_greeter.data()->hasGuestAccountHint())    //允许游客登录
+        m_model.data()->setShowGuest(true);
+    if(m_greeter.data()->showManualLoginHint())    //允许手动输入用户名
+        m_model.data()->setShowManualLogin(true);
 
     initUI();
 }
@@ -38,20 +42,19 @@ void GreeterWindow::initUI()
     m_secondWnd = new QWidget(this);
     m_secondWnd->setGeometry(screen);
 
-    m_model = new UsersModel(this);
     for(int i = 0; i < 3; i++)
     {
         QStandardItem *item = new QStandardItem("test" + QString::number(i));
-        m_model->extraRowModel()->appendRow(item);
+        m_model.data()->extraRowModel()->appendRow(item);
     }
 
     m_userWnd = new UserWindow(m_firstWnd);
     m_userWnd->setModel(m_model);
     QRect userRect(m_firstWnd->rect().width()/2 - 600, m_firstWnd->rect().height()/2 - 175, 1200, 350);
     m_userWnd->setGeometry(userRect);
-    connect(m_userWnd, SIGNAL(loggedIn(QString)), this, SLOT(onLoggedIn(QString)));
+    connect(m_userWnd, SIGNAL(loggedIn(QModelIndex)), this, SLOT(onLoggedIn(QModelIndex)));
 
-    m_loginWnd = new LoginWindow(m_secondWnd);
+    m_loginWnd = new LoginWindow(m_greeter, m_secondWnd);
     m_loginWnd->setModel(m_model);
     QRect loginRect(m_secondWnd->rect().width()/2 - 300, m_secondWnd->rect().height()/2 - 90, 600, 180);
     m_loginWnd->setGeometry(loginRect);
@@ -62,19 +65,14 @@ void GreeterWindow::initUI()
     m_layout->setCurrentWidget(m_firstWnd);
 }
 
-void GreeterWindow::onLoggedIn(const QString &name)
+void GreeterWindow::onLoggedIn(const QModelIndex &index)
 {
-    int row = -1;
-    for(int i = 0; i < m_model->rowCount(QModelIndex()); i++)
-    {
-        QString iName = m_model->index(i, 0).data(Qt::DisplayRole).toString();
-        if(iName == name)
-        {
-            row = i;
-            break;
-        }
+
+    QString name = index.data().toString();
+    if(name == tr("Guest")){
+        //直接登录
     }
-    m_loginWnd->setIndex(row);
+    m_loginWnd->setIndex(index);
     m_layout->setCurrentWidget(m_secondWnd);
 }
 

@@ -18,7 +18,7 @@ void UserWindow::initUI()
     m_userList->setObjectName(QStringLiteral("m_userList"));
     m_userList->setGeometry(QRect(150, 25, 901, 251));
     connect(m_userList, SIGNAL(switchPage(int)), this, SLOT(onSwitchPage(int)));
-    connect(m_userList, SIGNAL(loggedIn(QString)), this, SLOT(onLoggedIn(QString)));
+    connect(m_userList, SIGNAL(loggedIn(QModelIndex)), this, SLOT(onLoggedIn(QModelIndex)));
 
     m_prevLabel = new QLabel(this);
     m_prevLabel->setObjectName(QStringLiteral("m_prevLabel"));
@@ -95,10 +95,11 @@ bool UserWindow::eventFilter(QObject *obj, QEvent *event)
     return QWidget::eventFilter(obj, event);
 }
 
-void UserWindow::setModel(QAbstractItemModel *model)
+void UserWindow::setModel(QSharedPointer<UsersModel> model)
 {
-    if(m_userList)
+    if(m_userList){
         m_userList->setModel(model);
+    }
 }
 
 void UserWindow::onSwitchPage(int)
@@ -111,7 +112,7 @@ void UserWindow::onSwitchPage(int)
 
 }
 
-void UserWindow::onLoggedIn(const QString &name)
+void UserWindow::onLoggedIn(const QModelIndex& index)
 {
-    emit loggedIn(name);
+    emit loggedIn(index);
 }

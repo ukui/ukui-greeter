@@ -6,22 +6,23 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QAbstractItemModel>
-#include <QWeakPointer>
+#include <QSharedPointer>
 #include <QLightDM/Greeter>
 #include <QLightDM/UsersModel>
 #include "iconedit.h"
+#include "greeterwrapper.h"
 
 class LoginWindow : public QWidget
 {
     Q_OBJECT
 public:
-    explicit LoginWindow(QWidget *parent = 0);
+    explicit LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent = 0);
     ~LoginWindow(){}
 
     void addMessage(const QString &);
-//    void setEntry(const QString& name, const QString& facePath, bool islogin);
-    void setModel(QAbstractItemModel *model);
-    bool setIndex(int index);
+    void setModel(QSharedPointer<QAbstractItemModel> model);
+    bool setIndex(const QModelIndex& index);
+    void setGreeter(QSharedPointer<GreeterWrapper> greeter);
 private:
     void initUI();
 
@@ -41,8 +42,8 @@ public slots:
     void login_cb(const QString &str);
 
 private:
-    QLightDM::Greeter *m_greeter;
-    QWeakPointer<QAbstractItemModel> m_model;
+    QSharedPointer<QAbstractItemModel> m_model;
+    QSharedPointer<GreeterWrapper> m_greeter;
 
     QLabel  *m_backLabel;         //返回用户列表
     QLabel  *m_faceLabel;         //头像

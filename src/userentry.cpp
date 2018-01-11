@@ -7,7 +7,7 @@
 #include <QDebug>
 
 
-UserEntry::UserEntry(const QString &facePath, const QString &name, bool isLogin, QWidget *parent)
+UserEntry::UserEntry(const QString &name, const QString &facePath, bool isLogin, QWidget *parent)
     :QWidget(parent)//, m_face(facePath), m_name(name), m_login(isLogin)
 {
     setupUi();

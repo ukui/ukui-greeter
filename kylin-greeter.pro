@@ -8,7 +8,7 @@ QT       += core gui
 
 QT += widgets
 
-TARGET = kylin-greeter-qt
+TARGET = kylin-greeter
 TEMPLATE = app
 
 
@@ -21,7 +21,8 @@ SOURCES += \
     src/pagelistview.cpp \
     src/userentry.cpp \
     src/usersmodel.cpp \
-    src/userwindow.cpp
+    src/userwindow.cpp \
+    src/greeterwrapper.cpp
 
 HEADERS  += \
     src/extrarowproxymodel.h \
@@ -31,7 +32,8 @@ HEADERS  += \
     src/pagelistview.h \
     src/userentry.h \
     src/usersmodel.h \
-    src/userwindow.h
+    src/userwindow.h \
+    src/greeterwrapper.h
 
 CONFIG += c++11
 QMAKE_CXXFLAGS = -g

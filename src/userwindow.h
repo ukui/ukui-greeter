@@ -2,9 +2,8 @@
 #define USERWINDOW_H
 
 #include <QWidget>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QLabel>
+#include <QSharedPointer>
 #include <QLightDM/UsersModel>
 #include "pagelistview.h"
 
@@ -15,17 +14,17 @@ public:
     explicit UserWindow(QWidget *parent = 0);
 
     void initUI();
-    void setModel(QAbstractItemModel *model);
+    void setModel(QSharedPointer<UsersModel> model);
 
 protected:
     bool eventFilter(QObject *, QEvent *);
 
 private slots:
     void onSwitchPage(int);
-    void onLoggedIn(const QString &);
+    void onLoggedIn(const QModelIndex &);
 
 signals:
-    void loggedIn(const QString &name);
+    void loggedIn(const QModelIndex &index);
 
 private:
 //    QLightDM::UsersModel *m_model;

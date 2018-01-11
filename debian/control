@@ -10,6 +10,9 @@ Homepage: http://www.ubuntukylin.com
 
 Package: kylin-greeter
 Architecture: any
-Depends: qt5-default, 
+Depends: libqt5widgets5,
+		 libqt5gui5,
+		 libqt5core5a,
+		 libqt5dbus5,
 		${shlibs:Depends}, ${misc:Depends}
 Description: The greeter for the Kylin desktop rewritten using qt 

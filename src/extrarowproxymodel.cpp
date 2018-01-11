@@ -1,5 +1,5 @@
 #include "extrarowproxymodel.h"
-
+#include <QDebug>
 ExtraRowProxyModel::ExtraRowProxyModel(QObject *parent)
     :QAbstractListModel(parent), m_extraModel(new QStandardItemModel(this))
 {

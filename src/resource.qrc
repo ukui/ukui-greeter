@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
+        <file>resource/arrow_left_active.png</file>
         <file>resource/arrow_left_prelight.png</file>
         <file>resource/arrow_left.png</file>
         <file>resource/arrow_right.png</file>
@@ -9,6 +10,5 @@
         <file>resource/next.png</file>
         <file>resource/prev_hl.png</file>
         <file>resource/prev.png</file>
-        <file>resource/arrow_left_active.png</file>
     </qresource>
 </RCC>
