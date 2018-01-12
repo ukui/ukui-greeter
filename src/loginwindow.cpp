@@ -2,6 +2,7 @@
 #include <QMouseEvent>
 #include <QDebug>
 #include <QApplication>
+#include "globalv.h"
 
 LoginWindow::LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent)
     : QWidget(parent), m_greeter(greeter)
@@ -22,17 +23,19 @@ void LoginWindow::initUI()
 {
     if (this->objectName().isEmpty())
         this->setObjectName(QStringLiteral("this"));
-    this->resize(583, 162);
+    this->resize(600*scale, 180*scale);
 
     m_backLabel = new QLabel(this);
     m_backLabel->setObjectName(QStringLiteral("m_backLabel"));
-    m_backLabel->setGeometry(QRect(0, 0, 32, 32));
-    m_backLabel->setPixmap(QPixmap(":/resource/arrow_left.png"));
+    m_backLabel->setGeometry(QRect(0, 0, 32*scale, 32*scale));
+    QPixmap back(":/resource/arrow_left.png");
+    back = back.scaled(32*scale, 32*scale, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    m_backLabel->setPixmap(back);
     m_backLabel->installEventFilter(this);
 
     m_faceLabel = new QLabel(this);
     m_faceLabel->setObjectName(QStringLiteral("m_faceLabel"));
-    m_faceLabel->setGeometry(QRect(60, 0, 130, 130));
+    m_faceLabel->setGeometry(QRect(60*scale, 0, 132*scale, 132*scale));
     m_faceLabel->setStyleSheet("QLabel{ border: 2px solid white}");
 
     QPalette plt;
@@ -40,25 +43,26 @@ void LoginWindow::initUI()
 
     m_nameLabel = new QLabel(this);
     m_nameLabel->setObjectName(QStringLiteral("m_nameLabel"));
-    m_nameLabel->setGeometry(QRect(220, 0, 200, 30));
+    m_nameLabel->setGeometry(QRect(220*scale, 0, 200*scale, 30*scale));
     m_nameLabel->setPalette(plt);
-    m_nameLabel->setFont(QFont("ubuntu", 14));
+    int font_size = 14*scale;
+    m_nameLabel->setFont(QFont("ubuntu", font_size));
 
     m_isLoginLabel = new QLabel(this);
     m_isLoginLabel->setObjectName(QStringLiteral("m_isLoginLabel"));
-    m_isLoginLabel->setGeometry(QRect(220, 35, 200, 20));
+    m_isLoginLabel->setGeometry(QRect(220*scale, 35*scale, 200*scale, 20*scale));
     m_isLoginLabel->setPalette(plt);
 
     m_messageLabel = new QLabel(this);
     m_messageLabel->setObjectName(QStringLiteral("m_messageLabel"));
-    m_messageLabel->setGeometry(QRect(220, 60, 300, 20));
+    m_messageLabel->setGeometry(QRect(220*scale, 60*scale, 300*scale, 20*scale));
     plt.setColor(QPalette::WindowText, Qt::red);
     m_messageLabel->setPalette(plt);
 
     m_passwordEdit = new IconEdit(QIcon(":/resource/arrow_right.png"), this);
-    QRect pwdRect(220, 90, 300, 40);
+    QRect pwdRect(220*scale, 90*scale, 300*scale, 40*scale);
     m_passwordEdit->setGeometry(pwdRect);
-    m_passwordEdit->resize(QSize(300, 40));
+    m_passwordEdit->resize(QSize(300*scale, 40*scale));
     connect(m_passwordEdit, SIGNAL(clicked(const QString&)), this, SLOT(login_cb(const QString&)));
 }
 
@@ -68,12 +72,16 @@ bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
     {
         if(event->type() == QEvent::MouseButtonPress)
         {
-            m_backLabel->setPixmap(QPixmap(":/resource/arrow_left_active.png"));
+            QPixmap back_active(":/resource/arrow_left_active.png");
+            back_active = back_active.scaled(32*scale, 32*scale, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+            m_backLabel->setPixmap(back_active);
             return true;
         }
         if(event->type() == QEvent::MouseButtonRelease)
         {
-            m_backLabel->setPixmap(QPixmap(":/resource/arrow_left.png"));
+            QPixmap back_image(":/resource/arrow_left.png");
+            back_image = back_image.scaled(32*scale, 32*scale, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+            m_backLabel->setPixmap(back_image);
             //清空当前连接
             m_nameLabel->setText("");
             m_isLoginLabel->setText("");
@@ -108,7 +116,7 @@ bool LoginWindow::setIndex(const QModelIndex& index)
         face.load(facePath);
     else
         face.load(":/resource/default_face.png");
-    face = face.scaled(m_faceLabel->width(), m_faceLabel->height(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    face = face.scaled(128*scale, 128*scale, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
     m_faceLabel->setPixmap(face);
 
     bool islogin = index.data(QLightDM::UsersModel::LoggedInRole).toBool();
@@ -116,7 +124,7 @@ bool LoginWindow::setIndex(const QModelIndex& index)
 
     //用户认证
     if(name == tr("Guest")) {                       //游客登录
-        m_greeter->authenticateAsGuest();
+        //m_greeter->authenticateAsGuest();
     }
     else if(name == tr("Login")) {                  //手动输入用户名
         m_passwordEdit->setPrompt(tr("Username"));

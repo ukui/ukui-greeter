@@ -4,13 +4,11 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT  += core gui widgets
 
-QT += widgets
 
 TARGET = kylin-greeter
 TEMPLATE = app
-
 
 SOURCES += \
     src/extrarowproxymodel.cpp \
@@ -33,14 +31,23 @@ HEADERS  += \
     src/userentry.h \
     src/usersmodel.h \
     src/userwindow.h \
-    src/greeterwrapper.h
+    src/greeterwrapper.h \
+    src/globalv.h
 
-CONFIG += c++11
-QMAKE_CXXFLAGS = -g
+CONFIG += c++11 \
+        debug_and_release   \
+        build_all
+CONFIG(debug, debug|release){
+    TARGET = kylin-greeter-debug
+} else {
+    TARGET = kylin-greeter
+}
 
-INCLUDEPATH += /usr/include/lightdm-qt5-3
+INCLUDEPATH += /usr/include/lightdm-qt5-3   \
+               /usr/include/glog
 
-LIBS += /usr/lib/x86_64-linux-gnu/liblightdm-qt5-3.so
+LIBS += /usr/lib/x86_64-linux-gnu/liblightdm-qt5-3.so \
+        /usr/lib/x86_64-linux-gnu/libglog.a
 
 RESOURCES += src/resource.qrc
 

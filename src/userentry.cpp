@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QMouseEvent>
 #include <QDebug>
+#include "globalv.h"
 
 
 UserEntry::UserEntry(const QString &name, const QString &facePath, bool isLogin, QWidget *parent)
@@ -21,22 +22,28 @@ void UserEntry::setupUi()
 {
     if (objectName().isEmpty())
         setObjectName(QString::fromUtf8("Entry"));
-    setFixedSize(190, 240);     //不能用resize，否则放到layout中时，如果layout加有stretch，则该widget显示不出来
+    setFixedSize(190*scale, 240*scale);     //不能用resize，否则放到layout中时，如果layout加有stretch，则该widget显示不出来
     m_faceLabel = new QLabel(this);
     m_faceLabel->setObjectName(QString::fromUtf8("m_faceLabel"));
-    m_faceLabel->setGeometry(QRect(30, 30, 130, 130));
+    m_faceLabel->setGeometry(QRect(30*scale, 30*scale, 130*scale, 130*scale));
     m_faceLabel->setStyleSheet(QString::fromUtf8("border-color: rgb(255, 255, 255);"));
     m_faceLabel->setAlignment(Qt::AlignCenter);
+
     m_nameLabel = new QLabel(this);
     m_nameLabel->setObjectName(QString::fromUtf8("m_nameLabel"));
-    m_nameLabel->setGeometry(QRect(30, 175, 130, 20));
+    m_nameLabel->setGeometry(QRect(30*scale, 175*scale, 130*scale, 20*scale));
     m_nameLabel->setAlignment(Qt::AlignCenter);
+    m_nameLabel->setFont(QFont("Ubuntu", 14*scale));
+
     m_loginLabel = new QLabel(this);
     m_loginLabel->setObjectName(QString::fromUtf8("m_loginLabel"));
-    m_loginLabel->setGeometry(QRect(30, 200, 130, 20));
+    m_loginLabel->setGeometry(QRect(30*scale, 200*scale, 130*scale, 20*scale));
     m_loginLabel->setAlignment(Qt::AlignCenter);
+    m_loginLabel->setFont(QFont("Ubuntu", 14*scale));
 
-    m_faceLabel->setPixmap(QPixmap("/usr/share/kylin-greeter/default_face.png"));
+    QPixmap face_image("/usr/share/kylin-greeter/default_face.png");
+    face_image.scaled(128*scale, 128*scale,  Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    m_faceLabel->setPixmap(face_image);
     m_faceLabel->setStyleSheet("QLabel{border:2px solid white}");
 
     QPalette plt;
@@ -62,7 +69,7 @@ void UserEntry::paintEvent(QPaintEvent *event)
         //color.setAlpha(0.7);
         brush.setColor(color);
         painter.setBrush(brush);
-        painter.drawRect(QRect(23, 23, 144, 144));
+        painter.drawRect(QRect(23*scale, 23*scale, 144*scale, 144*scale));
     }
     return QWidget::paintEvent(event);
 }
@@ -102,7 +109,7 @@ void UserEntry::setFace(const QString &facePath)
     if(!faceFile.exists())
         this->m_face = ":/resource/default_face.png";
     QPixmap pixmap(this->m_face);
-    pixmap = pixmap.scaled(128, 128, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    pixmap = pixmap.scaled(128*scale, 128*scale, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
     this->m_faceLabel->setPixmap(pixmap);
 }
 

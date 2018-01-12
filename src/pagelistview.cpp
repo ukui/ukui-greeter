@@ -10,10 +10,11 @@
 #include <functional>
 #include "userentry.h"
 #include <QLightDM/UsersModel>
+#include "globalv.h"
 
 PageListView::PageListView(QWidget *parent) : QWidget(parent), m_layout(new QHBoxLayout(this))
 {
-    resize(900, 250);
+    resize(900*scale, 250*scale);
 }
 
 bool PageListView::eventFilter(QObject *obj, QEvent *event)
@@ -79,9 +80,9 @@ void PageListView::setModel(QSharedPointer<UsersModel> model)
     m_itemCount = m_model.data()->rowCount();
     m_end = m_itemCount >= 5 ? 4 : m_itemCount - 1; //每页最多显示5个
     m_curItem = 0;
-    drawPage();
+//    drawPage();
 
-//    drawPageLayout();
+    drawPageLayout();
 }
 
 void PageListView::drawPage()
@@ -113,7 +114,7 @@ void PageListView::drawPage()
             m_itemList[i] = entry;
         }
         m_itemList[i]->show();
-        m_layout->addWidget(m_itemList[i]);
+        m_layout->addWidget(m_itemList[i], 0, Qt::AlignTop);
     }
 //    if(m_itemCount < 5)
         m_layout->addStretch(5);
