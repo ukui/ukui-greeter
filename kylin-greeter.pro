@@ -20,7 +20,10 @@ SOURCES += \
     src/userentry.cpp \
     src/usersmodel.cpp \
     src/userwindow.cpp \
-    src/greeterwrapper.cpp
+    src/greeterwrapper.cpp \
+    src/globalv.cpp \
+    src/screenmodel.cpp \
+    src/screenmanager.cpp
 
 HEADERS  += \
     src/extrarowproxymodel.h \
@@ -32,7 +35,9 @@ HEADERS  += \
     src/usersmodel.h \
     src/userwindow.h \
     src/greeterwrapper.h \
-    src/globalv.h
+    src/globalv.h \
+    src/screenmodel.h \
+    src/screenmanager.h
 
 CONFIG += c++11 \
         debug_and_release   \

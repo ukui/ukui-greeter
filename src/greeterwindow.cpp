@@ -8,8 +8,6 @@
 #include <QDebug>
 #include "globalv.h"
 
-float scale;
-
 GreeterWindow::GreeterWindow(QWidget *parent)
     : QWidget(parent), m_model(new UsersModel(this)),
       m_greeter(new GreeterWrapper(this))
@@ -30,13 +28,6 @@ GreeterWindow::~GreeterWindow()
 void GreeterWindow::initUI()
 {
     QRect screen = QApplication::desktop()->rect();
-    if(screen.width() >= 1920)
-        scale = 0.63;
-    else{
-        scale = screen.width() / 1920.0;
-    }
-    qDebug() <<"screen:" << screen.width() << " "<< screen.height()<< " scale: "<< scale;
-
     //背景
     setGeometry(screen);
     this->setAutoFillBackground(true);
@@ -67,7 +58,7 @@ void GreeterWindow::initUI()
 
     m_loginWnd = new LoginWindow(m_greeter, m_secondWnd);
     m_loginWnd->setModel(m_model);
-    QRect loginRect(m_secondWnd->rect().width()/2 - 300*scale, m_secondWnd->rect().height()/2 - 90*scale, 600*scale, 180*scale);
+    QRect loginRect(m_secondWnd->rect().width()/2 - 300, m_secondWnd->rect().height()/2 - 90, 600, 180);
     m_loginWnd->setGeometry(loginRect);
     connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBack()));
 

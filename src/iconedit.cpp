@@ -67,6 +67,7 @@ void TipEdit::drawTip()
 
     QPainter painter(this);
     painter.setPen(QColor("#888"));
+    painter.setFont(QFont("ubuntu", 10));
     QTextOption option(Qt::AlignLeft | Qt::AlignVCenter);
     option.setWrapMode(QTextOption::WordWrap);
 

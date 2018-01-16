@@ -14,7 +14,7 @@
 
 PageListView::PageListView(QWidget *parent) : QWidget(parent), m_layout(new QHBoxLayout(this))
 {
-    resize(900*scale, 250*scale);
+    resize(920*scale, 300*scale);
 }
 
 bool PageListView::eventFilter(QObject *obj, QEvent *event)
@@ -80,9 +80,9 @@ void PageListView::setModel(QSharedPointer<UsersModel> model)
     m_itemCount = m_model.data()->rowCount();
     m_end = m_itemCount >= 5 ? 4 : m_itemCount - 1; //每页最多显示5个
     m_curItem = 0;
-//    drawPage();
+    drawPage();
 
-    drawPageLayout();
+//    drawPageLayout();
 }
 
 void PageListView::drawPage()

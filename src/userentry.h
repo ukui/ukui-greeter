@@ -10,7 +10,7 @@ class UserEntry : public QWidget
     Q_OBJECT
 public:
     UserEntry(const QString &facePath, const QString &name, bool isLogin, QWidget *parent);
-    UserEntry(QWidget *parent);
+    UserEntry(QWidget *parent=0);
 
     void setFace(const QString &facePath);
     const QString& userName();
@@ -25,8 +25,8 @@ protected:
 
 
 private:
-    void setupUi();
     void onClicked();
+    void initUI();
 
 signals:
     void clicked(const QString&);
