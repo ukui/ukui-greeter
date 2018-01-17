@@ -9,15 +9,14 @@
 #include "globalv.h"
 
 GreeterWindow::GreeterWindow(QWidget *parent)
-    : QWidget(parent), m_model(new UsersModel(this)),
-      m_greeter(new GreeterWrapper(this))
+    : QWidget(parent),
+      m_model(new UsersModel()),
+      m_greeter(new GreeterWrapper())
 {
     if(m_greeter.data()->hasGuestAccountHint())    //允许游客登录
         m_model.data()->setShowGuest(true);
     if(m_greeter.data()->showManualLoginHint())    //允许手动输入用户名
         m_model.data()->setShowManualLogin(true);
-
-    initUI();
 }
 
 GreeterWindow::~GreeterWindow()
@@ -27,22 +26,12 @@ GreeterWindow::~GreeterWindow()
 
 void GreeterWindow::initUI()
 {
-    QRect screen = QApplication::desktop()->rect();
-    //背景
-    setGeometry(screen);
-    this->setAutoFillBackground(true);
-    QPalette palette;
-    QPixmap background(":/resource/background.png");
-    background = background.scaled(screen.width(), screen.height(),  Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-    palette.setBrush(QPalette::Window, QBrush(background));
-    this->setPalette(palette);
-
     m_layout = new QStackedLayout(this);
 
     m_firstWnd = new QWidget(this);
-    m_firstWnd->setGeometry(screen);
+    m_firstWnd->setGeometry(rect());
     m_secondWnd = new QWidget(this);
-    m_secondWnd->setGeometry(screen);
+    m_secondWnd->setGeometry(rect());
 
     for(int i = 0; i < 3; i++)
     {
@@ -52,13 +41,13 @@ void GreeterWindow::initUI()
 
     m_userWnd = new UserWindow(m_firstWnd);
     m_userWnd->setModel(m_model);
-    QRect userRect(m_firstWnd->rect().width()/2 - 600*scale, m_firstWnd->rect().height()/2 - 175*scale, 1200*scale, 350*scale);
+    QRect userRect(rect().width()/2 - 600*scale, rect().height()/2 - 175*scale, 1200*scale, 350*scale);
     m_userWnd->setGeometry(userRect);
     connect(m_userWnd, SIGNAL(loggedIn(QModelIndex)), this, SLOT(onLoggedIn(QModelIndex)));
 
     m_loginWnd = new LoginWindow(m_greeter, m_secondWnd);
     m_loginWnd->setModel(m_model);
-    QRect loginRect(m_secondWnd->rect().width()/2 - 300, m_secondWnd->rect().height()/2 - 90, 600, 180);
+    QRect loginRect(rect().width()/2 - 300, rect().height()/2 - 90, 600, 180);
     m_loginWnd->setGeometry(loginRect);
     connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBack()));
 

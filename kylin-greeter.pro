@@ -23,7 +23,9 @@ SOURCES += \
     src/greeterwrapper.cpp \
     src/globalv.cpp \
     src/screenmodel.cpp \
-    src/screenmanager.cpp
+#    src/screenmanager.cpp \
+#    src/globalapplication.cpp \
+    src/mainwindow.cpp
 
 HEADERS  += \
     src/extrarowproxymodel.h \
@@ -37,16 +39,18 @@ HEADERS  += \
     src/greeterwrapper.h \
     src/globalv.h \
     src/screenmodel.h \
-    src/screenmanager.h
+#    src/screenmanager.h \
+#    src/globalapplication.h \
+    src/mainwindow.h
 
 CONFIG += c++11 \
-        debug_and_release   \
-        build_all
-CONFIG(debug, debug|release){
-    TARGET = kylin-greeter-debug
-} else {
-    TARGET = kylin-greeter
-}
+#        debug_and_release   \
+#        build_all
+#CONFIG(debug, debug|release){
+#    TARGET = kylin-greeter-debug
+#} else {
+#    TARGET = kylin-greeter
+#}
 
 INCLUDEPATH += /usr/include/lightdm-qt5-3   \
                /usr/include/glog

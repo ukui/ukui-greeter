@@ -12,7 +12,9 @@
 #include <QLightDM/UsersModel>
 #include "globalv.h"
 
-PageListView::PageListView(QWidget *parent) : QWidget(parent), m_layout(new QHBoxLayout(this))
+PageListView::PageListView(QWidget *parent)
+    : QWidget(parent),
+      m_layout(new QHBoxLayout(this))
 {
     resize(920*scale, 300*scale);
 }
@@ -62,7 +64,7 @@ void PageListView::keyReleaseEvent(QKeyEvent *event)
     }
 }
 
-void PageListView::setModel(QSharedPointer<UsersModel> model)
+void PageListView::setModel(QSharedPointer<QAbstractItemModel> model)
 {
     if(model.isNull())
         return;
@@ -70,7 +72,7 @@ void PageListView::setModel(QSharedPointer<UsersModel> model)
     {
 
     }
-    m_model = QSharedPointer<UsersModel>(model);
+    m_model = model;
     m_itemList = QVector<UserEntry*>(m_model.data()->rowCount(), NULL);
 
     m_pageNum = qCeil(m_model.data()->rowCount() * 1.0 / MAX_NUM_PP);

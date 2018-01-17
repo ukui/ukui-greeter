@@ -14,7 +14,7 @@ public:
     explicit UserWindow(QWidget *parent = 0);
 
     void initUI();
-    void setModel(QSharedPointer<UsersModel> model);
+    void setModel(QSharedPointer<QAbstractItemModel> model);
 
 protected:
     bool eventFilter(QObject *, QEvent *);

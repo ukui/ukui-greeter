@@ -46,7 +46,7 @@ void UserEntry::initUI()
     m_loginLabel->setAlignment(Qt::AlignCenter);
     m_loginLabel->setFont(QFont("Ubuntu", fontSize));
 
-    QPixmap face_image("/usr/share/kylin-greeter/default_face.png");
+    QPixmap face_image(":/resource/default_face.png");
     face_image.scaled(128*scale, 128*scale,  Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
     m_faceLabel->setPixmap(face_image);
     m_faceLabel->setStyleSheet("QLabel{border:2px solid white}");

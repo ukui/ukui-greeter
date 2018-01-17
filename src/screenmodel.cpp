@@ -1,13 +1,15 @@
 #include "screenmodel.h"
 #include <QDesktopWidget>
 #include <QApplication>
-
-ScreenModel::ScreenModel(QObject *parent) : QAbstractListModel(parent)
+#include <QDebug>
+ScreenModel::ScreenModel(QObject *parent)
+    : QAbstractListModel(parent)
 {
     loadScreens();
-    QDesktopWidget *desktop = QApplication::desktop();
-    connect(desktop, SIGNAL(resized(int)), this, SLOT(onScreenResized(int)));
-    connect(desktop, SIGNAL(screenCountChanged(int)), this, SLOT(onScreenCountChanged(int)));
+//    qDebug() << m_screen.size();
+    QDesktopWidget *dw = QApplication::desktop();
+    connect(dw, SIGNAL(resized(int)), this, SLOT(onScreenResized(int)));
+    connect(dw, SIGNAL(screenCountChanged(int)), this, SLOT(onScreenCountChanged(int)));
 }
 
 int ScreenModel::rowCount(const QModelIndex &parent) const
@@ -55,7 +57,6 @@ void ScreenModel::loadScreens()
     for(int i = 0; i < desktopWidget->screenCount(); i++){
         m_screen.append(desktopWidget->screenGeometry(i));
     }
-    delete(desktopWidget);
     endResetModel();
 }
 

@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include <QStackedLayout>
-#include <QStackedWidget>
 #include <QSharedPointer>
 #include "userwindow.h"
 #include "loginwindow.h"
@@ -18,7 +17,7 @@ public:
     GreeterWindow(QWidget *parent = 0);
     ~GreeterWindow();
 
-private:
+public:
     void initUI();
 
 private slots:
@@ -30,7 +29,6 @@ private:
     QStackedLayout  *m_layout;
     QWidget         *m_firstWnd;
     QWidget         *m_secondWnd;
-
     QSharedPointer<UsersModel> m_model;
     QSharedPointer<GreeterWrapper> m_greeter;
 };

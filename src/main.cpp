@@ -7,6 +7,9 @@
 #include <QDebug>
 #include "globalv.h"
 #include "screenmanager.h"
+#include "globalapplication.h"
+#include "mainwindow.h"
+
 float scale;
 int fontSize;
 QFont font;
@@ -28,10 +31,15 @@ int main(int argc, char *argv[])
     font = QFont("ubuntu", fontSize);
 
     QResource::registerResource("./resource.qrc");
-    /*
-    GreeterWindow *w = new GreeterWindow();
-    w->show();
-    */
-    ScreenManager sm;
+
+    MainWindow w;
+    w.show();
+
+//    ScreenManager *sm = new ScreenManager();
+//    a.setScreenManager(sm);
+//    sm->showWindow();
+//    QObject::connect(&a, SIGNAL(mouseMove(QPoint)), &sm, SLOT(onMouseMove(QPoint)));
+
+
     return a.exec();
 }

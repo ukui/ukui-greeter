@@ -5,8 +5,11 @@
 #include <QVector>
 #include <QRect>
 
+class QDesktopWidget;
+
 class ScreenModel : public QAbstractListModel
 {
+    Q_OBJECT
 public:
     ScreenModel(QObject *parent=0);
     int rowCount(const QModelIndex &parent = QModelIndex()) const;

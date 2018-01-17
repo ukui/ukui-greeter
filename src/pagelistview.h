@@ -14,7 +14,7 @@ class PageListView : public QWidget
     Q_OBJECT
 public:
     explicit PageListView(QWidget *parent = 0);
-    void setModel(QSharedPointer<UsersModel>);
+    void setModel(QSharedPointer<QAbstractItemModel>);
     void pageUp();      //切换到上一页    留给父窗口通过按钮调用
     void pageDown();    //切换到下一页
     bool hasPrev();     //是否有上一页
@@ -48,8 +48,7 @@ private slots:
 public:
     const int MAX_NUM_PP = 5;   //每页最大的数量
 private:
-    QSharedPointer<UsersModel> m_model;
-//    QList<UserEntry*>  m_itemList;
+    QSharedPointer<QAbstractItemModel> m_model;
     QVector<UserEntry*> m_itemList;
     QHBoxLayout *m_layout;
 

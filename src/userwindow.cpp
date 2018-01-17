@@ -110,7 +110,7 @@ bool UserWindow::eventFilter(QObject *obj, QEvent *event)
     return QWidget::eventFilter(obj, event);
 }
 
-void UserWindow::setModel(QSharedPointer<UsersModel> model)
+void UserWindow::setModel(QSharedPointer<QAbstractItemModel> model)
 {
     if(m_userList){
         m_userList->setModel(model);
