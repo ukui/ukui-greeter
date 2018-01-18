@@ -29,7 +29,8 @@ private:
     QStackedLayout  *m_layout;
     QWidget         *m_firstWnd;
     QWidget         *m_secondWnd;
-    QSharedPointer<UsersModel> m_model;
+    QSharedPointer<UsersModel> m_usersModel;
+    QSharedPointer<QAbstractItemModel> m_sessionsModel;
     QSharedPointer<GreeterWrapper> m_greeter;
 };
 

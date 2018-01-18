@@ -20,11 +20,14 @@ public:
     ~LoginWindow(){}
 
     void addMessage(const QString &);
-    void setModel(QSharedPointer<QAbstractItemModel> model);
-    bool setIndex(const QModelIndex& index);
+    void setUsersModel(QSharedPointer<QAbstractItemModel> model);
+    bool setUserIndex(const QModelIndex& index);
+    void setSessionsModel(QSharedPointer<QAbstractItemModel> model);
+    bool setSessionIndex(const QModelIndex& index);
     void setGreeter(QSharedPointer<GreeterWrapper> greeter);
 private:
     void initUI();
+    void setSession(QString);
 
 protected:
     bool eventFilter(QObject *, QEvent *);
@@ -42,15 +45,17 @@ public slots:
     void login_cb(const QString &str);
 
 private:
-    QSharedPointer<QAbstractItemModel> m_model;
+    QSharedPointer<QAbstractItemModel> m_usersModel;
+    QSharedPointer<QAbstractItemModel> m_sessionsModel;
     QSharedPointer<GreeterWrapper> m_greeter;
 
     QLabel  *m_backLabel;         //返回用户列表
     QLabel  *m_faceLabel;         //头像
+    QLabel  *m_sessionLabel;      //session图标
     QLabel  *m_nameLabel;         //用户名
     QLabel  *m_isLoginLabel;      //提示是否已登录
     QLabel  *m_messageLabel;      //提示信息
-    IconEdit *m_passwordEdit;     //密码
+    IconEdit *m_passwordEdit;     //密码输入框
 
 };
 

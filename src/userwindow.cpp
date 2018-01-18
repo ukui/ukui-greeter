@@ -15,7 +15,7 @@ void UserWindow::initUI()
 {
     if (this->objectName().isEmpty())
         this->setObjectName(QStringLiteral("this"));
-    this->resize(1100*scale, 400*scale);
+    this->resize(1100*scale, 300*scale);
     this->setMaximumSize(QSize(1200*scale, 400*scale));
 
     m_userList = new PageListView(this);

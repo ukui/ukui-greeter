@@ -30,7 +30,7 @@ IconButton::IconButton(QLineEdit *edit)
 
     // 设置输入框中文件输入区，不让输入的文字在被隐藏在按钮下
     edit->setTextMargins(1, 1, m_size.width() , 1);
-    edit->setStyleSheet(" QLineEdit { border: 1px solid blue ; lineedit-password-character:9679}");
+    edit->setStyleSheet(" QLineEdit { border: 1px solid #026096 ; lineedit-password-character:8226}");  //设置密码显示为中等大小的实心圆点
     this->setStyleSheet("QPushButton{background:transparent; border:0px}");
 }
 IconButton::IconButton(QLineEdit *edit, const QIcon &icon)

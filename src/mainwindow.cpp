@@ -47,9 +47,9 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
         if(isPointInRect(point, screenRect)) {
             curScreen = i;
         }
-    }
-    qDebug() << "active screen: from " << m_activeScreen << "to " << curScreen;
+    } 
     if(curScreen != m_activeScreen){
+        qDebug() << "active screen: from " << m_activeScreen << "to " << curScreen;
         m_activeScreen = curScreen;
         m_greeterWnd->setGeometry(m_model->index(m_activeScreen, 0).data(Qt::UserRole).toRect());
     }

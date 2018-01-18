@@ -25,7 +25,8 @@ SOURCES += \
     src/screenmodel.cpp \
 #    src/screenmanager.cpp \
 #    src/globalapplication.cpp \
-    src/mainwindow.cpp
+    src/mainwindow.cpp \
+    src/sessionwindow.cpp
 
 HEADERS  += \
     src/extrarowproxymodel.h \
@@ -41,7 +42,8 @@ HEADERS  += \
     src/screenmodel.h \
 #    src/screenmanager.h \
 #    src/globalapplication.h \
-    src/mainwindow.h
+    src/mainwindow.h \
+    src/sessionwindow.h
 
 CONFIG += c++11 \
 #        debug_and_release   \

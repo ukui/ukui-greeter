@@ -22,5 +22,11 @@
         <file>resource/shutdown.png</file>
         <file>resource/suspend_highlight.png</file>
         <file>resource/suspend.png</file>
+        <file>resource/gnome_badge.png</file>
+        <file>resource/kde_badge.png</file>
+        <file>resource/recovery_console_badge.png</file>
+        <file>resource/ubuntu_badge.png</file>
+        <file>resource/unknown_badge.png</file>
+        <file>resource/checked.png</file>
     </qresource>
 </RCC>

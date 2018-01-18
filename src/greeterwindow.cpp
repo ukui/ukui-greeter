@@ -6,17 +6,19 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QDebug>
+#include <QLightDM/SessionsModel>
 #include "globalv.h"
 
 GreeterWindow::GreeterWindow(QWidget *parent)
     : QWidget(parent),
-      m_model(new UsersModel()),
+      m_usersModel(new UsersModel()),
+      m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions)),
       m_greeter(new GreeterWrapper())
 {
-    if(m_greeter.data()->hasGuestAccountHint())    //允许游客登录
-        m_model.data()->setShowGuest(true);
-    if(m_greeter.data()->showManualLoginHint())    //允许手动输入用户名
-        m_model.data()->setShowManualLogin(true);
+    if(m_greeter->hasGuestAccountHint())    //允许游客登录
+        m_usersModel->setShowGuest(true);
+    if(m_greeter->showManualLoginHint())    //允许手动输入用户名
+        m_usersModel->setShowManualLogin(true);
 }
 
 GreeterWindow::~GreeterWindow()
@@ -36,17 +38,18 @@ void GreeterWindow::initUI()
     for(int i = 0; i < 3; i++)
     {
         QStandardItem *item = new QStandardItem("test" + QString::number(i));
-        m_model.data()->extraRowModel()->appendRow(item);
+        m_usersModel->extraRowModel()->appendRow(item);
     }
 
     m_userWnd = new UserWindow(m_firstWnd);
-    m_userWnd->setModel(m_model);
-    QRect userRect(rect().width()/2 - 600*scale, rect().height()/2 - 175*scale, 1200*scale, 350*scale);
+    m_userWnd->setModel(m_usersModel);
+    QRect userRect(rect().width()/2 - 600*scale, rect().height()/2 - 150*scale, 1200*scale, 300*scale);
     m_userWnd->setGeometry(userRect);
     connect(m_userWnd, SIGNAL(loggedIn(QModelIndex)), this, SLOT(onLoggedIn(QModelIndex)));
 
     m_loginWnd = new LoginWindow(m_greeter, m_secondWnd);
-    m_loginWnd->setModel(m_model);
+    m_loginWnd->setUsersModel(m_usersModel);
+    m_loginWnd->setSessionsModel(m_sessionsModel);
     QRect loginRect(rect().width()/2 - 300, rect().height()/2 - 90, 600, 180);
     m_loginWnd->setGeometry(loginRect);
     connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBack()));
@@ -63,7 +66,7 @@ void GreeterWindow::onLoggedIn(const QModelIndex &index)
     if(name == tr("Guest")){
         //直接登录
     }
-    m_loginWnd->setIndex(index);
+    m_loginWnd->setUserIndex(index);
     m_layout->setCurrentWidget(m_secondWnd);
 }
 

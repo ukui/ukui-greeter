@@ -2,6 +2,7 @@
 #include <QMouseEvent>
 #include <QDebug>
 #include <QApplication>
+#include <QLightDM/SessionsModel>
 #include "globalv.h"
 
 LoginWindow::LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent)
@@ -23,7 +24,7 @@ void LoginWindow::initUI()
 {
     if (this->objectName().isEmpty())
         this->setObjectName(QStringLiteral("this"));
-    this->resize(600, 180);
+    this->resize(520, 180);
 
     m_backLabel = new QLabel(this);
     m_backLabel->setObjectName(QStringLiteral("m_backLabel"));
@@ -37,6 +38,10 @@ void LoginWindow::initUI()
     m_faceLabel->setObjectName(QStringLiteral("m_faceLabel"));
     m_faceLabel->setGeometry(QRect(60, 0, 132, 132));
     m_faceLabel->setStyleSheet("QLabel{ border: 2px solid white}");
+
+    m_sessionLabel = new QLabel(this);
+    m_sessionLabel->setObjectName(QStringLiteral("m_sessionLabel"));
+    m_sessionLabel->setGeometry(QRect(width()-22, 0, 22, 22));
 
     QPalette plt;
     plt.setColor(QPalette::WindowText, Qt::white);
@@ -70,17 +75,14 @@ void LoginWindow::initUI()
 
 bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
 {
-    if(obj == m_backLabel)
-    {
-        if(event->type() == QEvent::MouseButtonPress)
-        {
+    if(obj == m_backLabel) {
+        if(event->type() == QEvent::MouseButtonPress) {
             QPixmap back_active(":/resource/arrow_left_active.png");
             back_active = back_active.scaled(32, 32, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
             m_backLabel->setPixmap(back_active);
             return true;
         }
-        if(event->type() == QEvent::MouseButtonRelease)
-        {
+        if(event->type() == QEvent::MouseButtonRelease) {
             QPixmap back_image(":/resource/arrow_left.png");
             back_image = back_image.scaled(32, 32, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
             m_backLabel->setPixmap(back_image);
@@ -93,24 +95,31 @@ bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
             return true;
         }
     }
+    else if(obj == m_sessionLabel) {
+        if(event->type() == QEvent::MouseButtonRelease) {
+
+        }
+    }
     return QWidget::eventFilter(obj, event);
 }
 
-void LoginWindow::setModel(QSharedPointer<QAbstractItemModel> model)
+void LoginWindow::setUsersModel(QSharedPointer<QAbstractItemModel> model)
 {
     if(model.isNull())
         return;
-    m_model = model;
+    m_usersModel = model;
 }
 
-bool LoginWindow::setIndex(const QModelIndex& index)
+bool LoginWindow::setUserIndex(const QModelIndex& index)
 {
     if(!index.isValid()){
         return false;
     }
+    //设置用户名
     QString name = index.data(Qt::DisplayRole).toString();
     m_nameLabel->setText(name);
 
+    //设置头像
     QString facePath = index.data(QLightDM::UsersModel::ImagePathRole).toString();
     QFile faceFile(facePath);
     QPixmap face;
@@ -121,8 +130,14 @@ bool LoginWindow::setIndex(const QModelIndex& index)
     face = face.scaled(128, 128, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
     m_faceLabel->setPixmap(face);
 
+    //显示是否已经登录
     bool islogin = index.data(QLightDM::UsersModel::LoggedInRole).toBool();
     m_isLoginLabel->setText(islogin ? tr("logged in") : "");
+
+    //显示session图标
+    if(!m_sessionsModel.isNull() && m_sessionsModel->rowCount() > 1) {
+        setSession(index.data(QLightDM::UsersModel::SessionRole).toString());
+    }
 
     //用户认证
     if(name == tr("Guest")) {                       //游客登录
@@ -137,6 +152,67 @@ bool LoginWindow::setIndex(const QModelIndex& index)
     }
 
     return true;
+}
+
+void LoginWindow::setSessionsModel(QSharedPointer<QAbstractItemModel> model)
+{
+    if(model.isNull()){
+        return ;
+    }
+    m_sessionsModel = model;
+    //如果session有多个，则显示session图标，默认显示用户上次登录的session
+    //如果当前还没有设置用户，则默认显示第一个session
+    if(m_sessionsModel->rowCount() > 1) {
+        if(!m_usersModel.isNull() && !m_nameLabel->text().isEmpty()) {
+            for(int i = 0; i < m_usersModel->rowCount(); i++){
+                QModelIndex index = m_usersModel->index(i, 0);
+                if(index.data(Qt::DisplayRole).toString() == m_nameLabel->text()){
+                    setSession(index.data(QLightDM::UsersModel::SessionRole).toString());
+                    return;
+                }
+            }
+        }
+        setSession(m_sessionsModel->index(0, 0).data().toString());
+    }
+}
+
+bool LoginWindow::setSessionIndex(const QModelIndex &index)
+{
+    //显示选择的session（如果有多个session则显示，否则不显示）
+    if(!index.isValid()) {
+        return false;
+    }
+    setSession(index.data(Qt::DisplayRole).toString());
+    return true;
+}
+
+void LoginWindow::setSession(QString sessionName)
+{
+    QString sessionIcon;
+    //有些用户没有设置session，为空，如果系统有Ubuntu session，则设为默认session；
+    //否则，则选择第一个session为默认session
+    if(sessionName.isEmpty()) {
+        for(int i = 0; i < m_sessionsModel->rowCount(); i++) {
+            QModelIndex index = m_sessionsModel->index(i, 0);
+            if(index.data(Qt::DisplayRole).toString().toLower() == "ubuntu") {
+                sessionIcon = ":/resource/ubuntu_badge.png";
+                break;
+            }
+        }
+        if(sessionIcon.isEmpty()) {
+            sessionName = m_sessionsModel->index(0, 0).data().toString();
+        }
+    }
+    if(sessionName.toLower() == "ubuntu") {
+        sessionIcon = ":/resource/ubuntu_badge.png";
+    } else if (sessionName.toLower() == "gnome") {
+        sessionIcon = ":/resource/ubuntu_badge.png";
+    } else if (sessionName.toLower() == "kde") {
+        sessionIcon = ":/resource/ubuntu_badge.png";
+    } else {
+        sessionIcon = ":/resource/unknown_badge.png";
+    }
+    m_sessionLabel->setPixmap(scaledPixmap(22, 22, sessionIcon));
 }
 
 void LoginWindow::login_cb(const QString &str)
