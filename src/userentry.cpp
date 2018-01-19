@@ -138,7 +138,7 @@ void UserEntry::setLogin(bool isLogin)
     if(m_login != isLogin)
     {
         m_login = isLogin;
-        this->m_loginLabel->setText(m_login ? "logged in" : "");
+        this->m_loginLabel->setText(m_login ? tr("logged in") : "");
     }
 }
 

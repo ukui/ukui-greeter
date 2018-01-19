@@ -15,45 +15,34 @@ void UserWindow::initUI()
 {
     if (this->objectName().isEmpty())
         this->setObjectName(QStringLiteral("this"));
-    this->resize(1100*scale, 300*scale);
+    this->resize(1050*scale, 300*scale);
     this->setMaximumSize(QSize(1200*scale, 400*scale));
 
     m_userList = new PageListView(this);
     m_userList->setObjectName(QStringLiteral("m_userList"));
-    QRect listRect(150*scale, 25*scale, 900*scale, 300*scale);
+    QRect listRect(64*scale, 25*scale, 900*scale, 300*scale);
     m_userList->setGeometry(listRect);
-    connect(m_userList, SIGNAL(switchPage(int)), this, SLOT(onSwitchPage(int)));
+    connect(m_userList, SIGNAL(pageChanged()), this, SLOT(onPageChanged()));
     connect(m_userList, SIGNAL(loggedIn(QModelIndex)), this, SLOT(onLoggedIn(QModelIndex)));
-
 
     m_prevLabel = new QLabel(this);
     m_prevLabel->setObjectName(QStringLiteral("m_prevLabel"));
-    QRect prevRect(listRect.left()-64*scale, 65*scale, 64*scale, 128*scale);
+    QRect prevRect(0, 65*scale, 64*scale, 128*scale);
     m_prevLabel->setGeometry(prevRect);
     m_prevLabel->installEventFilter(this);
-    QPixmap prevImage(":/resource/prev.png");
-    prevImage = prevImage.scaled(32*scale, 64*scale, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-    m_prevLabel->setPixmap(prevImage);
+    m_prevLabel->setPixmap(scaledPixmap(64*scale, 64*scale, ":/resource/prev.png"));
+    m_prevLabel->setStyleSheet("QLabel{background-color: rgba(255, 255, 255, 0.1)}"
+                               "QLabel::hover{background-color: rgba(255, 255, 255, 0.2)}");
+//    m_prevLabel->hide();
 
     m_nextLabel = new QLabel(this);
     m_nextLabel->setObjectName(QStringLiteral("m_nextLabel"));
-    QRect nextRect(listRect.right(), 70*scale, 64*scale, 128*scale);
+    QRect nextRect(listRect.right()+20*scale, 65*scale, 64*scale, 128*scale);
     m_nextLabel->setGeometry(nextRect);
     m_nextLabel->installEventFilter(this);
-    QPixmap nextImage(":/resource/next.png");
-    nextImage = nextImage.scaled(32*scale, 64*scale, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-    m_nextLabel->setPixmap(nextImage);
-
-
-//    m_pageIndicator = new QLabel(this);
-//    m_pageIndicator->setObjectName(QStringLiteral("m_pageIndicator"));
-//    m_pageIndicator->setGeometry(QRect(450*scale, 300*scale, 300*scale, 20*scale));
-//    m_pageIndicator->setAlignment(Qt::AlignCenter);
-
-//    QHBoxLayout *layout = new QHBoxLayout(this);
-//    layout->addWidget(m_prevLabel, 0, Qt::AlignLeft | Qt::AlignVCenter);
-//    layout->addWidget(m_userList, 0, Qt::AlignTop);
-//    layout->addWidget(m_nextLabel, 0, Qt::AlignTop);
+    m_nextLabel->setPixmap(scaledPixmap(64*scale, 64*scale, ":/resource/next.png"));
+    m_nextLabel->setStyleSheet("QLabel{background-color: rgba(255, 255, 255, 0.1)}"
+                               "QLabel::hover{background-color: rgba(255, 255, 255, 0.3)}");
 }
 
 bool UserWindow::eventFilter(QObject *obj, QEvent *event)
@@ -66,10 +55,7 @@ bool UserWindow::eventFilter(QObject *obj, QEvent *event)
             QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
             if(mouseEvent->button() == Qt::LeftButton)
             {
-//                m_prevLabel->setPixmap(QPixmap(":/resource/prev_hl.png"));
-                QPixmap prevHLImg = scaledPixmap(32*scale, 64*scale, ":/resource/prev_hl.png");
-                m_prevLabel->setPixmap(prevHLImg);
-                m_prevLabel->setStyleSheet("QLabel{background:transparent;}");
+//                m_prevLabel->setPixmap(scaledPixmap(64*scale, 64*scale, ":/resource/prev_hl.png"));
                 return true;
             }
         }
@@ -78,7 +64,7 @@ bool UserWindow::eventFilter(QObject *obj, QEvent *event)
             QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
             if(mouseEvent->button() == Qt::LeftButton)
             {
-                m_prevLabel->setPixmap(scaledPixmap(32*scale, 64*scale, ":/resource/prev.png"));
+//                m_prevLabel->setPixmap(scaledPixmap(64*scale, 64*scale, ":/resource/prev.png"));
                 m_userList->pageUp();
                 return true;
             }
@@ -91,8 +77,7 @@ bool UserWindow::eventFilter(QObject *obj, QEvent *event)
             QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
             if(mouseEvent->button() == Qt::LeftButton)
             {
-                m_nextLabel->setPixmap(scaledPixmap(32*scale, 64*scale, ":/resource/next_hl.png"));
-                m_nextLabel->setStyleSheet("QLabel{background:transparent;}");
+//                m_nextLabel->setPixmap(scaledPixmap(64*scale, 64*scale, ":/resource/next_hl.png"));
                 return true;
             }
         }
@@ -101,7 +86,7 @@ bool UserWindow::eventFilter(QObject *obj, QEvent *event)
             QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
             if(mouseEvent->button() == Qt::LeftButton)
             {
-                m_nextLabel->setPixmap(scaledPixmap(32*scale, 64*scale, ":/resource/next.png"));
+//                m_nextLabel->setPixmap(scaledPixmap(64*scale, 64*scale, ":/resource/next.png"));
                 m_userList->pageDown();
                 return true;
             }
@@ -117,14 +102,18 @@ void UserWindow::setModel(QSharedPointer<QAbstractItemModel> model)
     }
 }
 
-void UserWindow::onSwitchPage(int)
+void UserWindow::onPageChanged()
 {
-    qDebug() << "switch page";
-//    if(!m_userList->hasNext())
-//    {
-//        m_userList->removeEventFilter(this);
-//    }
-
+    if(m_userList->hasPrev()) {
+        m_prevLabel->show();
+    } else {
+        m_prevLabel->hide();
+    }
+    if(m_userList->hasNext()) {
+        m_nextLabel->show();
+    } else {
+        m_nextLabel->hide();
+    }
 }
 
 void UserWindow::onLoggedIn(const QModelIndex& index)

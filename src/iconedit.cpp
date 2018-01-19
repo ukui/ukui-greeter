@@ -84,6 +84,8 @@ IconEdit::IconEdit(QWidget *parent)
     m_edit = new TipEdit(this);
     m_iconButton = new IconButton(m_edit);
     connect(m_iconButton, SIGNAL(clicked(bool)), this, SLOT(clicked_cb()));
+    connect(m_edit, SIGNAL(textChanged(QString)), this, SLOT(showIcon(QString)));
+    m_iconButton->hide();
 }
 
 IconEdit::IconEdit(const QIcon& icon, QWidget *parent)
@@ -107,13 +109,24 @@ void IconEdit::setText(const QString &text)
 void IconEdit::keyReleaseEvent ( QKeyEvent * event )
 {
     if(event->key() == Qt::Key_Return)
+    {
+
         return clicked_cb();
+    }
     return QWidget::keyReleaseEvent(event);
 }
 
 void IconEdit::clicked_cb()
 {
     emit clicked(m_edit->text());
+}
+void IconEdit::showIcon(const QString &text)
+{
+    if(text.isEmpty()){
+        m_iconButton->hide();
+    } else {
+        m_iconButton->show();
+    }
 }
 
 void IconEdit::setIcon(const QString &filename)

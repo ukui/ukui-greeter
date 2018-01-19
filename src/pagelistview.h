@@ -12,15 +12,16 @@
 class PageListView : public QWidget
 {
     Q_OBJECT
+    Q_PROPERTY(int page NOTIFY pageChanged)
 public:
     explicit PageListView(QWidget *parent = 0);
     void setModel(QSharedPointer<QAbstractItemModel>);
     void pageUp();      //切换到上一页    留给父窗口通过按钮调用
     void pageDown();    //切换到下一页
-    bool hasPrev();     //是否有上一页
-    bool hasNext();     //是否有下一页
-    int pageNum();      //页数
-    int curPage();      //当前页 0起
+    bool hasPrev();
+    bool hasNext();
+//    int pageNum();      //页数
+//    int curPage();      //当前页 0起
 
 protected:
     void keyReleaseEvent(QKeyEvent *);
@@ -28,7 +29,7 @@ protected:
 
 private:
     void drawPage();
-    void drawPageLayout();
+//    void drawPageLayout();
     void destroyPage();
     void goHome();      //切换到首页
     void goEnd();       //切换到尾页
@@ -37,7 +38,7 @@ private:
     void switchToUser();    //切换到选中的用户登录界面
 
 signals:
-    void switchPage(int cur_page);  //当翻页的时候发出
+    void pageChanged();  //当焦点所在项发生变化时发出
     void loggedIn(const QModelIndex& index);    //当选定用户时发出
 
 private slots:
@@ -52,9 +53,9 @@ private:
     QVector<UserEntry*> m_itemList;
     QHBoxLayout *m_layout;
 
-    int m_itemNum;      //每页的项数量
-    int m_pageNum;      //总页数
-    int m_curPage;      //当前页数
+//    int m_itemNum;      //每页的项数量
+//    int m_pageNum;      //总页数
+//    int m_curPage;      //当前页数
     int m_curItem;      //当前焦点所在项
     int m_end;
     int m_lastend;

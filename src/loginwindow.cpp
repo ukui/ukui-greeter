@@ -6,7 +6,8 @@
 #include "globalv.h"
 
 LoginWindow::LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent)
-    : QWidget(parent), m_greeter(greeter)
+    : QWidget(parent), m_greeter(greeter),
+      m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions, this))
 {    
     initUI();
     connect(m_greeter.data(), SIGNAL(showMessage(QString,QLightDM::Greeter::MessageType)),
@@ -24,7 +25,7 @@ void LoginWindow::initUI()
 {
     if (this->objectName().isEmpty())
         this->setObjectName(QStringLiteral("this"));
-    this->resize(520, 180);
+    this->resize(520, 135);
 
     m_backLabel = new QLabel(this);
     m_backLabel->setObjectName(QStringLiteral("m_backLabel"));
@@ -42,6 +43,7 @@ void LoginWindow::initUI()
     m_sessionLabel = new QLabel(this);
     m_sessionLabel->setObjectName(QStringLiteral("m_sessionLabel"));
     m_sessionLabel->setGeometry(QRect(width()-22, 0, 22, 22));
+    m_sessionLabel->installEventFilter(this);
 
     QPalette plt;
     plt.setColor(QPalette::WindowText, Qt::white);
@@ -91,13 +93,13 @@ bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
             m_isLoginLabel->setText("");
             m_messageLabel->setText("");
             m_passwordEdit->setType(QLineEdit::Password);
-            emit back();
+            emit back(1);
             return true;
         }
-    }
-    else if(obj == m_sessionLabel) {
+    } else if(obj == m_sessionLabel) {
         if(event->type() == QEvent::MouseButtonRelease) {
-
+            emit selectSession(m_session);
+            return true;
         }
     }
     return QWidget::eventFilter(obj, event);
@@ -195,14 +197,15 @@ void LoginWindow::setSession(QString sessionName)
         for(int i = 0; i < m_sessionsModel->rowCount(); i++) {
             QModelIndex index = m_sessionsModel->index(i, 0);
             if(index.data(Qt::DisplayRole).toString().toLower() == "ubuntu") {
-                sessionIcon = ":/resource/ubuntu_badge.png";
+                sessionName = "ubuntu";
                 break;
             }
         }
-        if(sessionIcon.isEmpty()) {
+        if(sessionName.isEmpty()) {
             sessionName = m_sessionsModel->index(0, 0).data().toString();
         }
     }
+    m_session = sessionName;
     if(sessionName.toLower() == "ubuntu") {
         sessionIcon = ":/resource/ubuntu_badge.png";
     } else if (sessionName.toLower() == "gnome") {
@@ -213,6 +216,13 @@ void LoginWindow::setSession(QString sessionName)
         sessionIcon = ":/resource/unknown_badge.png";
     }
     m_sessionLabel->setPixmap(scaledPixmap(22, 22, sessionIcon));
+}
+
+void LoginWindow::onSessionChanged(const QString &sessionName)
+{
+    qDebug() << "select session: " << sessionName;
+    m_session = sessionName;
+    setSession(m_session);
 }
 
 void LoginWindow::login_cb(const QString &str)
@@ -246,7 +256,6 @@ void LoginWindow::showMessage_cb(QString text, QLightDM::Greeter::MessageType ty
 
 void LoginWindow::authenticationComplete_cb()
 {
-    qDebug() << "authentication complete";
     if(m_greeter.data()->isAuthenticated())
     {
         qDebug()<< "authentication success";
@@ -255,8 +264,9 @@ void LoginWindow::authenticationComplete_cb()
     }
     else
     {
+        qDebug() << "authentication failed";
         m_greeter.data()->authenticate(m_nameLabel->text());
-        addMessage("password error, please input again");
+        addMessage(tr("password error, please input again"));
         m_passwordEdit->clear();
     }
 }

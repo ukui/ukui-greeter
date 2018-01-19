@@ -12,11 +12,12 @@ class SessionWindow : public QWidget
     Q_OBJECT
 public:
     explicit SessionWindow(QWidget *parent = 0);
-    void setSessionModel(QSharedPointer<QAbstractItemModel> model);
     bool eventFilter(QObject *, QEvent *);
+    void setSessionModel(QSharedPointer<QAbstractItemModel> model);
+    void setSession(const QString&);
 
 signals:
-    void back();
+    void back(int);
     void sessionChanged(const QString& sessionName);
 
 private:
@@ -27,6 +28,7 @@ private:
     QLabel *m_prompt;
     QSharedPointer<QAbstractItemModel> m_sessionsModel;
     int m_selectedIndex;
+    int m_origIndex;
 };
 
 #endif // SESSIONWINDOW_H

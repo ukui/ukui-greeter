@@ -20,7 +20,7 @@ protected:
     bool eventFilter(QObject *, QEvent *);
 
 private slots:
-    void onSwitchPage(int);
+    void onPageChanged();
     void onLoggedIn(const QModelIndex &);
 
 signals:

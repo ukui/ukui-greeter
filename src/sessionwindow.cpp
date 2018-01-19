@@ -12,7 +12,8 @@ public:
         : QWidget(parent),
           m_iconLabel(new QLabel(this)),
           m_textLabel(new QLabel(this)),
-          m_checkLabel(new QLabel(this))
+          m_checkLabel(new QLabel(this)),
+          _isChecked(false)
     {
         m_iconLabel->setGeometry(0, 0, height, height);
         m_textLabel->setGeometry(height+5, 0, width-height-5, height);
@@ -28,6 +29,12 @@ public:
         } else {
             m_checkLabel->setPixmap(QPixmap());
         }
+        _isChecked = isChecked;
+    }
+
+    bool checked()
+    {
+        return _isChecked;
     }
 
     void setContent(const QPixmap& icon, const QString& text)
@@ -42,12 +49,13 @@ private:
     QLabel *m_iconLabel;
     QLabel *m_textLabel;
     QLabel *m_checkLabel;
+    bool _isChecked;
 };
 
 
 SessionWindow::SessionWindow(QWidget *parent)
     : QWidget(parent),
-      m_selectedIndex(0),
+      m_selectedIndex(-1),
       m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions))
 {
     initUI();
@@ -59,7 +67,7 @@ void SessionWindow::initUI()
         setObjectName(QStringLiteral("this"));
     int sessionNum = m_sessionsModel->rowCount();
     int height = 55 + 30 * sessionNum + 20 * (sessionNum - 1);
-    resize(405, height);
+    resize(520, height);
     QPalette plt;
     plt.setBrush(QPalette::Window, QBrush("#142D6F"));
     plt.setColor(QPalette::WindowText, Qt::white);
@@ -67,21 +75,22 @@ void SessionWindow::initUI()
 
     m_backLabel = new QLabel(this);
     m_backLabel->setObjectName(QStringLiteral("m_backLabel"));
-    m_backLabel->setGeometry(QRect(0, 5, 32, 32));
+    m_backLabel->setGeometry(QRect(0, 0, 32, 32));
     m_backLabel->setPixmap(scaledPixmap(32, 32, ":/resource/arrow_left.png"));
+    m_backLabel->installEventFilter(this);
 
     m_prompt = new QLabel(this);
     m_prompt->setObjectName(QStringLiteral("m_prompt"));
-    m_prompt->setGeometry(QRect(52, 0, 350, 30));
+    m_prompt->setGeometry(QRect(220, 0, 350, 30));
     m_prompt->setFont(QFont("Ubuntu", 16));
-    m_prompt->setText(tr("select the desktop environment"));//
+    m_prompt->setText(tr("select the desktop environment"));
 
     for(int i = 0; i < sessionNum; i++) {
         QString sessionName = m_sessionsModel->index(i, 0).data().toString();
         IconLabel *sessionLabel = new IconLabel(300, 30, this);
         sessionLabel->setObjectName("session"+QString::number(i));
         sessionLabel->setContent(getSessionIcon(sessionName), sessionName);
-        sessionLabel->setGeometry(52, 55+ 30*i + 10*i, 300, 30);
+        sessionLabel->setGeometry(220, 55+ 30*i + 10*i, 300, 30);
         sessionLabel->installEventFilter(this);
     }
 }
@@ -93,10 +102,36 @@ bool SessionWindow::eventFilter(QObject *obj, QEvent *event)
         if(event->type() == QEvent::MouseButtonRelease){
             IconLabel *lastSessionLabel = findChild<IconLabel*>("session" + QString::number(m_selectedIndex));
             if(lastSessionLabel){
-                lastSessionLabel->setChecked(false);
+                lastSessionLabel->setChecked(!lastSessionLabel->checked());
             }
-            sessionLabel->setChecked(true);
-            m_selectedIndex = obj->objectName().right(1).toInt();
+            if(lastSessionLabel != obj) {
+                sessionLabel->setChecked(!sessionLabel->checked());
+            }
+            m_selectedIndex = sessionLabel->checked() ? obj->objectName().right(1).toInt() : -1;
+            return true;
+        }
+    }
+    if(obj == m_backLabel) {
+        if(event->type() == QEvent::MouseButtonPress) {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+            if(mouseEvent->button() == Qt::LeftButton) {
+                m_backLabel->setPixmap(scaledPixmap(32, 32, ":/resource/arrow_left_active.png"));
+                return true;
+            }
+        }
+        if(event->type() == QEvent::MouseButtonRelease) {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+            if(mouseEvent->button() == Qt::LeftButton) {
+                m_backLabel->setPixmap(scaledPixmap(32, 32, ":/resource/arrow_left.png"));
+                IconLabel *sessionLabel = findChild<IconLabel*>("session" + QString::number(m_selectedIndex));
+                if(sessionLabel)
+                    sessionLabel->setChecked(false);
+                if(m_selectedIndex != m_origIndex) {
+                    emit sessionChanged(m_sessionsModel->index(m_selectedIndex, 0).data().toString());
+                }
+                emit back(2);
+                return true;
+            }
         }
     }
 
@@ -110,6 +145,18 @@ void SessionWindow::setSessionModel(QSharedPointer<QAbstractItemModel> model)
     }
     m_sessionsModel = model;
     initUI();
+}
+
+void SessionWindow::setSession(const QString &sessionName)
+{
+    for(int i = 0; i < m_sessionsModel->rowCount(); i++) {
+        QString session = m_sessionsModel->index(i, 0).data().toString();
+        if(session.toLower() == sessionName.toLower()) {
+            IconLabel *sessionLabel = findChild<IconLabel*>("session" + QString::number(i));
+            sessionLabel->setChecked(true);
+            m_selectedIndex = m_origIndex = i;
+        }
+    }
 }
 
 QPixmap SessionWindow::getSessionIcon(const QString &sessionName)

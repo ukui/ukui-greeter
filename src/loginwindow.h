@@ -33,10 +33,11 @@ protected:
     bool eventFilter(QObject *, QEvent *);
 
 signals:
-    void back();
+    void back(int);
+    void selectSession(const QString& );
 
 public slots:
-
+    void onSessionChanged(const QString&);
     void showMessage_cb(QString text, QLightDM::Greeter::MessageType type);
     void showPrompt_cb(QString text, QLightDM::Greeter::PromptType type);
     void authenticationComplete_cb();
@@ -56,6 +57,8 @@ private:
     QLabel  *m_isLoginLabel;      //提示是否已登录
     QLabel  *m_messageLabel;      //提示信息
     IconEdit *m_passwordEdit;     //密码输入框
+
+    QString m_session;
 
 };
 

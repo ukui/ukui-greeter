@@ -75,8 +75,8 @@ void PageListView::setModel(QSharedPointer<QAbstractItemModel> model)
     m_model = model;
     m_itemList = QVector<UserEntry*>(m_model.data()->rowCount(), NULL);
 
-    m_pageNum = qCeil(m_model.data()->rowCount() * 1.0 / MAX_NUM_PP);
-    m_curPage = 0;
+//    m_pageNum = qCeil(m_model.data()->rowCount() * 1.0 / MAX_NUM_PP);
+//    m_curPage = 0;
 
     m_lastend = -1;
     m_itemCount = m_model.data()->rowCount();
@@ -102,7 +102,7 @@ void PageListView::drawPage()
         }
     }
 //    if(m_itemCount < 5)
-        m_layout->addStretch(5);
+        m_layout->addStretch();
     //如果entry不存在则创建，添加到layout中
     for(int i = begin; i <= m_end; i++)
     {
@@ -119,10 +119,12 @@ void PageListView::drawPage()
         m_layout->addWidget(m_itemList[i], 0, Qt::AlignTop);
     }
 //    if(m_itemCount < 5)
-        m_layout->addStretch(5);
+        m_layout->addStretch();
     m_itemList[m_curItem]->setFocus();
+    emit pageChanged();
 }
 
+/*
 void PageListView::drawPageLayout()
 {
     if(m_layout == NULL)
@@ -163,7 +165,7 @@ void PageListView::drawPageLayout()
     m_itemList[0]->setFocus();
     m_curItem = 0;
 }
-
+*/
 void PageListView::destroyPage()
 {
     int count = m_itemList.length();
@@ -281,7 +283,7 @@ void PageListView::onEntryLogin(const QString &name)
 
 bool PageListView::hasPrev()
 {
-    if(m_curPage > 0)
+    if(m_end > 4)
         return true;
     else
         return false;
@@ -289,18 +291,18 @@ bool PageListView::hasPrev()
 
 bool PageListView::hasNext()
 {
-    if(m_curPage < m_pageNum - 1)
+    if(m_end < m_itemCount -1)
         return true;
     else
         return false;
 }
 
-int PageListView::pageNum()
-{
-    return m_pageNum;
-}
+//int PageListView::pageNum()
+//{
+//    return m_pageNum;
+//}
 
-int PageListView::curPage()
-{
-    return m_curPage;
-}
+//int PageListView::curPage()
+//{
+//    return m_curPage;
+//}

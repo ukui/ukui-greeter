@@ -60,6 +60,7 @@ signals:
 
 public slots:
     void clicked_cb();
+    void showIcon(const QString&);
 
 private:
 

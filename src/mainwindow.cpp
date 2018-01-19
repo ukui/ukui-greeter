@@ -48,7 +48,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
             curScreen = i;
         }
     } 
-    if(curScreen != m_activeScreen){
+    if(curScreen != m_activeScreen && curScreen > 0){
         qDebug() << "active screen: from " << m_activeScreen << "to " << curScreen;
         m_activeScreen = curScreen;
         m_greeterWnd->setGeometry(m_model->index(m_activeScreen, 0).data(Qt::UserRole).toRect());

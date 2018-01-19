@@ -10,6 +10,8 @@ QT  += core gui widgets
 TARGET = kylin-greeter
 TEMPLATE = app
 
+DEFINES += QT_MESSAGELOGCONTEXT
+
 SOURCES += \
     src/extrarowproxymodel.cpp \
     src/greeterwindow.cpp \
@@ -23,8 +25,6 @@ SOURCES += \
     src/greeterwrapper.cpp \
     src/globalv.cpp \
     src/screenmodel.cpp \
-#    src/screenmanager.cpp \
-#    src/globalapplication.cpp \
     src/mainwindow.cpp \
     src/sessionwindow.cpp
 
@@ -40,19 +40,10 @@ HEADERS  += \
     src/greeterwrapper.h \
     src/globalv.h \
     src/screenmodel.h \
-#    src/screenmanager.h \
-#    src/globalapplication.h \
     src/mainwindow.h \
     src/sessionwindow.h
 
-CONFIG += c++11 \
-#        debug_and_release   \
-#        build_all
-#CONFIG(debug, debug|release){
-#    TARGET = kylin-greeter-debug
-#} else {
-#    TARGET = kylin-greeter
-#}
+CONFIG += c++11
 
 INCLUDEPATH += /usr/include/lightdm-qt5-3   \
                /usr/include/glog
@@ -60,7 +51,14 @@ INCLUDEPATH += /usr/include/lightdm-qt5-3   \
 LIBS += /usr/lib/x86_64-linux-gnu/liblightdm-qt5-3.so \
         /usr/lib/x86_64-linux-gnu/libglog.a
 
-RESOURCES += src/resource.qrc
+RESOURCES += src/resource.qrc \
+             src/translate.qrc
+TRANSLATIONS += src/ts/zh_CN.ts
+
+MOC_DIR += build/
+RCC_DIR += build/
+OBJECTS_DIR += build/
+DESTDIR += build/
 
 INSTALLS += target
 target.path += /usr/bin
