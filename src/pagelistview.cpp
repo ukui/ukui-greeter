@@ -6,17 +6,16 @@
 #include <QApplication>
 #include <QPushButton>
 #include <QDebug>
-#include <algorithm>
-#include <functional>
-#include "userentry.h"
+#include <QSettings>
 #include <QLightDM/UsersModel>
 #include "globalv.h"
+#include "userentry.h"
 
 PageListView::PageListView(QWidget *parent)
     : QWidget(parent),
       m_layout(new QHBoxLayout(this))
 {
-    resize(920*scale, 300*scale);
+    setFixedSize(950*scale, 300*scale);
 }
 
 bool PageListView::eventFilter(QObject *obj, QEvent *event)
@@ -36,27 +35,21 @@ void PageListView::keyReleaseEvent(QKeyEvent *event)
             break;
         }
         case Qt::Key_PageUp:
-//            qDebug() << "previous page";
             pageUp();
             break;
         case Qt::Key_PageDown:
-//            qDebug() << "next page";
             pageDown();
             break;
         case Qt::Key_Left:
-//            qDebug() << "previous";
             preItem();
             break;
         case Qt::Key_Right:
-//            qDebug() << "next";
             nextItem();
             break;
         case Qt::Key_Home:
-//            qDebug() << "home page";
             goHome();
             break;
         case Qt::Key_End:
-//            qDebug() << "end page";
             goEnd();
             break;
         default:
@@ -73,25 +66,38 @@ void PageListView::setModel(QSharedPointer<QAbstractItemModel> model)
 
     }
     m_model = model;
+    connect(m_model.data(), SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(onUserInserted(QModelIndex,int,int)));
+    connect(m_model.data(), SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SLOT(onUserRemoved(QModelIndex,int,int)));
+    connect(m_model.data(), SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
+            this, SLOT(onUserChanged(QModelIndex,QModelIndex)));
     m_itemList = QVector<UserEntry*>(m_model.data()->rowCount(), NULL);
-
-//    m_pageNum = qCeil(m_model.data()->rowCount() * 1.0 / MAX_NUM_PP);
-//    m_curPage = 0;
 
     m_lastend = -1;
     m_itemCount = m_model.data()->rowCount();
     m_end = m_itemCount >= 5 ? 4 : m_itemCount - 1; //每页最多显示5个
-    m_curItem = 0;
-    drawPage();
+    /* 读取上一次登录的用户 */
+    QSettings config(configFile, QSettings::IniFormat);
+    QString lastUser = config.value("lastLogUser").toString();
+    bool find = false;
+    for(int i = 0; i < m_model->rowCount(); i++) {
+        QString user = m_model->index(i, 0).data().toString();
+        if(lastUser == user) {
+            m_curItem = i;
+            find = true;
+            break;
+        }
+    }
+    if(!find) {
+        m_curItem = 0;
+    }
 
-//    drawPageLayout();
+    drawPage();
 }
 
 void PageListView::drawPage()
 {
     int begin = m_end - (m_itemCount > 5 ? 4 : m_itemCount - 1);
 
-    //从layout中移除之前的entry
     if(m_lastend > 0)
     {
         int lastbegin = m_lastend - (m_itemCount > 5 ? 4 : m_itemCount - 1);
@@ -101,83 +107,37 @@ void PageListView::drawPage()
             m_itemList[i]->hide();
         }
     }
-//    if(m_itemCount < 5)
+    if(m_itemCount < 5)
         m_layout->addStretch();
-    //如果entry不存在则创建，添加到layout中
+
     for(int i = begin; i <= m_end; i++)
     {
-        if(m_itemList[i] == NULL)
-        {
-            QModelIndex index = m_model.data()->index(i, 0);
-            UserEntry *entry = new UserEntry(index.data(Qt::DisplayRole).toString(),
-                                             index.data(QLightDM::UsersModel::ImagePathRole).toString(),
-                                             index.data(QLightDM::UsersModel::LoggedInRole).toBool(), this);
-            connect(entry, SIGNAL(clicked(QString)), this, SLOT(onEntryLogin(QString)));
-            m_itemList[i] = entry;
+        //如果entry不存在则创建，添加到layout中
+        if(m_itemList[i] == NULL) {
+            m_itemList[i] = createEntry(i);
+        } else if(m_itemList[i]->userName() != m_model->index(i, 0).data().toString()) {
+            m_itemList.insert(i, createEntry(i));
         }
         m_itemList[i]->show();
-        m_layout->addWidget(m_itemList[i], 0, Qt::AlignTop);
+        m_layout->addWidget(m_itemList[i], 0);
     }
-//    if(m_itemCount < 5)
+    if(m_itemCount < 5)
         m_layout->addStretch();
-    m_itemList[m_curItem]->setFocus();
+
+    if(m_itemList.size() > 0) {
+        m_itemList[m_curItem]->setFocus();
+    }
     emit pageChanged();
 }
 
-/*
-void PageListView::drawPageLayout()
+UserEntry* PageListView::createEntry(int i)
 {
-    if(m_layout == NULL)
-    {
-        m_layout = new QHBoxLayout(this);
-        m_layout->setSpacing(0);
-    }
-    m_itemNum = m_model.data()->rowCount() - m_curPage * MAX_NUM_PP > 5 ? 5 : m_model.data()->rowCount() - m_curPage * MAX_NUM_PP;
-    qDebug()<< "第" << m_curPage<<  "页， 共" <<  m_itemNum << "项";
-
-
-    m_layout->addStretch();
-
-    for(int i = 0; i< m_itemNum; i++)
-    {
-        UserEntry *entry = new UserEntry(this);
-        entry->setObjectName("Entry"+QString::number(i));
-        connect(entry, SIGNAL(clicked(QString)), this, SLOT(onEntryLogin(QString)));
-
-        QModelIndex index = m_model.data()->index(m_curPage * MAX_NUM_PP + i, 0);
-        QString face = index.data(QLightDM::UsersModel::ImagePathRole).toString();
-        QString name = index.data(Qt::DisplayRole).toString();
-        bool islogin = index.data(QLightDM::UsersModel::LoggedInRole).toBool();
-        qDebug() << face << " "<< name << " " << islogin;
-        entry->setFace(face);
-        entry->setUserName(name);
-        entry->setLogin(islogin);
-
-        m_itemList[i] = entry;
-        m_layout->addWidget(entry);
-
-    }
-
-    m_layout->addStretch();
-
-
-    this->setLayout(m_layout);
-    m_itemList[0]->setFocus();
-    m_curItem = 0;
-}
-*/
-void PageListView::destroyPage()
-{
-    int count = m_itemList.length();
-    for(int i = 0; i< count; i++)
-        delete m_itemList[i];
-    m_itemList.clear();
-
-    if(m_layout)
-    {
-        delete m_layout;
-        m_layout = NULL;
-    }
+    QModelIndex index = m_model->index(i, 0);
+    UserEntry *entry = new UserEntry(index.data(Qt::DisplayRole).toString(),
+                                     index.data(QLightDM::UsersModel::ImagePathRole).toString(),
+                                     index.data(QLightDM::UsersModel::LoggedInRole).toBool(), this);
+    connect(entry, SIGNAL(clicked(QString)), this, SLOT(onEntryLogin(QString)));
+    return entry;
 }
 
 void PageListView::pageUp()
@@ -276,8 +236,6 @@ void PageListView::onEntryLogin(const QString &name)
             m_curItem = i;
         }
     }
-//    auto iter = std::find_if(m_itemList.begin(), m_itemList.end(), [name](UserEntry *entry){return entry->userName() == name;});
-//    m_curItem = std::distance(m_itemList.begin(), iter);
     emit loggedIn(m_model.data()->index(m_curItem, 0));
 }
 
@@ -297,12 +255,51 @@ bool PageListView::hasNext()
         return false;
 }
 
-//int PageListView::pageNum()
-//{
-//    return m_pageNum;
-//}
+void PageListView::onUserInserted(const QModelIndex& parent, int begin, int end)
+{
+    Q_UNUSED(parent)
 
-//int PageListView::curPage()
-//{
-//    return m_curPage;
-//}
+    m_itemCount = m_model->rowCount();
+    m_curItem = begin;
+    if(m_end >= begin) {
+        m_lastend = m_end;
+        drawPage();
+    } else {
+        pageDown();
+    }
+}
+
+void PageListView::onUserRemoved(const QModelIndex & parent, int begin, int end)
+{
+    Q_UNUSED(parent)
+
+    for(int i = begin; i<=end; i++) {
+        if(m_itemList[i])
+            delete(m_itemList[i]);
+        m_itemList.remove(i);
+    }
+    if(m_end == m_itemCount-1) {
+        m_end -= (end-begin+1);
+        m_lastend = m_end;
+    }
+    if(m_curItem >= m_end) {
+        m_curItem = m_end;
+    }
+    m_itemCount = m_model->rowCount();
+    drawPage();
+}
+
+void PageListView::onUserChanged(const QModelIndex & topLeft,
+                                 const QModelIndex& bottomRight)
+{
+    int begin = topLeft.row();
+    int end = bottomRight.row();
+    for(int i = begin; i <= end; i++) {
+        if(m_itemList[i]) {
+            QModelIndex index = m_model->index(i, 0);
+            m_itemList[i]->setUserName(index.data().toString());
+            m_itemList[i]->setFace(index.data(QLightDM::UsersModel::ImagePathRole).toString());
+            m_itemList[i]->setLogin(index.data(QLightDM::UsersModel::LoggedInRole).toBool());
+        }
+    }
+}

@@ -23,8 +23,11 @@ public:
 
 private slots:
     void onLoggedIn(const QModelIndex &);
-    void onBack(int);
+    void onBacktoUsers();
+    void onBacktoLogin();
     void onSelectSession(const QString&);
+    void timedAutologin();
+
 private:
     UserWindow      *m_userWnd;
     LoginWindow     *m_loginWnd;

@@ -20,17 +20,14 @@ public:
     void pageDown();    //切换到下一页
     bool hasPrev();
     bool hasNext();
-//    int pageNum();      //页数
-//    int curPage();      //当前页 0起
 
 protected:
     void keyReleaseEvent(QKeyEvent *);
     bool eventFilter(QObject *, QEvent *);
 
 private:
+    UserEntry* createEntry(int );
     void drawPage();
-//    void drawPageLayout();
-    void destroyPage();
     void goHome();      //切换到首页
     void goEnd();       //切换到尾页
     void preItem();     //切换到上一项
@@ -43,9 +40,9 @@ signals:
 
 private slots:
     void onEntryLogin(const QString &name);
-//    void onUserChanged();
-//    void onUserInserted();
-//    void onUserRemoved();
+    void onUserChanged(const QModelIndex&, const QModelIndex&);
+    void onUserInserted(const QModelIndex&, int, int);
+    void onUserRemoved(const QModelIndex&, int, int);
 public:
     const int MAX_NUM_PP = 5;   //每页最大的数量
 private:
@@ -53,12 +50,10 @@ private:
     QVector<UserEntry*> m_itemList;
     QHBoxLayout *m_layout;
 
-//    int m_itemNum;      //每页的项数量
-//    int m_pageNum;      //总页数
-//    int m_curPage;      //当前页数
+    int m_lastItem;     //上一次选择的项
     int m_curItem;      //当前焦点所在项
-    int m_end;
-    int m_lastend;
+    int m_end;          //当前页的最后一项
+    int m_lastend;      //上一次的最后一项
     int m_itemCount;
 };
 

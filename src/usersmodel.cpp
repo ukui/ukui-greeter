@@ -1,11 +1,12 @@
 #include "usersmodel.h"
 #include <QLightDM/UsersModel>
 
-UsersModel::UsersModel(QObject *parent) :
+UsersModel::UsersModel(bool hideUsers, QObject *parent) :
     ExtraRowProxyModel(parent),
     m_showGuest(false)
 {
-    setSourceModel(new QLightDM::UsersModel(this));
+    if(!hideUsers)
+        setSourceModel(new QLightDM::UsersModel(this));
 }
 
 void UsersModel::setShowGuest(bool isShowGuest)

@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QAbstractItemModel>
 #include <QSharedPointer>
+#include <QSettings>
 #include <QLightDM/Greeter>
 #include <QLightDM/UsersModel>
 #include "iconedit.h"
@@ -28,27 +29,35 @@ public:
 private:
     void initUI();
     void setSession(QString);
+    int sessionIndex(const QString &session);
+    void saveLastLoginUser();
 
 protected:
     bool eventFilter(QObject *, QEvent *);
 
 signals:
-    void back(int);
+    void back();
     void selectSession(const QString& );
 
 public slots:
-    void onSessionChanged(const QString&);
-    void showMessage_cb(QString text, QLightDM::Greeter::MessageType type);
-    void showPrompt_cb(QString text, QLightDM::Greeter::PromptType type);
-    void authenticationComplete_cb();
-    void autologinTimerExpired_cb();
-    void reset_cb();
-    void login_cb(const QString &str);
+    void startAuthenticate(const QString& username);
+//    void cancelAuthenticate();
+    void startSession();
+    void saveRootImage();
+    void onSessionSelected(const QString&);
+    void onShowMessage(QString text, QLightDM::Greeter::MessageType type);
+    void onShowPrompt(QString text, QLightDM::Greeter::PromptType type);
+    void onAuthenticationComplete();
+    void onAutologinTimerExpired();
+    void onReset();
+    void onLogin(const QString &str);
 
 private:
     QSharedPointer<QAbstractItemModel> m_usersModel;
     QSharedPointer<QAbstractItemModel> m_sessionsModel;
     QSharedPointer<GreeterWrapper> m_greeter;
+    QString m_session;
+    QSettings *m_config;
 
     QLabel  *m_backLabel;         //返回用户列表
     QLabel  *m_faceLabel;         //头像
@@ -57,9 +66,6 @@ private:
     QLabel  *m_isLoginLabel;      //提示是否已登录
     QLabel  *m_messageLabel;      //提示信息
     IconEdit *m_passwordEdit;     //密码输入框
-
-    QString m_session;
-
 };
 
 #endif // LOGINWINDOW_H

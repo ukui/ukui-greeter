@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QPainter>
 #include <QMouseEvent>
+#include <QDebug>
 #include "globalv.h"
 #include "greeterwindow.h"
 MainWindow::MainWindow(QWidget *parent)

@@ -1,24 +1,23 @@
 #include "greeterwindow.h"
 #include <stdio.h>
+#include <string>
 #include <QApplication>
 #include <QTextCodec>
 #include <QResource>
 #include <QTranslator>
 #include <QDesktopWidget>
 #include <QRect>
-#include <QMutex>
 #include <QDateTime>
 #include <QDebug>
+#include <QStandardPaths>
 #include "globalv.h"
 #include "mainwindow.h"
-#include "sessionwindow.h"
-#include <QLightDM/SessionsModel>
-
-#define QT_MESSAGELOGCONTEXT
 
 float scale;
 int fontSize;
 QFont font;
+QString configFile;
+int top;
 
 void outputMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -31,16 +30,16 @@ void outputMessage(QtMsgType type, const QMessageLogContext &context, const QStr
         fprintf(stderr, "%s Debug: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
         break;
     case QtInfoMsg:
-        fprintf(stderr, "%s Info: %s:%u: %s\n", time.constData(), __FILE__, __LINE__, localMsg.constData());
+        fprintf(stderr, "%s Info: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
         break;
     case QtWarningMsg:
-        fprintf(stderr, "%s Warnning: %s:%u: %s\n", time.constData(), __FILE__, __LINE__, localMsg.constData());
+        fprintf(stderr, "%s Warnning: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
         break;
     case QtCriticalMsg:
-        fprintf(stderr, "%s Critical: %s:%u: %s\n", time.constData(), __FILE__, __LINE__, localMsg.constData());
+        fprintf(stderr, "%s Critical: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
         break;
     case QtFatalMsg:
-        fprintf(stderr, "%s Fatal: %s:%u: %s\n", time.constData(), __FILE__, __LINE__, localMsg.constData());
+        fprintf(stderr, "%s Fatal: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
         abort();
     }
 
@@ -51,25 +50,33 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(outputMessage);
     QApplication a(argc, argv);
 
-    //计算缩放比例
-    QRect screen = QApplication::desktop()->rect();
-    scale = QString::number(screen.width() / 1920.0, 'f', 1).toFloat();
-    scale = scale > 1.0 ? 1.0 : (scale < 0.5 ? 0.5 : scale);
-    qDebug() <<"ScreenSize:" << screen.width() << " "<< screen.height()<< ", scale: "<< scale;
-    scale = 1.0;
-    //字体大小
-    fontSize = 10;
-    font = QFont("ubuntu", fontSize);
-
     QResource::registerResource("resource.qrc");
     QResource::registerResource("translate.qrc");
 
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QTextCodec::setCodecForLocale(codec);
 
+    //加载翻译文件
     QTranslator translator;
     translator.load(":/qm/zh_CN.qm");
     a.installTranslator(&translator);
+
+    //用于QSettings
+    QApplication::setOrganizationName("Kylin");
+    QApplication::setApplicationName("Greeter");
+
+    configFile = QStandardPaths::displayName(QStandardPaths::CacheLocation) + "/kylin-greeter.conf";
+    qDebug() << "load configure file: "<< configFile;
+    //计算缩放比例
+    QRect screen = QApplication::desktop()->rect();
+    scale = QString::number(screen.width() / 1920.0, 'f', 1).toFloat();
+    scale = scale > 1.0 ? 1.0 : (scale < 0.5 ? 0.5 : scale);
+    qDebug() <<"ScreenSize:" << screen.width() << " "<< screen.height()<< ", scale: "<< scale;
+//    scale = std::stof(argv[1]);
+//    top = std::stoi(argv[2]);
+    //字体大小
+    fontSize = 10;
+    font = QFont("ubuntu", fontSize);
 
     MainWindow w;
     w.show();

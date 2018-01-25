@@ -2,23 +2,27 @@
 #include <QMouseEvent>
 #include <QDebug>
 #include <QApplication>
+#include <QStandardPaths>
+#include <QScreen>
+#include <QProcess>
 #include <QLightDM/SessionsModel>
+#include <X11/Xlib.h>
+#include <X11/cursorfont.h>
 #include "globalv.h"
 
 LoginWindow::LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent)
     : QWidget(parent), m_greeter(greeter),
-      m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions, this))
+      m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions, this)),
+      m_config(new QSettings(configFile, QSettings::IniFormat))
 {    
     initUI();
     connect(m_greeter.data(), SIGNAL(showMessage(QString,QLightDM::Greeter::MessageType)),
-            this, SLOT(showMessage_cb(QString,QLightDM::Greeter::MessageType)));
+            this, SLOT(onShowMessage(QString,QLightDM::Greeter::MessageType)));
     connect(m_greeter.data(), SIGNAL(showPrompt(QString,QLightDM::Greeter::PromptType)),
-            this, SLOT(showPrompt_cb(QString,QLightDM::Greeter::PromptType)));
+            this, SLOT(onShowPrompt(QString,QLightDM::Greeter::PromptType)));
     connect(m_greeter.data(), SIGNAL(authenticationComplete()),
-            this, SLOT(authenticationComplete_cb()));
-    connect(m_greeter.data(), SIGNAL(autologinTimerExpired()),
-            this, SLOT(autologinTimerExpired_cb()));
-    connect(m_greeter.data(), SIGNAL(reset()), this, SLOT(reset_cb()));
+            this, SLOT(onAuthenticationComplete()));
+    connect(m_greeter.data(), SIGNAL(reset()), this, SLOT(onReset()));
 }
 
 void LoginWindow::initUI()
@@ -72,7 +76,7 @@ void LoginWindow::initUI()
     QRect pwdRect(220, 90, 300, 40);
     m_passwordEdit->setGeometry(pwdRect);
     m_passwordEdit->resize(QSize(300, 40));
-    connect(m_passwordEdit, SIGNAL(clicked(const QString&)), this, SLOT(login_cb(const QString&)));
+    connect(m_passwordEdit, SIGNAL(clicked(const QString&)), this, SLOT(onLogin(const QString&)));
 }
 
 bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
@@ -92,11 +96,15 @@ bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
             m_nameLabel->setText("");
             m_isLoginLabel->setText("");
             m_messageLabel->setText("");
+            m_passwordEdit->clear();
             m_passwordEdit->setType(QLineEdit::Password);
-            emit back(1);
+            emit back();
             return true;
         }
     } else if(obj == m_sessionLabel) {
+        if(event->type() == QEvent::Paint) {
+
+        }
         if(event->type() == QEvent::MouseButtonRelease) {
             emit selectSession(m_session);
             return true;
@@ -110,6 +118,11 @@ void LoginWindow::setUsersModel(QSharedPointer<QAbstractItemModel> model)
     if(model.isNull())
         return;
     m_usersModel = model;
+
+    if(m_usersModel->rowCount() == 1) {
+        m_backLabel->hide();
+        setUserIndex(m_usersModel->index(0,0));
+    }
 }
 
 bool LoginWindow::setUserIndex(const QModelIndex& index)
@@ -141,17 +154,7 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
         setSession(index.data(QLightDM::UsersModel::SessionRole).toString());
     }
 
-    //用户认证
-    if(name == tr("Guest")) {                       //游客登录
-        //m_greeter->authenticateAsGuest();
-    }
-    else if(name == tr("Login")) {                  //手动输入用户名
-        m_passwordEdit->setPrompt(tr("Username"));
-        m_passwordEdit->setType(QLineEdit::Normal);
-    }
-    else {
-        m_greeter->authenticate(name);
-    }
+    startAuthenticate(name);
 
     return true;
 }
@@ -188,29 +191,46 @@ bool LoginWindow::setSessionIndex(const QModelIndex &index)
     return true;
 }
 
-void LoginWindow::setSession(QString sessionName)
+int LoginWindow::sessionIndex(const QString &session)
 {
-    QString sessionIcon;
-    //有些用户没有设置session，为空，如果系统有Ubuntu session，则设为默认session；
-    //否则，则选择第一个session为默认session
-    if(sessionName.isEmpty()) {
-        for(int i = 0; i < m_sessionsModel->rowCount(); i++) {
-            QModelIndex index = m_sessionsModel->index(i, 0);
-            if(index.data(Qt::DisplayRole).toString().toLower() == "ubuntu") {
-                sessionName = "ubuntu";
-                break;
-            }
-        }
-        if(sessionName.isEmpty()) {
-            sessionName = m_sessionsModel->index(0, 0).data().toString();
+    if(!m_sessionsModel){
+        return -1;
+    }
+    for(int i = 0; i < m_sessionsModel->rowCount(); i++){
+        QString sessionName = m_sessionsModel->index(i, 0).data().toString();
+        if(session.toLower() == sessionName.toLower()) {
+            return i;
         }
     }
-    m_session = sessionName;
-    if(sessionName.toLower() == "ubuntu") {
+    return -1;
+}
+
+void LoginWindow::setSession(QString session)
+{
+    QString sessionIcon;
+
+    if(session.isEmpty() || sessionIndex(session) == -1) {
+        /* default */
+        QString defaultSession = m_greeter->defaultSessionHint();
+        if(defaultSession != session && sessionIndex(defaultSession) != -1) {
+            session = defaultSession;
+        }
+        /* first session in session list */
+        else if(m_sessionsModel && m_sessionsModel->rowCount() > 0) {
+            session = m_sessionsModel->index(0, 0).data().toString();
+        }
+        else {
+            session = "";
+        }
+    }
+    m_session = session;
+    if(session.isEmpty()) {
+        sessionIcon = "";
+    } else if(session.toLower() == "ubuntu") {
         sessionIcon = ":/resource/ubuntu_badge.png";
-    } else if (sessionName.toLower() == "gnome") {
+    } else if (session.toLower() == "gnome") {
         sessionIcon = ":/resource/ubuntu_badge.png";
-    } else if (sessionName.toLower() == "kde") {
+    } else if (session.toLower() == "kde") {
         sessionIcon = ":/resource/ubuntu_badge.png";
     } else {
         sessionIcon = ":/resource/unknown_badge.png";
@@ -218,65 +238,111 @@ void LoginWindow::setSession(QString sessionName)
     m_sessionLabel->setPixmap(scaledPixmap(22, 22, sessionIcon));
 }
 
-void LoginWindow::onSessionChanged(const QString &sessionName)
+void LoginWindow::onSessionSelected(const QString &session)
 {
-    qDebug() << "select session: " << sessionName;
-    m_session = sessionName;
+    qDebug() << "select session: " << session;
+    if(!session.isEmpty() && m_session != session) {
+        m_session = session;
+    }
     setSession(m_session);
+//    startAuthenticate(m_nameLabel->text());
 }
 
-void LoginWindow::login_cb(const QString &str)
+void LoginWindow::startAuthenticate(const QString &username)
 {
-    qDebug()<< "login: " << str;
+    //用户认证
+    if(username == tr("Guest")) {                       //游客登录
+        qDebug() << "guest login";
+        //m_greeter->authenticateAsGuest();
+    }
+    else if(username == tr("Login")) {                  //手动输入用户名
+        m_passwordEdit->setPrompt(tr("Username"));
+        m_passwordEdit->setType(QLineEdit::Normal);
+    }
+    else {
+        qDebug() << "login: " << username;
+        m_greeter->authenticate(username);
+    }
+}
+
+void LoginWindow::startSession()
+{
+    //#TODO: set language
+
+    QString sessionKey;
+    for(int i = 0; i < m_sessionsModel->rowCount(); i++) {
+        QString session = m_sessionsModel->index(i, 0).data(Qt::DisplayRole).toString();
+        if(m_session == session) {
+            sessionKey = m_sessionsModel->index(i, 0).data(Qt::UserRole).toString();
+        }
+    }
+    saveLastLoginUser();
+//    saveRootImage();
+    if(!m_greeter->startSessionSync(sessionKey)) {
+        addMessage(tr("Failed to start session"));
+        m_greeter->authenticate(m_nameLabel->text());
+    }
+}
+
+void LoginWindow::saveLastLoginUser()
+{
+//    m_config->beginGroup("Greeter");
+    m_config->setValue("lastLoginUser", m_nameLabel->text());
+//    m_config->endGroup();
+    m_config->sync();
+    qDebug() << m_config->fileName();
+}
+
+void LoginWindow::onLogin(const QString &str)
+{
+    qDebug()<< "password: " << str;
+    m_messageLabel->clear();
     QString name = m_nameLabel->text();
     if(name == tr("Login")) {
         m_nameLabel->setText(str);
         m_passwordEdit->setText("");
         m_passwordEdit->setType(QLineEdit::Password);
         m_greeter->authenticate(str);
+        qDebug() << "login: " << name;
     }
     else {
-        m_greeter.data()->respond(str);
+        m_greeter->respond(str);
     }
     m_passwordEdit->setText("");
 }
 
-void LoginWindow::showPrompt_cb(QString text, QLightDM::Greeter::PromptType type)
+void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
 {
     qDebug()<< "prompt: "<< text;
     m_passwordEdit->setPrompt(text);
     update();   //不更新的话，第一次不会显示prompt
 }
 
-void LoginWindow::showMessage_cb(QString text, QLightDM::Greeter::MessageType type)
+void LoginWindow::onShowMessage(QString text, QLightDM::Greeter::MessageType type)
 {
     qDebug()<< "message: "<< text;
     addMessage(text);
 }
 
-void LoginWindow::authenticationComplete_cb()
+void LoginWindow::onAuthenticationComplete()
 {
-    if(m_greeter.data()->isAuthenticated())
-    {
+    if(m_greeter->isAuthenticated()) {
         qDebug()<< "authentication success";
-        m_greeter.data()->startSessionSync("ubuntu");
-        exit(0);
-    }
-    else
-    {
+        startSession();
+    } else {
         qDebug() << "authentication failed";
-        m_greeter.data()->authenticate(m_nameLabel->text());
+        m_greeter->authenticate(m_nameLabel->text());
         addMessage(tr("password error, please input again"));
         m_passwordEdit->clear();
     }
 }
 
-void LoginWindow::autologinTimerExpired_cb()
+void LoginWindow::onAutologinTimerExpired()
 {
 
 }
 
-void LoginWindow::reset_cb()
+void LoginWindow::onReset()
 {
 
 }
@@ -284,4 +350,18 @@ void LoginWindow::reset_cb()
 void LoginWindow::addMessage(const QString &text)
 {
     m_messageLabel->setText(text);
+}
+#include <QDesktopWidget>
+void LoginWindow::saveRootImage()
+{
+//    QPixmap pix = QApplication::primaryScreen()->grabWindow(QApplication::desktop()->winId());
+//    QPixmap pix(":/resource/background");
+    QProcess process;
+    process.setStandardErrorFile("/tmp/kylin-greeter.log", QIODevice::Append);
+    process.setStandardOutputFile("/tmp/kylin-greeter.log", QIODevice::Append);
+    QString rootimagePaths = QStandardPaths::findExecutable("kylin-greeter-rootimage");
+    process.start(rootimagePaths, QIODevice::WriteOnly);
+//    pix.save(&process, "xpm"); //write pixmap to rootimage
+//    process.closeWriteChannel();
+    process.waitForFinished();
 }

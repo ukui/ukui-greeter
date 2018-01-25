@@ -17,8 +17,8 @@ public:
     void setSession(const QString&);
 
 signals:
-    void back(int);
-    void sessionChanged(const QString& sessionName);
+    void back();
+    void sessionSelected(const QString& sessionName);
 
 private:
     void initUI();

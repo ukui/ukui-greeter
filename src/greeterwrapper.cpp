@@ -1,5 +1,6 @@
 #include "greeterwrapper.h"
 #include <QDebug>
+#include "globalv.h"
 
 GreeterWrapper::GreeterWrapper(QObject *parent) : QLightDM::Greeter(parent)
 {
@@ -9,4 +10,3 @@ GreeterWrapper::GreeterWrapper(QObject *parent) : QLightDM::Greeter(parent)
         exit(1);
     }
 }
-

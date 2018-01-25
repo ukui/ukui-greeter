@@ -1,13 +1,13 @@
 #include "globalv.h"
 
-//#include <QPoint>
+#include <QDebug>
 #include <QRect>
 
 QPixmap scaledPixmap(int width, int height, QString url)
 {
     QFile imgFile(url);
     if(!imgFile.exists()){
-        qDebug()<< "not find this file";
+        qDebug()<< "not find the pixmap file";
         return QPixmap();
     }
     QPixmap pixmap(url);

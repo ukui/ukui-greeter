@@ -1,7 +1,8 @@
 #include "extrarowproxymodel.h"
 #include <QDebug>
 ExtraRowProxyModel::ExtraRowProxyModel(QObject *parent)
-    :QAbstractListModel(parent), m_extraModel(new QStandardItemModel(this))
+    : QAbstractListModel(parent),
+      m_extraModel(new QStandardItemModel(this))
 {
     connect(m_extraModel, SIGNAL(rowsInserted(const QModelIndex&, int, int)),
             this, SLOT(onExtraRowsInserted(const QModelIndex&, int, int)));

@@ -9,7 +9,7 @@ class UsersModel : public ExtraRowProxyModel
     Q_PROPERTY(bool m_showGuest READ showGuest WRITE setShowGuest)
     Q_PROPERTY(bool m_showManualLogin READ showManualLogin WRITE setShowManualLogin)
 public:
-    explicit UsersModel(QObject *parent=0);
+    explicit UsersModel(bool hideUsers=false, QObject *parent=0);
     void setShowGuest(bool);
     bool showGuest() const;
     void setShowManualLogin(bool);

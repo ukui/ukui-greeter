@@ -23,18 +23,18 @@ UserEntry::UserEntry(const QString &name, const QString &facePath, bool isLogin,
 void UserEntry::initUI()
 {
     if (objectName().isEmpty())
-        setObjectName(QString::fromUtf8("Entry"));
-    setFixedSize(190*scale, 300*scale);     //不能用resize，否则放到layout中时，如果layout加有stretch，则该widget显示不出来
+        setObjectName(QString::fromUtf8("Entry"));   
+    setFixedSize(190*scale, 130*scale+70);//不能用resize，否则放到layout中时，如果layout加有stretch，则该widget显示不出来
     m_faceLabel = new QLabel(this);
     m_faceLabel->setObjectName(QString::fromUtf8("m_faceLabel"));
-    QRect faceRect(30*scale, 30*scale, 130*scale, 130*scale);
+    QRect faceRect(30*scale, 10, 130*scale, 130*scale);
     m_faceLabel->setGeometry(faceRect);
     m_faceLabel->setStyleSheet(QString::fromUtf8("border-color: rgb(255, 255, 255);"));
-    m_faceLabel->setAlignment(Qt::AlignCenter);
+//    m_faceLabel->setAlignment(Qt::AlignCenter);
 
     m_nameLabel = new QLabel(this);
     m_nameLabel->setObjectName(QString::fromUtf8("m_nameLabel"));
-    QRect nameRect(30*scale, faceRect.bottom()+15, 130*scale, 20);
+    QRect nameRect(30*scale, faceRect.bottom()+12, 130*scale, 20);
     m_nameLabel->setGeometry(nameRect);
     m_nameLabel->setAlignment(Qt::AlignCenter);
     m_nameLabel->setFont(QFont("Ubuntu", fontSize));
@@ -74,7 +74,7 @@ void UserEntry::paintEvent(QPaintEvent *event)
         brush.setColor(color);
         painter.setBrush(brush);
         QRect rect = m_faceLabel->geometry();
-        QRect border(rect.top()-7, rect.left()-7, rect.width()+14, rect.height()+14);
+        QRect border(rect.left()-7, rect.top()-7, rect.width()+14, rect.height()+14);
         painter.drawRect(border);
     }
     return QWidget::paintEvent(event);
@@ -142,3 +142,7 @@ void UserEntry::setLogin(bool isLogin)
     }
 }
 
+void UserEntry::selected(bool isSelected)
+{
+    this->isSelected = isSelected;
+}

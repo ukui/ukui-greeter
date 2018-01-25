@@ -126,10 +126,8 @@ bool SessionWindow::eventFilter(QObject *obj, QEvent *event)
                 IconLabel *sessionLabel = findChild<IconLabel*>("session" + QString::number(m_selectedIndex));
                 if(sessionLabel)
                     sessionLabel->setChecked(false);
-                if(m_selectedIndex != m_origIndex) {
-                    emit sessionChanged(m_sessionsModel->index(m_selectedIndex, 0).data().toString());
-                }
-                emit back(2);
+                emit sessionSelected(m_sessionsModel->index(m_selectedIndex, 0).data().toString());
+                emit back();
                 return true;
             }
         }

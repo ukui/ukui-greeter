@@ -10,7 +10,8 @@ QT  += core gui widgets
 TARGET = kylin-greeter
 TEMPLATE = app
 
-DEFINES += QT_MESSAGELOGCONTEXT
+DEFINES += QT_MESSAGELOGCONTEXT \    #使用qInstallMessageHandler定制日志输出格式
+           GREETER_CONFIG=/usr/share/lightdm/kylin-greeter
 
 SOURCES += \
     src/extrarowproxymodel.cpp \
@@ -26,7 +27,8 @@ SOURCES += \
     src/globalv.cpp \
     src/screenmodel.cpp \
     src/mainwindow.cpp \
-    src/sessionwindow.cpp
+    src/sessionwindow.cpp \
+#    src/rootimageapp.cpp
 
 HEADERS  += \
     src/extrarowproxymodel.h \
@@ -43,24 +45,35 @@ HEADERS  += \
     src/mainwindow.h \
     src/sessionwindow.h
 
+#SUBDIRS += rootimage
+#rootimage.subdir = src
+#rootimage.file = root-image.pro
+#rootimage.target = root-image
+
 CONFIG += c++11
 
-INCLUDEPATH += /usr/include/lightdm-qt5-3   \
-               /usr/include/glog
+INCLUDEPATH += /usr/include/lightdm-qt5-3
 
 LIBS += /usr/lib/x86_64-linux-gnu/liblightdm-qt5-3.so \
-        /usr/lib/x86_64-linux-gnu/libglog.a
+#        /usr/lib/x86_64-linux-gnu/libX11.so.6
 
 RESOURCES += src/resource.qrc \
              src/translate.qrc
 TRANSLATIONS += src/ts/zh_CN.ts
 
-MOC_DIR += build/
-RCC_DIR += build/
-OBJECTS_DIR += build/
-DESTDIR += build/
+#MOC_DIR += build/
+#RCC_DIR += build/
+#OBJECTS_DIR += build/
+#DESTDIR += build/
 
-INSTALLS += target
+configfile.path = /usr/share/lightdm/lightdm.conf.d/
+configfile.files = debian/kylin-greeter.desktop
+
+desktopfile.path = /usr/share/xgreeters/
+desktopfile.files = debian/95-kylin-greeter.conf
+
 target.path += /usr/bin
+INSTALLS += target configfile desktopfile
+
 
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0
