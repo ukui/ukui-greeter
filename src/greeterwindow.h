@@ -17,9 +17,8 @@ class GreeterWindow : public QWidget
 public:
     GreeterWindow(QWidget *parent = 0);
     ~GreeterWindow();
-
-public:
     void initUI();
+    bool eventFilter(QObject *, QEvent *);
 
 private slots:
     void onLoggedIn(const QModelIndex &);
@@ -36,6 +35,8 @@ private:
     QWidget         *m_firstWnd;
     QWidget         *m_secondWnd;
     QWidget         *m_thirdWnd;
+    QLabel          *m_keyboardLB;
+    QLabel          *m_powerLB;
     QSharedPointer<UsersModel> m_usersModel;
     QSharedPointer<QAbstractItemModel> m_sessionsModel;
     QSharedPointer<GreeterWrapper> m_greeter;

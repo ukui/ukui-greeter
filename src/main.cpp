@@ -5,6 +5,7 @@
 #include <QTextCodec>
 #include <QResource>
 #include <QTranslator>
+#include <QLocale>
 #include <QDesktopWidget>
 #include <QRect>
 #include <QDateTime>
@@ -12,12 +13,13 @@
 #include <QStandardPaths>
 #include "globalv.h"
 #include "mainwindow.h"
+#include "powerwindow.h"
 
 float scale;
 int fontSize;
 QFont font;
 QString configFile;
-int top;
+QLocale::Language language;
 
 void outputMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -56,9 +58,14 @@ int main(int argc, char *argv[])
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QTextCodec::setCodecForLocale(codec);
 
+    language = QLocale::system().language();
+    qDebug() << QLocale::languageToString(language);
+
     //加载翻译文件
     QTranslator translator;
-    translator.load(":/qm/zh_CN.qm");
+    if(language == QLocale::Chinese) {
+        translator.load(":/ts/zh_CN.qm");
+    }
     a.installTranslator(&translator);
 
     //用于QSettings
@@ -80,6 +87,8 @@ int main(int argc, char *argv[])
 
     MainWindow w;
     w.show();
+//    PowerWindow w;
+//    w.show();
 
 
     return a.exec();

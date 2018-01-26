@@ -2,13 +2,15 @@
 #include "loginwindow.h"
 #include "userwindow.h"
 #include "usersmodel.h"
-#include <QHBoxLayout>
+//#include <QHBoxLayout>
 #include <QApplication>
 #include <QDesktopWidget>
-#include <QPushButton>
+//#include <QPushButton>
+#include <QVBoxLayout>
 #include <QDebug>
 #include <QLightDM/SessionsModel>
 #include "globalv.h"
+#include "powerwindow.h"
 
 GreeterWindow::GreeterWindow(QWidget *parent)
     : QWidget(parent),
@@ -35,14 +37,20 @@ GreeterWindow::~GreeterWindow()
 
 void GreeterWindow::initUI()
 {
-    m_layout = new QStackedLayout(this);
-    m_firstWnd = nullptr;
+    //    for(int i = 0; i < 3; i++)
+    //    {
+    //        QStandardItem *item = new QStandardItem("test" + QString::number(i));
+    //        m_usersModel->extraRowModel()->appendRow(item);
+    //    }
 
-//    for(int i = 0; i < 3; i++)
-//    {
-//        QStandardItem *item = new QStandardItem("test" + QString::number(i));
-//        m_usersModel->extraRowModel()->appendRow(item);
-//    }
+
+
+    QWidget *widget = new QWidget(this);
+    widget->setGeometry(rect());
+    widget->setWindowFlags(Qt::WindowStaysOnBottomHint);
+
+    m_layout = new QStackedLayout(widget);
+    m_firstWnd = nullptr;
 
     /* 如果只用一个用户的话，直接进入登录界面 */
     if(m_usersModel->rowCount() != 1) {
@@ -73,7 +81,39 @@ void GreeterWindow::initUI()
     if(m_firstWnd) {
         m_layout->setCurrentWidget(m_firstWnd);
     }
+
+    m_keyboardLB = new QLabel(this);
+    m_keyboardLB->setGeometry(this->width() - 120, 20, 39, 39);
+    m_keyboardLB->setStyleSheet("QLabel{background:url(:/resource/keyboard.png)}");
+    m_keyboardLB->installEventFilter(this);
+    m_keyboardLB->setWindowFlags(Qt::WindowStaysOnTopHint);
+
+    m_powerLB = new QLabel(this);
+    m_powerLB->setGeometry(this->width() - 60, 20, 39, 39);
+    m_powerLB->setStyleSheet("QLabel{background:url(:/resource/power.png)}");
+    m_powerLB->installEventFilter(this);
+    m_powerLB->setWindowFlags(Qt::WindowStaysOnTopHint);
 }
+
+bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if(obj == m_keyboardLB) {
+
+    } else if(obj == m_powerLB) {
+        if(event->type() == QEvent::MouseButtonRelease) {
+            bool hasOpenSessions = false;
+            for(int i = 0; i < m_usersModel->rowCount(); i++) {
+                hasOpenSessions = m_usersModel->index(i, 0).data(QLightDM::UsersModel::LoggedInRole).toBool();
+                if(hasOpenSessions)
+                    break;
+            }
+            PowerWindow *w = new PowerWindow(hasOpenSessions, this);
+            w->show();
+        }
+    }
+    return QWidget::eventFilter(obj, event);
+}
+
 
 void GreeterWindow::onLoggedIn(const QModelIndex &index)
 {
