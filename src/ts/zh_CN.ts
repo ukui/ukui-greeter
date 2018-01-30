@@ -4,7 +4,7 @@
 <context>
     <name>GreeterWindow</name>
     <message>
-        <location filename="../greeterwindow.cpp" line="82"/>
+        <location filename="../greeterwindow.cpp" line="133"/>
         <source>Guest</source>
         <translation type="unfinished">游客登录</translation>
     </message>
@@ -46,27 +46,32 @@
 <context>
     <name>PowerWindow</name>
     <message>
-        <location filename="../powerwindow.cpp" line="34"/>
+        <location filename="../powerwindow.cpp" line="38"/>
         <source>Goodbye. Would you like to…</source>
         <translation type="unfinished">再见，你是否想要...</translation>
     </message>
     <message>
-        <location filename="../powerwindow.cpp" line="39"/>
+        <location filename="../powerwindow.cpp" line="43"/>
         <source>Other users are currently logged in to this computer, shutting down now will also close these other sessions.</source>
         <translation type="unfinished">当前已有其他用户登录此电脑，现在关机，其他用户的会话也将被终止。</translation>
     </message>
     <message>
-        <location filename="../powerwindow.cpp" line="168"/>
+        <location filename="../powerwindow.cpp" line="180"/>
         <source>suspend</source>
         <translation type="unfinished">挂起</translation>
     </message>
     <message>
-        <location filename="../powerwindow.cpp" line="174"/>
+        <location filename="../powerwindow.cpp" line="194"/>
+        <source>hibernate</source>
+        <translation type="unfinished">休眠</translation>
+    </message>
+    <message>
+        <location filename="../powerwindow.cpp" line="208"/>
         <source>restart</source>
         <translation type="unfinished">重启</translation>
     </message>
     <message>
-        <location filename="../powerwindow.cpp" line="180"/>
+        <location filename="../powerwindow.cpp" line="222"/>
         <source>shutdown</source>
         <translation type="unfinished">关机</translation>
     </message>

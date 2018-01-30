@@ -6,15 +6,17 @@
 #include <QMouseEvent>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QGraphicsBlurEffect>
+#include <QImage>
+#include <QDebug>
+#include <QException>
 #include "globalv.h"
+#include "exponentialblur.h"
 
 PowerWindow::PowerWindow(bool hasOpenSessions, QWidget *parent)
     : QWidget(parent),
       m_hasOpenSessions(hasOpenSessions),
       m_power(new QLightDM::PowerInterface(this))
 {
-
     initUI();
     QDesktopWidget *dw = QApplication::desktop();
     setGeometry((dw->width()-width())/2, (dw->height()-height())/2,
@@ -45,7 +47,6 @@ void PowerWindow::initUI()
     }
 
     m_centerWidget->setGeometry(QRect(24, 24, 594, height()-24*2));
-    m_centerWidget->setGraphicsEffect(new QGraphicsBlurEffect(this));
 
     m_prompt = new QLabel(m_centerWidget);
     m_prompt->adjustSize();
@@ -142,8 +143,16 @@ void PowerWindow::paintEvent(QPaintEvent *e)
     painter.setBrush(QColor(180, 180, 250, 30));
     painter.drawRect(rect());
 
-    painter.setBrush(QColor(46, 39, 101, 200));
-    painter.drawRect(QRect(24, 24, 594, height()-24*2));
+    QRect center = QRect(24, 24, width()-24 * 2, height()-24*2);
+    QImage image(width()-24 * 2, height()-24*2, QImage::Format_ARGB32);
+    image.fill(QColor(46, 39, 101, 200));
+//    painter.setBrush(QColor(46, 39, 101, 200));
+//    painter.drawRect(QRect(24, 24, width()-24 * 2, height()-24*2));
+    ExponentialBlur().translate(image, 10);
+    QPixmap pixmap;
+    pixmap = pixmap.fromImage(image);
+    painter.drawImage(center, image, image.rect());
+//    painter.drawPixmap(center, pixmap);
     QWidget::paintEvent(e);
 }
 
@@ -171,18 +180,56 @@ bool PowerWindow::eventFilter(QObject *obj, QEvent *event)
             m_suspendLabel->setText(tr("suspend"));
         } else if(event->type() == QEvent::Leave) {
             m_suspendLabel->setText("");
+        } else if(event->type() == QEvent::MouseButtonRelease){
+            qDebug() << "suspend";
+            try{
+                m_power->suspend();
+                close();
+            }catch(QException &e) {
+
+            }
+        }
+    }else if(obj == m_hibernate) {
+        if(event->type() == QEvent::Enter) {
+            m_hibernateLabel->setText(tr("hibernate"));
+        } else if(event->type() == QEvent::Leave) {
+            m_hibernateLabel->setText("");
+        } else if(event->type() == QEvent::MouseButtonRelease){
+            qDebug() << "hibernate";
+            try{
+                m_power->hibernate();
+                close();
+            }catch(QException &e) {
+
+            }
         }
     } else if(obj == m_restart) {
         if(event->type() == QEvent::Enter) {
             m_restartLabel->setText(tr("restart"));
         }else if(event->type() == QEvent::Leave) {
             m_restartLabel->setText("");
+        }else if(event->type() == QEvent::MouseButtonRelease){
+            qDebug() << "restart";
+            try{
+                m_power->restart();
+                close();
+            }catch(QException &e) {
+
+            }
         }
     } else if(obj == m_shutdown) {
         if(event->type() == QEvent::Enter) {
             m_shutdownLabel->setText(tr("shutdown"));
         }else if(event->type() == QEvent::Leave) {
             m_shutdownLabel->setText("");
+        }else if(event->type() == QEvent::MouseButtonRelease){
+            try{
+                qDebug() << "shutdown";
+                m_power->shutdown();
+                close();
+            }catch(QException &e) {
+
+            }
         }
     }
     return QWidget::eventFilter(obj, event);

@@ -29,5 +29,7 @@
         <file>resource/ubuntu_badge.png</file>
         <file>resource/unknown_badge.png</file>
         <file>resource/ubuntu.png</file>
+        <file>resource/keyboard.png</file>
+        <file>resource/power.png</file>
     </qresource>
 </RCC>

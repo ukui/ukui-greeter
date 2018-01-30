@@ -10,6 +10,7 @@
 #include "usersmodel.h"
 #include "greeterwrapper.h"
 
+class PowerWindow;
 class GreeterWindow : public QWidget
 {
     Q_OBJECT
@@ -40,6 +41,7 @@ private:
     QSharedPointer<UsersModel> m_usersModel;
     QSharedPointer<QAbstractItemModel> m_sessionsModel;
     QSharedPointer<GreeterWrapper> m_greeter;
+    PowerWindow     *m_powerWnd;
 };
 
 #endif // GREETERWINDOW_H

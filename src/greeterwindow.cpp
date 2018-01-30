@@ -5,7 +5,7 @@
 //#include <QHBoxLayout>
 #include <QApplication>
 #include <QDesktopWidget>
-//#include <QPushButton>
+#include <QMouseEvent>
 #include <QVBoxLayout>
 #include <QDebug>
 #include <QLightDM/SessionsModel>
@@ -16,18 +16,21 @@ GreeterWindow::GreeterWindow(QWidget *parent)
     : QWidget(parent),
       m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions)),
       m_greeter(new GreeterWrapper()),
-      m_sessionWnd(nullptr)
+      m_sessionWnd(nullptr),
+      m_powerWnd(nullptr)
 {
     m_usersModel = QSharedPointer<UsersModel>(new UsersModel(m_greeter->hideUsersHint()));
     if(m_greeter->hasGuestAccountHint()){    //允许游客登录
+        qDebug() << "allow guest";
         m_usersModel->setShowGuest(true);
     }
     if(m_greeter->showManualLoginHint()) {    //允许手动输入用户名
+        qDebug() << "allow manual login";
         m_usersModel->setShowManualLogin(true);
     }
 
-    connect(m_greeter.data(), SIGNAL(autologinTimerExpired()),
-            this, SLOT(timedAutologin()));
+    connect(m_greeter.data(), SIGNAL(autologinTimerExpired()),this, SLOT(timedAutologin()));
+    installEventFilter(this);
 }
 
 GreeterWindow::~GreeterWindow()
@@ -98,7 +101,7 @@ void GreeterWindow::initUI()
 bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
 {
     if(obj == m_keyboardLB) {
-
+        //软键盘
     } else if(obj == m_powerLB) {
         if(event->type() == QEvent::MouseButtonRelease) {
             bool hasOpenSessions = false;
@@ -107,8 +110,16 @@ bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
                 if(hasOpenSessions)
                     break;
             }
-            PowerWindow *w = new PowerWindow(hasOpenSessions, this);
-            w->show();
+            m_powerWnd = new PowerWindow(hasOpenSessions, this);
+            m_powerWnd->show();
+            return true;
+        }
+    }
+    if(m_powerWnd && event->type() == QEvent::MouseButtonPress) {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        QPoint pos = mouseEvent->pos();
+        if(!m_powerWnd->geometry().contains(pos)) {
+            m_powerWnd->close();
         }
     }
     return QWidget::eventFilter(obj, event);
