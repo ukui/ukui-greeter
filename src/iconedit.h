@@ -6,20 +6,6 @@
 #include <QPushButton>
 #include <QPixmap>
 
-
-class IconButton : public QPushButton
-{
-    Q_OBJECT
-public:
-    IconButton(QLineEdit *edit);
-    IconButton(QLineEdit *edit, const QIcon &icon);
-
-    void resize(const QSize &size);
-
-private:
-    QSize m_size;
-};
-
 class TipEdit : public QLineEdit
 {
     Q_OBJECT
@@ -27,14 +13,34 @@ class TipEdit : public QLineEdit
 public:
     TipEdit(QWidget *parent=0);
     void paintEvent(QPaintEvent *);
+    void keyReleaseEvent(QKeyEvent *);
 
     void drawTip();
-
     const QString& innerTip(){ return m_tip; }
     void setInnerTip(const QString &tip){ m_tip = tip;}
 
+signals:
+    void CapsStateChanged(bool capsState);
+
 private:
     QString m_tip;
+    bool m_capsState;
+};
+
+class IconButton : public QPushButton
+{
+    Q_OBJECT
+public:
+    IconButton(TipEdit *edit);
+    IconButton(TipEdit *edit, const QIcon &icon);
+    void resize(const QSize &size);
+
+public slots:
+    void onCapsStateChanged(bool);
+
+private:
+    QSize   m_size;
+    QLabel  *m_capTips;
 };
 
 class IconEdit : public QWidget
@@ -43,7 +49,6 @@ class IconEdit : public QWidget
 public:
     IconEdit(QWidget *parent = 0);
     IconEdit(const QIcon& icon, QWidget *parent = 0);
-
     virtual void keyReleaseEvent ( QKeyEvent * event );
 
     void setIcon(const QString &filename);
@@ -63,7 +68,6 @@ public slots:
     void showIcon(const QString&);
 
 private:
-
     TipEdit      *m_edit;
     IconButton   *m_iconButton;
 };
