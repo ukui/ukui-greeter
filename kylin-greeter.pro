@@ -28,7 +28,9 @@ SOURCES += \
     src/screenmodel.cpp \
     src/mainwindow.cpp \
     src/sessionwindow.cpp \
-#    src/rootimageapp.cpp
+    src/powerwindow.cpp \
+    src/toolbar.cpp \
+    src/exponentialblur.cpp
 
 HEADERS  += \
     src/extrarowproxymodel.h \
@@ -43,7 +45,10 @@ HEADERS  += \
     src/globalv.h \
     src/screenmodel.h \
     src/mainwindow.h \
-    src/sessionwindow.h
+    src/sessionwindow.h \
+    src/powerwindow.h \
+    src/toolbar.h \
+    src/exponentialblur.h
 
 #SUBDIRS += rootimage
 #rootimage.subdir = src
@@ -55,7 +60,7 @@ CONFIG += c++11
 INCLUDEPATH += /usr/include/lightdm-qt5-3
 
 LIBS += /usr/lib/x86_64-linux-gnu/liblightdm-qt5-3.so \
-#        /usr/lib/x86_64-linux-gnu/libX11.so.6
+        /usr/lib/x86_64-linux-gnu/libX11.so.6
 
 RESOURCES += src/resource.qrc \
              src/translate.qrc
@@ -77,3 +82,11 @@ INSTALLS += target configfile desktopfile
 
 
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0
+
+#TODO: 1.对屏幕大小变化的处理（针对虚拟机）
+#      2.对自动登录的处理
+#      3.语言选择
+#      4.电源对话框
+#      5.对焦点的处理（启动时用户头像没有边框）
+#      6.登录后的屏幕图片
+#      7.远程登录的支持

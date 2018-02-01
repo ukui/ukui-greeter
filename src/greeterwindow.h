@@ -21,6 +21,7 @@ public:
     void initUI();
     bool eventFilter(QObject *, QEvent *);
 
+
 private slots:
     void onLoggedIn(const QModelIndex &);
     void onBacktoUsers();
@@ -29,6 +30,8 @@ private slots:
     void timedAutologin();
 
 private:
+    void showPowerWnd();
+
     UserWindow      *m_userWnd;
     LoginWindow     *m_loginWnd;
     SessionWindow   *m_sessionWnd;
@@ -42,6 +45,7 @@ private:
     QSharedPointer<QAbstractItemModel> m_sessionsModel;
     QSharedPointer<GreeterWrapper> m_greeter;
     PowerWindow     *m_powerWnd;
+    QWidget         *m_blackbgWnd;
 };
 
 #endif // GREETERWINDOW_H

@@ -2,13 +2,15 @@
 #include "loginwindow.h"
 #include "userwindow.h"
 #include "usersmodel.h"
-//#include <QHBoxLayout>
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QMouseEvent>
 #include <QVBoxLayout>
 #include <QDebug>
 #include <QLightDM/SessionsModel>
+#include <X11/Xatom.h>
+#include <X11/Xlib.h>
+#include <X11/extensions/Xrandr.h>
 #include "globalv.h"
 #include "powerwindow.h"
 
@@ -104,14 +106,7 @@ bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
         //软键盘
     } else if(obj == m_powerLB) {
         if(event->type() == QEvent::MouseButtonRelease) {
-            bool hasOpenSessions = false;
-            for(int i = 0; i < m_usersModel->rowCount(); i++) {
-                hasOpenSessions = m_usersModel->index(i, 0).data(QLightDM::UsersModel::LoggedInRole).toBool();
-                if(hasOpenSessions)
-                    break;
-            }
-            m_powerWnd = new PowerWindow(hasOpenSessions, this);
-            m_powerWnd->show();
+            showPowerWnd();
             return true;
         }
     }
@@ -120,6 +115,7 @@ bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
         QPoint pos = mouseEvent->pos();
         if(!m_powerWnd->geometry().contains(pos)) {
             m_powerWnd->close();
+            return true;
         }
     }
     return QWidget::eventFilter(obj, event);
@@ -176,4 +172,27 @@ void GreeterWindow::timedAutologin()
     } else {
         m_greeter->authenticateAutologin();
     }
+}
+
+void GreeterWindow::showPowerWnd()
+{
+    //创建一个黑色背景透明的窗口
+    m_blackbgWnd = new QWidget(this);
+    QPalette plt;
+    plt.setColor(QPalette::Background, QColor(0, 0, 0, 150));
+    m_blackbgWnd->setAutoFillBackground(true);
+    m_blackbgWnd->setPalette(plt);
+    m_blackbgWnd->setGeometry(0, 0, width(), height());
+    m_blackbgWnd->show();
+
+    //判断是否已经有用户登录
+    bool hasOpenSessions = false;
+    for(int i = 0; i < m_usersModel->rowCount(); i++) {
+        hasOpenSessions = m_usersModel->index(i, 0).data(QLightDM::UsersModel::LoggedInRole).toBool();
+        if(hasOpenSessions)
+            break;
+    }
+    m_powerWnd = new PowerWindow(hasOpenSessions, this);
+    connect(m_powerWnd, SIGNAL(aboutToClose()), m_blackbgWnd, SLOT(close()));
+    m_powerWnd->show();
 }
