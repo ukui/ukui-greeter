@@ -29,7 +29,6 @@ SOURCES += \
     src/mainwindow.cpp \
     src/sessionwindow.cpp \
     src/powerwindow.cpp \
-    src/toolbar.cpp \
     src/exponentialblur.cpp
 
 HEADERS  += \
@@ -47,7 +46,6 @@ HEADERS  += \
     src/mainwindow.h \
     src/sessionwindow.h \
     src/powerwindow.h \
-    src/toolbar.h \
     src/exponentialblur.h
 
 #SUBDIRS += rootimage
@@ -72,10 +70,10 @@ TRANSLATIONS += src/ts/zh_CN.ts
 #DESTDIR += build/
 
 configfile.path = /usr/share/lightdm/lightdm.conf.d/
-configfile.files = debian/kylin-greeter.desktop
+configfile.files = debian/95-kylin-greeter.conf
 
 desktopfile.path = /usr/share/xgreeters/
-desktopfile.files = debian/95-kylin-greeter.conf
+desktopfile.files = debian/kylin-greeter.desktop
 
 target.path += /usr/bin
 INSTALLS += target configfile desktopfile
@@ -86,7 +84,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0
 #TODO: 1.对屏幕大小变化的处理（针对虚拟机）
 #      2.对自动登录的处理
 #      3.语言选择
-#      4.电源对话框
+##      4.电源对话框
 #      5.对焦点的处理（启动时用户头像没有边框）
 #      6.登录后的屏幕图片
 #      7.远程登录的支持

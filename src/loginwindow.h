@@ -34,6 +34,7 @@ private:
 
 protected:
     bool eventFilter(QObject *, QEvent *);
+    void showEvent(QShowEvent *);
 
 signals:
     void back();

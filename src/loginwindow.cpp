@@ -113,6 +113,12 @@ bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
     return QWidget::eventFilter(obj, event);
 }
 
+void LoginWindow::showEvent(QShowEvent *e)
+{
+    QWidget::showEvent(e);
+    m_passwordEdit->setFocus();
+}
+
 void LoginWindow::setUsersModel(QSharedPointer<QAbstractItemModel> model)
 {
     if(model.isNull())
@@ -267,8 +273,14 @@ void LoginWindow::startAuthenticate(const QString &username)
 
 void LoginWindow::startSession()
 {
-    //#TODO: set language
+    //设置language
+    QString language = m_greeter->lang();
+    if(!language.isEmpty()) {
+        qDebug() << language;
+        m_greeter->setLanguage(language);
+    }
 
+    //启动session
     QString sessionKey;
     for(int i = 0; i < m_sessionsModel->rowCount(); i++) {
         QString session = m_sessionsModel->index(i, 0).data(Qt::DisplayRole).toString();
@@ -277,9 +289,9 @@ void LoginWindow::startSession()
         }
     }
     saveLastLoginUser();
-//    saveRootImage();
     if(!m_greeter->startSessionSync(sessionKey)) {
         addMessage(tr("Failed to start session"));
+        //如果启动session失败，需要重新认证
         m_greeter->authenticate(m_nameLabel->text());
     }
 }
