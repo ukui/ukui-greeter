@@ -25,7 +25,7 @@ void UserWindow::initUI()
     QRect listRect(64*scale, 0, m_userList->width(), m_userList->height());
     m_userList->setGeometry(listRect);
     connect(m_userList, SIGNAL(pageChanged()), this, SLOT(onPageChanged()));
-    connect(m_userList, SIGNAL(loggedIn(QModelIndex)), this, SLOT(onLoggedIn(QModelIndex)));
+    connect(m_userList, SIGNAL(selectedChanged(QModelIndex)), this, SLOT(onSelectedChanged(QModelIndex)));
 
     m_prevLabel = new QLabel(this);
     m_prevLabel->setObjectName(QStringLiteral("m_prevLabel"));
@@ -113,7 +113,7 @@ void UserWindow::onPageChanged()
     }
 }
 
-void UserWindow::onLoggedIn(const QModelIndex& index)
+void UserWindow::onSelectedChanged(const QModelIndex& index)
 {
-    emit loggedIn(index);
+    emit selectedChanged(index);
 }

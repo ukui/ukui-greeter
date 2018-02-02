@@ -21,10 +21,10 @@ protected:
 
 private slots:
     void onPageChanged();
-    void onLoggedIn(const QModelIndex &);
+    void onSelectedChanged(const QModelIndex &);
 
 signals:
-    void loggedIn(const QModelIndex &index);
+    void selectedChanged(const QModelIndex &index);
 
 private:
 //    QLightDM::UsersModel *m_model;

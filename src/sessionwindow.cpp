@@ -2,20 +2,21 @@
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
-#include "globalv.h"
+#include <QSvgWidget>
 #include <QLightDM/SessionsModel>
+#include "globalv.h"
 
 class IconLabel : public QWidget
 {
 public:
     IconLabel(int width, int height, QWidget* parent = 0)
         : QWidget(parent),
-          m_iconLabel(new QLabel(this)),
+          m_iconLabel(new QSvgWidget(this)),
           m_textLabel(new QLabel(this)),
           m_checkLabel(new QLabel(this)),
           _isChecked(false)
     {
-        m_iconLabel->setGeometry(0, 0, height, height);
+        m_iconLabel->setGeometry(0, (height-22)/2, 22, 22);
         m_textLabel->setGeometry(height+5, 0, width-height-5, height);
         m_textLabel->setStyleSheet("QLabel{border-radius:5; color: white}"
                               "QLabel::hover{ background-color: rgba(255, 255, 255, 0.3) }");
@@ -37,19 +38,19 @@ public:
         return _isChecked;
     }
 
-    void setContent(const QPixmap& icon, const QString& text)
+    void setContent(const QString& icon, const QString& text)
     {
-        m_iconLabel->setPixmap(icon);
+        m_iconLabel->load(icon);
         m_textLabel->setText(text);
         m_textLabel->setFont(QFont("Ubutnu", 14));
         m_textLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     }
 
 private:
-    QLabel *m_iconLabel;
-    QLabel *m_textLabel;
-    QLabel *m_checkLabel;
-    bool _isChecked;
+    QSvgWidget *m_iconLabel;
+    QLabel     *m_textLabel;
+    QLabel     *m_checkLabel;
+    bool       _isChecked;
 };
 
 
@@ -100,15 +101,17 @@ bool SessionWindow::eventFilter(QObject *obj, QEvent *event)
     if(obj->objectName().contains("session")){
         IconLabel *sessionLabel = findChild<IconLabel*>(obj->objectName());
         if(event->type() == QEvent::MouseButtonRelease){
-            IconLabel *lastSessionLabel = findChild<IconLabel*>("session" + QString::number(m_selectedIndex));
-            if(lastSessionLabel){
-                lastSessionLabel->setChecked(!lastSessionLabel->checked());
+            if(((QMouseEvent*)event)->button() == Qt::LeftButton){
+                IconLabel *lastSessionLabel = findChild<IconLabel*>("session" + QString::number(m_selectedIndex));
+                if(lastSessionLabel){
+                    lastSessionLabel->setChecked(!lastSessionLabel->checked());
+                }
+                if(lastSessionLabel != obj) {
+                    sessionLabel->setChecked(!sessionLabel->checked());
+                }
+                m_selectedIndex = sessionLabel->checked() ? obj->objectName().right(1).toInt() : -1;
+                return true;
             }
-            if(lastSessionLabel != obj) {
-                sessionLabel->setChecked(!sessionLabel->checked());
-            }
-            m_selectedIndex = sessionLabel->checked() ? obj->objectName().right(1).toInt() : -1;
-            return true;
         }
     }
     if(obj == m_backLabel) {
@@ -157,17 +160,9 @@ void SessionWindow::setSession(const QString &sessionName)
     }
 }
 
-QPixmap SessionWindow::getSessionIcon(const QString &sessionName)
+QString SessionWindow::getSessionIcon(const QString &session)
 {
     QString sessionIcon;
-    if(sessionName.toLower() == "ubuntu") {
-        sessionIcon = ":/resource/ubuntu_badge.png";
-    } else if (sessionName.toLower() == "gnome") {
-        sessionIcon = ":/resource/ubuntu_badge.png";
-    } else if (sessionName.toLower() == "kde") {
-        sessionIcon = ":/resource/ubuntu_badge.png";
-    } else {
-        sessionIcon = ":/resource/unknown_badge.png";
-    }
-    return scaledPixmap(22, 22, sessionIcon);
+    sessionIcon = RESOURCE_DIR + QString("badges/%1_badge-symbolic.svg").arg(session.toLower());
+    return sessionIcon;
 }

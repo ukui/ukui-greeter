@@ -48,7 +48,7 @@ void LoginWindow::initUI()
     m_faceLabel->setGeometry(QRect(60, 0, 132, 132));
     m_faceLabel->setStyleSheet("QLabel{ border: 2px solid white}");
 
-    m_sessionLabel = new QLabel(this);
+    m_sessionLabel = new QSvgWidget(this);
     m_sessionLabel->setObjectName(QStringLiteral("m_sessionLabel"));
     m_sessionLabel->setGeometry(QRect(width()-22, 0, 22, 22));
     m_sessionLabel->installEventFilter(this);
@@ -89,30 +89,36 @@ bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
         if(!m_backLabel->isEnabled())
             return true;
         if(event->type() == QEvent::MouseButtonPress) {
-            QPixmap back_active(":/resource/arrow_left_active.png");
-            back_active = back_active.scaled(32, 32, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-            m_backLabel->setPixmap(back_active);
-            return true;
+            if(((QMouseEvent*)event)->button() == Qt::LeftButton){
+                QPixmap back_active(":/resource/arrow_left_active.png");
+                back_active = back_active.scaled(32, 32, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+                m_backLabel->setPixmap(back_active);
+                return true;
+            }
         }
         if(event->type() == QEvent::MouseButtonRelease) {
-            QPixmap back_image(":/resource/arrow_left.png");
-            back_image = back_image.scaled(32, 32, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-            m_backLabel->setPixmap(back_image);
-            //清空当前连接
-            m_nameLabel->setText("");
-            m_isLoginLabel->setText("");
-            m_messageLabel->setText("");
-            m_passwordEdit->clear();
-            m_passwordEdit->setType(QLineEdit::Password);
-            emit back();
-            return true;
+            if(((QMouseEvent*)event)->button() == Qt::LeftButton){
+                QPixmap back_image(":/resource/arrow_left.png");
+                back_image = back_image.scaled(32, 32, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+                m_backLabel->setPixmap(back_image);
+                //清空当前连接
+                m_nameLabel->setText("");
+                m_isLoginLabel->setText("");
+                m_messageLabel->setText("");
+                m_passwordEdit->clear();
+                m_passwordEdit->setType(QLineEdit::Password);
+                emit back();
+                return true;
+            }
         }
     } else if(obj == m_sessionLabel) {
         if(!m_sessionLabel->isEnabled())
             return true;
         if(event->type() == QEvent::MouseButtonRelease) {
-            emit selectSession(m_session);
-            return true;
+            if(((QMouseEvent*)event)->button() == Qt::LeftButton){
+                emit selectSession(m_session);
+                return true;
+            }
         }
     }
     return QWidget::eventFilter(obj, event);
@@ -235,18 +241,19 @@ void LoginWindow::setSession(QString session)
         }
     }
     m_session = session;
-    if(session.isEmpty()) {
-        sessionIcon = "";
-    } else if(session.toLower() == "ubuntu") {
-        sessionIcon = ":/resource/ubuntu_badge.png";
-    } else if (session.toLower() == "gnome") {
-        sessionIcon = ":/resource/ubuntu_badge.png";
-    } else if (session.toLower() == "kde") {
-        sessionIcon = ":/resource/ubuntu_badge.png";
-    } else {
-        sessionIcon = ":/resource/unknown_badge.png";
-    }
-    m_sessionLabel->setPixmap(scaledPixmap(22, 22, sessionIcon));
+//    if(session.isEmpty()) {
+//        sessionIcon = "";
+//    } else if(session.toLower() == "ubuntu") {
+//        sessionIcon = ":/resource/ubuntu_badge.png";
+//    } else if (session.toLower() == "gnome") {
+//        sessionIcon = ":/resource/ubuntu_badge.png";
+//    } else if (session.toLower() == "kde") {
+//        sessionIcon = ":/resource/ubuntu_badge.png";
+//    } else {
+//        sessionIcon = ":/resource/unknown_badge.png";
+//    }
+    sessionIcon = RESOURCE_DIR + QString("badges/%1_badge-symbolic.svg").arg(session.toLower());
+    m_sessionLabel->load(sessionIcon);
 }
 
 void LoginWindow::onSessionSelected(const QString &session)
@@ -337,7 +344,6 @@ void LoginWindow::saveLastLoginUser()
 
 void LoginWindow::onLogin(const QString &str)
 {
-    qDebug()<< "password: " << str;
     m_messageLabel->clear();
     QString name = m_nameLabel->text();
     if(name == tr("Login")) {

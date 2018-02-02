@@ -4,14 +4,16 @@
 #
 #-------------------------------------------------
 
-QT  += core gui widgets
+QT  += core gui widgets svg
 
 
 TARGET = kylin-greeter
 TEMPLATE = app
 
 DEFINES += QT_MESSAGELOGCONTEXT \    #使用qInstallMessageHandler定制日志输出格式
-           GREETER_CONFIG=/usr/share/lightdm/kylin-greeter
+           GREETER_CONFIG=/usr/share/lightdm/kylin-greeter/ \
+           RESOURCE=/usr/share/kylin-greeter/ \
+           USE_QRC=true \
 
 SOURCES += \
     src/extrarowproxymodel.cpp \
@@ -29,7 +31,6 @@ SOURCES += \
     src/mainwindow.cpp \
     src/sessionwindow.cpp \
     src/powerwindow.cpp \
-    src/exponentialblur.cpp
 
 HEADERS  += \
     src/extrarowproxymodel.h \
@@ -46,28 +47,20 @@ HEADERS  += \
     src/mainwindow.h \
     src/sessionwindow.h \
     src/powerwindow.h \
-    src/exponentialblur.h
 
-#SUBDIRS += rootimage
-#rootimage.subdir = src
-#rootimage.file = root-image.pro
-#rootimage.target = root-image
-
-CONFIG += c++11
+CONFIG += c++11 debug
 
 INCLUDEPATH += /usr/include/lightdm-qt5-3
 
 LIBS += /usr/lib/x86_64-linux-gnu/liblightdm-qt5-3.so \
         /usr/lib/x86_64-linux-gnu/libX11.so.6
 
-RESOURCES += src/resource.qrc \
-             src/translate.qrc
+debug{
+    RESOURCES += src/resource.qrc \
+                 src/translate.qrc
+}
 TRANSLATIONS += src/ts/zh_CN.ts
 
-#MOC_DIR += build/
-#RCC_DIR += build/
-#OBJECTS_DIR += build/
-#DESTDIR += build/
 
 configfile.path = /usr/share/lightdm/lightdm.conf.d/
 configfile.files = debian/95-kylin-greeter.conf
@@ -75,15 +68,18 @@ configfile.files = debian/95-kylin-greeter.conf
 desktopfile.path = /usr/share/xgreeters/
 desktopfile.files = debian/kylin-greeter.desktop
 
+resourcefiles.path = /usr/share/kylin-greeter/
+resourcefiles.files = src/resource/*
+
 target.path += /usr/bin
-INSTALLS += target configfile desktopfile
+INSTALLS += target configfile desktopfile resourcefiles
 
 
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0
 
 #TODO: 1.对屏幕大小变化的处理（针对虚拟机）
 #      2.对自动登录的处理
-#      3.语言选择
+##      3.语言选择
 ##      4.电源对话框
 #      5.对焦点的处理（启动时用户头像没有边框）
 #      6.登录后的屏幕图片

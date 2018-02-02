@@ -1,18 +1,21 @@
 #include "greeterwindow.h"
-#include "loginwindow.h"
-#include "userwindow.h"
-#include "usersmodel.h"
+#include <signal.h>
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QMouseEvent>
 #include <QVBoxLayout>
 #include <QMenu>
 #include <QDebug>
+#include <QProcess>
+#include <QStandardPaths>
 #include <QLightDM/SessionsModel>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 #include "globalv.h"
+#include "loginwindow.h"
+#include "userwindow.h"
+#include "usersmodel.h"
 #include "powerwindow.h"
 
 GreeterWindow::GreeterWindow(QWidget *parent)
@@ -23,7 +26,8 @@ GreeterWindow::GreeterWindow(QWidget *parent)
       m_loginWnd(nullptr),
       m_sessionWnd(nullptr),
       m_powerWnd(nullptr),
-      m_languageMenu(nullptr)
+      m_languageMenu(nullptr),
+      m_board(nullptr)
 {
     m_usersModel = QSharedPointer<UsersModel>(new UsersModel(m_greeter->hideUsersHint()));
     if(m_greeter->hasGuestAccountHint()){    //允许游客登录
@@ -41,42 +45,29 @@ GreeterWindow::GreeterWindow(QWidget *parent)
 
 GreeterWindow::~GreeterWindow()
 {
-    //#TODO: 断开连接
+    //先kill虚拟键盘进程，再销毁process对象
+    if(m_board && m_board->state() == QProcess::Running){
+        int boardid = m_board->processId();
+        qDebug() << boardid;
+        m_board->kill();
+        m_board->waitForFinished(100);
+    }
+    if(m_board){
+        delete(m_board);
+    }
 }
 
 void GreeterWindow::initUI()
 {
-    //    for(int i = 0; i < 3; i++)
-    //    {
-    //        QStandardItem *item = new QStandardItem("test" + QString::number(i));
-    //        m_usersModel->extraRowModel()->appendRow(item);
-    //    }
-
-
-
-//    QWidget *widget = new QWidget(this);
-//    widget->setGeometry(rect());
-//    widget->setWindowFlags(Qt::WindowStaysOnBottomHint);
-
-//    m_layout = new QStackedLayout(widget);
-//    m_firstWnd = nullptr;
-
     /* 如果只用一个用户的话，直接进入登录界面 */
     if(m_usersModel->rowCount() != 1) {
-//        m_firstWnd = new QWidget(this);
-//        m_firstWnd->setGeometry(rect());
-
         m_userWnd = new UserWindow(this);
         m_userWnd->setModel(m_usersModel);
         QRect userRect((rect().width()-m_userWnd->width())/2, (rect().height()-m_userWnd->height())/2,
                        m_userWnd->width(), m_userWnd->height());
         m_userWnd->setGeometry(userRect);
-        connect(m_userWnd, SIGNAL(loggedIn(QModelIndex)), this, SLOT(onLoggedIn(QModelIndex)));
-//        m_layout->addWidget(m_firstWnd);
+        connect(m_userWnd, SIGNAL(selectedChanged(QModelIndex)), this, SLOT(onSelectedUserChanged(QModelIndex)));
     }
-
-//    m_secondWnd = new QWidget(this);
-//    m_secondWnd->setGeometry(rect());
 
     m_loginWnd = new LoginWindow(m_greeter, this);
     m_loginWnd->setUsersModel(m_usersModel);
@@ -86,11 +77,6 @@ void GreeterWindow::initUI()
     m_loginWnd->hide();
     connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBacktoUsers()));
     connect(m_loginWnd, SIGNAL(selectSession(QString)), this, SLOT(onSelectSession(QString)));
-//    m_layout->addWidget(m_secondWnd);
-
-//    if(m_firstWnd) {
-//        m_layout->setCurrentWidget(m_firstWnd);
-//    }
 
     m_languageLB = new QLabel(this);
     m_languageLB->setGeometry(this->width() - 180, 20, 39, 39);
@@ -121,7 +107,6 @@ void GreeterWindow::initUI()
     m_powerLB->setPixmap(QPixmap(":/resource/power.png"));
     m_powerLB->installEventFilter(this);
     m_powerLB->setStyleSheet("QLabel::hover{background-color:rgb(255, 255, 255, 50)}");
-//    m_powerLB->setWindowFlags(Qt::WindowStaysOnTopHint);
 }
 
 bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
@@ -129,19 +114,26 @@ bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
     if(obj == m_keyboardLB) {
         //软键盘
         if(event->type() == QEvent::MouseButtonRelease) {
-
+            if(((QMouseEvent*)event)->button() == Qt::LeftButton){
+                showBoard();
+                return true;
+            }
         }
     } else if(obj == m_powerLB) {
         //电源对话框
         if(event->type() == QEvent::MouseButtonRelease) {
-            showPowerWnd();
-            return true;
+            if(((QMouseEvent*)event)->button() == Qt::LeftButton){
+                showPowerWnd();
+                return true;
+            }
         }
     } else if(obj == m_languageLB) {
         //选择语言
         if(event->type() == QEvent::MouseButtonRelease) {
-            showLanguageMenu();
-            return true;
+            if(((QMouseEvent*)event)->button() == Qt::LeftButton){
+                showLanguageMenu();
+                return true;
+            }
         }
     }else if(obj == m_languageMenu) {
         if(event->type() == QEvent::Close) {
@@ -162,7 +154,7 @@ bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
 }
 
 
-void GreeterWindow::onLoggedIn(const QModelIndex &index)
+void GreeterWindow::onSelectedUserChanged(const QModelIndex &index)
 {
 
     QString name = index.data().toString();
@@ -170,42 +162,31 @@ void GreeterWindow::onLoggedIn(const QModelIndex &index)
         //直接登录
     }
     m_loginWnd->setUserIndex(index);
-//    m_layout->setCurrentWidget(m_secondWnd);
 
     switchWnd(1);
 }
 
 void GreeterWindow::onBacktoUsers()
 {
-//    if(m_firstWnd) {
-//        m_layout->setCurrentWidget(m_firstWnd);
-//    }
     switchWnd(0);
 }
 
 void GreeterWindow::onBacktoLogin()
 {
-//    if(m_secondWnd) {
-//        m_layout->setCurrentWidget(m_secondWnd);
-//    }
     switchWnd(1);
 }
 
 void GreeterWindow::onSelectSession(const QString &sessionName)
 {
     if(!m_sessionWnd) {
-//        m_thirdWnd = new QWidget(this);
-//        m_thirdWnd->setGeometry(rect());
         m_sessionWnd = new SessionWindow(this);
         m_sessionWnd->setGeometry((rect().width()-m_sessionWnd->width())/2,
                                   (rect().height()-m_sessionWnd->height())/2,
                                   m_sessionWnd->width(), m_sessionWnd->height());
         connect(m_sessionWnd, SIGNAL(sessionSelected(QString)), m_loginWnd, SLOT(onSessionSelected(QString)));
         connect(m_sessionWnd, SIGNAL(back()), this, SLOT(onBacktoLogin()));
-//        m_layout->addWidget(m_thirdWnd);
     }
     m_sessionWnd->setSession(sessionName);
-//    m_layout->setCurrentWidget(m_thirdWnd);
 
     switchWnd(2);
 }
@@ -247,6 +228,7 @@ void GreeterWindow::showPowerWnd()
 {
     //创建一个黑色透明背景的窗口
     m_blackbgWnd = new QWidget(this);
+    m_blackbgWnd->setAttribute(Qt::WA_DeleteOnClose);
     QPalette plt;
     plt.setColor(QPalette::Background, QColor(0, 0, 0, 150));
     m_blackbgWnd->setAutoFillBackground(true);
@@ -281,7 +263,6 @@ void GreeterWindow::showLanguageMenu()
         m_languageMenu = new QMenu(this);
         m_languageMenu->addActions(actgroup->actions());
         m_languageMenu->installEventFilter(this);
-        m_languageMenu->setStyleSheet("QMenu{background-color:#333333}");
         connect(m_languageMenu, SIGNAL(triggered(QAction*)), this, SLOT(onMenuItemClicked(QAction*)));
 
         if(m_greeter->lang() == "zh_CN")
@@ -302,4 +283,11 @@ void GreeterWindow::onMenuItemClicked(QAction *action)
         m_languageLB->setText(tr("Zh"));
         m_greeter->setLang("zh_CN");
     }
+}
+
+void GreeterWindow::showBoard()
+{
+    m_board = new QProcess();
+    QString program(QStandardPaths::findExecutable("onboard"));
+    m_board->start(program);
 }

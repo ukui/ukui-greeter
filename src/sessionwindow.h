@@ -22,7 +22,7 @@ signals:
 
 private:
     void initUI();
-    QPixmap getSessionIcon(const QString&);
+    QString getSessionIcon(const QString&);
 
     QLabel *m_backLabel;
     QLabel *m_prompt;

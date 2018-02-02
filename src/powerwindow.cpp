@@ -10,7 +10,6 @@
 #include <QDebug>
 #include <QException>
 #include "globalv.h"
-#include "exponentialblur.h"
 
 PowerWindow::PowerWindow(bool hasOpenSessions, QWidget *parent)
     : QWidget(parent),
@@ -66,8 +65,8 @@ void PowerWindow::initUI()
         m_suspend = new QLabel(m_centerWidget);
         m_suspend->setFixedSize(168, 168);
         m_suspend->setObjectName(QStringLiteral("m_suspend"));
-        m_suspend->setStyleSheet("QLabel{background:url(:/resource/hibernate.png); background-repeat:non-repeat}"
-                                 "QLabel::hover{background:url(:/resource/hibernate_highlight.png); background-repeat:non-repeat}");
+        m_suspend->setStyleSheet("QLabel{background:url(:/resource/hibernate.png); background-repeat:no-repeat}"
+                                 "QLabel::hover{background:url(:/resource/hibernate_highlight.png); background-repeat:no-repeat}");
         m_suspend->installEventFilter(this);
         m_suspendLabel = new QLabel(m_centerWidget);
         m_suspendLabel->setAlignment(Qt::AlignCenter);
@@ -80,8 +79,8 @@ void PowerWindow::initUI()
         m_hibernate = new QLabel(m_centerWidget);
         m_hibernate->setFixedSize(168, 168);
         m_hibernate->setObjectName(QStringLiteral("m_hibernate"));
-        m_hibernate->setStyleSheet("QLabel{background:url(:/resource/hibernate.png); background-repeat:non-repeat}"
-                                 "QLabel::hover{background:url(:/resource/hibernate_highlight.png); background-repeat:non-repeat}");
+        m_hibernate->setStyleSheet("QLabel{background:url(:/resource/hibernate.png); background-repeat:no-repeat}"
+                                 "QLabel::hover{background:url(:/resource/hibernate_highlight.png); background-repeat:no-repeat}");
         m_hibernate->installEventFilter(this);
         m_hibernateLabel = new QLabel(m_centerWidget);
         m_hibernateLabel->setAlignment(Qt::AlignCenter);
@@ -96,8 +95,8 @@ void PowerWindow::initUI()
     m_restart = new QLabel(m_centerWidget);
     m_restart->setFixedSize(168, 168);
     m_restart->setObjectName(QStringLiteral("m_restart"));
-    m_restart->setStyleSheet("QLabel{background:url(:/resource/restart.png); background-repeat:non-repeat}"
-                             "QLabel::hover{background:url(:/resource/restart_highlight.png); background-repeat:non-repeat}");
+    m_restart->setStyleSheet("QLabel{background:url(:/resource/restart.png); background-repeat:no-repeat}"
+                             "QLabel::hover{background:url(:/resource/restart_highlight.png); background-repeat:no-repeat}");
     m_restart->installEventFilter(this);
     m_restartLabel = new QLabel(m_centerWidget);
     m_restartLabel->setAlignment(Qt::AlignCenter);
@@ -111,8 +110,8 @@ void PowerWindow::initUI()
     m_shutdown = new QLabel(m_centerWidget);
     m_shutdown->setFixedSize(168, 168);
     m_shutdown->setObjectName(QStringLiteral("m_shutdown"));
-    m_shutdown->setStyleSheet("QLabel{background:url(:/resource/shutdown.png); background-repeat:non-repeat}"
-                              "QLabel::hover{background:url(:/resource/shutdown_highlight.png); background-repeat:non-repeat}");
+    m_shutdown->setStyleSheet("QLabel{background:url(:/resource/shutdown.png); background-repeat:no-repeat}"
+                              "QLabel::hover{background:url(:/resource/shutdown_highlight.png); background-repeat:no-repeat}");
     m_shutdown->installEventFilter(this);
     m_shutdownLabel = new QLabel(m_centerWidget);
     m_shutdownLabel->setAlignment(Qt::AlignCenter);
@@ -132,8 +131,8 @@ void PowerWindow::initUI()
     m_close = new QLabel(this);
     m_close->setObjectName(QStringLiteral("m_close"));
     m_close->setGeometry(QRect(0, 0, 24, 24));
-    m_close->setStyleSheet("QLabel{background:url(:/resource/dialog_close.png); background-repeat:non-repeat}"
-                           "QLabel::hover{background:url(:/resource/dialog_close_highlight.png); background-repeat:non-repeat}");
+    m_close->setStyleSheet("QLabel{background:url(:/resource/dialog_close.png); background-repeat:no-repeat}"
+                           "QLabel::hover{background:url(:/resource/dialog_close_highlight.png); background-repeat:no-repeat}");
     m_close->installEventFilter(this);
 }
 
@@ -145,15 +144,20 @@ void PowerWindow::paintEvent(QPaintEvent *e)
 
     QRect center = QRect(24, 24, width()-24 * 2, height()-24*2);
     QImage image(width()-24 * 2, height()-24*2, QImage::Format_ARGB32);
-    image.fill(QColor(46, 39, 101, 200));
+    image.fill(QColor(46, 39, 101, 250));
 //    painter.setBrush(QColor(46, 39, 101, 200));
 //    painter.drawRect(QRect(24, 24, width()-24 * 2, height()-24*2));
-    ExponentialBlur().translate(image, 10);
     QPixmap pixmap;
     pixmap = pixmap.fromImage(image);
     painter.drawImage(center, image, image.rect());
 //    painter.drawPixmap(center, pixmap);
     QWidget::paintEvent(e);
+}
+
+void PowerWindow::closeEvent(QCloseEvent *e)
+{
+    emit aboutToClose();
+    QWidget::closeEvent(e);
 }
 
 bool PowerWindow::eventFilter(QObject *obj, QEvent *event)

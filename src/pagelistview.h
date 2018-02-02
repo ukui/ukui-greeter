@@ -23,7 +23,7 @@ public:
 
 protected:
     void keyReleaseEvent(QKeyEvent *);
-    bool eventFilter(QObject *, QEvent *);
+    void showEvent(QShowEvent *);
 
 private:
     UserEntry* createEntry(int );
@@ -36,10 +36,10 @@ private:
 
 signals:
     void pageChanged();  //当焦点所在项发生变化时发出
-    void loggedIn(const QModelIndex& index);    //当选定用户时发出
+    void selectedChanged(const QModelIndex& index);    //当选定用户时发出
 
 private slots:
-    void onEntryLogin(const QString &name);
+    void onEntrySelected(const QString &name);
     void onUserChanged(const QModelIndex&, const QModelIndex&);
     void onUserInserted(const QModelIndex&, int, int);
     void onUserRemoved(const QModelIndex&, int, int);

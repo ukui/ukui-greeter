@@ -5,6 +5,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
+#include <QSvgWidget>
 #include <QAbstractItemModel>
 #include <QSharedPointer>
 #include <QSettings>
@@ -66,13 +67,13 @@ private:
     QTimer      *m_timer;
     QPixmap     m_waiting;
 
-    QLabel  *m_backLabel;         //返回用户列表
-    QLabel  *m_faceLabel;         //头像
-    QLabel  *m_sessionLabel;      //session图标
-    QLabel  *m_nameLabel;         //用户名
-    QLabel  *m_isLoginLabel;      //提示是否已登录
-    QLabel  *m_messageLabel;      //提示信息
-    IconEdit *m_passwordEdit;     //密码输入框
+    QLabel      *m_backLabel;         //返回用户列表
+    QLabel      *m_faceLabel;         //头像
+    QSvgWidget  *m_sessionLabel;      //session图标
+    QLabel      *m_nameLabel;         //用户名
+    QLabel      *m_isLoginLabel;      //提示是否已登录
+    QLabel      *m_messageLabel;      //提示信息
+    IconEdit    *m_passwordEdit;     //密码输入框
 };
 
 #endif // LOGINWINDOW_H

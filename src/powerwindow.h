@@ -13,8 +13,10 @@ public:
     void initUI();
     void paintEvent(QPaintEvent *);
     bool eventFilter(QObject *, QEvent *);
+    void closeEvent(QCloseEvent *);
 
 signals:
+    void aboutToClose();
 
 public slots:
 private:

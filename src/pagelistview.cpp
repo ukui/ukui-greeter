@@ -16,11 +16,7 @@ PageListView::PageListView(QWidget *parent)
       m_layout(new QHBoxLayout(this))
 {
     setFixedSize(950*scale, 300*scale);
-}
-
-bool PageListView::eventFilter(QObject *obj, QEvent *event)
-{
-    return QWidget::eventFilter(obj, event);
+    setFocus();
 }
 
 void PageListView::keyReleaseEvent(QKeyEvent *event)
@@ -31,7 +27,7 @@ void PageListView::keyReleaseEvent(QKeyEvent *event)
         {
             qDebug() << "login";
             UserEntry *entry = qobject_cast<UserEntry*>(focusWidget());
-            onEntryLogin(entry->userName());
+            onEntrySelected(entry->userName());
             break;
         }
         case Qt::Key_PageUp:
@@ -55,6 +51,12 @@ void PageListView::keyReleaseEvent(QKeyEvent *event)
         default:
             QWidget::keyReleaseEvent(event);
     }
+}
+
+void PageListView::showEvent(QShowEvent *e)
+{
+    QWidget::showEvent(e);
+    m_itemList[m_curItem]->setFocus();
 }
 
 void PageListView::setModel(QSharedPointer<QAbstractItemModel> model)
@@ -126,6 +128,7 @@ void PageListView::drawPage()
 
     if(m_itemList.size() > 0) {
         m_itemList[m_curItem]->setFocus();
+//        m_itemList[m_curItem]->setSelected(true);
     }
     emit pageChanged();
 }
@@ -136,7 +139,7 @@ UserEntry* PageListView::createEntry(int i)
     UserEntry *entry = new UserEntry(index.data(Qt::DisplayRole).toString(),
                                      index.data(QLightDM::UsersModel::ImagePathRole).toString(),
                                      index.data(QLightDM::UsersModel::LoggedInRole).toBool(), this);
-    connect(entry, SIGNAL(clicked(QString)), this, SLOT(onEntryLogin(QString)));
+    connect(entry, SIGNAL(clicked(QString)), this, SLOT(onEntrySelected(QString)));
     return entry;
 }
 
@@ -229,14 +232,14 @@ void PageListView::nextItem()
     }
 }
 
-void PageListView::onEntryLogin(const QString &name)
+void PageListView::onEntrySelected(const QString &name)
 {
     for(int i = 0; i < m_itemList.size(); i++){
         if(m_itemList[i]!=NULL && m_itemList[i]->userName() == name){
             m_curItem = i;
         }
     }
-    emit loggedIn(m_model.data()->index(m_curItem, 0));
+    emit selectedChanged(m_model.data()->index(m_curItem, 0));
 }
 
 bool PageListView::hasPrev()
@@ -258,6 +261,10 @@ bool PageListView::hasNext()
 void PageListView::onUserInserted(const QModelIndex& parent, int begin, int end)
 {
     Q_UNUSED(parent)
+    for(int i = begin; i <= end; i++)
+    {
+        qDebug() << "User added:" << m_model->index(i, 0).data().toString();
+    }
 
     m_itemCount = m_model->rowCount();
     m_curItem = begin;
