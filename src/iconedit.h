@@ -31,8 +31,8 @@ class IconButton : public QPushButton
 {
     Q_OBJECT
 public:
-    IconButton(TipEdit *edit);
-    IconButton(TipEdit *edit, const QIcon &icon);
+    IconButton(TipEdit *edit, QWidget *parent=0);
+    IconButton(TipEdit *edit, const QIcon &icon, QWidget *parent=0);
     void resize(const QSize &size);
 
 public slots:
@@ -50,6 +50,7 @@ public:
     IconEdit(QWidget *parent = 0);
     IconEdit(const QIcon& icon, QWidget *parent = 0);
     virtual void keyReleaseEvent ( QKeyEvent * event );
+    virtual void focusInEvent(QFocusEvent *);
 
     void setIcon(const QString &filename);
     void setIcon(const QIcon &icon);
@@ -59,6 +60,7 @@ public:
     const QString& text();
     void setType(QLineEdit::EchoMode type = QLineEdit::Password);
     void setText(const QString& text);
+    void setWaiting(bool);
 
 signals:
     void clicked(const QString &);

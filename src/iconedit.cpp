@@ -10,8 +10,8 @@
 
 //////////////////////////// IconButton的成员 ////////////////////////////////////////
 
-IconButton::IconButton(TipEdit *edit)
-    :QPushButton(edit)
+IconButton::IconButton(TipEdit *edit, QWidget *parent)
+    :QPushButton(parent)
 {
     m_size = QSize(edit->height(), edit->height());
 
@@ -54,8 +54,8 @@ IconButton::IconButton(TipEdit *edit)
     edit->setStyleSheet(" QLineEdit { border: 1px solid #026096 ; lineedit-password-character:8226}");  //设置密码显示为中等大小的实心圆点
     this->setStyleSheet("QPushButton{background:transparent; border:0px}");
 }
-IconButton::IconButton(TipEdit *edit, const QIcon &icon)
-    :IconButton(edit)
+IconButton::IconButton(TipEdit *edit, const QIcon &icon, QWidget *parent)
+    :IconButton(edit, parent)
 {
     this->setIcon(icon);
 }
@@ -105,7 +105,6 @@ void TipEdit::keyReleaseEvent(QKeyEvent *event)
 
 void TipEdit::drawTip()
 {
-
     QRect csRect = cursorRect();
     QRect tipRect(csRect.right()-3, rect().top(), rect().right(), rect().bottom());
 
@@ -126,7 +125,7 @@ IconEdit::IconEdit(QWidget *parent)
     :QWidget(parent)
 {
     m_edit = new TipEdit(this);
-    m_iconButton = new IconButton(m_edit);
+    m_iconButton = new IconButton(m_edit, this);
     connect(m_iconButton, SIGNAL(clicked(bool)), this, SLOT(clicked_cb()));
     connect(m_edit, SIGNAL(textChanged(QString)), this, SLOT(showIcon(QString)));
     m_iconButton->hide();
@@ -157,6 +156,11 @@ void IconEdit::keyReleaseEvent ( QKeyEvent * event )
         return clicked_cb();
     }
     return QWidget::keyReleaseEvent(event);
+}
+
+void IconEdit::focusInEvent(QFocusEvent *)
+{
+    m_edit->setFocus();
 }
 
 void IconEdit::clicked_cb()
@@ -203,3 +207,7 @@ const QString& IconEdit::text()
     return m_edit->text();
 }
 
+void IconEdit::setWaiting(bool wait)
+{
+    m_edit->setReadOnly(wait);
+}

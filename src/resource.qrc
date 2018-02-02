@@ -31,5 +31,7 @@
         <file>resource/ubuntu.png</file>
         <file>resource/keyboard.png</file>
         <file>resource/power.png</file>
+        <file>resource/warn.png</file>
+        <file>resource/waiting.png</file>
     </qresource>
 </RCC>

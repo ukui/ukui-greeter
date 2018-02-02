@@ -8,6 +8,7 @@
 #include <QAbstractItemModel>
 #include <QSharedPointer>
 #include <QSettings>
+#include <QTimer>
 #include <QLightDM/Greeter>
 #include <QLightDM/UsersModel>
 #include "iconedit.h"
@@ -45,6 +46,9 @@ public slots:
 //    void cancelAuthenticate();
     void startSession();
     void saveRootImage();
+    void startWaiting();
+    void stopWaiting();
+    void updatePixmap();
     void onSessionSelected(const QString&);
     void onShowMessage(QString text, QLightDM::Greeter::MessageType type);
     void onShowPrompt(QString text, QLightDM::Greeter::PromptType type);
@@ -57,8 +61,10 @@ private:
     QSharedPointer<QAbstractItemModel> m_usersModel;
     QSharedPointer<QAbstractItemModel> m_sessionsModel;
     QSharedPointer<GreeterWrapper> m_greeter;
-    QString m_session;
-    QSettings *m_config;
+    QString     m_session;
+    QSettings   *m_config;
+    QTimer      *m_timer;
+    QPixmap     m_waiting;
 
     QLabel  *m_backLabel;         //返回用户列表
     QLabel  *m_faceLabel;         //头像

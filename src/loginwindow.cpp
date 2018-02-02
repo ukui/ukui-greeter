@@ -13,7 +13,8 @@
 LoginWindow::LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent)
     : QWidget(parent), m_greeter(greeter),
       m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions, this)),
-      m_config(new QSettings(configFile, QSettings::IniFormat))
+      m_config(new QSettings(configFile, QSettings::IniFormat)),
+      m_timer(new QTimer(this))
 {    
     initUI();
     connect(m_greeter.data(), SIGNAL(showMessage(QString,QLightDM::Greeter::MessageType)),
@@ -23,6 +24,9 @@ LoginWindow::LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent
     connect(m_greeter.data(), SIGNAL(authenticationComplete()),
             this, SLOT(onAuthenticationComplete()));
     connect(m_greeter.data(), SIGNAL(reset()), this, SLOT(onReset()));
+
+    m_timer->setInterval(50);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(updatePixmap()));
 }
 
 void LoginWindow::initUI()
@@ -82,6 +86,8 @@ void LoginWindow::initUI()
 bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
 {
     if(obj == m_backLabel) {
+        if(!m_backLabel->isEnabled())
+            return true;
         if(event->type() == QEvent::MouseButtonPress) {
             QPixmap back_active(":/resource/arrow_left_active.png");
             back_active = back_active.scaled(32, 32, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
@@ -102,9 +108,8 @@ bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
             return true;
         }
     } else if(obj == m_sessionLabel) {
-        if(event->type() == QEvent::Paint) {
-
-        }
+        if(!m_sessionLabel->isEnabled())
+            return true;
         if(event->type() == QEvent::MouseButtonRelease) {
             emit selectSession(m_session);
             return true;
@@ -296,6 +301,31 @@ void LoginWindow::startSession()
     }
 }
 
+void LoginWindow::startWaiting()
+{
+    m_passwordEdit->setWaiting(true);
+    m_backLabel->setEnabled(false);
+    m_sessionLabel->setEnabled(false);
+    m_timer->start();
+}
+
+void LoginWindow::stopWaiting()
+{
+    m_timer->stop();
+    m_passwordEdit->setWaiting(false);
+    m_passwordEdit->setIcon(":/resource/arrow_right.png");
+    m_backLabel->setEnabled(true);
+    m_sessionLabel->setEnabled(true);
+}
+
+void LoginWindow::updatePixmap()
+{
+    QMatrix matrix;
+    matrix.rotate(90.0);
+    m_waiting = m_waiting.transformed(matrix, Qt::FastTransformation);
+    m_passwordEdit->setIcon(QIcon(m_waiting));
+}
+
 void LoginWindow::saveLastLoginUser()
 {
 //    m_config->beginGroup("Greeter");
@@ -317,8 +347,11 @@ void LoginWindow::onLogin(const QString &str)
         m_greeter->authenticate(str);
         qDebug() << "login: " << name;
     }
-    else {
+    else {  //发送密码
         m_greeter->respond(str);
+        m_waiting.load(":/resource/waiting.png");
+        m_passwordEdit->setIcon(QIcon(m_waiting));
+        startWaiting();
     }
     m_passwordEdit->setText("");
 }
@@ -338,6 +371,7 @@ void LoginWindow::onShowMessage(QString text, QLightDM::Greeter::MessageType typ
 
 void LoginWindow::onAuthenticationComplete()
 {
+    stopWaiting();
     if(m_greeter->isAuthenticated()) {
         qDebug()<< "authentication success";
         startSession();
