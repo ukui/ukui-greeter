@@ -13,7 +13,6 @@
 #include <QStandardPaths>
 #include "globalv.h"
 #include "mainwindow.h"
-#include "powerwindow.h"
 
 float scale;
 int fontSize;
@@ -77,7 +76,7 @@ int main(int argc, char *argv[])
     //计算缩放比例
     QRect screen = QApplication::desktop()->rect();
     scale = QString::number(screen.width() / 1920.0, 'f', 1).toFloat();
-    scale = scale > 1.0 ? 1.0 : (scale < 0.5 ? 0.5 : scale);
+    scale = scale > 1.0 ? 1.0 : (scale < 0.6 ? 0.6 : scale);
     qDebug() <<"ScreenSize:" << screen.width() << " "<< screen.height()<< ", scale: "<< scale;
 //    scale = std::stof(argv[1]);
 //    top = std::stoi(argv[2]);
@@ -87,9 +86,6 @@ int main(int argc, char *argv[])
 
     MainWindow w;
     w.show();
-//    PowerWindow w;
-//    w.show();
-
 
     return a.exec();
 }

@@ -10,7 +10,8 @@
 
 
 UserEntry::UserEntry(const QString &name, const QString &facePath, bool isLogin, QWidget *parent)
-    :QWidget(parent)//, m_face(facePath), m_name(name), m_login(isLogin)
+    : QWidget(parent),
+      m_selected(false)
 {
     initUI();
 
@@ -18,6 +19,10 @@ UserEntry::UserEntry(const QString &name, const QString &facePath, bool isLogin,
     setFace(facePath);
     setUserName(name);
     setLogin(isLogin);
+}
+
+UserEntry::UserEntry(QWidget *parent) : UserEntry("", "", false, parent)
+{
 }
 
 void UserEntry::initUI()
@@ -29,7 +34,7 @@ void UserEntry::initUI()
     m_faceLabel->setObjectName(QString::fromUtf8("m_faceLabel"));
     QRect faceRect(30*scale, 10, 130*scale, 130*scale);
     m_faceLabel->setGeometry(faceRect);
-    m_faceLabel->setStyleSheet(QString::fromUtf8("border-color: rgb(255, 255, 255);"));
+    m_faceLabel->setStyleSheet("QLabel{border:2px solid white}");
 //    m_faceLabel->setAlignment(Qt::AlignCenter);
 
     m_nameLabel = new QLabel(this);
@@ -46,11 +51,6 @@ void UserEntry::initUI()
     m_loginLabel->setAlignment(Qt::AlignCenter);
     m_loginLabel->setFont(QFont("Ubuntu", fontSize));
 
-    QPixmap face_image(":/resource/default_face.png");
-    face_image.scaled(128*scale, 128*scale,  Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-    m_faceLabel->setPixmap(face_image);
-    m_faceLabel->setStyleSheet("QLabel{border:2px solid white}");
-
     QPalette plt;
     plt.setColor(QPalette::WindowText, Qt::white);
 
@@ -58,24 +58,14 @@ void UserEntry::initUI()
     m_loginLabel->setPalette(plt);
 }
 
-UserEntry::UserEntry(QWidget *parent) : UserEntry("", "", false, parent)
-{
-}
-
 void UserEntry::paintEvent(QPaintEvent *event)
 {
-
-    if(this->hasFocus())    //绘制边框
+    if(this->selected())    //绘制边框
     {
         QPainter painter(this);
-        QBrush brush;
-        brush.setStyle(Qt::Dense6Pattern);
-        QColor color(Qt::white);
-        brush.setColor(color);
-        painter.setBrush(brush);
         QRect rect = m_faceLabel->geometry();
-        QRect border(rect.left()-7, rect.top()-7, rect.width()+14, rect.height()+14);
-        painter.drawRect(border);
+        QRect border(rect.left()-10, rect.top()-10, rect.width()+20, rect.height()+20);
+        painter.fillRect(border, QColor(255, 255, 255, 30));
     }
     return QWidget::paintEvent(event);
 }
@@ -86,7 +76,8 @@ bool UserEntry::eventFilter(QObject *obj, QEvent *event)
         if(event->type() == QEvent::MouseButtonPress){
             QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
             if(mouseEvent->button() == Qt::LeftButton){
-                this->setFocus();
+//                this->setFocus();
+                this->setSelected();
                 return true;
             }
         }
@@ -103,8 +94,8 @@ bool UserEntry::eventFilter(QObject *obj, QEvent *event)
 
 void UserEntry::onClicked()
 {
-    qDebug() << "clicked";
-    this->setFocus();
+//    this->setFocus();
+    this->setSelected();
     emit clicked(m_name);
 }
 
@@ -142,7 +133,13 @@ void UserEntry::setLogin(bool isLogin)
     }
 }
 
-void UserEntry::selected(bool isSelected)
+void UserEntry::setSelected(bool selected)
 {
-    this->isSelected = isSelected;
+    this->m_selected = selected;
+    update();
+}
+
+bool UserEntry::selected()
+{
+    return this->m_selected;
 }

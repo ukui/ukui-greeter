@@ -10,9 +10,13 @@ public:
     explicit GreeterWrapper(QObject *parent=0);
     void setLang(const QString&);
     QString lang();
+    void setSession(const QString&);
+    QString session();
+    void startSession();
 
 private:
     QString m_language;
+    QString m_session;
 };
 
 #endif // GREETERWRAPPER_H

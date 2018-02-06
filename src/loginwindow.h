@@ -22,15 +22,24 @@ public:
     explicit LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent = 0);
     ~LoginWindow(){}
 
-    void addMessage(const QString &);
     void setUsersModel(QSharedPointer<QAbstractItemModel> model);
     bool setUserIndex(const QModelIndex& index);
     void setSessionsModel(QSharedPointer<QAbstractItemModel> model);
     bool setSessionIndex(const QModelIndex& index);
     void setGreeter(QSharedPointer<GreeterWrapper> greeter);
-private:
-    void initUI();
+
+    void setUserName(const QString& userName);
+    QString getUserName();
+    void setFace(const QString& faceFile);
+    void setLoggedIn(bool isLoggedIn);
+    void setPrompt(const QString& text);
+    void addMessage(const QString &);
+    QString getPassword();
     void setSession(QString);
+    QString getSession();
+
+private:
+    void initUI();    
     int sessionIndex(const QString &session);
     void saveLastLoginUser();
 
@@ -43,10 +52,7 @@ signals:
     void selectSession(const QString& );
 
 public slots:
-    void startAuthenticate(const QString& username);
-//    void cancelAuthenticate();
-    void startSession();
-    void saveRootImage();
+    void startAuthentication(const QString& username);
     void startWaiting();
     void stopWaiting();
     void updatePixmap();
@@ -54,19 +60,18 @@ public slots:
     void onShowMessage(QString text, QLightDM::Greeter::MessageType type);
     void onShowPrompt(QString text, QLightDM::Greeter::PromptType type);
     void onAuthenticationComplete();
-    void onAutologinTimerExpired();
-    void onReset();
     void onLogin(const QString &str);
 
 private:
     QSharedPointer<QAbstractItemModel> m_usersModel;
     QSharedPointer<QAbstractItemModel> m_sessionsModel;
     QSharedPointer<GreeterWrapper> m_greeter;
-    QString     m_session;
+    QString     m_session;  //session的名称
     QSettings   *m_config;
     QTimer      *m_timer;
     QPixmap     m_waiting;
 
+    // UI
     QLabel      *m_backLabel;         //返回用户列表
     QLabel      *m_faceLabel;         //头像
     QSvgWidget  *m_sessionLabel;      //session图标

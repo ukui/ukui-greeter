@@ -13,10 +13,11 @@
 
 PageListView::PageListView(QWidget *parent)
     : QWidget(parent),
-      m_layout(new QHBoxLayout(this))
+      m_layout(new QHBoxLayout(this)),
+      m_lastItem(-1)
 {
     setFixedSize(950*scale, 300*scale);
-    setFocus();
+//    setFocus();
 }
 
 void PageListView::keyReleaseEvent(QKeyEvent *event)
@@ -26,7 +27,7 @@ void PageListView::keyReleaseEvent(QKeyEvent *event)
         case Qt::Key_Return:
         {
             qDebug() << "login";
-            UserEntry *entry = qobject_cast<UserEntry*>(focusWidget());
+            UserEntry *entry = m_itemList[m_curItem];
             onEntrySelected(entry->userName());
             break;
         }
@@ -51,12 +52,6 @@ void PageListView::keyReleaseEvent(QKeyEvent *event)
         default:
             QWidget::keyReleaseEvent(event);
     }
-}
-
-void PageListView::showEvent(QShowEvent *e)
-{
-    QWidget::showEvent(e);
-    m_itemList[m_curItem]->setFocus();
 }
 
 void PageListView::setModel(QSharedPointer<QAbstractItemModel> model)
@@ -127,8 +122,8 @@ void PageListView::drawPage()
         m_layout->addStretch();
 
     if(m_itemList.size() > 0) {
-        m_itemList[m_curItem]->setFocus();
-//        m_itemList[m_curItem]->setSelected(true);
+//        m_itemList[m_curItem]->setFocus();
+        moveFocus();
     }
     emit pageChanged();
 }
@@ -148,7 +143,8 @@ void PageListView::pageUp()
     if(m_itemCount <= 5 || m_end == 4)  //位于首页
     {
         m_curItem = 0;
-        m_itemList[m_curItem]->setFocus();
+//        m_itemList[m_curItem]->setFocus();
+        moveFocus();
         return;
     }
     m_lastend = m_end;
@@ -162,7 +158,8 @@ void PageListView::pageDown()
     if(m_itemCount <= 5 || m_end == m_itemCount - 1)    //位于尾页
     {
         m_curItem = m_end;
-        m_itemList[m_curItem]->setFocus();
+//        m_itemList[m_curItem]->setFocus();
+        moveFocus();
         return;
     }
     m_lastend = m_end;
@@ -176,7 +173,8 @@ void PageListView::goHome()
     if(m_itemCount <= 5 || m_end == 4)
     {
         m_curItem = 0;
-        m_itemList[m_curItem]->setFocus();
+//        m_itemList[m_curItem]->setFocus();
+        moveFocus();
         return;
     }
     m_lastend = m_end;
@@ -190,7 +188,8 @@ void PageListView::goEnd()
     if(m_itemCount <= 5 || m_end == m_itemCount - 1)    //位于尾页
     {
         m_curItem = m_end;
-        m_itemList[m_curItem]->setFocus();
+//        m_itemList[m_curItem]->setFocus();
+        moveFocus();
         return;
     }
     m_lastend = m_end;
@@ -205,7 +204,8 @@ void PageListView::preItem()
     if(m_curItem - begin > 0)
     {
         --m_curItem;
-        m_itemList[m_curItem]->setFocus();
+//        m_itemList[m_curItem]->setFocus();
+        moveFocus();
     }
     else if(m_curItem > 0)
     {
@@ -221,7 +221,8 @@ void PageListView::nextItem()
     if(m_curItem < m_end)
     {
         ++m_curItem;
-        m_itemList[m_curItem]->setFocus();
+//        m_itemList[m_curItem]->setFocus();
+        moveFocus();
     }
     else if(m_curItem < m_itemCount - 1)
     {
@@ -239,6 +240,7 @@ void PageListView::onEntrySelected(const QString &name)
             m_curItem = i;
         }
     }
+    moveFocus();
     emit selectedChanged(m_model.data()->index(m_curItem, 0));
 }
 
@@ -309,4 +311,12 @@ void PageListView::onUserChanged(const QModelIndex & topLeft,
             m_itemList[i]->setLogin(index.data(QLightDM::UsersModel::LoggedInRole).toBool());
         }
     }
+}
+
+void PageListView::moveFocus()
+{
+    if(m_lastItem >= 0 && m_lastItem < m_itemCount && m_itemList[m_lastItem] != NULL)
+        m_itemList[m_lastItem]->setSelected(false);
+    m_itemList[m_curItem]->setSelected();
+    m_lastItem = m_curItem;
 }

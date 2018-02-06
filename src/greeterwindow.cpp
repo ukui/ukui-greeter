@@ -1,5 +1,4 @@
 #include "greeterwindow.h"
-#include <signal.h>
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QMouseEvent>
@@ -9,9 +8,8 @@
 #include <QProcess>
 #include <QStandardPaths>
 #include <QLightDM/SessionsModel>
-#include <X11/Xatom.h>
 #include <X11/Xlib.h>
-#include <X11/extensions/Xrandr.h>
+#include <X11/cursorfont.h>
 #include "globalv.h"
 #include "loginwindow.h"
 #include "userwindow.h"
@@ -20,14 +18,14 @@
 
 GreeterWindow::GreeterWindow(QWidget *parent)
     : QWidget(parent),
-      m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions)),
-      m_greeter(new GreeterWrapper()),
       m_userWnd(nullptr),
       m_loginWnd(nullptr),
       m_sessionWnd(nullptr),
       m_powerWnd(nullptr),
       m_languageMenu(nullptr),
-      m_board(nullptr)
+      m_board(nullptr),
+      m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions)),
+      m_greeter(new GreeterWrapper())
 {
     m_usersModel = QSharedPointer<UsersModel>(new UsersModel(m_greeter->hideUsersHint()));
     if(m_greeter->hasGuestAccountHint()){    //允许游客登录
@@ -47,8 +45,6 @@ GreeterWindow::~GreeterWindow()
 {
     //先kill虚拟键盘进程，再销毁process对象
     if(m_board && m_board->state() == QProcess::Running){
-        int boardid = m_board->processId();
-        qDebug() << boardid;
         m_board->kill();
         m_board->waitForFinished(100);
     }
@@ -59,7 +55,7 @@ GreeterWindow::~GreeterWindow()
 
 void GreeterWindow::initUI()
 {
-    /* 如果只用一个用户的话，直接进入登录界面 */
+    // 如果只用一个用户的话，直接进入登录界面，否则显示用户列表窗口
     if(m_usersModel->rowCount() != 1) {
         m_userWnd = new UserWindow(this);
         m_userWnd->setModel(m_usersModel);
@@ -69,6 +65,7 @@ void GreeterWindow::initUI()
         connect(m_userWnd, SIGNAL(selectedChanged(QModelIndex)), this, SLOT(onSelectedUserChanged(QModelIndex)));
     }
 
+    //登录窗口
     m_loginWnd = new LoginWindow(m_greeter, this);
     m_loginWnd->setUsersModel(m_usersModel);
     QRect loginRect((rect().width()-m_loginWnd->width())/2, (rect().height()-m_loginWnd->height())/2,
@@ -78,6 +75,7 @@ void GreeterWindow::initUI()
     connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBacktoUsers()));
     connect(m_loginWnd, SIGNAL(selectSession(QString)), this, SLOT(onSelectSession(QString)));
 
+    //语言选择
     m_languageLB = new QLabel(this);
     m_languageLB->setGeometry(this->width() - 180, 20, 39, 39);
     m_languageLB->setAlignment(Qt::AlignCenter);
@@ -96,12 +94,14 @@ void GreeterWindow::initUI()
         m_greeter->setLang("en_US");
     }
 
+    //虚拟键盘
     m_keyboardLB = new QLabel(this);
     m_keyboardLB->setGeometry(this->width() - 120, 20, 39, 39);
     m_keyboardLB->setPixmap(QPixmap(":/resource/keyboard.png"));
     m_keyboardLB->installEventFilter(this);
     m_keyboardLB->setStyleSheet("QLabel::hover{background-color:rgb(255, 255, 255, 50)}");
 
+    //电源
     m_powerLB = new QLabel(this);
     m_powerLB->setGeometry(this->width() - 60, 20, 39, 39);
     m_powerLB->setPixmap(QPixmap(":/resource/power.png"));
@@ -112,7 +112,7 @@ void GreeterWindow::initUI()
 bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
 {
     if(obj == m_keyboardLB) {
-        //软键盘
+        //虚拟键盘
         if(event->type() == QEvent::MouseButtonRelease) {
             if(((QMouseEvent*)event)->button() == Qt::LeftButton){
                 showBoard();
@@ -135,10 +135,17 @@ bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
                 return true;
             }
         }
-    }else if(obj == m_languageMenu) {
+    } else if(obj == m_languageMenu) {
         if(event->type() == QEvent::Close) {
             //当菜单关闭时需要重绘label，否则指针悬浮在label上产生的背景不会消失
             repaint(m_languageLB->geometry());
+        } else if(event->type() == QEvent::MouseButtonRelease) {
+            //打开电源对话框后再打开语言选择菜单，单击菜单项接收不到triggered信号，
+            //需要双击菜单项才会生效，所以这里直接调用trigger函数
+            QAction *action = m_languageMenu->activeAction();
+            if(action)
+                action->trigger();
+            m_languageMenu->close();
         }
     }
     //打开了电源对话框，点击对话框之外的地方关闭对话框
@@ -191,6 +198,11 @@ void GreeterWindow::onSelectSession(const QString &sessionName)
     switchWnd(2);
 }
 
+/**
+ * @brief GreeterWindow::switchWnd
+ * @param index （0：用户列表窗口；1：登录窗口；2：session选择窗口）
+ * 切换窗口
+ */
 void GreeterWindow::switchWnd(int index)
 {
     m_userWnd->hide();
@@ -214,16 +226,10 @@ void GreeterWindow::switchWnd(int index)
     }
 }
 
-void GreeterWindow::timedAutologin()
-{
-    if(m_greeter->isAuthenticated()) {
-        /* 选择了用户 */
-
-    } else {
-        m_greeter->authenticateAutologin();
-    }
-}
-
+/**
+ * @brief GreeterWindow::showPowerWnd
+ * 显示电源对话框
+ */
 void GreeterWindow::showPowerWnd()
 {
     //创建一个黑色透明背景的窗口
@@ -248,10 +254,14 @@ void GreeterWindow::showPowerWnd()
     m_powerWnd->show();
 }
 
+/**
+ * @brief GreeterWindow::showLanguageMenu
+ * 显示语言选择菜单
+ */
 void GreeterWindow::showLanguageMenu()
 {
     if(!m_languageMenu) {
-        //目前只允许language设置为中文或者英文
+        // 目前只允许language设置为中文或者英文
         QAction *m_en = new QAction(tr("English"), this);
         m_en->setCheckable(true);
         QAction *m_zh = new QAction(tr("Chinese"), this);
@@ -265,6 +275,7 @@ void GreeterWindow::showLanguageMenu()
         m_languageMenu->installEventFilter(this);
         connect(m_languageMenu, SIGNAL(triggered(QAction*)), this, SLOT(onMenuItemClicked(QAction*)));
 
+        // 默认选项
         if(m_greeter->lang() == "zh_CN")
             m_zh->setChecked(true);
         else
@@ -273,6 +284,11 @@ void GreeterWindow::showLanguageMenu()
     m_languageMenu->popup(mapToGlobal(m_languageLB->geometry().bottomLeft()));
 }
 
+/**
+ * @brief GreeterWindow::onMenuItemClicked
+ * @param action
+ * 选择语言
+ */
 void GreeterWindow::onMenuItemClicked(QAction *action)
 {
     QString text = action->text();
@@ -285,9 +301,43 @@ void GreeterWindow::onMenuItemClicked(QAction *action)
     }
 }
 
+/**
+ * @brief GreeterWindow::showBoard
+ * 显示虚拟键盘
+ */
 void GreeterWindow::showBoard()
 {
     m_board = new QProcess();
     QString program(QStandardPaths::findExecutable("onboard"));
+    QStringList arg{"--xid"};
+    m_board->setArguments(arg);
     m_board->start(program);
+
+//    QWidget *boardWnd = new QWidget(this);
+//    boardWnd->setGeometry(geometry().x(), geometry().y() + geometry().height() - 200, geometry().width(), 200);
+//    boardWnd->show();
+
+    Display *display = XOpenDisplay(NULL);
+    Window window = XCreateSimpleWindow(display, DefaultRootWindow(display),
+                                        geometry().x(), geometry().y() + geometry().height() - 200,
+                                        geometry().width(), 200, 0, 0, 0);
+    XDefineCursor(display, window, XCreateFontCursor(display, XC_arrow));
+}
+
+/**
+ * @brief GreeterWindow::timedAutologin
+ * 处理延时自动登录
+ */
+void GreeterWindow::timedAutologin()
+{
+    if(m_greeter->isAuthenticated()) {
+        if(!m_greeter->authenticationUser().isEmpty())
+            m_greeter->startSession();
+        else if(m_greeter->autologinGuestHint())
+            m_greeter->startSession();
+        else if(!m_greeter->autologinUserHint().isEmpty())
+            m_greeter->authenticate(m_greeter->autologinUserHint());
+    }
+    else
+        m_greeter->authenticateAutologin();
 }

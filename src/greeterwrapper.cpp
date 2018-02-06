@@ -20,3 +20,28 @@ QString GreeterWrapper::lang()
 {
     return this->m_language;
 }
+
+void GreeterWrapper::setSession(const QString &session)
+{
+    m_session = session;
+}
+
+QString GreeterWrapper::session()
+{
+    return m_session;
+}
+
+void GreeterWrapper::startSession()
+{
+    //设置language
+    if(!m_language.isEmpty()) {
+        setLanguage(m_language);
+    }
+
+    //启动session
+    if(!startSessionSync(m_session)) {
+        Q_EMIT showMessage(tr("failed to start session."), QLightDM::Greeter::MessageTypeError);
+        //如果启动session失败，需要重新认证
+        authenticate(authenticationUser());
+    }
+}

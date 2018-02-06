@@ -72,7 +72,6 @@ void PowerWindow::initUI()
         m_suspendLabel->setAlignment(Qt::AlignCenter);
         m_suspendLabel->setFixedSize(168, 30);
         m_suspendLabel->setPalette(plt);
-//        m_suspendLabel->hide();
         vbox1->addWidget(m_suspend);
         vbox1->addWidget(m_suspendLabel);
     } else if(m_power->canHibernate()) {
@@ -86,7 +85,6 @@ void PowerWindow::initUI()
         m_hibernateLabel->setAlignment(Qt::AlignCenter);
         m_hibernateLabel->setFixedSize(168, 30);
         m_hibernateLabel->setPalette(plt);
-//        m_hibernateLabel->hide();
         vbox1->addWidget(m_hibernate);
         vbox1->addWidget(m_hibernateLabel);
     }
@@ -102,7 +100,6 @@ void PowerWindow::initUI()
     m_restartLabel->setAlignment(Qt::AlignCenter);
     m_restartLabel->setFixedSize(168, 30);
     m_restartLabel->setPalette(plt);
-//    m_restartLabel->hide();
     vbox2->addWidget(m_restart);
     vbox2->addWidget(m_restartLabel);
 
@@ -117,7 +114,6 @@ void PowerWindow::initUI()
     m_shutdownLabel->setAlignment(Qt::AlignCenter);
     m_shutdownLabel->setFixedSize(168, 30);
     m_shutdownLabel->setPalette(plt);
-//    m_shutdownLabel->hide();
     vbox3->addWidget(m_shutdown);
     vbox3->addWidget(m_shutdownLabel);
 
@@ -145,12 +141,9 @@ void PowerWindow::paintEvent(QPaintEvent *e)
     QRect center = QRect(24, 24, width()-24 * 2, height()-24*2);
     QImage image(width()-24 * 2, height()-24*2, QImage::Format_ARGB32);
     image.fill(QColor(46, 39, 101, 250));
-//    painter.setBrush(QColor(46, 39, 101, 200));
-//    painter.drawRect(QRect(24, 24, width()-24 * 2, height()-24*2));
     QPixmap pixmap;
     pixmap = pixmap.fromImage(image);
     painter.drawImage(center, image, image.rect());
-//    painter.drawPixmap(center, pixmap);
     QWidget::paintEvent(e);
 }
 

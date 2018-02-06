@@ -18,6 +18,7 @@ public:
 
 protected:
     bool eventFilter(QObject *, QEvent *);
+    void showEvent(QShowEvent *);
 
 private slots:
     void onPageChanged();

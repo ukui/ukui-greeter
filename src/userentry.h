@@ -16,7 +16,8 @@ public:
     const QString& userName();
     void setUserName(const QString &name);
     void setLogin(bool isLogin);
-    void selected(bool);
+    void setSelected(bool selected=true);
+    bool selected();
     static int X(){return 190;}
     static int Y(){return 240;}
 
@@ -40,7 +41,7 @@ private:
     QString m_face;
     QString m_name;
     bool m_login;
-    bool isSelected;
+    bool m_selected;
 };
 
 

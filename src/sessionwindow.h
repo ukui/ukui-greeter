@@ -23,6 +23,7 @@ signals:
 private:
     void initUI();
     QString getSessionIcon(const QString&);
+    void saveAndBack();
 
     QLabel *m_backLabel;
     QLabel *m_prompt;

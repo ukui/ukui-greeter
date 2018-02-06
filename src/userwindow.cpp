@@ -9,6 +9,7 @@ UserWindow::UserWindow(QWidget *parent)
     : QWidget(parent), m_userList(nullptr)
 {
     initUI();
+    m_userList->setFocus();
 }
 
 void UserWindow::initUI()
@@ -44,6 +45,12 @@ void UserWindow::initUI()
     m_nextLabel->setPixmap(scaledPixmap(64*scale, 64*scale, ":/resource/next.png"));
     m_nextLabel->setStyleSheet("QLabel{background-color: rgba(255, 255, 255, 0.1)}"
                                "QLabel::hover{background-color: rgba(255, 255, 255, 0.3)}");
+}
+
+void UserWindow::showEvent(QShowEvent *e)
+{
+    m_userList->setFocus();
+    QWidget::showEvent(e);
 }
 
 bool UserWindow::eventFilter(QObject *obj, QEvent *event)

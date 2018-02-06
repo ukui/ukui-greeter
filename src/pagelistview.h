@@ -23,7 +23,6 @@ public:
 
 protected:
     void keyReleaseEvent(QKeyEvent *);
-    void showEvent(QShowEvent *);
 
 private:
     UserEntry* createEntry(int );
@@ -32,7 +31,7 @@ private:
     void goEnd();       //切换到尾页
     void preItem();     //切换到上一项
     void nextItem();    //切换到下一项
-    void switchToUser();    //切换到选中的用户登录界面
+    void moveFocus();   //移动焦点
 
 signals:
     void pageChanged();  //当焦点所在项发生变化时发出

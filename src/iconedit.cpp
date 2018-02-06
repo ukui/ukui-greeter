@@ -195,11 +195,13 @@ void IconEdit::resize(const QSize& size)
 void IconEdit::clear()
 {
     m_edit->setText("");
+    setPrompt("");
 }
 
 void IconEdit::setPrompt(const QString &prompt)
 {
     m_edit->setInnerTip(prompt);
+    update();   //不更新的话，第一次不会显示prompt
 }
 
 const QString& IconEdit::text()
