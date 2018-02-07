@@ -125,10 +125,14 @@ IconEdit::IconEdit(QWidget *parent)
     :QWidget(parent)
 {
     m_edit = new TipEdit(this);
+    m_edit->setObjectName("m_edit");
     m_iconButton = new IconButton(m_edit, this);
+    m_iconButton->setFocusPolicy(Qt::NoFocus);
+    m_iconButton->setObjectName("m_iconButton");
     connect(m_iconButton, SIGNAL(clicked(bool)), this, SLOT(clicked_cb()));
     connect(m_edit, SIGNAL(textChanged(QString)), this, SLOT(showIcon(QString)));
     m_iconButton->hide();
+    setFocusProxy(m_edit);
 }
 
 IconEdit::IconEdit(const QIcon& icon, QWidget *parent)
@@ -158,10 +162,15 @@ void IconEdit::keyReleaseEvent ( QKeyEvent * event )
     return QWidget::keyReleaseEvent(event);
 }
 
-void IconEdit::focusInEvent(QFocusEvent *)
-{
-    m_edit->setFocus();
-}
+//void IconEdit::focusInEvent(QFocusEvent *)
+//{
+//    this->m_edit->setFocus();
+//}
+
+//void IconEdit::focusOutEvent(QFocusEvent *)
+//{
+//    emit focusOut();
+//}
 
 void IconEdit::clicked_cb()
 {

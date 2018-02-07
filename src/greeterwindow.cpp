@@ -6,8 +6,11 @@
 #include <QMenu>
 #include <QDebug>
 #include <QProcess>
+#include <QtDBus/QDBusInterface>
+#include <QtDBus/QDBusConnection>
 #include <QStandardPaths>
 #include <QLightDM/SessionsModel>
+#include <QX11Info>
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
 #include "globalv.h"
@@ -303,25 +306,29 @@ void GreeterWindow::onMenuItemClicked(QAction *action)
 
 /**
  * @brief GreeterWindow::showBoard
- * 显示虚拟键盘
+ * 显示或隐藏虚拟键盘
  */
 void GreeterWindow::showBoard()
 {
-    m_board = new QProcess();
-    QString program(QStandardPaths::findExecutable("onboard"));
-    QStringList arg{"--xid"};
-    m_board->setArguments(arg);
-    m_board->start(program);
+    if(m_board == nullptr){
+        m_board = new QProcess();
+        QString program(QStandardPaths::findExecutable("onboard"));
+        QStringList arg{"--xid"};
+        m_board->setArguments(arg);
+        m_board->start(program);
+    }
 
-//    QWidget *boardWnd = new QWidget(this);
-//    boardWnd->setGeometry(geometry().x(), geometry().y() + geometry().height() - 200, geometry().width(), 200);
-//    boardWnd->show();
+    if(m_board->state() == QProcess::Running){
+        QDBusInterface iface("org.onboard.Onboard", "/org/onboard/Onboard/Keyboard",
+                             "org.onboard.Onboard.Keyboard", QDBusConnection::sessionBus());
+        if(!iface.isValid()){
+            qDebug() << qPrintable(QDBusConnection::sessionBus().lastError().message());
+        }
+        iface.call("ToggleVisible");
+    }
 
-    Display *display = XOpenDisplay(NULL);
-    Window window = XCreateSimpleWindow(display, DefaultRootWindow(display),
-                                        geometry().x(), geometry().y() + geometry().height() - 200,
-                                        geometry().width(), 200, 0, 0, 0);
-    XDefineCursor(display, window, XCreateFontCursor(display, XC_arrow));
+    //设置虚拟键盘窗口的鼠标指针
+    XDefineCursor(QX11Info::display(), QX11Info::appRootWindow(), XCreateFontCursor(QX11Info::display(), XC_arrow));
 }
 
 /**

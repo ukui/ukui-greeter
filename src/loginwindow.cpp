@@ -5,9 +5,8 @@
 #include <QStandardPaths>
 #include <QScreen>
 #include <QProcess>
+#include <QFocusEvent>
 #include <QLightDM/SessionsModel>
-#include <X11/Xlib.h>
-#include <X11/cursorfont.h>
 #include "globalv.h"
 
 LoginWindow::LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent)
@@ -51,6 +50,7 @@ void LoginWindow::initUI()
     m_sessionLabel->setObjectName(QStringLiteral("m_sessionLabel"));
     m_sessionLabel->setGeometry(QRect(width()-22, 0, 22, 22));
     m_sessionLabel->installEventFilter(this);
+    m_sessionLabel->hide();
 
     QPalette plt;
     plt.setColor(QPalette::WindowText, Qt::white);
@@ -76,9 +76,12 @@ void LoginWindow::initUI()
     m_messageLabel->setPalette(plt);
 
     m_passwordEdit = new IconEdit(QIcon(":/resource/arrow_right.png"), this);
+    m_passwordEdit->setObjectName("m_passwordEdit");
     QRect pwdRect(220, 90, 300, 40);
     m_passwordEdit->setGeometry(pwdRect);
     m_passwordEdit->resize(QSize(300, 40));
+    m_passwordEdit->installEventFilter(this);
+    m_passwordEdit->setStyleSheet("QWidget{background-color:rgb(255, 255, 255, 150)}");
     connect(m_passwordEdit, SIGNAL(clicked(const QString&)), this, SLOT(onLogin(const QString&)));
 }
 
@@ -122,8 +125,8 @@ bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
 
 void LoginWindow::showEvent(QShowEvent *e)
 {
-    m_passwordEdit->setFocus();
     QWidget::showEvent(e);
+    m_passwordEdit->setFocus();
 }
 
 /**
@@ -188,7 +191,7 @@ void LoginWindow::setLoggedIn(bool isLoggedIn)
  */
 void LoginWindow::setPrompt(const QString& text)
 {
-    m_passwordEdit->setPrompt(text);
+//    m_passwordEdit->setPrompt(text);
 }
 
 
@@ -341,8 +344,6 @@ int LoginWindow::sessionIndex(const QString &session)
     return -1;
 }
 
-
-
 void LoginWindow::onSessionSelected(const QString &session)
 {
     qDebug() << "select session: " << session;
@@ -357,7 +358,7 @@ void LoginWindow::startAuthentication(const QString &username)
     //用户认证
     if(username == tr("Guest")) {                       //游客登录
         qDebug() << "guest login";
-        //m_greeter->authenticateAsGuest();
+        m_greeter->authenticateAsGuest();
     }
     else if(username == tr("Login")) {                  //手动输入用户名
         m_passwordEdit->setPrompt(tr("Username"));
@@ -376,7 +377,7 @@ void LoginWindow::startAuthentication(const QString &username)
  */
 void LoginWindow::startWaiting()
 {
-    m_passwordEdit->setWaiting(true);
+//    m_passwordEdit->setWaiting(true);
     m_backLabel->setEnabled(false);
     m_sessionLabel->setEnabled(false);
     m_timer->start();

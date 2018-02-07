@@ -35,7 +35,6 @@ void UserEntry::initUI()
     QRect faceRect(30*scale, 10, 130*scale, 130*scale);
     m_faceLabel->setGeometry(faceRect);
     m_faceLabel->setStyleSheet("QLabel{border:2px solid white}");
-//    m_faceLabel->setAlignment(Qt::AlignCenter);
 
     m_nameLabel = new QLabel(this);
     m_nameLabel->setObjectName(QString::fromUtf8("m_nameLabel"));
@@ -62,10 +61,14 @@ void UserEntry::paintEvent(QPaintEvent *event)
 {
     if(this->selected())    //绘制边框
     {
-        QPainter painter(this);
         QRect rect = m_faceLabel->geometry();
         QRect border(rect.left()-10, rect.top()-10, rect.width()+20, rect.height()+20);
-        painter.fillRect(border, QColor(255, 255, 255, 30));
+
+        QPainter painter(this);
+        painter.setPen(QPen(QColor(255, 255, 255, 51), 1));
+        painter.setBrush(QColor(0, 0 , 0, 50));
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        painter.drawRoundedRect(border, 0, 0, Qt::RelativeSize);
     }
     return QWidget::paintEvent(event);
 }

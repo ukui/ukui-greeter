@@ -9,7 +9,6 @@ UserWindow::UserWindow(QWidget *parent)
     : QWidget(parent), m_userList(nullptr)
 {
     initUI();
-    m_userList->setFocus();
 }
 
 void UserWindow::initUI()

@@ -50,7 +50,8 @@ public:
     IconEdit(QWidget *parent = 0);
     IconEdit(const QIcon& icon, QWidget *parent = 0);
     virtual void keyReleaseEvent ( QKeyEvent * event );
-    virtual void focusInEvent(QFocusEvent *);
+//    virtual void focusInEvent(QFocusEvent *);
+//    virtual void focusOutEvent(QFocusEvent *);
 
     void setIcon(const QString &filename);
     void setIcon(const QIcon &icon);
@@ -64,6 +65,7 @@ public:
 
 signals:
     void clicked(const QString &);
+    void focusOut();
 
 public slots:
     void clicked_cb();

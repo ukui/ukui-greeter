@@ -78,7 +78,7 @@ private:
     QLabel      *m_nameLabel;         //用户名
     QLabel      *m_isLoginLabel;      //提示是否已登录
     QLabel      *m_messageLabel;      //提示信息
-    IconEdit    *m_passwordEdit;     //密码输入框
+    IconEdit   *m_passwordEdit;     //密码输入框
 };
 
 #endif // LOGINWINDOW_H
