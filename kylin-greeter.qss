@@ -1,0 +1,45 @@
+/*QLabel#m_close {
+    background:url(:/resource/dialog_close.png);
+    background-repeat:no-repeat
+}
+
+QLabel:hover#m_close {
+    background:url(:/resource/dialog_close_highlight.png);
+    background-repeat:no-repeat
+}
+
+QLabel#m_suspend{
+    background:url(:/resource/suspend.png);
+    background-repeat:no-repeat
+}
+QLabel:hover#m_suspend{
+    background:url(:/resource/suspend_highlight.png);
+    background-repeat:no-repeat
+}
+
+QLabel#m_hibernate{
+    background:url(:/resource/hibernate.png);
+    background-repeat:no-repeat};
+}
+QLabel::hover#m_hibernate{
+    background:url(:/resource/hibernate_highlight.png);
+    background-repeat:no-repeat;
+}
+
+QLabel#m_restart{
+    background:url(:/resource/restart.png);
+    background-repeat:no-repeat};
+}
+QLabel:hover#m_restart{
+    background:url(:/resource/restart_highlight.png);
+    background-repeat:no-repeat;
+}
+
+QLabel#m_shutdown{
+    background:url(:/resource/shutdown.png);
+    background-repeat:no-repeat;
+}
+QLabel:hover#m_shutdown{
+    background:url(:/resource/shutdown_highlight.png);
+    background-repeat:no-repeat;
+}*/

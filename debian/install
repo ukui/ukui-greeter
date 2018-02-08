@@ -1,2 +1,2 @@
-debian/95-kylin-greeter.conf /usr/share/lightdm/lightdm.conf.d/
-debian/kylin-greeter.desktop /usr/share/xgreeters/
+# debian/95-kylin-greeter.conf /usr/share/lightdm/lightdm.conf.d/
+# debian/kylin-greeter.desktop /usr/share/xgreeters/
