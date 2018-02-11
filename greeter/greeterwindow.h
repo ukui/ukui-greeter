@@ -21,6 +21,7 @@ public:
     virtual ~GreeterWindow();
     void initUI();
     bool eventFilter(QObject *, QEvent *);
+//    void keyReleaseEvent(QKeyEvent *);
 
 private slots:
     void onSelectedUserChanged(const QModelIndex &);

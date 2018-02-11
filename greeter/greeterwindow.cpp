@@ -142,6 +142,7 @@ bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
         if(event->type() == QEvent::Close) {
             //当菜单关闭时需要重绘label，否则指针悬浮在label上产生的背景不会消失
             repaint(m_languageLB->geometry());
+            return true;
         } else if(event->type() == QEvent::MouseButtonRelease) {
             //打开电源对话框后再打开语言选择菜单，单击菜单项接收不到triggered信号，
             //需要双击菜单项才会生效，所以这里直接调用trigger函数
@@ -149,6 +150,7 @@ bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
             if(action)
                 action->trigger();
             m_languageMenu->close();
+            return true;
         }
     }
     //打开了电源对话框，点击对话框之外的地方关闭对话框
@@ -162,6 +164,13 @@ bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
     }
     return QWidget::eventFilter(obj, event);
 }
+
+//void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
+//{
+//    if(e->key() == Qt::Key_Escape){
+//        qDebug() << "escape";
+//    }
+//}
 
 
 void GreeterWindow::onSelectedUserChanged(const QModelIndex &index)
@@ -189,7 +198,7 @@ void GreeterWindow::onBacktoLogin()
 void GreeterWindow::onSelectSession(const QString &sessionName)
 {
     if(!m_sessionWnd) {
-        m_sessionWnd = new SessionWindow(this);
+        m_sessionWnd = new SessionWindow(m_greeter->defaultSessionHint(), this);
         m_sessionWnd->setGeometry((rect().width()-m_sessionWnd->width())/2,
                                   (rect().height()-m_sessionWnd->height())/2,
                                   m_sessionWnd->width(), m_sessionWnd->height());
@@ -223,6 +232,7 @@ void GreeterWindow::switchWnd(int index)
         break;
     case 2:
         m_sessionWnd->show();
+        m_sessionWnd->setFocus();
         break;
     default:
         break;

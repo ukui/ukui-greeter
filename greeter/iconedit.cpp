@@ -53,6 +53,7 @@ IconButton::IconButton(TipEdit *edit, QWidget *parent)
     edit->setTextMargins(1, 1, m_size.width()*2, 1);
     edit->setStyleSheet(" QLineEdit { border: 1px solid #026096 ; lineedit-password-character:8226}");  //设置密码显示为中等大小的实心圆点
     this->setStyleSheet("QPushButton{background:transparent; border:0px}");
+    m_capTips->setStyleSheet("QLabel{background:transparent; border:0px}");
 }
 IconButton::IconButton(TipEdit *edit, const QIcon &icon, QWidget *parent)
     :IconButton(edit, parent)

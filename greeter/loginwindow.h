@@ -42,10 +42,12 @@ private:
     void initUI();    
     int sessionIndex(const QString &session);
     void saveLastLoginUser();
+    void backToUsers();
 
 protected:
     bool eventFilter(QObject *, QEvent *);
     void showEvent(QShowEvent *);
+    void keyReleaseEvent(QKeyEvent *);
 
 signals:
     void back();
@@ -66,7 +68,7 @@ private:
     QSharedPointer<QAbstractItemModel> m_usersModel;
     QSharedPointer<QAbstractItemModel> m_sessionsModel;
     QSharedPointer<GreeterWrapper> m_greeter;
-    QString     m_session;  //session的名称
+    QString     m_session;  //session的标识
     QSettings   *m_config;
     QTimer      *m_timer;
     QPixmap     m_waiting;
@@ -74,11 +76,12 @@ private:
     // UI
     QLabel      *m_backLabel;         //返回用户列表
     QLabel      *m_faceLabel;         //头像
+    QWidget     *m_sessionBg;
     QSvgWidget  *m_sessionLabel;      //session图标
     QLabel      *m_nameLabel;         //用户名
     QLabel      *m_isLoginLabel;      //提示是否已登录
     QLabel      *m_messageLabel;      //提示信息
-    IconEdit   *m_passwordEdit;     //密码输入框
+    IconEdit   *m_passwordEdit;       //密码输入框
 };
 
 #endif // LOGINWINDOW_H

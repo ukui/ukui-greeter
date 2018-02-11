@@ -33,6 +33,8 @@ void LoginWindow::initUI()
         this->setObjectName(QStringLiteral("this"));
     this->resize(520, 135);
 
+    QPalette plt;
+
     m_backLabel = new QLabel(this);
     m_backLabel->setObjectName(QStringLiteral("m_backLabel"));
     m_backLabel->setGeometry(QRect(0, 0, 32, 32));
@@ -46,13 +48,16 @@ void LoginWindow::initUI()
     m_faceLabel->setGeometry(QRect(60, 0, 132, 132));
     m_faceLabel->setStyleSheet("QLabel{ border: 2px solid white}");
 
+    m_sessionBg = new QWidget(this);
+    m_sessionBg->setGeometry(QRect(width()-26, 0, 26, 26));
+    m_sessionBg->hide();
     m_sessionLabel = new QSvgWidget(this);
     m_sessionLabel->setObjectName(QStringLiteral("m_sessionLabel"));
-    m_sessionLabel->setGeometry(QRect(width()-22, 0, 22, 22));
+    m_sessionLabel->setGeometry(QRect(width()-23, 3, 20, 20));
     m_sessionLabel->installEventFilter(this);
     m_sessionLabel->hide();
+    m_sessionLabel->setFocusPolicy(Qt::StrongFocus);
 
-    QPalette plt;
     plt.setColor(QPalette::WindowText, Qt::white);
 
     m_nameLabel = new QLabel(this);
@@ -80,9 +85,11 @@ void LoginWindow::initUI()
     QRect pwdRect(220, 90, 300, 40);
     m_passwordEdit->setGeometry(pwdRect);
     m_passwordEdit->resize(QSize(300, 40));
+    m_passwordEdit->setFocusPolicy(Qt::StrongFocus);
     m_passwordEdit->installEventFilter(this);
-    m_passwordEdit->setStyleSheet("QWidget{background-color:rgb(255, 255, 255, 150)}");
     connect(m_passwordEdit, SIGNAL(clicked(const QString&)), this, SLOT(onLogin(const QString&)));
+
+    setTabOrder(m_passwordEdit, m_sessionLabel);
 }
 
 bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
@@ -97,16 +104,9 @@ bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
             }
         }
         if(event->type() == QEvent::MouseButtonRelease) {
-            //返回到用户列表窗口
             if(((QMouseEvent*)event)->button() == Qt::LeftButton){
                 m_backLabel->setPixmap(scaledPixmap(32, 32, ":/resource/arrow_left.png"));
-                //清空当前用户信息
-                m_nameLabel->setText("");
-                m_isLoginLabel->setText("");
-                m_messageLabel->setText("");
-                m_passwordEdit->clear();
-                m_passwordEdit->setType(QLineEdit::Password);
-                emit back();
+                backToUsers();
                 return true;
             }
         }
@@ -115,6 +115,15 @@ bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
             return true;
         if(event->type() == QEvent::MouseButtonRelease) {
             if(((QMouseEvent*)event)->button() == Qt::LeftButton){
+                emit selectSession(m_session);
+                return true;
+            }
+        } else if(event->type() == QEvent::FocusIn){
+            m_sessionBg->setStyleSheet(QString::fromUtf8("QWidget{border:1px solid white; border-radius: 4px}"));
+        } else if(event->type() == QEvent::FocusOut){
+            m_sessionBg->setStyleSheet("");
+        } else if(event->type() == QEvent::KeyRelease){
+            if(((QKeyEvent*)event)->key() == Qt::Key_Return){
                 emit selectSession(m_session);
                 return true;
             }
@@ -127,6 +136,30 @@ void LoginWindow::showEvent(QShowEvent *e)
 {
     QWidget::showEvent(e);
     m_passwordEdit->setFocus();
+}
+
+void LoginWindow::keyReleaseEvent(QKeyEvent *e)
+{
+    if(e->key() == Qt::Key_Escape){
+        backToUsers();
+    } else if(e->key() == Qt::Key_S && (e->modifiers() & Qt::ControlModifier)){
+        Q_EMIT selectSession(m_session);
+    }
+}
+
+/**
+ * @brief LoginWindow::backToUsers
+ * 返回到用户列表窗口
+ */
+void LoginWindow::backToUsers()
+{
+    //清空当前用户信息
+    m_nameLabel->setText("");
+    m_isLoginLabel->setText("");
+    m_messageLabel->setText("");
+    m_passwordEdit->clear();
+    m_passwordEdit->setType(QLineEdit::Password);
+    Q_EMIT back();
 }
 
 /**
@@ -191,7 +224,7 @@ void LoginWindow::setLoggedIn(bool isLoggedIn)
  */
 void LoginWindow::setPrompt(const QString& text)
 {
-//    m_passwordEdit->setPrompt(text);
+    m_passwordEdit->setPrompt(text);
 }
 
 
@@ -291,6 +324,7 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
     //显示session图标
     if(!m_sessionsModel.isNull() && m_sessionsModel->rowCount() > 1) {
         m_sessionLabel->show();
+        m_sessionBg->show();
         setSession(index.data(QLightDM::UsersModel::SessionRole).toString());
     }
 
@@ -350,18 +384,20 @@ void LoginWindow::onSessionSelected(const QString &session)
     qDebug() << "select session: " << session;
     if(!session.isEmpty() && m_session != session) {
         m_session = session;
+        m_greeter->setSession(m_session);
+        setSession(m_session);
 
-        //查找session的标识
-        QString sessionName, sessionKey;
-        for(int i = 0; i < m_sessionsModel->rowCount(); i++){
-            sessionName = m_sessionsModel->index(i, 0).data().toString();
-            if(sessionName == session){
-                sessionKey = m_sessionsModel->index(i, 0).data(Qt::UserRole).toString();
-                m_greeter->setSession(sessionKey);
-                this->setSession(m_session);
-                return;
-            }
-        }
+//        //查找session的标识
+//        QString sessionName, sessionKey;
+//        for(int i = 0; i < m_sessionsModel->rowCount(); i++){
+//            sessionName = m_sessionsModel->index(i, 0).data().toString();
+//            if(sessionName == session){
+//                sessionKey = m_sessionsModel->index(i, 0).data(Qt::UserRole).toString();
+//                m_greeter->setSession(sessionKey);
+//                this->setSession(m_session);
+//                return;
+//            }
+//        }
     }
 }
 
