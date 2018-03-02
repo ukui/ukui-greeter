@@ -21,7 +21,7 @@ public slots:
     void onScreenCountChanged();
 
 private:
-    QSharedPointer<ScreenModel> m_model;
+    QSharedPointer<ScreenModel> m_screenModel;
     GreeterWindow *m_greeterWnd;
     int m_activeScreen;
     QPixmap m_logo;

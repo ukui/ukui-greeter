@@ -67,10 +67,10 @@ int main(int argc, char *argv[])
     a.installTranslator(&translator);
 
     //加载qss文件
-    QFile qss(":/kylin-greeter.qss");
-    qss.open(QFile::ReadOnly);
-    a.setStyleSheet(qss.readAll());
-    qss.close();
+//    QFile qss(":/kylin-greeter.qss");
+//    qss.open(QFile::ReadOnly);
+//    a.setStyleSheet(qss.readAll());
+//    qss.close();
 
     //用于QSettings
     QApplication::setOrganizationName("Kylin");

@@ -6,6 +6,7 @@
 #include <QScreen>
 #include <QProcess>
 #include <QFocusEvent>
+#include <QWindow>
 #include <QLightDM/SessionsModel>
 #include "globalv.h"
 
@@ -74,11 +75,11 @@ void LoginWindow::initUI()
     m_isLoginLabel->setPalette(plt);
     m_isLoginLabel->setFont(QFont("ubuntu", fontSize));
 
-    m_messageLabel = new QLabel(this);
-    m_messageLabel->setObjectName(QStringLiteral("m_messageLabel"));
-    m_messageLabel->setGeometry(QRect(220, 60, 300, 20));
-    plt.setColor(QPalette::WindowText, Qt::red);
-    m_messageLabel->setPalette(plt);
+//    m_messageLabel = new QLabel(this);
+//    m_messageLabel->setObjectName(QStringLiteral("m_messageLabel"));
+//    m_messageLabel->setGeometry(QRect(220, 60, 300, 20));
+//    plt.setColor(QPalette::WindowText, Qt::red);
+//    m_messageLabel->setPalette(plt);
 
     m_passwordEdit = new IconEdit(QIcon(":/resource/arrow_right.png"), this);
     m_passwordEdit->setObjectName("m_passwordEdit");
@@ -87,6 +88,7 @@ void LoginWindow::initUI()
     m_passwordEdit->resize(QSize(300, 40));
     m_passwordEdit->setFocusPolicy(Qt::StrongFocus);
     m_passwordEdit->installEventFilter(this);
+    m_passwordEdit->hide(); //收到请求密码的prompt才显示出来
     connect(m_passwordEdit, SIGNAL(clicked(const QString&)), this, SLOT(onLogin(const QString&)));
 
     setTabOrder(m_passwordEdit, m_sessionLabel);
@@ -135,7 +137,7 @@ bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
 void LoginWindow::showEvent(QShowEvent *e)
 {
     QWidget::showEvent(e);
-    m_passwordEdit->setFocus();
+//    m_passwordEdit->setFocus();
 }
 
 void LoginWindow::keyReleaseEvent(QKeyEvent *e)
@@ -148,17 +150,40 @@ void LoginWindow::keyReleaseEvent(QKeyEvent *e)
 }
 
 /**
+ * @brief LoginWindow::recover
+ * 复原UI
+ */
+void LoginWindow::recover()
+{
+    m_nameLabel->clear();
+    m_isLoginLabel->clear();
+    m_passwordEdit->clear();
+    m_passwordEdit->setType(QLineEdit::Password);
+    m_passwordEdit->hide();
+    clearMessage();
+}
+
+void LoginWindow::clearMessage()
+{
+    //清除所有的message label
+    for(int i = 0; i < m_messageLabels.size(); i++) {
+        QLabel *msgLabel = m_messageLabels[i];
+        delete(msgLabel);
+    }
+    m_messageLabels.clear();
+    //恢复密码输入框的位置
+    m_passwordEdit->move(m_passwordEdit->geometry().left(), 90);
+    //恢复窗口大小
+    this->resize(520, 135);
+}
+
+/**
  * @brief LoginWindow::backToUsers
  * 返回到用户列表窗口
  */
 void LoginWindow::backToUsers()
 {
-    //清空当前用户信息
-    m_nameLabel->setText("");
-    m_isLoginLabel->setText("");
-    m_messageLabel->setText("");
-    m_passwordEdit->clear();
-    m_passwordEdit->setType(QLineEdit::Password);
+    recover();
     Q_EMIT back();
 }
 
@@ -225,12 +250,6 @@ void LoginWindow::setLoggedIn(bool isLoggedIn)
 void LoginWindow::setPrompt(const QString& text)
 {
     m_passwordEdit->setPrompt(text);
-}
-
-
-void LoginWindow::addMessage(const QString &text)
-{
-    m_messageLabel->setText(text);
 }
 
 /**
@@ -425,7 +444,7 @@ void LoginWindow::startAuthentication(const QString &username)
  */
 void LoginWindow::startWaiting()
 {
-//    m_passwordEdit->setWaiting(true);
+    m_passwordEdit->setWaiting(true);   //等待认证结果期间不能再输入密码
     m_backLabel->setEnabled(false);
     m_sessionLabel->setEnabled(false);
     m_timer->start();
@@ -458,7 +477,7 @@ void LoginWindow::saveLastLoginUser()
 
 void LoginWindow::onLogin(const QString &str)
 {
-    m_messageLabel->clear();
+    clearMessage();
     QString name = m_nameLabel->text();
     if(name == tr("Login")) {   //认证用户
         m_nameLabel->setText(str);
@@ -470,16 +489,30 @@ void LoginWindow::onLogin(const QString &str)
     else {  //发送密码
         m_greeter->respond(str);
         m_waiting.load(":/resource/waiting.png");
-        m_passwordEdit->showIcon("*");  //当没有输入密码登录时，显示等待提示
+        m_passwordEdit->showIcon("*");  //当没有输入密码登录时，也显示等待提示
         m_passwordEdit->setIcon(QIcon(m_waiting));
         startWaiting();
     }
     m_passwordEdit->setText("");
+
 }
 
 void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
 {
     qDebug()<< "prompt: "<< text;
+//    if(text == "") {    //显示生物识别窗口
+//        int bioWid;
+//        QWindow *bioWindow = QWindow::fromWinId(bioWid);
+//        QWidget *bioWidget = QWidget::createWindowContainer(bioWindow, this, Qt::Widget);
+//        bioWidget->setGeometry(m_passwordEdit->geometry());
+//        bioWidget->show();
+//        return;
+//    }
+    if(m_timer->isActive())
+        stopWaiting();
+    if(!text.isEmpty())
+        m_passwordEdit->show();
+    m_passwordEdit->setFocus();
     if(type != QLightDM::Greeter::PromptTypeSecret)
         m_passwordEdit->setType(QLineEdit::Normal);
     else
@@ -491,7 +524,30 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
 void LoginWindow::onShowMessage(QString text, QLightDM::Greeter::MessageType type)
 {
     qDebug()<< "message: "<< text;
-    addMessage(text);
+    int lineNum = text.count('\n') + 1;
+    int height = 20 * lineNum;  //label的高度
+    if(m_messageLabels.size() >= 1) {
+    //调整窗口大小
+        this->resize(this->width(), this->height()+height);
+    //移动密码输入框的位置
+        m_passwordEdit->move(m_passwordEdit->geometry().left(),
+                             m_passwordEdit->geometry().top() + height);
+    }
+    //每条message添加一个label
+    int top = m_passwordEdit->geometry().top() - height - 10;
+    QLabel *msgLabel = new QLabel(this);
+    msgLabel->setObjectName(QStringLiteral("msgLabel"));
+    msgLabel->setGeometry(QRect(220, top, 300, height));
+    QPalette plt;
+    if(type == QLightDM::Greeter::MessageTypeError)
+        plt.setColor(QPalette::WindowText, Qt::red);
+    else if(type == QLightDM::Greeter::MessageTypeInfo)
+        plt.setColor(QPalette::WindowText, Qt::white);
+    msgLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    msgLabel->setPalette(plt);
+    msgLabel->setText(text);
+    msgLabel->show();
+    m_messageLabels.push_back(msgLabel);
 }
 
 void LoginWindow::onAuthenticationComplete()
@@ -499,10 +555,12 @@ void LoginWindow::onAuthenticationComplete()
     stopWaiting();
     if(m_greeter->isAuthenticated()) {
         qDebug()<< "authentication success";
-        m_greeter->startSession();
+//        m_greeter->startSession();
+        Q_EMIT authenticationSuccess();
     } else {
         qDebug() << "authentication failed";
-        addMessage(tr("Incorrect password, please input again"));
+//        addMessage(tr("Incorrect password, please input again"));
+        onShowMessage(tr("Incorrect password, please input again"), QLightDM::Greeter::MessageTypeInfo);
         m_passwordEdit->clear();
         m_greeter->authenticate(m_nameLabel->text());
     }

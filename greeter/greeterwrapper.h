@@ -17,6 +17,10 @@ public:
 private:
     QString m_language;
     QString m_session;
+
+signals:
+    void aboutToLogin();
+
 };
 
 #endif // GREETERWRAPPER_H

@@ -51,7 +51,7 @@ IconButton::IconButton(TipEdit *edit, QWidget *parent)
 
     // 设置输入框中文件输入区，不让输入的文字在被隐藏在按钮下
     edit->setTextMargins(1, 1, m_size.width()*2, 1);
-    edit->setStyleSheet(" QLineEdit { border: 1px solid #026096 ; lineedit-password-character:8226}");  //设置密码显示为中等大小的实心圆点
+    edit->setStyleSheet(" QLineEdit { border: 1px solid #026096 ; lineedit-password-character:8226}");  //设置密码显示为中等大小的实心圆点 8226
     this->setStyleSheet("QPushButton{background:transparent; border:0px}");
     m_capTips->setStyleSheet("QLabel{background:transparent; border:0px}");
 }
@@ -127,6 +127,7 @@ IconEdit::IconEdit(QWidget *parent)
 {
     m_edit = new TipEdit(this);
     m_edit->setObjectName("m_edit");
+    m_edit->setAttribute(Qt::WA_InputMethodEnabled, false);
     m_iconButton = new IconButton(m_edit, this);
     m_iconButton->setObjectName("m_iconButton");
     connect(m_iconButton, SIGNAL(clicked(bool)), this, SLOT(clicked_cb()));

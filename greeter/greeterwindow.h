@@ -15,13 +15,14 @@ class QProcess;
 class GreeterWindow : public QWidget
 {
     Q_OBJECT
-
+    Q_PROPERTY(qreal opacity WRITE setOpacity)
 public:
     GreeterWindow(QWidget *parent = 0);
     virtual ~GreeterWindow();
     void initUI();
     bool eventFilter(QObject *, QEvent *);
 //    void keyReleaseEvent(QKeyEvent *);
+    void setOpacity(qreal);
 
 private slots:
     void onSelectedUserChanged(const QModelIndex &);
@@ -30,6 +31,8 @@ private slots:
     void onSelectSession(const QString&);
     void onMenuItemClicked(QAction *action);
     void timedAutologin();
+    void setRootImage();
+    void startTransparent();
 
 private:
     void switchWnd(int);
@@ -50,6 +53,7 @@ private:
     QSharedPointer<UsersModel> m_usersModel;
     QSharedPointer<QAbstractItemModel> m_sessionsModel;
     QSharedPointer<GreeterWrapper> m_greeter;
+    qreal            m_opacity;
 };
 
 #endif // GREETERWINDOW_H

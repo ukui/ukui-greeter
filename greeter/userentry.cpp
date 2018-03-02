@@ -16,6 +16,7 @@ UserEntry::UserEntry(const QString &name, const QString &facePath, bool isLogin,
     initUI();
 
     m_faceLabel->installEventFilter(this);
+
     setFace(facePath);
     setUserName(name);
     setLogin(isLogin);

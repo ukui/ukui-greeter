@@ -9,6 +9,7 @@
 #include <QtDBus/QDBusInterface>
 #include <QtDBus/QDBusConnection>
 #include <QStandardPaths>
+#include <QScreen>
 #include <QLightDM/SessionsModel>
 #include <QX11Info>
 #include <X11/Xlib.h>
@@ -59,7 +60,7 @@ GreeterWindow::~GreeterWindow()
 void GreeterWindow::initUI()
 {
     // 如果只用一个用户的话，直接进入登录界面，否则显示用户列表窗口
-    if(m_usersModel->rowCount() != 1) {
+    if(m_usersModel->rowCount() > 1) {
         m_userWnd = new UserWindow(this);
         m_userWnd->setModel(m_usersModel);
         QRect userRect((rect().width()-m_userWnd->width())/2, (rect().height()-m_userWnd->height())/2,
@@ -74,9 +75,11 @@ void GreeterWindow::initUI()
     QRect loginRect((rect().width()-m_loginWnd->width())/2, (rect().height()-m_loginWnd->height())/2,
                     m_loginWnd->width(), m_loginWnd->height());
     m_loginWnd->setGeometry(loginRect);
-    m_loginWnd->hide();
+    if(m_usersModel->rowCount() > 1)    //如果显示了用户选择窗口，则先隐藏登录窗口
+        m_loginWnd->hide();
     connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBacktoUsers()));
     connect(m_loginWnd, SIGNAL(selectSession(QString)), this, SLOT(onSelectSession(QString)));
+    connect(m_loginWnd, SIGNAL(authenticationSuccess()), this, SLOT(startTransparent()));
 
     //语言选择
     m_languageLB = new QLabel(this);
@@ -357,4 +360,38 @@ void GreeterWindow::timedAutologin()
     }
     else
         m_greeter->authenticateAutologin();
+}
+#include <QThread>
+void GreeterWindow::setRootImage()
+{
+    qDebug() << "setRootImage";
+    XDefineCursor(QX11Info::display(), QX11Info::appRootWindow(), XCreateFontCursor(QX11Info::display(), XC_circle));
+//    QPixmap pix = QApplication::primaryScreen()->grabWindow(winId());
+//    QProcess process;
+//    process.start(QStandardPaths::findExecutable("kylin-greeter-rootimage"), QIODevice::WriteOnly);
+//    pix.save(&process, "xpm"); //write pixmap to rootimage
+//    process.closeWriteChannel();
+//    if(process.waitForFinished())
+        m_greeter->startSession();
+}
+
+#include <QPropertyAnimation>
+void GreeterWindow::startTransparent()
+{
+    qDebug() << "startTransparent";
+    QPropertyAnimation *animation = new QPropertyAnimation(this, "opacity");
+    connect(animation, &QPropertyAnimation::finished, this, &GreeterWindow::setRootImage);
+    animation->setDuration(1);
+    animation->setStartValue(1.0);
+    animation->setEndValue(0.0);
+
+    animation->start();
+}
+#include <QGraphicsOpacityEffect>
+void GreeterWindow::setOpacity(qreal opacity)
+{
+    m_opacity = opacity;
+    QGraphicsOpacityEffect  *pGraphicsOpacityEffect = new QGraphicsOpacityEffect;
+    pGraphicsOpacityEffect->setOpacity(m_opacity);
+    this->setGraphicsEffect(pGraphicsOpacityEffect);
 }

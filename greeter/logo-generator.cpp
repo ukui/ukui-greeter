@@ -36,6 +36,12 @@ QString getSystemVersion()
  */
 QPixmap logoGenerator(const QString &text)
 {
+    QString logoFile(IMAGE_DIR + "logo.png");
+    if(QFile(logoFile).exists())
+    {
+        QPixmap logo(IMAGE_DIR + "logo.png");
+        return logo;
+    }
     QPixmap logoBare;
     logoBare.load(":/resource/logo-bare.png");
 

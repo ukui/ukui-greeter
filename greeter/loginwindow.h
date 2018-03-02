@@ -33,7 +33,6 @@ public:
     void setFace(const QString& faceFile);
     void setLoggedIn(bool isLoggedIn);
     void setPrompt(const QString& text);
-    void addMessage(const QString &);
     QString getPassword();
     void setSession(QString);
     QString getSession();
@@ -43,6 +42,8 @@ private:
     int sessionIndex(const QString &session);
     void saveLastLoginUser();
     void backToUsers();
+    void recover();
+    void clearMessage();
 
 protected:
     bool eventFilter(QObject *, QEvent *);
@@ -52,6 +53,7 @@ protected:
 signals:
     void back();
     void selectSession(const QString& );
+    void authenticationSuccess();
 
 public slots:
     void startAuthentication(const QString& username);
@@ -80,7 +82,7 @@ private:
     QSvgWidget  *m_sessionLabel;      //session图标
     QLabel      *m_nameLabel;         //用户名
     QLabel      *m_isLoginLabel;      //提示是否已登录
-    QLabel      *m_messageLabel;      //提示信息
+    QVector<QLabel*> m_messageLabels;      //提示信息
     IconEdit   *m_passwordEdit;       //密码输入框
 };
 
