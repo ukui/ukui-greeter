@@ -1,3 +1,21 @@
+/* main.cpp
+ * Copyright (C) 2018 yanghao <yanghao@kylinos.cn>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+**/
 #include "greeterwindow.h"
 #include <stdio.h>
 #include <string>
@@ -30,9 +48,9 @@ void outputMessage(QtMsgType type, const QMessageLogContext &context, const QStr
     case QtDebugMsg:
         fprintf(stderr, "%s Debug: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
         break;
-    case QtInfoMsg:
-        fprintf(stderr, "%s Info: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
-        break;
+//    case QtInfoMsg:
+//        fprintf(stderr, "%s Info: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
+//        break;
     case QtWarningMsg:
         fprintf(stderr, "%s Warnning: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
         break;
@@ -74,9 +92,9 @@ int main(int argc, char *argv[])
 
     //用于QSettings
     QApplication::setOrganizationName("Kylin");
-    QApplication::setApplicationName("Greeter");
+    QApplication::setApplicationName("ukui-greeter");
 
-    configFile = QStandardPaths::displayName(QStandardPaths::CacheLocation) + "/kylin-greeter.conf";
+    configFile = QStandardPaths::displayName(QStandardPaths::CacheLocation) + "/ukui-greeter.conf";
     qDebug() << "load configure file: "<< configFile;
     //计算缩放比例
     QRect screen = QApplication::desktop()->rect();

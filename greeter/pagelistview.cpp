@@ -1,3 +1,21 @@
+/* pagelistview.cpp
+ * Copyright (C) 2018 yanghao <yanghao@kylinos.cn>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+**/
 #include "pagelistview.h"
 #include <QPainter>
 #include <qmath.h>
@@ -73,7 +91,8 @@ void PageListView::setModel(QSharedPointer<QAbstractItemModel> model)
     m_end = m_itemCount >= 5 ? 4 : m_itemCount - 1; //每页最多显示5个
     /* 读取上一次登录的用户 */
     QSettings config(configFile, QSettings::IniFormat);
-    QString lastUser = config.value("lastLogUser").toString();
+    QString lastUser = config.value("lastLoginUser").toString();
+    qDebug() << "lastLoginUser: " << lastUser;
     bool find = false;
     for(int i = 0; i < m_model->rowCount(); i++) {
         QString user = m_model->index(i, 0).data().toString();

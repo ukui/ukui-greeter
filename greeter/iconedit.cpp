@@ -1,3 +1,21 @@
+/* iconedit.cpp
+ * Copyright (C) 2018 yanghao <yanghao@kylinos.cn>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+**/
 #include "iconedit.h"
 #include <QHBoxLayout>
 #include <QWidget>
@@ -51,7 +69,7 @@ IconButton::IconButton(TipEdit *edit, QWidget *parent)
 
     // 设置输入框中文件输入区，不让输入的文字在被隐藏在按钮下
     edit->setTextMargins(1, 1, m_size.width()*2, 1);
-    edit->setStyleSheet(" QLineEdit { border: 1px solid #026096 ; lineedit-password-character:8226}");  //设置密码显示为中等大小的实心圆点 8226
+    edit->setStyleSheet(" QLineEdit { border: 1px solid #026096 ; lineedit-password-character:10043}");  //设置密码显示为中等大小的实心圆点 8226
     this->setStyleSheet("QPushButton{background:transparent; border:0px}");
     m_capTips->setStyleSheet("QLabel{background:transparent; border:0px}");
 }

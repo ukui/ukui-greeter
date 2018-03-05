@@ -6,14 +6,15 @@
 
 QT  += core gui widgets svg dbus x11extras
 
+greaterThan(QT_MAJOR_VERSION, 4)
 
-TARGET = kylin-greeter
+TARGET = ukui-greeter
 TEMPLATE = app
 
-PREFIX = /usr/share/kylin-greeter
+PREFIX = /usr/share/ukui-greeter
 
 DEFINES += QT_MESSAGELOGCONTEXT \    #使用qInstallMessageHandler定制日志输出格式
-           GREETER_CONFIG=/usr/share/lightdm/kylin-greeter/ \
+           GREETER_CONFIG=/usr/share/lightdm/ukui-greeter/ \
            RESOURCE_PATH=$${PREFIX} \
            QT_DISABLE_DEPRECATED_BEFORE=0
 
@@ -70,10 +71,10 @@ qm_file.path = $${PREFIX}/translations/
 resourcefiles.files = resource/*
 resourcefiles.path = $${PREFIX}/images/
 
-configfile.files = debian/95-kylin-greeter.conf
+configfile.files = debian/95-ukui-greeter.conf
 configfile.path = /usr/share/lightdm/lightdm.conf.d/
 
-desktopfile.files = debian/kylin-greeter.desktop
+desktopfile.files = debian/ukui-greeter.desktop
 desktopfile.path = /usr/share/xgreeters/
 
 target.path = /usr/sbin/

@@ -1,9 +1,28 @@
+/* mainwindow.cpp
+ * Copyright (C) 2018 yanghao <yanghao@kylinos.cn>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+**/
 #include "mainwindow.h"
 #include <QDesktopWidget>
 #include <QApplication>
 #include <QPainter>
 #include <QMouseEvent>
 #include <QDebug>
+#include <QDir>
 #include "globalv.h"
 #include "greeterwindow.h"
 MainWindow::MainWindow(QWidget *parent)
@@ -29,7 +48,12 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::paintEvent(QPaintEvent *e)
 {
-    QPixmap background(IMAGE_DIR + QString("background.png"));
+    QDir dir(IMAGE_DIR);
+    QStringList names{"background*"};
+    QStringList files = dir.entryList(names, QDir::Files);
+    QPixmap background;
+    if(files.size() > 0)
+        background.load(IMAGE_DIR + files[0]);
     QPixmap cof(":/resource/cof.png");
     for(int i = 0; i < m_screenModel->rowCount(); i++){
         //绘制背景

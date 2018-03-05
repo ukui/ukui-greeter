@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=UKUI Greeter
+Comment=UKUI Greeter
+Exec=ukui-greeter
+Type=Application
+X-Ubuntu-Gettext-Domain=kylin-greeter
+Name[zh_CN]=ukui-greeter.desktop

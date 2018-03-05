@@ -1,21 +1,24 @@
-Source: kylin-greeter
-Section: utils 
+Source: ukui-greeter
+Section: x11
 Priority: optional
 Maintainer: yanghao <yanghao@kylinos.cn>
 Build-Depends: debhelper (>=9),
 			   qt5-default,
-			   liblightdm-qt5-3-0,
+			   libqt5svg5-dev,
+			   libqt5x11extras5-dev,
+			   liblightdm-qt5-3-dev,
 			   libx11-dev
 Standards-Version: 3.9.6
 Homepage: http://www.ubuntukylin.com 
 
-Package: kylin-greeter
+Package: ukui-greeter
 Architecture: any
 Depends: libqt5widgets5,
 		 libqt5gui5,
 		 libqt5core5a,
-		 libqt5dbus5,
 		 libqt5svg5,
+		 libqt5x11extras5,
 		 libx11-6,
-		${shlibs:Depends}, ${misc:Depends}
-Description: The greeter for the Kylin desktop rewritten using qt 
+		 liblightdm-qt5-3-0,
+		 ${shlibs:Depends}, ${misc:Depends}
+Description: The greeter for UKUI written using Qt5.

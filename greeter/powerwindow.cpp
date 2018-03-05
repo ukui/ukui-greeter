@@ -1,3 +1,21 @@
+/* powerwindow.cpp
+ * Copyright (C) 2018 yanghao <yanghao@kylinos.cn>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+**/
 #include "powerwindow.h"
 #include <QLabel>
 #include <QPainter>
@@ -50,7 +68,6 @@ void PowerWindow::initUI()
         cnt++;
     this->setFixedWidth(455 + 188 * cnt);
     m_centerWidget->setGeometry(QRect(24, 24, width()-24*2, height()-24*2));
-    qDebug() << "power window size: " << rect();
 
     QVBoxLayout *vbox = new QVBoxLayout(m_centerWidget);
     vbox->setContentsMargins(20, 10, 20, 2);
@@ -88,7 +105,8 @@ void PowerWindow::initUI()
         vboxSuspend->addWidget(m_suspendLabel);
 
         hbox->addLayout(vboxSuspend);
-    } else if(m_power->canHibernate()) {
+    }
+    if(m_power->canHibernate()) {
         QVBoxLayout *vboxHibernate = new QVBoxLayout();
         m_hibernate = new QLabel(m_centerWidget);
         m_hibernate->setFixedSize(168, 168);
