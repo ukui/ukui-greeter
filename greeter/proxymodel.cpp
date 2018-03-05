@@ -1,5 +1,5 @@
-/* extrarowproxymodel.cpp
- * Copyright (C) 2018 yanghao <yanghao@kylinos.cn>
+/* proxymodel.cpp
+ * Copyright (C) 2018 Tianjin KYLIN Information Technology Co., Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301, USA.
 **/
-#include "extrarowproxymodel.h"
+#include "proxymodel.h"
 #include <QDebug>
-ExtraRowProxyModel::ExtraRowProxyModel(QObject *parent)
+ProxyModel::ProxyModel(QObject *parent)
     : QAbstractListModel(parent),
       m_extraModel(new QStandardItemModel(this))
 {
@@ -31,7 +31,7 @@ ExtraRowProxyModel::ExtraRowProxyModel(QObject *parent)
 
 }
 
-QVariant ExtraRowProxyModel::data(const QModelIndex &index, int role) const
+QVariant ProxyModel::data(const QModelIndex &index, int role) const
 {
     if(index.row() < sourceRowCount())
         return m_model.data()->index(index.row(), 0).data(role);
@@ -39,18 +39,18 @@ QVariant ExtraRowProxyModel::data(const QModelIndex &index, int role) const
         return m_extraModel->index(index.row() - sourceRowCount(), 0).data(role);
 }
 
-int ExtraRowProxyModel::rowCount(const QModelIndex &parent) const
+int ProxyModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return sourceRowCount() + m_extraModel->rowCount();
 }
 
-QStandardItemModel* ExtraRowProxyModel::extraRowModel()
+QStandardItemModel* ProxyModel::extraRowModel()
 {
     return m_extraModel;
 }
 
-void ExtraRowProxyModel::setSourceModel(QAbstractListModel *sourceModel)
+void ProxyModel::setSourceModel(QAbstractListModel *sourceModel)
 {
     if(!m_model.isNull())
     {
@@ -74,43 +74,43 @@ void ExtraRowProxyModel::setSourceModel(QAbstractListModel *sourceModel)
                this, SLOT(onSourceDataChanged(const QModelIndex&, const QModelIndex&)));
 }
 
-int ExtraRowProxyModel::sourceRowCount() const
+int ProxyModel::sourceRowCount() const
 {
-    return m_model.isNull() ? 0 : m_model.data()->rowCount(/*QModelIndex()*/);
+    return m_model.isNull() ? 0 : m_model.data()->rowCount();
 }
 
-void ExtraRowProxyModel::onSourceDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+void ProxyModel::onSourceDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
 {
     dataChanged(createIndex(topLeft.row(), 0), createIndex(bottomRight.row(), 0));
 }
 
-void ExtraRowProxyModel::onSourceRowsInserted(const QModelIndex &parent, int start, int end)
+void ProxyModel::onSourceRowsInserted(const QModelIndex &parent, int start, int end)
 {
     Q_UNUSED(parent);
     beginInsertRows(parent, start, end);
     endInsertRows();
 }
 
-void ExtraRowProxyModel::onSourceRowsRemoved(const QModelIndex &parent, int start, int end)
+void ProxyModel::onSourceRowsRemoved(const QModelIndex &parent, int start, int end)
 {
     Q_UNUSED(parent);
     beginRemoveRows(parent, start, end);
     endRemoveRows();
 }
 
-void ExtraRowProxyModel::onExtraDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+void ProxyModel::onExtraDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
 {
     dataChanged(createIndex(sourceRowCount() + topLeft.row(), 0), createIndex(sourceRowCount() + bottomRight.row(), 0));
 }
 
-void ExtraRowProxyModel::onExtraRowsInserted(const QModelIndex &parent, int start, int end)
+void ProxyModel::onExtraRowsInserted(const QModelIndex &parent, int start, int end)
 {
     Q_UNUSED(parent);
     beginInsertRows(parent, sourceRowCount() + start, sourceRowCount() + end);
     endInsertRows();
 }
 
-void ExtraRowProxyModel::onExtraRowsRemoved(const QModelIndex &parent, int start, int end)
+void ProxyModel::onExtraRowsRemoved(const QModelIndex &parent, int start, int end)
 {
     Q_UNUSED(parent);
     beginRemoveRows(parent, sourceRowCount() + start, sourceRowCount() + end);

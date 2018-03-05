@@ -1,5 +1,5 @@
 /* usersmodel.h
- * Copyright (C) 2018 yanghao <yanghao@kylinos.cn>
+ * Copyright (C) 2018 Tianjin KYLIN Information Technology Co., Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@
 #ifndef USERSMODEL_H
 #define USERSMODEL_H
 
-#include "extrarowproxymodel.h"
+#include "proxymodel.h"
 
-class UsersModel : public ExtraRowProxyModel
+class UsersModel : public ProxyModel
 {
     Q_OBJECT
     Q_PROPERTY(bool m_showGuest READ showGuest WRITE setShowGuest)

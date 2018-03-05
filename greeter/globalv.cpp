@@ -1,5 +1,5 @@
 /* globalv.cpp
- * Copyright (C) 2018 yanghao <yanghao@kylinos.cn>
+ * Copyright (C) 2018 Tianjin KYLIN Information Technology Co., Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,10 @@
 
 #include <QDebug>
 #include <QRect>
+#include <QPixmap>
+#include <QFontMetrics>
+#include <QPainter>
+#include <QRegularExpression>
 
 QPixmap scaledPixmap(int width, int height, QString url)
 {
@@ -30,4 +34,56 @@ QPixmap scaledPixmap(int width, int height, QString url)
     }
     QPixmap pixmap(url);
     return pixmap.scaled(width, height, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+}
+
+/**
+ * @brief getSystemVersion
+ * @return
+ * 获取系统版本号
+ */
+QString getSystemVersion()
+{
+    QSettings settings("/etc/lsb-release", QSettings::IniFormat);
+    QString version = settings.value("DISTRIB_DESCRIPTION").toString();
+    int n = version.length() - version.indexOf(QRegularExpression("\\d"));
+    version = version.right(n);
+    return version;
+}
+
+/**
+ * @brief logoGenerator
+ * @param text
+ * @return
+ * 生成logo
+ */
+QPixmap logoGenerator(const QString &text)
+{
+    QString logoFile(IMAGE_DIR + "logo.png");
+    if(QFile(logoFile).exists())
+    {
+        QPixmap logo(IMAGE_DIR + "logo.png");
+        return logo;
+    }
+    QPixmap logoBare;
+    logoBare.load(":/resource/logo-bare.png");
+
+    QFont font("ubuntu", 18);
+    QFontMetrics fm(font);
+    int textPixelSize = fm.width(text);
+
+    QPixmap logo(logoBare.width() + textPixelSize + 3, logoBare.height());
+    logo.fill(Qt::transparent);
+
+    QPainter painter;
+    painter.begin(&logo);
+    painter.drawPixmap(logoBare.rect(), logoBare, logoBare.rect());
+
+    painter.setPen(Qt::white);
+    painter.setFont(font);
+    QTextOption option(Qt::AlignLeft | Qt::AlignVCenter);
+    option.setWrapMode(QTextOption::WordWrap);
+    QRect versionRect(logoBare.rect().right()+3, 3, logo.width() - logoBare.width(), logo.height());
+    painter.drawText(versionRect, text, option);
+
+    return logo;
 }

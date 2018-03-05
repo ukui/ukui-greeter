@@ -19,7 +19,6 @@ DEFINES += QT_MESSAGELOGCONTEXT \    #使用qInstallMessageHandler定制日志�
            QT_DISABLE_DEPRECATED_BEFORE=0
 
 SOURCES += \
-    greeter/extrarowproxymodel.cpp \
     greeter/greeterwindow.cpp \
     greeter/iconedit.cpp \
     greeter/loginwindow.cpp \
@@ -34,10 +33,9 @@ SOURCES += \
     greeter/mainwindow.cpp \
     greeter/sessionwindow.cpp \
     greeter/powerwindow.cpp \
-    greeter/logo-generator.cpp
+    greeter/proxymodel.cpp
 
 HEADERS  += \
-    greeter/extrarowproxymodel.h \
     greeter/greeterwindow.h \
     greeter/iconedit.h \
     greeter/loginwindow.h \
@@ -51,6 +49,7 @@ HEADERS  += \
     greeter/mainwindow.h \
     greeter/sessionwindow.h \
     greeter/powerwindow.h \
+    greeter/proxymodel.h
 
 CONFIG += c++11 debug
 

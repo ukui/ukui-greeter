@@ -1,5 +1,5 @@
-/* extrarowproxymodel.h
- * Copyright (C) 2018 yanghao <yanghao@kylinos.cn>
+/* proxymodel.h
+ * Copyright (C) 2018 Tianjin KYLIN Information Technology Co., Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
  * 02110-1301, USA.
 **/
 
-#ifndef EXTRAROWPROXYMODEL_H
-#define EXTRAROWPROXYMODEL_H
+#ifndef PROXYMODEL_H
+#define PROXYMODEL_H
 
 #include <QAbstractListModel>
 #include <QWeakPointer>
@@ -26,11 +26,11 @@
 
 /* 扩展QAbstractListModel, 用代理的方式实现在固定的model中增加额外的数据 */
 
-class ExtraRowProxyModel : public QAbstractListModel
+class ProxyModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    ExtraRowProxyModel(QObject *parent = 0);
+    ProxyModel(QObject *parent = 0);
     QVariant data(const QModelIndex &index, int role) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
@@ -53,4 +53,4 @@ private:
     int sourceRowCount() const;
 };
 
-#endif // EXTRAROWPROXYMODEL_H
+#endif // PROXYMODEL_H
