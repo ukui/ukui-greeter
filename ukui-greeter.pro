@@ -76,9 +76,12 @@ configfile.path = /usr/share/lightdm/lightdm.conf.d/
 desktopfile.files = debian/ukui-greeter.desktop
 desktopfile.path = /usr/share/xgreeters/
 
+manfile.files = man/ukui-greeter.1.gz
+manfile.path = /usr/share/man/man1/
+
 target.path = /usr/sbin/
 
-INSTALLS += target configfile desktopfile resourcefiles qm_file
+INSTALLS += target configfile desktopfile resourcefiles qm_file manfile
 
 
 
