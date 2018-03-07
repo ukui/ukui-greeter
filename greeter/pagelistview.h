@@ -60,8 +60,7 @@ private slots:
     void onUserChanged(const QModelIndex&, const QModelIndex&);
     void onUserInserted(const QModelIndex&, int, int);
     void onUserRemoved(const QModelIndex&, int, int);
-public:
-    const int MAX_NUM_PP = 5;   //每页最大的数量
+
 private:
     QSharedPointer<QAbstractItemModel> m_model;
     QVector<UserEntry*> m_itemList;

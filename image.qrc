@@ -1,21 +1,9 @@
 <RCC>
     <qresource prefix="/">
-        <file>resource/badges/gnome_badge-symbolic.svg</file>
-        <file>resource/badges/kde_badge-symbolic.svg</file>
-        <file>resource/badges/lubuntu_badge-symbolic.svg</file>
-        <file>resource/badges/lxde_badge-symbolic.svg</file>
-        <file>resource/badges/mate_badge-symbolic.svg</file>
-        <file>resource/badges/pantheon_badge-symbolic.svg</file>
-        <file>resource/badges/ubuntu_badge-symbolic.svg</file>
-        <file>resource/badges/wmaker-common_badge-symbolic.svg</file>
-        <file>resource/badges/xfce_badge-symbolic.svg</file>
-        <file>resource/badges/xterm_badge-symbolic.svg</file>
-        <file>resource/badges/xubuntu_badge-symbolic.svg</file>
         <file>resource/arrow_left_active.png</file>
         <file>resource/arrow_left_prelight.png</file>
         <file>resource/arrow_left.png</file>
         <file>resource/arrow_right.png</file>
-        <file>resource/checked.png</file>
         <file>resource/cof.png</file>
         <file>resource/default_face.png</file>
         <file>resource/dialog_close_highlight.png</file>
@@ -33,9 +21,16 @@
         <file>resource/shutdown.png</file>
         <file>resource/suspend_highlight.png</file>
         <file>resource/suspend.png</file>
-        <file>resource/unknown_badge.png</file>
         <file>resource/waiting.png</file>
         <file>resource/warn.png</file>
         <file>resource/logo-bare.png</file>
+        <file>resource/badges/gnome_badge.png</file>
+        <file>resource/badges/lubuntu_badge.png</file>
+        <file>resource/badges/mate_badge.png</file>
+        <file>resource/badges/pantheon_badge.png</file>
+        <file>resource/badges/ubuntu_badge.png</file>
+        <file>resource/badges/unknown_badge.png</file>
+        <file>resource/badges/xfce_badge.png</file>
+        <file>resource/badges/xubuntu_badge.png</file>
     </qresource>
 </RCC>

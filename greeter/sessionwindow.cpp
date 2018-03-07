@@ -20,7 +20,6 @@
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QSvgWidget>
 #include <QDebug>
 #include <QListWidget>
 #include <QLightDM/SessionsModel>
@@ -31,7 +30,7 @@ class IconLabel : public QWidget
 public:
     IconLabel(int width, int height, QWidget* parent = 0)
         : QWidget(parent),
-          m_iconLabel(new QSvgWidget(this)),
+          m_iconLabel(new QLabel(this)),
           m_textLabel(new QLabel(this))
     {
         m_iconLabel->setGeometry(3, (height-22)/2, 22, 22);
@@ -41,7 +40,7 @@ public:
 
     void setIcon(const QString& icon)
     {
-        m_iconLabel->load(icon);
+        m_iconLabel->setPixmap(QPixmap(icon));
     }
 
     void setText(const QString& text)
@@ -52,8 +51,8 @@ public:
     }
 
 private:
-    QSvgWidget *m_iconLabel;
-    QLabel     *m_textLabel;
+    QLabel  *m_iconLabel;
+    QLabel  *m_textLabel;
 };
 
 
@@ -64,6 +63,9 @@ SessionWindow::SessionWindow(const QString& session, QWidget *parent)
       m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions))
 
 {
+    for(int i = 0; i < m_sessionsModel->rowCount(); i++){
+        qDebug() << "session " << m_sessionsModel->index(i, 0).data(Qt::UserRole).toString() << " added";
+    }
     initUI();
 }
 
@@ -110,7 +112,7 @@ void SessionWindow::addSessionLabels()
         QString sessionName = m_sessionsModel->index(i, 0).data().toString();
         QString sessionKey = m_sessionsModel->index(i, 0).data(Qt::UserRole).toString();
         IconLabel *sessionLabel = new IconLabel(300, 40, this);
-        sessionLabel->setIcon(getSessionIcon(sessionName));
+        sessionLabel->setIcon(getSessionIcon(sessionKey));
         if(sessionKey == m_defaultSession)
             sessionLabel->setText(sessionName + tr(" (Default)"));
         else
@@ -187,10 +189,12 @@ void SessionWindow::setSessionModel(QSharedPointer<QAbstractItemModel> model)
 
 void SessionWindow::setSession(const QString &session)
 {
+    qDebug() << "current session: " << session;
     for(int i = 0; i < m_sessionsModel->rowCount(); i++){
         QString sessionKey = m_sessionsModel->index(i, 0).data(Qt::UserRole).toString();
         if(sessionKey == session){
             m_sessionsList->setCurrentRow(i);
+            return;
         }
     }
 }
@@ -198,7 +202,11 @@ void SessionWindow::setSession(const QString &session)
 QString SessionWindow::getSessionIcon(const QString &session)
 {
     QString sessionIcon;
-    sessionIcon = IMAGE_DIR + QString("badges/%1_badge-symbolic.svg").arg(session.toLower());
+    sessionIcon = IMAGE_DIR + QString("badges/%1_badge.png").arg(session.toLower());
+    QFile iconFile(sessionIcon);
+    if(!iconFile.exists()){
+        sessionIcon = IMAGE_DIR + QString("badges/unknown_badge.png");
+    }
     return sessionIcon;
 }
 

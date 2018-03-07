@@ -67,12 +67,9 @@ void LoginWindow::initUI()
     m_faceLabel->setGeometry(QRect(60, 0, 132, 132));
     m_faceLabel->setStyleSheet("QLabel{ border: 2px solid white}");
 
-    m_sessionBg = new QWidget(this);
-    m_sessionBg->setGeometry(QRect(width()-26, 0, 26, 26));
-    m_sessionBg->hide();
-    m_sessionLabel = new QSvgWidget(this);
+    m_sessionLabel = new QLabel(this);
     m_sessionLabel->setObjectName(QStringLiteral("m_sessionLabel"));
-    m_sessionLabel->setGeometry(QRect(width()-23, 3, 20, 20));
+    m_sessionLabel->setGeometry(QRect(width()-26, 0, 26, 26));
     m_sessionLabel->installEventFilter(this);
     m_sessionLabel->hide();
     m_sessionLabel->setFocusPolicy(Qt::StrongFocus);
@@ -139,9 +136,9 @@ bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
                 return true;
             }
         } else if(event->type() == QEvent::FocusIn){
-            m_sessionBg->setStyleSheet(QString::fromUtf8("QWidget{border:1px solid white; border-radius: 4px}"));
+            m_sessionLabel->setStyleSheet("QLabel{border-width: 2px; border-style: solid; border-color: white; border-radius: 5px}");
         } else if(event->type() == QEvent::FocusOut){
-            m_sessionBg->setStyleSheet("");
+            m_sessionLabel->setStyleSheet("");
         } else if(event->type() == QEvent::KeyRelease){
             if(((QKeyEvent*)event)->key() == Qt::Key_Return){
                 emit selectSession(m_session);
@@ -155,7 +152,8 @@ bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
 void LoginWindow::showEvent(QShowEvent *e)
 {
     QWidget::showEvent(e);
-//    m_passwordEdit->setFocus();
+    if(!m_passwordEdit->isHidden())
+        m_passwordEdit->setFocus();
 }
 
 void LoginWindow::keyReleaseEvent(QKeyEvent *e)
@@ -306,8 +304,12 @@ void LoginWindow::setSession(QString session)
     }
     m_session = session;
 
-    sessionIcon = IMAGE_DIR + QString("badges/%1_badge-symbolic.svg").arg(session.toLower());
-    m_sessionLabel->load(sessionIcon);
+    sessionIcon = IMAGE_DIR + QString("badges/%1_badge.png").arg(session.toLower());
+    QFile iconFile(sessionIcon);
+    if(!iconFile.exists()){
+        sessionIcon = IMAGE_DIR + QString("badges/unknown_badge.png");
+    }
+    m_sessionLabel->setPixmap(scaledPixmap(22, 22, sessionIcon));
 }
 
 /**
@@ -348,6 +350,7 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
     }
     //设置用户名
     QString name = index.data(Qt::DisplayRole).toString();
+    m_name = index.data(QLightDM::UsersModel::NameRole).toString();
     setUserName(name);
 
     //设置头像
@@ -361,7 +364,6 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
     //显示session图标
     if(!m_sessionsModel.isNull() && m_sessionsModel->rowCount() > 1) {
         m_sessionLabel->show();
-        m_sessionBg->show();
         setSession(index.data(QLightDM::UsersModel::SessionRole).toString());
     }
 
@@ -450,8 +452,8 @@ void LoginWindow::startAuthentication(const QString &username)
         m_passwordEdit->setType(QLineEdit::Normal);
     }
     else {
-        qDebug() << "login: " << username;
-        m_greeter->authenticate(username);
+        qDebug() << "login: " << m_name;
+        m_greeter->authenticate(m_name);
     }
 }
 
@@ -581,6 +583,6 @@ void LoginWindow::onAuthenticationComplete()
 //        addMessage(tr("Incorrect password, please input again"));
         onShowMessage(tr("Incorrect password, please input again"), QLightDM::Greeter::MessageTypeInfo);
         m_passwordEdit->clear();
-        m_greeter->authenticate(m_nameLabel->text());
+        m_greeter->authenticate(m_name);
     }
 }

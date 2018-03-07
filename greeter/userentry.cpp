@@ -84,7 +84,7 @@ void UserEntry::paintEvent(QPaintEvent *event)
         QRect border(rect.left()-10, rect.top()-10, rect.width()+20, rect.height()+20);
 
         QPainter painter(this);
-        painter.setPen(QPen(QColor(255, 255, 255, 51), 1));
+        painter.setPen(QPen(QColor(255, 255, 255, 0), 1));
         painter.setBrush(QColor(0, 0, 0, 50));
 //        painter.setRenderHint(QPainter::Antialiasing, true);
 //        painter.drawRoundedRect(border, 0, 0, Qt::RelativeSize);

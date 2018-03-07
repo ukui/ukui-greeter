@@ -86,24 +86,30 @@ void PageListView::setModel(QSharedPointer<QAbstractItemModel> model)
             this, SLOT(onUserChanged(QModelIndex,QModelIndex)));
     m_itemList = QVector<UserEntry*>(m_model.data()->rowCount(), NULL);
 
-    m_lastend = -1;
+    m_lastend = m_curItem = -1;
     m_itemCount = m_model.data()->rowCount();
-    m_end = m_itemCount >= 5 ? 4 : m_itemCount - 1; //每页最多显示5个
+
     /* 读取上一次登录的用户 */
     QSettings config(configFile, QSettings::IniFormat);
     QString lastUser = config.value("lastLoginUser").toString();
     qDebug() << "lastLoginUser: " << lastUser;
-    bool find = false;
+
     for(int i = 0; i < m_model->rowCount(); i++) {
         QString user = m_model->index(i, 0).data().toString();
         if(lastUser == user) {
             m_curItem = i;
-            find = true;
             break;
         }
     }
-    if(!find) {
+    if(m_curItem < 0) {
         m_curItem = 0;
+    }
+    //当前要显示的用户是哪几个
+    int np = qCeil((m_curItem + 1) * 1.0 / 5);
+    if(m_itemCount <= np * 5){
+        m_end = m_itemCount -1;
+    } else {
+        m_end = np * 5 - 1;
     }
 
     drawPage();

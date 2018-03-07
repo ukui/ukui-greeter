@@ -218,6 +218,7 @@ void GreeterWindow::onBacktoLogin()
 
 void GreeterWindow::onSelectSession(const QString &sessionName)
 {
+    qDebug() << "selection session";
     if(!m_sessionWnd) {
         m_sessionWnd = new SessionWindow(m_greeter->defaultSessionHint(), this);
         m_sessionWnd->setGeometry((rect().width()-m_sessionWnd->width())/2,
@@ -238,11 +239,12 @@ void GreeterWindow::onSelectSession(const QString &sessionName)
  */
 void GreeterWindow::switchWnd(int index)
 {
-    m_userWnd->hide();
-    m_loginWnd->hide();
-    if(m_sessionWnd) {
+    if(m_userWnd)
+        m_userWnd->hide();
+    if(m_loginWnd)
+        m_loginWnd->hide();
+    if(m_sessionWnd)
         m_sessionWnd->hide();
-    }
 
     switch (index) {
     case 0:
@@ -252,6 +254,7 @@ void GreeterWindow::switchWnd(int index)
         m_loginWnd->show();
         break;
     case 2:
+        qDebug() << "switch sessionwindow";
         m_sessionWnd->show();
         m_sessionWnd->setFocus();
         break;
@@ -379,18 +382,48 @@ void GreeterWindow::timedAutologin()
     else
         m_greeter->authenticateAutologin();
 }
-#include <QThread>
+
+void setRootWindowId(Pixmap& pixmap)
+{
+    char *atom_names[] = {"_XROOTPMAP_ID", "ESETROOT_PMAP_ID"};
+    Atom atoms[2] = {0};
+    Atom type;
+    int format;
+    unsigned long nitems, after;
+    unsigned char *data_root, *data_esetroot;
+
+    Display *display = QX11Info::display();
+    Window xroot = QX11Info::appRootWindow(0);
+
+//    if(XInternAtoms(
+//                display, xroot, atoms[0], 0L, 1L, 0, AnyPropertyType,
+//                    &type, &format, &nitems, &after, &data_root)) &&
+
+}
+
 void GreeterWindow::setRootImage()
 {
     qDebug() << "setRootImage";
+
     XDefineCursor(QX11Info::display(), QX11Info::appRootWindow(), XCreateFontCursor(QX11Info::display(), XC_circle));
 //    QPixmap pix = QApplication::primaryScreen()->grabWindow(winId());
-//    QProcess process;
-//    process.start(QStandardPaths::findExecutable("kylin-greeter-rootimage"), QIODevice::WriteOnly);
-//    pix.save(&process, "xpm"); //write pixmap to rootimage
-//    process.closeWriteChannel();
-//    if(process.waitForFinished())
-        m_greeter->startSession();
+//    QPixmap pix("/usr/share/backgrounds/Black_hole_by_Marek_Koteluk.jpg");
+//    QPalette plt;
+//    plt.setBrush(QApplication::desktop()->backgroundRole(), QBrush(pix));
+//    QApplication::desktop()->setPalette(plt);
+
+//    int width = QApplication::desktop()->width();
+//    int height = QApplication::desktop()->height();
+//    Pixmap pix = XCreatePixmap(QX11Info::display(), QX11Info::appRootWindow(), width, height, DefaultDepth(QX11Info::display(), 0));
+//    XSetCloseDownMode(QX11Info::display(), RetainPermanent);
+
+//    XSetWindowBackgroundPixmap(QX11Info::display(), QX11Info::appRootWindow(), pix);
+//    setRootWindowId(pix);
+
+//    XClearWindow(QX11Info::display(), QApplication::desktop()->winId());
+//    XFlush(QX11Info::display());
+
+    m_greeter->startSession();
 }
 
 #include <QPropertyAnimation>

@@ -23,7 +23,6 @@
 #include <QPixmap>
 #include <QFontMetrics>
 #include <QPainter>
-#include <QRegularExpression>
 
 QPixmap scaledPixmap(int width, int height, QString url)
 {
@@ -44,10 +43,11 @@ QPixmap scaledPixmap(int width, int height, QString url)
 QString getSystemVersion()
 {
     QSettings settings("/etc/lsb-release", QSettings::IniFormat);
-    QString version = settings.value("DISTRIB_DESCRIPTION").toString();
-    int n = version.length() - version.indexOf(QRegularExpression("\\d"));
-    version = version.right(n);
-    return version;
+    QString release = settings.value("DISTRIB_RELEASE").toString();
+    QString description = settings.value("DISTRIB_DESCRIPTION").toString();
+    if(description.right(3) == "LTS")
+        release = release + " LTS";
+    return release;
 }
 
 /**

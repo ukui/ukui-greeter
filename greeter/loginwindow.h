@@ -23,7 +23,6 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
-#include <QSvgWidget>
 #include <QAbstractItemModel>
 #include <QSharedPointer>
 #include <QSettings>
@@ -89,6 +88,7 @@ private:
     QSharedPointer<QAbstractItemModel> m_sessionsModel;
     QSharedPointer<GreeterWrapper> m_greeter;
     QString     m_session;  //session的标识
+    QString     m_name;     //m_nameLabel显示的是全名(显示的),m_name保存的是用户名(用于登录的)
     QSettings   *m_config;
     QTimer      *m_timer;
     QPixmap     m_waiting;
@@ -97,7 +97,7 @@ private:
     QLabel      *m_backLabel;         //返回用户列表
     QLabel      *m_faceLabel;         //头像
     QWidget     *m_sessionBg;
-    QSvgWidget  *m_sessionLabel;      //session图标
+    QLabel      *m_sessionLabel;      //session图标
     QLabel      *m_nameLabel;         //用户名
     QLabel      *m_isLoginLabel;      //提示是否已登录
     QVector<QLabel*> m_messageLabels;      //提示信息
