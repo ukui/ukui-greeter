@@ -20,11 +20,11 @@
 #define USERWINDOW_H
 
 #include <QWidget>
-#include <QLabel>
 #include <QSharedPointer>
 #include <QLightDM/UsersModel>
-#include "pagelistview.h"
 
+class QPushButton;
+class PageListView;
 class UserWindow : public QWidget
 {
     Q_OBJECT
@@ -37,6 +37,7 @@ public:
 protected:
     bool eventFilter(QObject *, QEvent *);
     void showEvent(QShowEvent *);
+    void resizeEvent(QResizeEvent *);
 
 private slots:
     void onPageChanged();
@@ -49,10 +50,9 @@ private:
 //    QLightDM::UsersModel *m_model;
 //    QVBoxLayout *m_vlayout;
 //    QHBoxLayout *m_hlayout;
-    QLabel      *m_pageIndicator;
-    QLabel      *m_prevLabel;
-    QLabel      *m_nextLabel;
-    PageListView *m_userList;
+    QPushButton      *m_prevLabel;
+    QPushButton      *m_nextLabel;
+    PageListView     *m_userList;
 };
 
 #endif // USERWINDOW_H

@@ -31,18 +31,23 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     void paintEvent(QPaintEvent *);
     void mouseMoveEvent(QMouseEvent *);
+    void keyReleaseEvent(QKeyEvent *);
 
 signals:
+    void capslockChanged(bool);
 
 public slots:
     void onScreenResized(const QModelIndex&, const QModelIndex&);
     void onScreenCountChanged();
+    void moveToScreen(int screen = 0);
 
 private:
-    QSharedPointer<ScreenModel> m_screenModel;
-    GreeterWindow *m_greeterWnd;
-    int m_activeScreen;
-    QPixmap m_logo;
+    ScreenModel     *m_screenModel;
+    GreeterWindow   *m_greeterWnd;
+    int              m_activeScreen;
+    QPixmap          m_logo;
+    QPixmap          m_background;
+    bool             m_capsLock;
 };
 
 #endif // MAINWINDOW_H

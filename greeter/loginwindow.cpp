@@ -29,8 +29,9 @@
 #include "globalv.h"
 
 LoginWindow::LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent)
-    : QWidget(parent), m_greeter(greeter),
+    : QWidget(parent),
       m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions, this)),
+      m_greeter(greeter),
       m_config(new QSettings(configFile, QSettings::IniFormat)),
       m_timer(new QTimer(this))
 {    
@@ -52,49 +53,45 @@ void LoginWindow::initUI()
         this->setObjectName(QStringLiteral("this"));
     this->resize(520, 135);
 
-    QPalette plt;
-
-    m_backLabel = new QLabel(this);
-    m_backLabel->setObjectName(QStringLiteral("m_backLabel"));
+    m_backLabel = new QPushButton(this);
+    m_backLabel->setObjectName(QStringLiteral("backButton"));
     m_backLabel->setGeometry(QRect(0, 0, 32, 32));
-    QPixmap back(":/resource/arrow_left.png");
-    back = back.scaled(32, 32, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-    m_backLabel->setPixmap(back);
-    m_backLabel->installEventFilter(this);
+    m_backLabel->setShortcut(Qt::Key_Escape);
+    connect(m_backLabel, &QPushButton::clicked, this, &LoginWindow::backToUsers);
+//    m_backLabel->setPixmap(scaledPixmap(32, 32, ":/resource/arrow_left.png"));
+//    m_backLabel->installEventFilter(this);
 
     m_faceLabel = new QLabel(this);
-    m_faceLabel->setObjectName(QStringLiteral("m_faceLabel"));
+    m_faceLabel->setObjectName(QStringLiteral("faceLabel"));
     m_faceLabel->setGeometry(QRect(60, 0, 132, 132));
-    m_faceLabel->setStyleSheet("QLabel{ border: 2px solid white}");
+    m_faceLabel->setFocusPolicy(Qt::NoFocus);
 
-    m_sessionLabel = new QLabel(this);
-    m_sessionLabel->setObjectName(QStringLiteral("m_sessionLabel"));
+    m_sessionLabel = new QPushButton(this);
+    m_sessionLabel->setObjectName(QStringLiteral("sessionButton"));
     m_sessionLabel->setGeometry(QRect(width()-26, 0, 26, 26));
-    m_sessionLabel->installEventFilter(this);
     m_sessionLabel->hide();
-    m_sessionLabel->setFocusPolicy(Qt::StrongFocus);
+    connect(m_sessionLabel, &QPushButton::clicked, this, &LoginWindow::onSessionButtonClicked);
+//    m_sessionLabel->installEventFilter(this);
+//    m_sessionLabel->setFocusPolicy(Qt::StrongFocus);
 
-    plt.setColor(QPalette::WindowText, Qt::white);
+//    QPalette plt;
+//    plt.setColor(QPalette::WindowText, Qt::white);
 
     m_nameLabel = new QLabel(this);
-    m_nameLabel->setObjectName(QStringLiteral("m_nameLabel"));
+    m_nameLabel->setObjectName(QStringLiteral("nameLabel"));
     QRect nameRect(220, 0, 200, 25);
     m_nameLabel->setGeometry(nameRect);
-    m_nameLabel->setPalette(plt);
-    m_nameLabel->setFont(QFont("ubuntu", fontSize+2));
+//    m_nameLabel->setPalette(plt);
+    m_nameLabel->setFont(QFont("ubuntu", 12));
+    m_nameLabel->setFocusPolicy(Qt::NoFocus);
 
     m_isLoginLabel = new QLabel(this);
-    m_isLoginLabel->setObjectName(QStringLiteral("m_isLoginLabel"));
+    m_isLoginLabel->setObjectName(QStringLiteral("isLoginLabel"));
     QRect loginRect(220, nameRect.bottom()+5, 200, 30);
     m_isLoginLabel->setGeometry(loginRect);
-    m_isLoginLabel->setPalette(plt);
-    m_isLoginLabel->setFont(QFont("ubuntu", fontSize));
-
-//    m_messageLabel = new QLabel(this);
-//    m_messageLabel->setObjectName(QStringLiteral("m_messageLabel"));
-//    m_messageLabel->setGeometry(QRect(220, 60, 300, 20));
-//    plt.setColor(QPalette::WindowText, Qt::red);
-//    m_messageLabel->setPalette(plt);
+//    m_isLoginLabel->setPalette(plt);
+    m_isLoginLabel->setFont(QFont("ubuntu", 10));
+    m_isLoginLabel->setFocusPolicy(Qt::NoFocus);
 
     m_passwordEdit = new IconEdit(QIcon(":/resource/arrow_right.png"), this);
     m_passwordEdit->setObjectName("m_passwordEdit");
@@ -106,47 +103,8 @@ void LoginWindow::initUI()
     m_passwordEdit->hide(); //收到请求密码的prompt才显示出来
     connect(m_passwordEdit, SIGNAL(clicked(const QString&)), this, SLOT(onLogin(const QString&)));
 
-    setTabOrder(m_passwordEdit, m_sessionLabel);
-}
-
-bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
-{
-    if(obj == m_backLabel) {
-        if(!m_backLabel->isEnabled())
-            return true;
-        if(event->type() == QEvent::MouseButtonPress) {
-            if(((QMouseEvent*)event)->button() == Qt::LeftButton){
-                m_backLabel->setPixmap(scaledPixmap(32, 32, ":/resource/arrow_left_active.png"));
-                return true;
-            }
-        }
-        if(event->type() == QEvent::MouseButtonRelease) {
-            if(((QMouseEvent*)event)->button() == Qt::LeftButton){
-                m_backLabel->setPixmap(scaledPixmap(32, 32, ":/resource/arrow_left.png"));
-                backToUsers();
-                return true;
-            }
-        }
-    } else if(obj == m_sessionLabel) {
-        if(!m_sessionLabel->isEnabled())
-            return true;
-        if(event->type() == QEvent::MouseButtonRelease) {
-            if(((QMouseEvent*)event)->button() == Qt::LeftButton){
-                emit selectSession(m_session);
-                return true;
-            }
-        } else if(event->type() == QEvent::FocusIn){
-            m_sessionLabel->setStyleSheet("QLabel{border-width: 2px; border-style: solid; border-color: white; border-radius: 5px}");
-        } else if(event->type() == QEvent::FocusOut){
-            m_sessionLabel->setStyleSheet("");
-        } else if(event->type() == QEvent::KeyRelease){
-            if(((QKeyEvent*)event)->key() == Qt::Key_Return){
-                emit selectSession(m_session);
-                return true;
-            }
-        }
-    }
-    return QWidget::eventFilter(obj, event);
+//    setTabOrder(m_passwordEdit, m_sessionLabel);
+//    setTabOrder(m_sessionLabel, m_backLabel);
 }
 
 void LoginWindow::showEvent(QShowEvent *e)
@@ -154,15 +112,6 @@ void LoginWindow::showEvent(QShowEvent *e)
     QWidget::showEvent(e);
     if(!m_passwordEdit->isHidden())
         m_passwordEdit->setFocus();
-}
-
-void LoginWindow::keyReleaseEvent(QKeyEvent *e)
-{
-    if(e->key() == Qt::Key_Escape){
-        backToUsers();
-    } else if(e->key() == Qt::Key_S && (e->modifiers() & Qt::ControlModifier)){
-        Q_EMIT selectSession(m_session);
-    }
 }
 
 /**
@@ -191,6 +140,11 @@ void LoginWindow::clearMessage()
     m_passwordEdit->move(m_passwordEdit->geometry().left(), 90);
     //恢复窗口大小
     this->resize(520, 135);
+}
+
+void LoginWindow::onSessionButtonClicked()
+{
+    Q_EMIT selectSession(m_session);
 }
 
 /**
@@ -309,7 +263,9 @@ void LoginWindow::setSession(QString session)
     if(!iconFile.exists()){
         sessionIcon = IMAGE_DIR + QString("badges/unknown_badge.png");
     }
-    m_sessionLabel->setPixmap(scaledPixmap(22, 22, sessionIcon));
+//    m_sessionLabel->setPixmap(scaledPixmap(22, 22, sessionIcon));
+    m_sessionLabel->setIcon(QIcon(sessionIcon));
+    m_sessionLabel->setIconSize(QSize(22, 22));
 }
 
 /**
@@ -425,18 +381,6 @@ void LoginWindow::onSessionSelected(const QString &session)
         m_session = session;
         m_greeter->setSession(m_session);
         setSession(m_session);
-
-//        //查找session的标识
-//        QString sessionName, sessionKey;
-//        for(int i = 0; i < m_sessionsModel->rowCount(); i++){
-//            sessionName = m_sessionsModel->index(i, 0).data().toString();
-//            if(sessionName == session){
-//                sessionKey = m_sessionsModel->index(i, 0).data(Qt::UserRole).toString();
-//                m_greeter->setSession(sessionKey);
-//                this->setSession(m_session);
-//                return;
-//            }
-//        }
     }
 }
 
@@ -556,15 +500,15 @@ void LoginWindow::onShowMessage(QString text, QLightDM::Greeter::MessageType typ
     //每条message添加一个label
     int top = m_passwordEdit->geometry().top() - height - 10;
     QLabel *msgLabel = new QLabel(this);
-    msgLabel->setObjectName(QStringLiteral("msgLabel"));
     msgLabel->setGeometry(QRect(220, top, 300, height));
-    QPalette plt;
-    if(type == QLightDM::Greeter::MessageTypeError)
-        plt.setColor(QPalette::WindowText, Qt::red);
-    else if(type == QLightDM::Greeter::MessageTypeInfo)
-        plt.setColor(QPalette::WindowText, Qt::white);
+
+    if(type == QLightDM::Greeter::MessageTypeError)    {
+        msgLabel->setObjectName(QStringLiteral("errorMsgLabel"));
+    }
+    else if(type == QLightDM::Greeter::MessageTypeInfo)    {
+        msgLabel->setObjectName(QStringLiteral("infoMsgLabel"));
+    }
     msgLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    msgLabel->setPalette(plt);
     msgLabel->setText(text);
     msgLabel->show();
     m_messageLabels.push_back(msgLabel);
@@ -580,8 +524,7 @@ void LoginWindow::onAuthenticationComplete()
         Q_EMIT authenticationSuccess();
     } else {
         qDebug() << "authentication failed";
-//        addMessage(tr("Incorrect password, please input again"));
-        onShowMessage(tr("Incorrect password, please input again"), QLightDM::Greeter::MessageTypeInfo);
+        onShowMessage(tr("Incorrect password, please input again"), QLightDM::Greeter::MessageTypeError);
         m_passwordEdit->clear();
         m_greeter->authenticate(m_name);
     }

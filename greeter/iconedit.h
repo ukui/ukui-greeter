@@ -75,7 +75,7 @@ public:
     void resize(const QSize& size);
     void clear();
     void setPrompt(const QString &);
-    const QString& text();
+    const QString text();
     void setType(QLineEdit::EchoMode type = QLineEdit::Password);
     void setText(const QString& text);
     void setWaiting(bool);

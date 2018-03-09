@@ -1,0 +1,134 @@
+QPushButton{
+    text-align:center;
+    color: rgb(255, 255, 255, 200);
+    border: none;
+    outline: none;
+    font-family: 'Ubuntu';
+    font-size: 22px;
+}
+QPushButton:flat{
+    border: none;
+}
+QPushButton::hover{
+    background-color:rgb(0, 0, 0, 50);
+}
+
+QLabel{
+    color: white;
+    font-family: "Ubuntu"
+}
+QPushButton::focus{
+    background-color:rgb(0, 0, 0, 50);
+}
+
+/* 返回按钮 */
+QPushButton#backButton{
+    background: url(:/resource/arrow_left.png);
+}
+QPushButton::hover#backButton{
+    background: url(:/resource/arrow_left_prelight.png);
+}
+QPushButton::focus#backButton{
+    background: url(:/resource/arrow_left_prelight.png);
+}
+QPushButton::pressed#backButton{
+    background: url(:/resource/arrow_left_active.png);
+}
+/* session选择按钮 */
+QPushButton::hover#sessionButton{
+    border-width: 2px;
+    border-style: solid;
+    border-color: white;
+    border-radius: 5px
+}
+QPushButton::focus#sessionButton{
+    border-width: 2px;
+    border-style: solid;
+    border-color: white;
+    border-radius: 5px
+}
+/* 头像 */
+QLabel#faceLabel{
+     border: 2px solid white;
+}
+/* 密码输入框 */
+QLineEdit {
+    border: 1px solid #026096;
+    lineedit-password-character:10043
+}
+/* 登录按钮 */
+QPushButton::hover#loginButton{
+    background:transparent;
+    border:0px
+}
+/* 登录错误提示 */
+QLabel#errorMsgLabel{
+    color: rgb(255, 0, 0, 200);
+}
+/* 电源对话框关闭按钮 */
+QPushButton#close{
+    background:url(:/resource/dialog_close.png);
+    background-repeat:no-repeat
+}
+QPushButton::hover#close{
+    background:url(:/resource/dialog_close_highlight.png);
+    background-repeat:no-repeat
+}
+/* 挂起按钮 */
+QLabel#suspend{
+    background:url(:/resource/suspend.png);
+    background-repeat:no-repeat
+}
+QLabel::hover#suspend{
+    background:url(:/resource/suspend_highlight.png);
+    background-repeat:no-repeat
+}
+/* 休眠按钮 */
+QLabel#hibernate{
+    background:url(:/resource/hibernate.png);
+    background-repeat:no-repeat
+}
+QLabel::hover#hibernate{
+    background:url(:/resource/hibernate_highlight.png);
+    background-repeat:no-repeat
+}
+/* 重启按钮 */
+QLabel#restart{
+    background:url(:/resource/restart.png);
+    background-repeat:no-repeat
+}
+QLabel::hover#restart{
+    background:url(:/resource/restart_highlight.png);
+    background-repeat:no-repeat
+}
+/* 关机按钮 */
+QLabel#shutdown{
+    background:url(:/resource/shutdown.png);
+    background-repeat:no-repeat
+}
+QLabel::hover#shutdown{
+    background:url(:/resource/shutdown_highlight.png);
+    background-repeat:no-repeat
+}
+/* 电源对话框中间区域 */
+QWidget#powerCenterWidget{
+    background: #2D698E
+}
+
+QListWidget{
+    background:transparent;
+}
+QListWidget::item{
+    height:40px
+}
+QListWidget::item:hover{
+    background:rgb(150, 150, 150, 50);
+    border:1px solid white;
+    border-radius:4px;
+}
+QListWidget::item:selected{
+    background:rgb(0, 0, 0, 150);
+    border:1px solid white;
+    border-radius:4px;
+}
+

@@ -34,8 +34,7 @@ PageListView::PageListView(QWidget *parent)
       m_layout(new QHBoxLayout(this)),
       m_lastItem(-1)
 {
-    setFixedSize(950*scale, 300*scale);
-//    setFocus();
+
 }
 
 void PageListView::keyReleaseEvent(QKeyEvent *event)
@@ -71,6 +70,14 @@ void PageListView::keyReleaseEvent(QKeyEvent *event)
     }
 }
 
+void PageListView::resizeEvent(QResizeEvent *e)
+{
+    for(int i = 0; i < m_itemList.size(); i++)
+        if(m_itemList[i])
+            m_itemList[i]->setFixedSize(130 * scale + 20, 130 * scale + 75);
+
+}
+
 void PageListView::setModel(QSharedPointer<QAbstractItemModel> model)
 {
     if(model.isNull())
@@ -84,7 +91,13 @@ void PageListView::setModel(QSharedPointer<QAbstractItemModel> model)
     connect(m_model.data(), SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SLOT(onUserRemoved(QModelIndex,int,int)));
     connect(m_model.data(), SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
             this, SLOT(onUserChanged(QModelIndex,QModelIndex)));
-    m_itemList = QVector<UserEntry*>(m_model.data()->rowCount(), NULL);
+//    m_itemList = QVector<UserEntry*>(m_model.data()->rowCount(), NULL);
+    for(int i = 0; i < m_model->rowCount(); i++)
+    {
+        UserEntry *entry = createEntry(i);
+        entry->hide();
+        m_itemList.append(entry);
+    }
 
     m_lastend = m_curItem = -1;
     m_itemCount = m_model.data()->rowCount();
@@ -117,6 +130,7 @@ void PageListView::setModel(QSharedPointer<QAbstractItemModel> model)
 
 void PageListView::drawPage()
 {
+    m_layout->setSpacing(10);
     int begin = m_end - (m_itemCount > 5 ? 4 : m_itemCount - 1);
 
     if(m_lastend > 0)
@@ -290,6 +304,7 @@ void PageListView::onUserInserted(const QModelIndex& parent, int begin, int end)
     for(int i = begin; i <= end; i++)
     {
         qDebug() << "User added:" << m_model->index(i, 0).data().toString();
+        m_itemList.insert(i, createEntry(i));
     }
 
     m_itemCount = m_model->rowCount();

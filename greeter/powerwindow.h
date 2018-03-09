@@ -23,6 +23,7 @@
 #include <QLightDM/Power>
 
 class QLabel;
+class QPushButton;
 class PowerWindow : public QWidget
 {
     Q_OBJECT
@@ -47,7 +48,7 @@ private:
     QLabel *m_hibernate;
     QLabel *m_restart;
     QLabel *m_shutdown;
-    QLabel *m_close;
+    QPushButton *m_close;
     QLabel *m_suspendLabel;
     QLabel *m_hibernateLabel;
     QLabel *m_restartLabel;

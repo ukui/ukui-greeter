@@ -70,10 +70,10 @@ qm_file.path = $${PREFIX}/translations/
 resourcefiles.files = resource/*
 resourcefiles.path = $${PREFIX}/images/
 
-configfile.files = debian/95-ukui-greeter.conf
+configfile.files = 95-ukui-greeter.conf
 configfile.path = /usr/share/lightdm/lightdm.conf.d/
 
-desktopfile.files = debian/ukui-greeter.desktop
+desktopfile.files = ukui-greeter.desktop
 desktopfile.path = /usr/share/xgreeters/
 
 manfile.files = man/ukui-greeter.1.gz

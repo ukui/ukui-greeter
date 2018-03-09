@@ -24,6 +24,7 @@
 #include <QAbstractItemModel>
 
 class QLabel;
+class QPushButton;
 class IconLabel;
 class QListWidget;
 class QListWidgetItem;
@@ -50,10 +51,10 @@ private:
     void addSessionLabels();
     void testAddSessionLabels();
 
-    QLabel      *m_backLabel;
-    QLabel      *m_prompt;
-    QListWidget *m_sessionsList;
-    QString     m_defaultSession;
+    QPushButton     *m_backLabel;
+    QLabel          *m_prompt;
+    QListWidget     *m_sessionsList;
+    QString          m_defaultSession;
     QSharedPointer<QAbstractItemModel> m_sessionsModel;
 };
 

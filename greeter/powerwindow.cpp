@@ -18,6 +18,7 @@
 **/
 #include "powerwindow.h"
 #include <QLabel>
+#include <QPushButton>
 #include <QPainter>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -46,7 +47,7 @@ void PowerWindow::initUI()
     setAttribute(Qt::WA_TranslucentBackground, true);
 
     m_centerWidget = new QWidget(this);
-    m_centerWidget->setObjectName(QStringLiteral("m_centerWidget"));
+    m_centerWidget->setObjectName(QStringLiteral("powerCenterWidget"));
 
     setFixedHeight(290);
     QString text = tr("Goodbye. Would you like to…");
@@ -72,15 +73,15 @@ void PowerWindow::initUI()
     QVBoxLayout *vbox = new QVBoxLayout(m_centerWidget);
     vbox->setContentsMargins(20, 10, 20, 2);
 
-    QPalette plt;
-    plt.setColor(QPalette::WindowText, Qt::white);
+//    QPalette plt;
+//    plt.setColor(QPalette::WindowText, Qt::white);
 
     m_prompt = new QLabel(m_centerWidget);
     m_prompt->adjustSize();
     m_prompt->setText(text);
     m_prompt->setWordWrap(true);
     m_prompt->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    m_prompt->setPalette(plt);
+//    m_prompt->setPalette(plt);
     m_prompt->setFont(QFont("Ubuntu Light 10"));
 
     vbox->addWidget(m_prompt);
@@ -92,14 +93,14 @@ void PowerWindow::initUI()
         QVBoxLayout *vboxSuspend = new QVBoxLayout();
         m_suspend = new QLabel(m_centerWidget);
         m_suspend->setFixedSize(168, 168);
-        m_suspend->setObjectName(QStringLiteral("m_suspend"));
-        m_suspend->setStyleSheet("QLabel{background:url(:/resource/suspend.png); background-repeat:no-repeat}"
-                                 "QLabel::hover{background:url(:/resource/suspend_highlight.png); background-repeat:no-repeat}");
+        m_suspend->setObjectName(QStringLiteral("suspend"));
+//        m_suspend->setStyleSheet("QLabel{background:url(:/resource/suspend.png); background-repeat:no-repeat}"
+//                                 "QLabel::hover{background:url(:/resource/suspend_highlight.png); background-repeat:no-repeat}");
         m_suspend->installEventFilter(this);
         m_suspendLabel = new QLabel(m_centerWidget);
         m_suspendLabel->setAlignment(Qt::AlignCenter);
         m_suspendLabel->setFixedSize(168, 30);
-        m_suspendLabel->setPalette(plt);
+//        m_suspendLabel->setPalette(plt);
 
         vboxSuspend->addWidget(m_suspend);
         vboxSuspend->addWidget(m_suspendLabel);
@@ -110,14 +111,14 @@ void PowerWindow::initUI()
         QVBoxLayout *vboxHibernate = new QVBoxLayout();
         m_hibernate = new QLabel(m_centerWidget);
         m_hibernate->setFixedSize(168, 168);
-        m_hibernate->setObjectName(QStringLiteral("m_hibernate"));
-        m_hibernate->setStyleSheet("QLabel{background:url(:/resource/hibernate.png); background-repeat:no-repeat}"
-                                 "QLabel::hover{background:url(:/resource/hibernate_highlight.png); background-repeat:no-repeat}");
+        m_hibernate->setObjectName(QStringLiteral("hibernate"));
+//        m_hibernate->setStyleSheet("QLabel{background:url(:/resource/hibernate.png); background-repeat:no-repeat}"
+//                                 "QLabel::hover{background:url(:/resource/hibernate_highlight.png); background-repeat:no-repeat}");
         m_hibernate->installEventFilter(this);
         m_hibernateLabel = new QLabel(m_centerWidget);
         m_hibernateLabel->setAlignment(Qt::AlignCenter);
         m_hibernateLabel->setFixedSize(168, 30);
-        m_hibernateLabel->setPalette(plt);
+//        m_hibernateLabel->setPalette(plt);
 
         vboxHibernate->addWidget(m_hibernate);
         vboxHibernate->addWidget(m_hibernateLabel);
@@ -128,28 +129,28 @@ void PowerWindow::initUI()
     QVBoxLayout *vboxStart = new QVBoxLayout();
     m_restart = new QLabel(m_centerWidget);
     m_restart->setFixedSize(168, 168);
-    m_restart->setObjectName(QStringLiteral("m_restart"));
-    m_restart->setStyleSheet("QLabel{background:url(:/resource/restart.png); background-repeat:no-repeat}"
-                             "QLabel::hover{background:url(:/resource/restart_highlight.png); background-repeat:no-repeat}");
+    m_restart->setObjectName(QStringLiteral("restart"));
+//    m_restart->setStyleSheet("QLabel{background:url(:/resource/restart.png); background-repeat:no-repeat}"
+//                             "QLabel::hover{background:url(:/resource/restart_highlight.png); background-repeat:no-repeat}");
     m_restart->installEventFilter(this);
     m_restartLabel = new QLabel(m_centerWidget);
     m_restartLabel->setAlignment(Qt::AlignCenter);
     m_restartLabel->setFixedSize(168, 30);
-    m_restartLabel->setPalette(plt);
+//    m_restartLabel->setPalette(plt);
     vboxStart->addWidget(m_restart);
     vboxStart->addWidget(m_restartLabel);
 
     QVBoxLayout *vboxShutdown = new QVBoxLayout();
     m_shutdown = new QLabel(m_centerWidget);
     m_shutdown->setFixedSize(168, 168);
-    m_shutdown->setObjectName(QStringLiteral("m_shutdown"));
-    m_shutdown->setStyleSheet("QLabel{background:url(:/resource/shutdown.png); background-repeat:no-repeat}"
-                              "QLabel::hover{background:url(:/resource/shutdown_highlight.png); background-repeat:no-repeat}");
+    m_shutdown->setObjectName(QStringLiteral("shutdown"));
+//    m_shutdown->setStyleSheet("QLabel{background:url(:/resource/shutdown.png); background-repeat:no-repeat}"
+//                              "QLabel::hover{background:url(:/resource/shutdown_highlight.png); background-repeat:no-repeat}");
     m_shutdown->installEventFilter(this);
     m_shutdownLabel = new QLabel(m_centerWidget);
     m_shutdownLabel->setAlignment(Qt::AlignCenter);
     m_shutdownLabel->setFixedSize(168, 30);
-    m_shutdownLabel->setPalette(plt);
+//    m_shutdownLabel->setPalette(plt);
     vboxShutdown->addWidget(m_shutdown);
     vboxShutdown->addWidget(m_shutdownLabel);
 
@@ -159,24 +160,25 @@ void PowerWindow::initUI()
     vbox->addLayout(hbox);
     vbox->addStretch();
 
-    m_close = new QLabel(this);
-    m_close->setObjectName(QStringLiteral("m_close"));
+    m_close = new QPushButton(this);
+    m_close->setObjectName(QStringLiteral("close"));
     m_close->setGeometry(QRect(0, 0, 24, 24));
-    m_close->setStyleSheet("QLabel{background:url(:/resource/dialog_close.png); background-repeat:no-repeat}"
-                           "QLabel::hover{background:url(:/resource/dialog_close_highlight.png); background-repeat:no-repeat}");
-    m_close->installEventFilter(this);
+    connect(m_close, &QPushButton::clicked, this, &PowerWindow::close);
+//    m_close->setStyleSheet("QLabel{background:url(:/resource/dialog_close.png); background-repeat:no-repeat}"
+//                           "QLabel::hover{background:url(:/resource/dialog_close_highlight.png); background-repeat:no-repeat}");
+//    m_close->installEventFilter(this);
 }
 
 void PowerWindow::paintEvent(QPaintEvent *e)
 {
     QPainter painter(this);
     painter.setPen(Qt::transparent);
-    painter.setBrush(QColor(180, 180, 250, 30));
+    painter.setBrush(QColor(255, 255, 255, 20));
     painter.drawRect(rect());
 
-    QRect center = QRect(24, 24, width()-24 * 2, height()-24*2);
-    painter.setBrush(QColor(46, 39, 101, 250));
-    painter.drawRect(center);
+//    QRect center = QRect(24, 24, width()-24 * 2, height()-24*2);
+//    painter.setBrush(QColor(46, 39, 101, 250));
+//    painter.drawRect(center);
     QWidget::paintEvent(e);
 }
 
@@ -188,7 +190,7 @@ void PowerWindow::closeEvent(QCloseEvent *e)
 
 bool PowerWindow::eventFilter(QObject *obj, QEvent *event)
 {
-    if(obj == m_close) {
+    /*if(obj == m_close) {
         if(event->type() == QEvent::MouseButtonPress) {
             QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
             if(mouseEvent->button() == Qt::LeftButton) {
@@ -205,7 +207,7 @@ bool PowerWindow::eventFilter(QObject *obj, QEvent *event)
                 return true;
             }
         }
-    } else if(obj == m_suspend) {
+    } else*/ if(obj == m_suspend) {
         if(event->type() == QEvent::Enter) {
             m_suspendLabel->setText(tr("suspend"));
         } else if(event->type() == QEvent::Leave) {

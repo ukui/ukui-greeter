@@ -38,6 +38,8 @@
 #include "usersmodel.h"
 #include "powerwindow.h"
 
+float scale;
+int fontSize;
 GreeterWindow::GreeterWindow(QWidget *parent)
     : QWidget(parent),
       m_userWnd(nullptr),
@@ -81,34 +83,34 @@ void GreeterWindow::initUI()
     if(m_usersModel->rowCount() > 1) {
         m_userWnd = new UserWindow(this);
         m_userWnd->setModel(m_usersModel);
-        QRect userRect((rect().width()-m_userWnd->width())/2, (rect().height()-m_userWnd->height())/2,
-                       m_userWnd->width(), m_userWnd->height());
-        m_userWnd->setGeometry(userRect);
+//        QRect userRect((rect().width()-m_userWnd->width())/2, (rect().height()-m_userWnd->height())/2,
+//                       m_userWnd->width(), m_userWnd->height());
+//        m_userWnd->setGeometry(userRect);
         connect(m_userWnd, SIGNAL(selectedChanged(QModelIndex)), this, SLOT(onSelectedUserChanged(QModelIndex)));
+//        qDebug() << "user window geometry: " << userRect;
     }
 
     //登录窗口
     m_loginWnd = new LoginWindow(m_greeter, this);
     m_loginWnd->setUsersModel(m_usersModel);
-    QRect loginRect((rect().width()-m_loginWnd->width())/2, (rect().height()-m_loginWnd->height())/2,
-                    m_loginWnd->width(), m_loginWnd->height());
-    m_loginWnd->setGeometry(loginRect);
+//    QRect loginRect((rect().width()-m_loginWnd->width())/2, (rect().height()-m_loginWnd->height())/2,
+//                    m_loginWnd->width(), m_loginWnd->height());
+//    m_loginWnd->setGeometry(loginRect);
+//    qDebug() << "login window geometry: " << loginRect;
     if(m_usersModel->rowCount() > 1)    //如果显示了用户选择窗口，则先隐藏登录窗口
         m_loginWnd->hide();
     connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBacktoUsers()));
     connect(m_loginWnd, SIGNAL(selectSession(QString)), this, SLOT(onSelectSession(QString)));
     connect(m_loginWnd, SIGNAL(authenticationSuccess()), this, SLOT(startTransparent()));
 
-    //语言选择
-    m_languageLB = new QLabel(this);
-    m_languageLB->setGeometry(this->width() - 180, 20, 39, 39);
-    m_languageLB->setAlignment(Qt::AlignCenter);
+    //语言选择按钮
+    m_languageLB = new QPushButton(this);
+    m_languageLB->setObjectName(QStringLiteral("languageButton"));
+    m_languageLB->setMenu(m_languageMenu);
+    m_languageLB->setShortcut(tr("Alt+L"));
+    m_languageLB->setFocusPolicy(Qt::NoFocus);
+//    m_languageLB->setGeometry(this->width() - 180, 20, 39, 39);
     m_languageLB->setFont(QFont("Ubuntu", 16));
-    QPalette plt;
-    plt.setColor(QPalette::WindowText, QColor(255, 255, 255, 200));
-    m_languageLB->setPalette(plt);
-    m_languageLB->installEventFilter(this);
-    m_languageLB->setStyleSheet("QLabel::hover{background-color:rgb(255, 255, 255, 50)}");
     QString defaultLanguage = qgetenv("LANG").constData();
     if(defaultLanguage.contains("zh_CN")) {
         m_languageLB->setText(tr("Zh"));
@@ -117,49 +119,71 @@ void GreeterWindow::initUI()
         m_languageLB->setText(tr("En"));
         m_greeter->setLang("en_US");
     }
+    connect(m_languageLB, &QPushButton::clicked, this, &GreeterWindow::showLanguageMenu);
 
-    //虚拟键盘
-    m_keyboardLB = new QLabel(this);
+    //虚拟键盘启动按钮
+    m_keyboardLB = new QPushButton(this);
+    m_keyboardLB->setObjectName(QStringLiteral("keyboardButton"));
+//    m_keyboardLB->setGeometry(this->width() - 120, 20, 39, 39);
+    m_keyboardLB->setIcon(QPixmap(":/resource/keyboard.png"));
+    m_keyboardLB->setIconSize(QSize(39, 39));
+    m_keyboardLB->setFocusPolicy(Qt::NoFocus);
+    connect(m_keyboardLB, &QPushButton::clicked, this, &GreeterWindow::showBoard);
+
+    //电源对话框打开按钮
+    m_powerLB = new QPushButton(this);
+    m_powerLB->setObjectName(QStringLiteral("powerButton"));
+//    m_powerLB->setGeometry(this->width() - 60, 20, 39, 39);
+    m_powerLB->setIcon(QPixmap(":/resource/power.png"));
+    m_powerLB->setIconSize(QSize(39, 39));
+    m_powerLB->setFocusPolicy(Qt::NoFocus);
+    connect(m_powerLB, &QPushButton::clicked, this, &GreeterWindow::showPowerWnd);
+}
+
+/**
+ * @brief GreeterWindow::resizeEvent
+ * @param event
+ * GreeterWindow的大小发生改变
+ */
+void GreeterWindow::resizeEvent(QResizeEvent *event)
+{
+    QSize size = event->size();
+    //重新计算缩放比例
+    scale = QString::number(size.width() / 1920.0, 'f', 1).toFloat();
+    scale = scale > 0.5 ? scale : (width() >= 800 ? 0.5 : scale);
+    //字体大小
+    fontSize = scale > 0.5 ? 10 : 8;
+
+    qDebug() << "GreeterWindow resize to " << size;
+    if(m_userWnd){
+        m_userWnd->setFixedSize(1100 * scale, 130 * scale + 75);
+        QRect userRect((rect().width()-m_userWnd->width())/2,
+                       (rect().height()-m_userWnd->height())/2,
+                       m_userWnd->width(), m_userWnd->height());
+        m_userWnd->setGeometry(userRect);
+    }
+    if(m_loginWnd){
+        QRect loginRect((rect().width()-m_loginWnd->width())/2,
+                        (rect().height()-m_loginWnd->height())/2,
+                        m_loginWnd->width(), m_loginWnd->height());
+        m_loginWnd->setGeometry(loginRect);
+    }
+
+    if(m_sessionWnd){
+        QRect sessionRect((rect().width()-m_sessionWnd->width())/2,
+                          (rect().height()-m_sessionWnd->height())/2,
+                          m_sessionWnd->width(), m_sessionWnd->height());
+        m_sessionWnd->setGeometry(sessionRect);
+    }
+
+    m_languageLB->setGeometry(this->width() - 180, 20, 39, 39);
     m_keyboardLB->setGeometry(this->width() - 120, 20, 39, 39);
-    m_keyboardLB->setPixmap(QPixmap(":/resource/keyboard.png"));
-    m_keyboardLB->installEventFilter(this);
-    m_keyboardLB->setStyleSheet("QLabel::hover{background-color:rgb(255, 255, 255, 50)}");
-
-    //电源
-    m_powerLB = new QLabel(this);
     m_powerLB->setGeometry(this->width() - 60, 20, 39, 39);
-    m_powerLB->setPixmap(QPixmap(":/resource/power.png"));
-    m_powerLB->installEventFilter(this);
-    m_powerLB->setStyleSheet("QLabel::hover{background-color:rgb(255, 255, 255, 50)}");
 }
 
 bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
 {
-    if(obj == m_keyboardLB) {
-        //虚拟键盘
-        if(event->type() == QEvent::MouseButtonRelease) {
-            if(((QMouseEvent*)event)->button() == Qt::LeftButton){
-                showBoard();
-                return true;
-            }
-        }
-    } else if(obj == m_powerLB) {
-        //电源对话框
-        if(event->type() == QEvent::MouseButtonRelease) {
-            if(((QMouseEvent*)event)->button() == Qt::LeftButton){
-                showPowerWnd();
-                return true;
-            }
-        }
-    } else if(obj == m_languageLB) {
-        //选择语言
-        if(event->type() == QEvent::MouseButtonRelease) {
-            if(((QMouseEvent*)event)->button() == Qt::LeftButton){
-                showLanguageMenu();
-                return true;
-            }
-        }
-    } else if(obj == m_languageMenu) {
+    if(obj == m_languageMenu) {
         if(event->type() == QEvent::Close) {
             //当菜单关闭时需要重绘label，否则指针悬浮在label上产生的背景不会消失
             repaint(m_languageLB->geometry());
@@ -254,9 +278,8 @@ void GreeterWindow::switchWnd(int index)
         m_loginWnd->show();
         break;
     case 2:
-        qDebug() << "switch sessionwindow";
         m_sessionWnd->show();
-        m_sessionWnd->setFocus();
+//        m_sessionWnd->setFocus();
         break;
     default:
         break;
@@ -287,6 +310,7 @@ void GreeterWindow::showPowerWnd()
             break;
     }
     m_powerWnd = new PowerWindow(hasOpenSessions, this);
+    m_powerWnd->setObjectName(QStringLiteral("powerWnd"));
     connect(m_powerWnd, SIGNAL(aboutToClose()), m_blackbgWnd, SLOT(close()));
     m_powerWnd->show();
 }
@@ -383,23 +407,23 @@ void GreeterWindow::timedAutologin()
         m_greeter->authenticateAutologin();
 }
 
-void setRootWindowId(Pixmap& pixmap)
-{
-    char *atom_names[] = {"_XROOTPMAP_ID", "ESETROOT_PMAP_ID"};
-    Atom atoms[2] = {0};
-    Atom type;
-    int format;
-    unsigned long nitems, after;
-    unsigned char *data_root, *data_esetroot;
+//void setRootWindowId(Pixmap& pixmap)
+//{
+//    char *atom_names[] = {"_XROOTPMAP_ID", "ESETROOT_PMAP_ID"};
+//    Atom atoms[2] = {0};
+//    Atom type;
+//    int format;
+//    unsigned long nitems, after;
+//    unsigned char *data_root, *data_esetroot;
 
-    Display *display = QX11Info::display();
-    Window xroot = QX11Info::appRootWindow(0);
+//    Display *display = QX11Info::display();
+//    Window xroot = QX11Info::appRootWindow(0);
 
-//    if(XInternAtoms(
-//                display, xroot, atoms[0], 0L, 1L, 0, AnyPropertyType,
-//                    &type, &format, &nitems, &after, &data_root)) &&
+////    if(XInternAtoms(
+////                display, xroot, atoms[0], 0L, 1L, 0, AnyPropertyType,
+////                    &type, &format, &nitems, &after, &data_root)) &&
 
-}
+//}
 
 void GreeterWindow::setRootImage()
 {
@@ -445,4 +469,9 @@ void GreeterWindow::setOpacity(qreal opacity)
     QGraphicsOpacityEffect  *pGraphicsOpacityEffect = new QGraphicsOpacityEffect;
     pGraphicsOpacityEffect->setOpacity(m_opacity);
     this->setGraphicsEffect(pGraphicsOpacityEffect);
+}
+
+qreal GreeterWindow::opacity()
+{
+    return m_opacity;
 }

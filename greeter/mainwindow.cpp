@@ -25,43 +25,51 @@
 #include <QDir>
 #include "globalv.h"
 #include "greeterwindow.h"
+
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent),
       m_screenModel(new ScreenModel(this)),
-      m_greeterWnd(new GreeterWindow(this)),
       m_activeScreen(0)
 {
-    connect(m_screenModel.data(), SIGNAL(dataChanged(QModelIndex,QModelIndex)),
-            this, SLOT(onScreenResized(QModelIndex, QModelIndex)));
-    connect(m_screenModel.data(), SIGNAL(modelReset()), this, SLOT(onScreenCountChanged()));
+    connect(m_screenModel, &ScreenModel::dataChanged, this, &MainWindow::onScreenResized);
+    connect(m_screenModel, &ScreenModel::modelReset, this, &MainWindow::onScreenCountChanged);
 
+    //设置窗口大小
     QDesktopWidget *dw = QApplication::desktop();
     resize(dw->rect().width(), dw->rect().height());
+
+    //设置监控鼠标移动
     setMouseTracking(true);
 
+    //获取当前大写键状态
+    m_capsLock = getCapsLock();
+
+    //激活屏幕(即Greeter窗口所在屏幕位置)
     m_activeScreen = dw->primaryScreen();
+    m_greeterWnd = new GreeterWindow(this);
     m_greeterWnd->setGeometry(m_screenModel->index(m_activeScreen, 0).data(Qt::UserRole).toRect());
     m_greeterWnd->initUI();
 
+    //logo
     m_logo = logoGenerator(getSystemVersion());
+
+    //背景图片
+    QDir dir(IMAGE_DIR);
+    QStringList names{"background*"};
+    QStringList files = dir.entryList(names, QDir::Files);
+    if(files.size() > 0)
+        m_background.load(IMAGE_DIR + files[0]);
 }
 
 void MainWindow::paintEvent(QPaintEvent *e)
 {
-    QDir dir(IMAGE_DIR);
-    QStringList names{"background*"};
-    QStringList files = dir.entryList(names, QDir::Files);
-    QPixmap background;
-    if(files.size() > 0)
-        background.load(IMAGE_DIR + files[0]);
-    QPixmap cof(":/resource/cof.png");
     for(int i = 0; i < m_screenModel->rowCount(); i++){
-        //绘制背景
+        //在每个屏幕上绘制背景
         QRect rect = m_screenModel->index(i, 0).data(Qt::UserRole).toRect();
-        background = background.scaled(rect.width(), rect.height(),
+        m_background = m_background.scaled(rect.width(), rect.height(),
                                        Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
         QPainter painter(this);
-        painter.setBrush(QBrush(background));
+        painter.setBrush(QBrush(m_background));
         painter.drawRect(rect);
         //绘制logo
         painter.setOpacity(0.5);
@@ -70,13 +78,22 @@ void MainWindow::paintEvent(QPaintEvent *e)
 
         //在没有登录窗口的屏幕上显示图标
         if(i != m_activeScreen)
-            painter.drawPixmap((rect.left()+rect.width()-cof.width())/2,
-                               (rect.top()+rect.height()-cof.height())/2,
-                               cof.width(), cof.height(), cof);
+        {
+            QPixmap cof(":/resource/cof.png");
+            QRect cofRect((rect.left()+rect.width()-cof.width())/2,
+                          (rect.top()+rect.height()-cof.height())/2,
+                          cof.width(), cof.height());
+            painter.drawPixmap(cofRect, cof);
+        }
     }
     return QWidget::paintEvent(e);
 }
 
+/**
+ * @brief MainWindow::mouseMoveEvent
+ * @param e
+ * 根据鼠标指针移动位置移动Greeter窗口所在屏幕
+ */
 void MainWindow::mouseMoveEvent(QMouseEvent *e)
 {
     QPoint point = e->pos();
@@ -89,20 +106,59 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
     } 
     if(curScreen != m_activeScreen && curScreen > 0){
         qDebug() << "active screen: from " << m_activeScreen << "to " << curScreen;
-        m_activeScreen = curScreen;
-        m_greeterWnd->setGeometry(m_screenModel->index(m_activeScreen, 0).data(Qt::UserRole).toRect());
+        moveToScreen(curScreen);
     }
     return QWidget::mouseMoveEvent(e);
 }
-
-void MainWindow::onScreenResized(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+void MainWindow::keyReleaseEvent(QKeyEvent *)
 {
-
+    if(getCapsLock() != m_capsLock){
+        m_capsLock = capsLock;
+        Q_EMIT capslockChanged(m_capsLock);
+    }
 }
 
+/**
+ * @brief MainWindow::onScreenResized
+ * @param topLeft
+ * @param bottomRight
+ * 有屏幕分辨率发生改变,移动Greeter窗口位置
+ */
+void MainWindow::onScreenResized(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+{
+    Q_UNUSED(topLeft)
+    Q_UNUSED(bottomRight)
+    QDesktopWidget *dw = QApplication::desktop();
+    resize(dw->width(), dw->height());
+    update();
+    moveToScreen(m_activeScreen);
+}
+
+/**
+ * @brief MainWindow::onScreenCountChanged
+ * 有屏幕插拔,移动GreeterWindow到主屏幕
+ */
 void MainWindow::onScreenCountChanged()
 {
     QDesktopWidget *dw = QApplication::desktop();
     resize(dw->width(), dw->height());
+    qDebug() << "screen changed to " << rect();
+    update();
+    moveToScreen(dw->primaryScreen());
 }
 
+/**
+ * @brief MainWindow::moveToScreen
+ * @param screen
+ * 移动Greeter窗口到第screen个屏幕上
+ */
+void MainWindow::moveToScreen(int screen)
+{
+    m_activeScreen = screen;
+    m_greeterWnd->setGeometry(m_screenModel->index(m_activeScreen, 0).data(Qt::UserRole).toRect());
+    //计算缩放比例
+//    QRect screen = m_screenModel->index(m_activeScreen, 0).data(Qt::UserRole).toRect();
+//    scale = QString::number(screen.width() / 1920.0, 'f', 1).toFloat();
+//    scale = scale > 1.0 ? 1.0 : (scale < 0.6 ? 0.6 : scale);
+//    qDebug() <<"ScreenSize:" << screen.width() << " "<< screen.height()<< ", scale: "<< scale;
+}

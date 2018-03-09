@@ -31,10 +31,8 @@
 #include <QStandardPaths>
 #include "globalv.h"
 #include "mainwindow.h"
+#include "userentry.h"
 
-float scale;
-int fontSize;
-QFont font;
 QString configFile;
 QLocale::Language language;
 
@@ -75,7 +73,7 @@ int main(int argc, char *argv[])
     QTextCodec::setCodecForLocale(codec);
 
     language = QLocale::system().language();
-    qDebug() << QLocale::languageToString(language);
+    qDebug() << "current locale language: " << QLocale::languageToString(language);
 
     //加载翻译文件
     QTranslator translator;
@@ -85,10 +83,10 @@ int main(int argc, char *argv[])
     a.installTranslator(&translator);
 
     //加载qss文件
-//    QFile qss(":/kylin-greeter.qss");
-//    qss.open(QFile::ReadOnly);
-//    a.setStyleSheet(qss.readAll());
-//    qss.close();
+    QFile qss(":/ukui-greeter.qss");
+    qss.open(QFile::ReadOnly);
+    a.setStyleSheet(qss.readAll());
+    qss.close();
 
     //用于QSettings
     QApplication::setOrganizationName("Kylin");
@@ -96,21 +94,14 @@ int main(int argc, char *argv[])
 
     configFile = QStandardPaths::displayName(QStandardPaths::CacheLocation) + "/ukui-greeter.conf";
     qDebug() << "load configure file: "<< configFile;
-    //计算缩放比例
-    QRect screen = QApplication::desktop()->rect();
-    scale = QString::number(screen.width() / 1920.0, 'f', 1).toFloat();
-    scale = scale > 1.0 ? 1.0 : (scale < 0.6 ? 0.6 : scale);
-    qDebug() <<"ScreenSize:" << screen.width() << " "<< screen.height()<< ", scale: "<< scale;
-//    scale = std::stof(argv[1]);
-//    top = std::stoi(argv[2]);
-    //字体大小
-    fontSize = 10;
-    font = QFont("ubuntu", fontSize);
 
     MainWindow w;
     w.show();
     //在没有窗口管理器的情况下，需要激活窗口，行为类似于用鼠标点击窗口
     w.activateWindow();
+
+//    UserEntry w;
+//    w.show();
 
     return a.exec();
 }

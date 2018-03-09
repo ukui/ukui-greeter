@@ -63,9 +63,7 @@ private:
     void clearMessage();
 
 protected:
-    bool eventFilter(QObject *, QEvent *);
     void showEvent(QShowEvent *);
-    void keyReleaseEvent(QKeyEvent *);
 
 signals:
     void back();
@@ -82,6 +80,7 @@ public slots:
     void onShowPrompt(QString text, QLightDM::Greeter::PromptType type);
     void onAuthenticationComplete();
     void onLogin(const QString &str);
+    void onSessionButtonClicked();
 
 private:
     QSharedPointer<QAbstractItemModel> m_usersModel;
@@ -89,15 +88,14 @@ private:
     QSharedPointer<GreeterWrapper> m_greeter;
     QString     m_session;  //session的标识
     QString     m_name;     //m_nameLabel显示的是全名(显示的),m_name保存的是用户名(用于登录的)
-    QSettings   *m_config;
-    QTimer      *m_timer;
+    QSettings  *m_config;
+    QTimer     *m_timer;
     QPixmap     m_waiting;
 
     // UI
-    QLabel      *m_backLabel;         //返回用户列表
+    QPushButton *m_backLabel;         //返回用户列表
+    QPushButton *m_sessionLabel;      //session图标
     QLabel      *m_faceLabel;         //头像
-    QWidget     *m_sessionBg;
-    QLabel      *m_sessionLabel;      //session图标
     QLabel      *m_nameLabel;         //用户名
     QLabel      *m_isLoginLabel;      //提示是否已登录
     QVector<QLabel*> m_messageLabels;      //提示信息

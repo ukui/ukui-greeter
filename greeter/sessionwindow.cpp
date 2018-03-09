@@ -18,6 +18,7 @@
 **/
 #include "sessionwindow.h"
 #include <QLabel>
+#include <QPushButton>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QDebug>
@@ -35,7 +36,7 @@ public:
     {
         m_iconLabel->setGeometry(3, (height-22)/2, 22, 22);
         m_textLabel->setGeometry(height+5, 0, width-height-5, height);
-        m_textLabel->setStyleSheet("QLabel{color: white}");
+//        m_textLabel->setStyleSheet("QLabel{color: white}");
     }
 
     void setIcon(const QString& icon)
@@ -72,20 +73,20 @@ SessionWindow::SessionWindow(const QString& session, QWidget *parent)
 void SessionWindow::initUI()
 {
     if (objectName().isEmpty())
-        setObjectName(QStringLiteral("this"));
+        setObjectName(QStringLiteral("SessionWnd"));
     int sessionNum = m_sessionsModel->rowCount();
     int height = 55 + 40 * sessionNum + 20 * (sessionNum - 1);
     resize(550, height);
-    QPalette plt;
-    plt.setBrush(QPalette::Window, QBrush("#142D6F"));
-    plt.setColor(QPalette::WindowText, Qt::white);
-    setPalette(plt);
+//    QPalette plt;
+//    plt.setBrush(QPalette::Window, QBrush("#142D6F"));
+//    plt.setColor(QPalette::WindowText, Qt::white);
+//    setPalette(plt);
 
-    m_backLabel = new QLabel(this);
-    m_backLabel->setObjectName(QStringLiteral("m_backLabel"));
+    m_backLabel = new QPushButton(this);
+    m_backLabel->setObjectName(QStringLiteral("backButton"));
     m_backLabel->setGeometry(QRect(0, 0, 32, 32));
-    m_backLabel->setPixmap(scaledPixmap(32, 32, ":/resource/arrow_left.png"));
-    m_backLabel->installEventFilter(this);
+    m_backLabel->setShortcut(Qt::Key_Escape);
+    connect(m_backLabel, &QPushButton::clicked, this, &SessionWindow::back);
 
     m_prompt = new QLabel(this);
     m_prompt->setObjectName(QStringLiteral("m_prompt"));
@@ -95,10 +96,10 @@ void SessionWindow::initUI()
 
     m_sessionsList = new QListWidget(this);
     m_sessionsList->setObjectName(QStringLiteral("sessionsList"));
-    m_sessionsList->setStyleSheet("QListWidget{background:transparent;}"
-                                  "QListWidget::item{height:40px}"
-                                  "QListWidget::item:hover{background:rgb(150, 150, 150, 50); border:1px solid white; border-radius:4px;}"
-                                  "QListWidget::item:selected{background:rgb(0, 0, 0, 150); border:1px solid white; border-radius:4px;}");
+//    m_sessionsList->setStyleSheet("QListWidget{background:transparent;}"
+//                                  "QListWidget::item{height:40px}"
+//                                  "QListWidget::item:hover{background:rgb(150, 150, 150, 50); border:1px solid white; border-radius:4px;}"
+//                                  "QListWidget::item:selected{background:rgb(0, 0, 0, 150); border:1px solid white; border-radius:4px;}");
     m_sessionsList->setSpacing(5);
     m_sessionsList->setGeometry(220, 55, 300, 40*sessionNum+20*(sessionNum-1));
     connect(m_sessionsList, &QListWidget::itemClicked, this, &SessionWindow::saveAndBack);
@@ -125,32 +126,30 @@ void SessionWindow::addSessionLabels()
 
 bool SessionWindow::eventFilter(QObject *obj, QEvent *event)
 {
-    if(obj == m_backLabel) {
-        if(event->type() == QEvent::MouseButtonPress) {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-            if(mouseEvent->button() == Qt::LeftButton) {
-                m_backLabel->setPixmap(scaledPixmap(32, 32, ":/resource/arrow_left_active.png"));
-                return true;
-            }
-        }
-        if(event->type() == QEvent::MouseButtonRelease) {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-            if(mouseEvent->button() == Qt::LeftButton) {
-                m_backLabel->setPixmap(scaledPixmap(32, 32, ":/resource/arrow_left.png"));
-                saveAndBack();
-                return true;
-            }
-        }
-    }
+//    if(obj == m_backLabel) {
+//        if(event->type() == QEvent::MouseButtonPress) {
+//            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+//            if(mouseEvent->button() == Qt::LeftButton) {
+//                m_backLabel->setPixmap(scaledPixmap(32, 32, ":/resource/arrow_left_active.png"));
+//                return true;
+//            }
+//        }
+//        if(event->type() == QEvent::MouseButtonRelease) {
+//            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+//            if(mouseEvent->button() == Qt::LeftButton) {
+//                m_backLabel->setPixmap(scaledPixmap(32, 32, ":/resource/arrow_left.png"));
+//                saveAndBack();
+//                return true;
+//            }
+//        }
+//    }
 
     return QWidget::eventFilter(obj, event);
 }
 
 void SessionWindow::keyReleaseEvent(QKeyEvent *e)
 {
-    if(e->key() == Qt::Key_Escape || e->key() == Qt::Key_Return)
-        saveAndBack();
-    else if(e->key() == Qt::Key_Tab){
+    if(e->key() == Qt::Key_Tab){
         if(m_sessionsList->currentRow() == m_sessionsList->count() - 1)
             m_sessionsList->setCurrentRow(0);
         else

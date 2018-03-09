@@ -23,7 +23,19 @@
 #include <QPixmap>
 #include <QFontMetrics>
 #include <QPainter>
+#include <X11/Xlib.h>
+#include <X11/XKBlib.h>
 
+bool capsLock;
+
+/**
+ * @brief scaledPixmap
+ * @param width
+ * @param height
+ * @param url
+ * @return
+ * 图片缩放
+ */
 QPixmap scaledPixmap(int width, int height, QString url)
 {
     QFile imgFile(url);
@@ -33,6 +45,25 @@ QPixmap scaledPixmap(int width, int height, QString url)
     }
     QPixmap pixmap(url);
     return pixmap.scaled(width, height, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+}
+
+/**
+ * @brief isCapsLock
+ * @return
+ * 获取大写键打开状态
+ */
+bool getCapsLock()
+{
+    //判断大写键状态
+    Display *display = XOpenDisplay(NULL);
+//    bool capsState = false;
+    capsLock = false;
+    if(display) {
+        unsigned int n;
+        XkbGetIndicatorState(display, XkbUseCoreKbd, &n);
+        capsLock = (n & 0x01) == 1;
+    }
+    return capsLock;
 }
 
 /**

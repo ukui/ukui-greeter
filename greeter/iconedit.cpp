@@ -69,9 +69,9 @@ IconButton::IconButton(TipEdit *edit, QWidget *parent)
 
     // 设置输入框中文件输入区，不让输入的文字在被隐藏在按钮下
     edit->setTextMargins(1, 1, m_size.width()*2, 1);
-    edit->setStyleSheet(" QLineEdit { border: 1px solid #026096 ; lineedit-password-character:10043}");  //设置密码显示为中等大小的实心圆点 8226
-    this->setStyleSheet("QPushButton{background:transparent; border:0px}");
-    m_capTips->setStyleSheet("QLabel{background:transparent; border:0px}");
+//    edit->setStyleSheet(" QLineEdit { border: 1px solid #026096 ; lineedit-password-character:10043}");  //设置密码显示为中等大小的实心圆点 8226
+//    this->setStyleSheet("QPushButton{background:transparent; border:0px}");
+//    m_capTips->setStyleSheet("QLabel{background:transparent; border:0px}");
 }
 IconButton::IconButton(TipEdit *edit, const QIcon &icon, QWidget *parent)
     :IconButton(edit, parent)
@@ -144,10 +144,10 @@ IconEdit::IconEdit(QWidget *parent)
     :QWidget(parent)
 {
     m_edit = new TipEdit(this);
-    m_edit->setObjectName("m_edit");
+    m_edit->setObjectName("passwdEdit");
     m_edit->setAttribute(Qt::WA_InputMethodEnabled, false);
     m_iconButton = new IconButton(m_edit, this);
-    m_iconButton->setObjectName("m_iconButton");
+    m_iconButton->setObjectName("loginButton");
     connect(m_iconButton, SIGNAL(clicked(bool)), this, SLOT(clicked_cb()));
     connect(m_edit, SIGNAL(textChanged(QString)), this, SLOT(showIcon(QString)));
     m_iconButton->hide();
@@ -222,7 +222,7 @@ void IconEdit::setPrompt(const QString &prompt)
     update();   //不更新的话，第一次不会显示prompt
 }
 
-const QString& IconEdit::text()
+const QString IconEdit::text()
 {
     return m_edit->text();
 }

@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301, USA.
-**/#ifndef SCREENMODEL_H
+**/
+#ifndef SCREENMODEL_H
 #define SCREENMODEL_H
 
 #include <QAbstractListModel>
@@ -38,7 +39,8 @@ private slots:
     void loadScreens();
 
 private:
-    QVector<QRect> m_screen;
+    QVector<QRect>  m_screen;
+    QDesktopWidget *_desktop;
 };
 
 #endif // SCREENMODEL_H

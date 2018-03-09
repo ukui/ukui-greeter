@@ -21,12 +21,13 @@
 #include <QApplication>
 #include <QDebug>
 ScreenModel::ScreenModel(QObject *parent)
-    : QAbstractListModel(parent)
+    : QAbstractListModel(parent),
+      _desktop(QApplication::desktop())
 {
     loadScreens();
-    QDesktopWidget *dw = QApplication::desktop();
-    connect(dw, SIGNAL(resized(int)), this, SLOT(onScreenResized(int)));
-    connect(dw, SIGNAL(screenCountChanged(int)), this, SLOT(onScreenCountChanged(int)));
+    connect(_desktop, &QDesktopWidget::workAreaResized, this, &ScreenModel::onScreenResized);
+    connect(_desktop, &QDesktopWidget::resized, this, &ScreenModel::onScreenResized);
+    connect(_desktop, &QDesktopWidget::screenCountChanged, this, &ScreenModel::onScreenCountChanged);
 }
 
 int ScreenModel::rowCount(const QModelIndex &parent) const
@@ -52,9 +53,9 @@ QVariant ScreenModel::data(const QModelIndex &index, int role) const
 
 void ScreenModel::onScreenResized(int screen)
 {
-    QDesktopWidget *dw = QApplication::desktop();
-    if(screen > 0 && screen < m_screen.size()){
-        m_screen[screen] = dw->screenGeometry(screen);
+    qDebug() << "screen " << screen << " resized to" << _desktop->screenGeometry(screen);
+    if(screen >= 0 && screen < m_screen.size()){
+        m_screen[screen] = _desktop->screenGeometry(screen);
     }
     QModelIndex index = createIndex(screen, 0);
     emit dataChanged(index, index);
@@ -70,9 +71,8 @@ void ScreenModel::loadScreens()
 {
     beginResetModel();
     m_screen.clear();
-    QDesktopWidget *desktopWidget = QApplication::desktop();
-    for(int i = 0; i < desktopWidget->screenCount(); i++){
-        m_screen.append(desktopWidget->screenGeometry(i));
+    for(int i = 0; i < _desktop->screenCount(); i++){
+        m_screen.append(_desktop->screenGeometry(i));
     }
     endResetModel();
 }

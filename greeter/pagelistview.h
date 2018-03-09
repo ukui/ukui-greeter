@@ -41,6 +41,7 @@ public:
 
 protected:
     void keyReleaseEvent(QKeyEvent *);
+    void resizeEvent(QResizeEvent *);
 
 private:
     UserEntry* createEntry(int );

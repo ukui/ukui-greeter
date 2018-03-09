@@ -32,5 +32,6 @@
         <file>resource/badges/unknown_badge.png</file>
         <file>resource/badges/xfce_badge.png</file>
         <file>resource/badges/xubuntu_badge.png</file>
+        <file>ukui-greeter.qss</file>
     </qresource>
 </RCC>
