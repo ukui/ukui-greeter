@@ -26,72 +26,6 @@
 #include <X11/Xlib.h>
 #include <X11/XKBlib.h>
 
-//////////////////////////// IconButton的成员 ////////////////////////////////////////
-
-IconButton::IconButton(TipEdit *edit, QWidget *parent)
-    :QPushButton(parent)
-{
-    m_size = QSize(edit->height(), edit->height());
-
-    this->setMinimumSize(m_size);
-    this->setMaximumSize(m_size);
-    this->setFocusPolicy(Qt::NoFocus);  //得到焦点时不显示虚线框
-    this->setFlat(true);
-    this->setCursor(QCursor(Qt::PointingHandCursor));
-    this->setIconSize(m_size);
-
-    connect(edit, SIGNAL(CapsStateChanged(bool)), this, SLOT(onCapsStateChanged(bool)));
-
-    QHBoxLayout *buttonLayout = new QHBoxLayout();
-    buttonLayout->setContentsMargins(1, 1, 1, 1);
-    buttonLayout->setSpacing(0);
-    buttonLayout->addStretch();
-
-    //判断大写键状态
-    Display *display = XOpenDisplay(NULL);
-    bool capsState = false;
-    if(display) {
-        unsigned int n;
-        XkbGetIndicatorState(display, XkbUseCoreKbd, &n);
-        capsState = (n & 0x01) == 1;
-    }
-    m_capTips = new QLabel(edit);
-    QPixmap pixmap(":/resource/warn.png");
-    m_capTips->setPixmap(pixmap);
-    if(!capsState)
-        m_capTips->hide();
-
-    buttonLayout->addWidget(m_capTips);
-    buttonLayout->addWidget(this);
-    buttonLayout->setDirection(QBoxLayout::LeftToRight);
-
-    edit->setLayout(buttonLayout);
-
-    // 设置输入框中文件输入区，不让输入的文字在被隐藏在按钮下
-    edit->setTextMargins(1, 1, m_size.width()*2, 1);
-//    edit->setStyleSheet(" QLineEdit { border: 1px solid #026096 ; lineedit-password-character:10043}");  //设置密码显示为中等大小的实心圆点 8226
-//    this->setStyleSheet("QPushButton{background:transparent; border:0px}");
-//    m_capTips->setStyleSheet("QLabel{background:transparent; border:0px}");
-}
-IconButton::IconButton(TipEdit *edit, const QIcon &icon, QWidget *parent)
-    :IconButton(edit, parent)
-{
-    this->setIcon(icon);
-}
-void IconButton::resize(const QSize& size)
-{
-    this->setMinimumSize(size);
-    this->setMaximumSize(size);
-}
-
-void IconButton::onCapsStateChanged(bool capsState)
-{
-    if(capsState)
-        m_capTips->show();
-    else
-        m_capTips->hide();
-}
-
 ///////////////////////////// TipEdit的成员 ////////////////////////////////////////
 TipEdit::TipEdit(QWidget *parent)
     :QLineEdit(parent)
@@ -110,18 +44,21 @@ void TipEdit::paintEvent(QPaintEvent *event)
 void TipEdit::keyReleaseEvent(QKeyEvent *event)
 {
     if(event->key() == Qt::Key_CapsLock) {
-        Display *display = XOpenDisplay(NULL);
-        m_capsState = false;
-        if(display) {
-            unsigned int n;
-            XkbGetIndicatorState(display, XkbUseCoreKbd, &n);
-            m_capsState = (n & 0x01) == 1;
-        }
-        Q_EMIT CapsStateChanged(m_capsState);
+        checkCapsState();
     }
     return QLineEdit::keyReleaseEvent(event);
 }
 
+void TipEdit::focusInEvent(QFocusEvent *event)
+{
+    checkCapsState();
+    return QLineEdit::focusInEvent(event);
+}
+
+/**
+ * @brief TipEdit::drawTip
+ * 绘制提示（和placeholder不同）
+ */
 void TipEdit::drawTip()
 {
     QRect csRect = cursorRect();
@@ -135,6 +72,22 @@ void TipEdit::drawTip()
 
     painter.drawText(tipRect, m_tip, option);
 }
+/**
+ * @brief TipEdit::checkCapsState
+ * 监测大写键开关状态，并发送信号
+ */
+void TipEdit::checkCapsState()
+{
+    //判断大写键状态
+    Display *display = XOpenDisplay(NULL);
+    bool capsState = false;
+    if(display) {
+        unsigned int n;
+        XkbGetIndicatorState(display, XkbUseCoreKbd, &n);
+        capsState = (n & 0x01) == 1;
+    }
+    Q_EMIT capsStateChanged(capsState);
+}
 
 
 //////////////////////////// IconEdit的成员 ////////////////////////////////////////
@@ -144,22 +97,37 @@ IconEdit::IconEdit(QWidget *parent)
     :QWidget(parent)
 {
     m_edit = new TipEdit(this);
-    m_edit->setObjectName("passwdEdit");
-    m_edit->setAttribute(Qt::WA_InputMethodEnabled, false);
-    m_iconButton = new IconButton(m_edit, this);
-    m_iconButton->setObjectName("loginButton");
-    connect(m_iconButton, SIGNAL(clicked(bool)), this, SLOT(clicked_cb()));
-    connect(m_edit, SIGNAL(textChanged(QString)), this, SLOT(showIcon(QString)));
+    m_edit->setObjectName(QStringLiteral("passwdEdit"));
+    m_edit->setAttribute(Qt::WA_InputMethodEnabled, false); //禁用输入法
+    m_edit->setTextMargins(1, 1, height(), 1);   // 设置输入框中文件输入区，不让输入的文字在被隐藏在按钮下
+
+    m_capsIcon = new QLabel(this);
+    m_capsIcon->setObjectName(QStringLiteral("capsIcon"));
+    m_capsIcon->setFixedSize(height(), height());
+    m_capsIcon->hide();
+
+    m_iconButton = new QPushButton(this);
+    m_iconButton->setObjectName(QStringLiteral("loginButton"));
+    m_iconButton->setFocusPolicy(Qt::NoFocus);
+    m_iconButton->setFixedSize(height(), height());
+    m_iconButton->setIcon(QIcon(":resource/arrow_right.png"));
+    m_iconButton->setIconSize(QSize(height(), height()));
+    m_iconButton->setCursor(QCursor(Qt::PointingHandCursor));
     m_iconButton->hide();
+
+    QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->setContentsMargins(1, 1, 1, 1);
+    layout->setSpacing(0);
+    layout->addStretch();
+    layout->addWidget(m_capsIcon);
+    layout->addWidget(m_iconButton);
+
+    connect(m_edit, &TipEdit::textChanged, this, &IconEdit::showIcon);
+    connect(m_edit, &TipEdit::capsStateChanged, m_capsIcon, &QLabel::setVisible);
+    connect(m_iconButton, &QPushButton::clicked, this, &IconEdit::clicked_cb);
     setFocusProxy(m_edit);
 }
 
-IconEdit::IconEdit(const QIcon& icon, QWidget *parent)
-    :IconEdit(parent)
-{
-    m_iconButton->setIcon(icon);
-    m_edit->setEchoMode(QLineEdit::Password);
-}
 void IconEdit::setType(QLineEdit::EchoMode type)
 {
     m_edit->setEchoMode(type);

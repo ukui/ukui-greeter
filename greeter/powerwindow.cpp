@@ -36,9 +36,7 @@ PowerWindow::PowerWindow(bool hasOpenSessions, QWidget *parent)
       m_power(new QLightDM::PowerInterface(this))
 {
     initUI();
-    QDesktopWidget *dw = QApplication::desktop();
-    setGeometry((dw->width()-width())/2, (dw->height()-height())/2,
-                width(), height());
+    setGeometry((parent->width()-width())/2, (parent->height()-height())/2, width(), height());
 }
 
 void PowerWindow::initUI()

@@ -31,35 +31,24 @@ class TipEdit : public QLineEdit
     Q_PROPERTY(QString innerTip READ innerTip WRITE setInnerTip)
 public:
     TipEdit(QWidget *parent=0);
-    void paintEvent(QPaintEvent *);
-    void keyReleaseEvent(QKeyEvent *);
-
-    void drawTip();
     const QString& innerTip(){ return m_tip; }
     void setInnerTip(const QString &tip){ m_tip = tip;}
 
+protected:
+    void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
+    void keyReleaseEvent(QKeyEvent *) Q_DECL_OVERRIDE;
+    void focusInEvent(QFocusEvent *) Q_DECL_OVERRIDE;
+
+private:
+    void drawTip();
+    void checkCapsState();
+
+
 signals:
-    void CapsStateChanged(bool capsState);
+    void capsStateChanged(bool capsState);
 
 private:
     QString m_tip;
-    bool m_capsState;
-};
-
-class IconButton : public QPushButton
-{
-    Q_OBJECT
-public:
-    IconButton(TipEdit *edit, QWidget *parent=0);
-    IconButton(TipEdit *edit, const QIcon &icon, QWidget *parent=0);
-    void resize(const QSize &size);
-
-public slots:
-    void onCapsStateChanged(bool);
-
-private:
-    QSize   m_size;
-    QLabel  *m_capTips;
 };
 
 class IconEdit : public QWidget
@@ -67,8 +56,7 @@ class IconEdit : public QWidget
     Q_OBJECT
 public:
     IconEdit(QWidget *parent = 0);
-    IconEdit(const QIcon& icon, QWidget *parent = 0);
-    virtual void keyReleaseEvent ( QKeyEvent * event );
+
 
     void setIcon(const QString &filename);
     void setIcon(const QIcon &icon);
@@ -80,6 +68,9 @@ public:
     void setText(const QString& text);
     void setWaiting(bool);
 
+protected:
+    void keyReleaseEvent ( QKeyEvent *event ) Q_DECL_OVERRIDE;
+
 signals:
     void clicked(const QString &);
     void focusOut();
@@ -89,8 +80,9 @@ public slots:
     void showIcon(const QString&);
 
 private:
-    TipEdit      *m_edit;
-    IconButton   *m_iconButton;
+    TipEdit         *m_edit;
+    QLabel          *m_capsIcon;
+    QPushButton     *m_iconButton;
 };
 
 #endif // ICONEDIT_H

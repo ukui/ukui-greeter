@@ -93,8 +93,8 @@ void LoginWindow::initUI()
     m_isLoginLabel->setFont(QFont("ubuntu", 10));
     m_isLoginLabel->setFocusPolicy(Qt::NoFocus);
 
-    m_passwordEdit = new IconEdit(QIcon(":/resource/arrow_right.png"), this);
-    m_passwordEdit->setObjectName("m_passwordEdit");
+    m_passwordEdit = new IconEdit(this);
+    m_passwordEdit->setObjectName(QStringLiteral("passwordEdit"));
     QRect pwdRect(220, 90, 300, 40);
     m_passwordEdit->setGeometry(pwdRect);
     m_passwordEdit->resize(QSize(300, 40));

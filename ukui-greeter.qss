@@ -56,10 +56,16 @@ QLineEdit {
     border: 1px solid #026096;
     lineedit-password-character:10043
 }
+QLabel#capsIcon{
+    background: url(:/resource/warn.png);
+    background-repeat: no-repeat;
+    background-position: center;
+}
 /* 登录按钮 */
-QPushButton::hover#loginButton{
-    background:transparent;
-    border:0px
+QPushButton#loginButton{
+/*    background: url(:/resource/arrow_right.png);*/
+    background-repeat: no-repeat;
+    background-position: center;
 }
 /* 登录错误提示 */
 QLabel#errorMsgLabel{

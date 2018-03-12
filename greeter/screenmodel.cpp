@@ -53,7 +53,6 @@ QVariant ScreenModel::data(const QModelIndex &index, int role) const
 
 void ScreenModel::onScreenResized(int screen)
 {
-    qDebug() << "screen " << screen << " resized to" << _desktop->screenGeometry(screen);
     if(screen >= 0 && screen < m_screen.size()){
         m_screen[screen] = _desktop->screenGeometry(screen);
     }

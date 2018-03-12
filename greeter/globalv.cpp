@@ -26,8 +26,6 @@
 #include <X11/Xlib.h>
 #include <X11/XKBlib.h>
 
-bool capsLock;
-
 /**
  * @brief scaledPixmap
  * @param width
@@ -57,7 +55,7 @@ bool getCapsLock()
     //判断大写键状态
     Display *display = XOpenDisplay(NULL);
 //    bool capsState = false;
-    capsLock = false;
+    bool capsLock = false;
     if(display) {
         unsigned int n;
         XkbGetIndicatorState(display, XkbUseCoreKbd, &n);

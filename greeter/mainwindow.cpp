@@ -41,9 +41,6 @@ MainWindow::MainWindow(QWidget *parent)
     //设置监控鼠标移动
     setMouseTracking(true);
 
-    //获取当前大写键状态
-    m_capsLock = getCapsLock();
-
     //激活屏幕(即Greeter窗口所在屏幕位置)
     m_activeScreen = dw->primaryScreen();
     m_greeterWnd = new GreeterWindow(this);
@@ -109,13 +106,6 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
         moveToScreen(curScreen);
     }
     return QWidget::mouseMoveEvent(e);
-}
-void MainWindow::keyReleaseEvent(QKeyEvent *)
-{
-    if(getCapsLock() != m_capsLock){
-        m_capsLock = capsLock;
-        Q_EMIT capslockChanged(m_capsLock);
-    }
 }
 
 /**

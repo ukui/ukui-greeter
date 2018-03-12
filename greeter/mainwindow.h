@@ -31,7 +31,6 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     void paintEvent(QPaintEvent *);
     void mouseMoveEvent(QMouseEvent *);
-    void keyReleaseEvent(QKeyEvent *);
 
 signals:
     void capslockChanged(bool);
@@ -47,7 +46,6 @@ private:
     int              m_activeScreen;
     QPixmap          m_logo;
     QPixmap          m_background;
-    bool             m_capsLock;
 };
 
 #endif // MAINWINDOW_H
