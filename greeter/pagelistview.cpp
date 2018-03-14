@@ -142,7 +142,7 @@ void PageListView::drawPage()
             m_itemList[i]->hide();
         }
     }
-    if(m_itemCount < 5)
+//    if(m_itemCount < 5)
         m_layout->addStretch();
 
     for(int i = begin; i <= m_end; i++)
@@ -155,9 +155,8 @@ void PageListView::drawPage()
         }
         m_itemList[i]->show();
         m_layout->addWidget(m_itemList[i], 0);
-    }
-    if(m_itemCount < 5)
         m_layout->addStretch();
+    }
 
     if(m_itemList.size() > 0) {
 //        m_itemList[m_curItem]->setFocus();

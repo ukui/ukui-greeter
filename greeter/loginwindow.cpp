@@ -421,7 +421,7 @@ void LoginWindow::stopWaiting()
     m_passwordEdit->setIcon(":/resource/arrow_right.png");
     m_backLabel->setEnabled(true);
     m_sessionLabel->setEnabled(true);
-    m_passwordEdit->showIcon("");
+    m_passwordEdit->showIconButton("");
 }
 
 void LoginWindow::updatePixmap()
@@ -453,7 +453,7 @@ void LoginWindow::onLogin(const QString &str)
     else {  //发送密码
         m_greeter->respond(str);
         m_waiting.load(":/resource/waiting.png");
-        m_passwordEdit->showIcon("*");  //当没有输入密码登录时，也显示等待提示
+        m_passwordEdit->showIconButton("*");  //当没有输入密码登录时，也显示等待提示
         m_passwordEdit->setIcon(QIcon(m_waiting));
         startWaiting();
     }

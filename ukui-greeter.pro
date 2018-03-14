@@ -56,7 +56,8 @@ CONFIG += c++11 debug
 INCLUDEPATH += /usr/include/lightdm-qt5-3
 
 LIBS += /usr/lib/x86_64-linux-gnu/liblightdm-qt5-3.so \
-        /usr/lib/x86_64-linux-gnu/libX11.so.6
+        /usr/lib/x86_64-linux-gnu/libX11.so.6 \
+        /usr/lib/x86_64-linux-gnu/libXrandr.so
 
 RESOURCES += image.qrc
 

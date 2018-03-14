@@ -4,4 +4,3 @@ Comment=UKUI Greeter
 Exec=ukui-greeter
 Type=Application
 X-Ubuntu-Gettext-Domain=ukui-greeter
-Name[zh_CN]=ukui-greeter.desktop

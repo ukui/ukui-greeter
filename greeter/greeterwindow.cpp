@@ -384,9 +384,6 @@ void GreeterWindow::showBoard()
         }
         iface.call("ToggleVisible");
     }
-
-    //设置虚拟键盘窗口的鼠标指针
-    XDefineCursor(QX11Info::display(), QX11Info::appRootWindow(), XCreateFontCursor(QX11Info::display(), XC_arrow));
 }
 
 /**
@@ -429,7 +426,7 @@ void GreeterWindow::setRootImage()
 {
     qDebug() << "setRootImage";
 
-    XDefineCursor(QX11Info::display(), QX11Info::appRootWindow(), XCreateFontCursor(QX11Info::display(), XC_circle));
+//    XDefineCursor(QX11Info::display(), QX11Info::appRootWindow(), XCreateFontCursor(QX11Info::display(), XC_circle));
 //    QPixmap pix = QApplication::primaryScreen()->grabWindow(winId());
 //    QPixmap pix("/usr/share/backgrounds/Black_hole_by_Marek_Koteluk.jpg");
 //    QPalette plt;

@@ -29,12 +29,41 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QStandardPaths>
+#include <QX11Info>
+#include <QThread>
+#include <QProcess>
+#include <X11/Xlib.h>
+#include <X11/cursorfont.h>
+#include <X11/extensions/Xrandr.h>
 #include "globalv.h"
 #include "mainwindow.h"
 #include "userentry.h"
+#include "ukgreeter.h"
 
 QString configFile;
 QLocale::Language language;
+
+void waitMonitorsReady()
+{
+    int n;
+    Display *dpy = XOpenDisplay(NULL);
+    int screen = DefaultScreen(dpy);
+    Window root = RootWindow(dpy, screen);
+    while(true){
+        XRRGetMonitors(dpy, root, false, &n);
+        if(n == -1)
+            qWarning() << "get monitors failed";
+        else if(n > 0){
+            qDebug() << "found " << n << " monitors";
+            return;
+        }
+        //启动xrandr，打开视频输出， 自动设置最佳分辨率
+        QProcess enableMonitors;
+        QStringList arg{"--auto"};
+        enableMonitors.start("xrandr --auto");
+        enableMonitors.waitForFinished(-1);
+    }
+}
 
 void outputMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -46,9 +75,9 @@ void outputMessage(QtMsgType type, const QMessageLogContext &context, const QStr
     case QtDebugMsg:
         fprintf(stderr, "%s Debug: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
         break;
-//    case QtInfoMsg:
-//        fprintf(stderr, "%s Info: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
-//        break;
+    case QtInfoMsg:
+        fprintf(stderr, "%s Info: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
+        break;
     case QtWarningMsg:
         fprintf(stderr, "%s Warnning: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
         break;
@@ -95,13 +124,16 @@ int main(int argc, char *argv[])
     configFile = QStandardPaths::displayName(QStandardPaths::CacheLocation) + "/ukui-greeter.conf";
     qDebug() << "load configure file: "<< configFile;
 
+    //设置鼠标指针样式
+    XDefineCursor(QX11Info::display(), QX11Info::appRootWindow(), XCreateFontCursor(QX11Info::display(), XC_arrow));
+
+    //等待显示器准备完毕
+    waitMonitorsReady();
+
     MainWindow w;
     w.show();
     //在没有窗口管理器的情况下，需要激活窗口，行为类似于用鼠标点击窗口
     w.activateWindow();
-
-//    UserEntry w;
-//    w.show();
 
     return a.exec();
 }

@@ -77,8 +77,8 @@ signals:
 
 public slots:
     void clicked_cb();
-    void showIcon(const QString&);
-
+    void showIconButton(const QString &);
+    void onCapsStateChanged(bool);
 private:
     TipEdit         *m_edit;
     QLabel          *m_capsIcon;

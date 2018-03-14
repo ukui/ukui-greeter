@@ -99,6 +99,7 @@ IconEdit::IconEdit(QWidget *parent)
     m_edit = new TipEdit(this);
     m_edit->setObjectName(QStringLiteral("passwdEdit"));
     m_edit->setAttribute(Qt::WA_InputMethodEnabled, false); //禁用输入法
+    m_edit->setContextMenuPolicy(Qt::NoContextMenu);    //禁用右键菜单
     m_edit->setTextMargins(1, 1, height(), 1);   // 设置输入框中文件输入区，不让输入的文字在被隐藏在按钮下
 
     m_capsIcon = new QLabel(this);
@@ -122,8 +123,8 @@ IconEdit::IconEdit(QWidget *parent)
     layout->addWidget(m_capsIcon);
     layout->addWidget(m_iconButton);
 
-    connect(m_edit, &TipEdit::textChanged, this, &IconEdit::showIcon);
-    connect(m_edit, &TipEdit::capsStateChanged, m_capsIcon, &QLabel::setVisible);
+    connect(m_edit, &TipEdit::textChanged, this, &IconEdit::showIconButton);
+    connect(m_edit, &TipEdit::capsStateChanged, this, &IconEdit::onCapsStateChanged);
     connect(m_iconButton, &QPushButton::clicked, this, &IconEdit::clicked_cb);
     setFocusProxy(m_edit);
 }
@@ -153,13 +154,16 @@ void IconEdit::clicked_cb()
 {
     emit clicked(m_edit->text());
 }
-void IconEdit::showIcon(const QString &text)
+
+void IconEdit::showIconButton(const QString &text)
 {
-    if(text.isEmpty()){
-        m_iconButton->hide();
-    } else {
-        m_iconButton->show();
-    }
+    m_iconButton->setVisible(!text.isEmpty());
+}
+
+void IconEdit::onCapsStateChanged(bool capsState)
+{
+    m_capsIcon->setVisible(capsState);
+    m_edit->setTextMargins(1, 1, capsState ? height() * 2 : height(), 1);
 }
 
 void IconEdit::setIcon(const QString &filename)
