@@ -38,7 +38,6 @@
 #include "globalv.h"
 #include "mainwindow.h"
 #include "userentry.h"
-#include "ukgreeter.h"
 
 QString configFile;
 QLocale::Language language;

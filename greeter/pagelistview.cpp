@@ -31,7 +31,7 @@
 
 PageListView::PageListView(QWidget *parent)
     : QWidget(parent),
-      m_layout(new QHBoxLayout(this)),
+      m_layout(nullptr),
       m_lastItem(-1)
 {
 
@@ -70,7 +70,7 @@ void PageListView::keyReleaseEvent(QKeyEvent *event)
     }
 }
 
-void PageListView::resizeEvent(QResizeEvent *e)
+void PageListView::resizeEvent(QResizeEvent *)
 {
     for(int i = 0; i < m_itemList.size(); i++)
         if(m_itemList[i])
@@ -130,12 +130,16 @@ void PageListView::setModel(QSharedPointer<QAbstractItemModel> model)
 
 void PageListView::drawPage()
 {
+    if(m_layout != nullptr)
+        delete(m_layout);
+    m_layout = new QHBoxLayout(this);
     m_layout->setSpacing(10);
     int begin = m_end - (m_itemCount > 5 ? 4 : m_itemCount - 1);
 
     if(m_lastend > 0)
     {
         int lastbegin = m_lastend - (m_itemCount > 5 ? 4 : m_itemCount - 1);
+        lastbegin = lastbegin > 0 ? lastbegin : 0;
         for(int i = lastbegin; i <= m_lastend; i++)
         {
             m_layout->removeWidget(m_itemList[i]);
@@ -296,7 +300,13 @@ bool PageListView::hasNext()
     else
         return false;
 }
-
+/**
+ * @brief PageListView::onUserInserted
+ * @param parent
+ * @param begin
+ * @param end
+ * 有用户增加
+ */
 void PageListView::onUserInserted(const QModelIndex& parent, int begin, int end)
 {
     Q_UNUSED(parent)
@@ -308,14 +318,22 @@ void PageListView::onUserInserted(const QModelIndex& parent, int begin, int end)
 
     m_itemCount = m_model->rowCount();
     m_curItem = begin;
-    if(m_end >= begin) {
+    if(m_end >= begin || m_itemCount <= 5) {
         m_lastend = m_end;
+        if(m_itemCount <= 5)
+            m_end = m_itemCount - 1;
         drawPage();
     } else {
         pageDown();
     }
 }
-
+/**
+ * @brief PageListView::onUserRemoved
+ * @param parent
+ * @param begin
+ * @param end
+ * 有用户删除
+ */
 void PageListView::onUserRemoved(const QModelIndex & parent, int begin, int end)
 {
     Q_UNUSED(parent)
@@ -336,6 +354,12 @@ void PageListView::onUserRemoved(const QModelIndex & parent, int begin, int end)
     drawPage();
 }
 
+/**
+ * @brief PageListView::onUserChanged
+ * @param topLeft
+ * @param bottomRight
+ * 用户信息发生变化
+ */
 void PageListView::onUserChanged(const QModelIndex & topLeft,
                                  const QModelIndex& bottomRight)
 {
