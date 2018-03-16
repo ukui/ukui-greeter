@@ -402,9 +402,7 @@ void LoginWindow::startAuthentication()
         m_passwordEdit->setPrompt(tr("login"));
     }
     else if(m_name == "*login") {                  //手动输入用户名
-        m_passwordEdit->show();
-        m_passwordEdit->setPrompt(tr("Username"));
-        m_passwordEdit->setType(QLineEdit::Normal);
+        m_greeter->authenticate("");
     }
     else {
         qDebug() << "login: " << m_name;
@@ -453,16 +451,18 @@ void LoginWindow::saveLastLoginUser()
 void LoginWindow::onLogin(const QString &str)
 {
     clearMessage();
-    QString name = m_nameLabel->text();
-    if(name == tr("Guest")) {
+//    QString name = m_nameLabel->text();
+    qDebug() << str;
+    if(m_name == "*guest") {
         m_greeter->authenticateAsGuest();
     }
-    else if(name == tr("Login")) {   //认证用户
+    else if(m_name == "*login") {   //用户输入用户名
+        m_name = str;
         m_nameLabel->setText(str);
         m_passwordEdit->setText("");
         m_passwordEdit->setType(QLineEdit::Password);
         m_greeter->authenticate(str);
-        qDebug() << "login: " << name;
+        qDebug() << "login: " << str;
     }
     else {  //发送密码
         m_greeter->respond(str);
@@ -499,6 +499,7 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
         text = tr("Password: ");
     if(text == "login:") {
         text = tr("login:");
+        m_name = "*login";
         m_nameLabel->setText(tr("login"));
     }
     m_passwordEdit->setPrompt(text);
