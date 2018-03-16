@@ -72,6 +72,7 @@ void UserWindow::initUI()
 //    m_nextLabel->setPixmap(scaledPixmap(64*scale, 64*scale, ":/resource/next.png"));
 //    m_nextLabel->setStyleSheet("QLabel{background-color: rgba(255, 255, 255, 0.1)}"
 //                               "QLabel::hover{background-color: rgba(255, 255, 255, 0.3)}");
+    this->setFocusProxy(m_userList);
 }
 
 void UserWindow::showEvent(QShowEvent *e)

@@ -28,10 +28,9 @@
 #include <QtDBus/QDBusConnection>
 #include <QStandardPaths>
 #include <QScreen>
+#include <QPropertyAnimation>
+#include <QGraphicsOpacityEffect>
 #include <QLightDM/SessionsModel>
-#include <QX11Info>
-#include <X11/Xlib.h>
-#include <X11/cursorfont.h>
 #include "globalv.h"
 #include "loginwindow.h"
 #include "userwindow.h"
@@ -62,6 +61,8 @@ GreeterWindow::GreeterWindow(QWidget *parent)
     }
 
     connect(m_greeter.data(), SIGNAL(autologinTimerExpired()),this, SLOT(timedAutologin()));
+    connect(m_greeter.data(), SIGNAL(authenticationSucess()), this, SLOT(hide()));
+    connect(m_greeter.data(), SIGNAL(startSessionFailed()), this, SLOT(show()));
     installEventFilter(this);
 }
 
@@ -83,20 +84,12 @@ void GreeterWindow::initUI()
     if(m_usersModel->rowCount() > 1) {
         m_userWnd = new UserWindow(this);
         m_userWnd->setModel(m_usersModel);
-//        QRect userRect((rect().width()-m_userWnd->width())/2, (rect().height()-m_userWnd->height())/2,
-//                       m_userWnd->width(), m_userWnd->height());
-//        m_userWnd->setGeometry(userRect);
         connect(m_userWnd, SIGNAL(selectedChanged(QModelIndex)), this, SLOT(onSelectedUserChanged(QModelIndex)));
-//        qDebug() << "user window geometry: " << userRect;
     }
 
     //登录窗口
     m_loginWnd = new LoginWindow(m_greeter, this);
     m_loginWnd->setUsersModel(m_usersModel);
-//    QRect loginRect((rect().width()-m_loginWnd->width())/2, (rect().height()-m_loginWnd->height())/2,
-//                    m_loginWnd->width(), m_loginWnd->height());
-//    m_loginWnd->setGeometry(loginRect);
-//    qDebug() << "login window geometry: " << loginRect;
     if(m_usersModel->rowCount() > 1)    //如果显示了用户选择窗口，则先隐藏登录窗口
         m_loginWnd->hide();
     connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBacktoUsers()));
@@ -107,9 +100,7 @@ void GreeterWindow::initUI()
     m_languageLB = new QPushButton(this);
     m_languageLB->setObjectName(QStringLiteral("languageButton"));
     m_languageLB->setMenu(m_languageMenu);
-    m_languageLB->setShortcut(tr("Alt+L"));
     m_languageLB->setFocusPolicy(Qt::NoFocus);
-//    m_languageLB->setGeometry(this->width() - 180, 20, 39, 39);
     m_languageLB->setFont(QFont("Ubuntu", 16));
     QString defaultLanguage = qgetenv("LANG").constData();
     if(defaultLanguage.contains("zh_CN")) {
@@ -124,7 +115,6 @@ void GreeterWindow::initUI()
     //虚拟键盘启动按钮
     m_keyboardLB = new QPushButton(this);
     m_keyboardLB->setObjectName(QStringLiteral("keyboardButton"));
-//    m_keyboardLB->setGeometry(this->width() - 120, 20, 39, 39);
     m_keyboardLB->setIcon(QPixmap(":/resource/keyboard.png"));
     m_keyboardLB->setIconSize(QSize(39, 39));
     m_keyboardLB->setFocusPolicy(Qt::NoFocus);
@@ -133,7 +123,6 @@ void GreeterWindow::initUI()
     //电源对话框打开按钮
     m_powerLB = new QPushButton(this);
     m_powerLB->setObjectName(QStringLiteral("powerButton"));
-//    m_powerLB->setGeometry(this->width() - 60, 20, 39, 39);
     m_powerLB->setIcon(QPixmap(":/resource/power.png"));
     m_powerLB->setIconSize(QSize(39, 39));
     m_powerLB->setFocusPolicy(Qt::NoFocus);
@@ -198,33 +187,33 @@ bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
             return true;
         }
     }
-    //打开了电源对话框，点击对话框之外的地方关闭对话框
-    if(m_powerWnd && event->type() == QEvent::MouseButtonPress) {
-        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-        QPoint pos = mouseEvent->pos();
-        if(!m_powerWnd->geometry().contains(pos)) {
-            m_powerWnd->close();
-            return true;
-        }
-    }
     return QWidget::eventFilter(obj, event);
 }
 
-//void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
-//{
-//    if(e->key() == Qt::Key_Escape){
-//        qDebug() << "escape";
-//    }
-//}
+void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
+{
+    if(e->key() == Qt::Key_L &&(e->modifiers() & Qt::ControlModifier))
+        m_languageLB->click();
+    else if(e->key() == Qt::Key_K &&(e->modifiers() & Qt::ControlModifier))
+        m_keyboardLB->click();
+    else if(e->key() == Qt::Key_P &&(e->modifiers() & Qt::ControlModifier))
+        m_powerLB->click();
+    else if(e->key() == Qt::Key_Escape) {
+        if(m_powerWnd && !m_powerWnd->isHidden())
+            m_powerWnd->close();
+        else if(m_loginWnd && !m_loginWnd->isHidden()){
+            m_loginWnd->recover();
+            switchWnd(0);
+        }
+        else if(m_sessionWnd && !m_sessionWnd->isHidden())
+            switchWnd(1);
+    }
+    QWidget::keyReleaseEvent(e);
+}
 
 
 void GreeterWindow::onSelectedUserChanged(const QModelIndex &index)
 {
-
-    QString name = index.data().toString();
-    if(name == tr("Guest")){
-        //直接登录
-    }
     m_loginWnd->setUserIndex(index);
 
     switchWnd(1);
@@ -292,16 +281,6 @@ void GreeterWindow::switchWnd(int index)
  */
 void GreeterWindow::showPowerWnd()
 {
-    //创建一个黑色透明背景的窗口
-    m_blackbgWnd = new QWidget(this);
-    m_blackbgWnd->setAttribute(Qt::WA_DeleteOnClose);
-    QPalette plt;
-    plt.setColor(QPalette::Background, QColor(0, 0, 0, 150));
-    m_blackbgWnd->setAutoFillBackground(true);
-    m_blackbgWnd->setPalette(plt);
-    m_blackbgWnd->setGeometry(0, 0, width(), height());
-    m_blackbgWnd->show();
-
     //判断是否已经有用户登录
     bool hasOpenSessions = false;
     for(int i = 0; i < m_usersModel->rowCount(); i++) {
@@ -311,7 +290,6 @@ void GreeterWindow::showPowerWnd()
     }
     m_powerWnd = new PowerWindow(hasOpenSessions, this);
     m_powerWnd->setObjectName(QStringLiteral("powerWnd"));
-    connect(m_powerWnd, SIGNAL(aboutToClose()), m_blackbgWnd, SLOT(close()));
     m_powerWnd->show();
 }
 
@@ -323,15 +301,17 @@ void GreeterWindow::showLanguageMenu()
 {
     if(!m_languageMenu) {
         // 目前只允许language设置为中文或者英文
-        QAction *m_en = new QAction(tr("English"), this);
+        m_languageMenu = new QMenu(this);
+
+        QAction *m_en = new QAction(tr("English"), m_languageMenu);
         m_en->setCheckable(true);
-        QAction *m_zh = new QAction(tr("Chinese"), this);
+        QAction *m_zh = new QAction(tr("Chinese"), m_languageMenu);
         m_zh->setCheckable(true);
-        QActionGroup *actgroup = new QActionGroup(this);
+        QActionGroup *actgroup = new QActionGroup(m_languageMenu);
         actgroup->addAction(m_en);
         actgroup->addAction(m_zh);
         actgroup->setExclusive(true);
-        m_languageMenu = new QMenu(this);
+
         m_languageMenu->addActions(actgroup->actions());
         m_languageMenu->installEventFilter(this);
         connect(m_languageMenu, SIGNAL(triggered(QAction*)), this, SLOT(onMenuItemClicked(QAction*)));
@@ -404,62 +384,18 @@ void GreeterWindow::timedAutologin()
         m_greeter->authenticateAutologin();
 }
 
-//void setRootWindowId(Pixmap& pixmap)
-//{
-//    char *atom_names[] = {"_XROOTPMAP_ID", "ESETROOT_PMAP_ID"};
-//    Atom atoms[2] = {0};
-//    Atom type;
-//    int format;
-//    unsigned long nitems, after;
-//    unsigned char *data_root, *data_esetroot;
-
-//    Display *display = QX11Info::display();
-//    Window xroot = QX11Info::appRootWindow(0);
-
-////    if(XInternAtoms(
-////                display, xroot, atoms[0], 0L, 1L, 0, AnyPropertyType,
-////                    &type, &format, &nitems, &after, &data_root)) &&
-
-//}
-
-void GreeterWindow::setRootImage()
-{
-    qDebug() << "setRootImage";
-
-//    XDefineCursor(QX11Info::display(), QX11Info::appRootWindow(), XCreateFontCursor(QX11Info::display(), XC_circle));
-//    QPixmap pix = QApplication::primaryScreen()->grabWindow(winId());
-//    QPixmap pix("/usr/share/backgrounds/Black_hole_by_Marek_Koteluk.jpg");
-//    QPalette plt;
-//    plt.setBrush(QApplication::desktop()->backgroundRole(), QBrush(pix));
-//    QApplication::desktop()->setPalette(plt);
-
-//    int width = QApplication::desktop()->width();
-//    int height = QApplication::desktop()->height();
-//    Pixmap pix = XCreatePixmap(QX11Info::display(), QX11Info::appRootWindow(), width, height, DefaultDepth(QX11Info::display(), 0));
-//    XSetCloseDownMode(QX11Info::display(), RetainPermanent);
-
-//    XSetWindowBackgroundPixmap(QX11Info::display(), QX11Info::appRootWindow(), pix);
-//    setRootWindowId(pix);
-
-//    XClearWindow(QX11Info::display(), QApplication::desktop()->winId());
-//    XFlush(QX11Info::display());
-
-    m_greeter->startSession();
-}
-
-#include <QPropertyAnimation>
 void GreeterWindow::startTransparent()
 {
     qDebug() << "startTransparent";
     QPropertyAnimation *animation = new QPropertyAnimation(this, "opacity");
-    connect(animation, &QPropertyAnimation::finished, this, &GreeterWindow::setRootImage);
+    connect(animation, &QPropertyAnimation::finished, m_greeter.data(), &GreeterWrapper::startSession);
     animation->setDuration(1);
     animation->setStartValue(1.0);
     animation->setEndValue(0.0);
 
     animation->start();
 }
-#include <QGraphicsOpacityEffect>
+
 void GreeterWindow::setOpacity(qreal opacity)
 {
     m_opacity = opacity;
@@ -471,4 +407,9 @@ void GreeterWindow::setOpacity(qreal opacity)
 qreal GreeterWindow::opacity()
 {
     return m_opacity;
+}
+
+void GreeterWindow::onStartSessionFailed()
+{
+    setOpacity(1.0);
 }

@@ -27,22 +27,33 @@ class QPushButton;
 class PowerWindow : public QWidget
 {
     Q_OBJECT
+    Q_PROPERTY(int opacity READ opacity WRITE setOpacity)
 public:
     explicit PowerWindow(bool hasOpenSessions = false, QWidget *parent = 0);
     void initUI();
+    void startBackground(int begin, int end, bool show);
+    int opacity();
+    void setOpacity(int);
+    void close();
+
+protected:
     void paintEvent(QPaintEvent *);
     bool eventFilter(QObject *, QEvent *);
-    void closeEvent(QCloseEvent *);
+//    void closeEvent(QCloseEvent *);
+    void showEvent(QShowEvent *event);
+    void resizeEvent(QResizeEvent *event);
+    void mousePressEvent(QMouseEvent *event);
 
 signals:
     void aboutToClose();
 
-public slots:
 private:
-    bool m_hasOpenSessions;
+    bool    m_hasOpenSessions;
+    qreal   m_opacity;
     QLightDM::PowerInterface *m_power;
 
     QWidget *m_centerWidget;
+    QWidget *m_borderWidget;
     QLabel *m_prompt;
     QLabel *m_suspend;
     QLabel *m_hibernate;

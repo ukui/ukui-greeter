@@ -31,14 +31,18 @@ public:
     void setSession(const QString&);
     QString session();
     void startSession();
+    QString userName();
+    void setUserName(const QString &);
 
 private:
     QString m_language;
     QString m_session;
+    QString m_userName;
 
 signals:
     void aboutToLogin();
-
+    void startSessionFailed();
+    void authenticationSucess();
 };
 
 #endif // GREETERWRAPPER_H

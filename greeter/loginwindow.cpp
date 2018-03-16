@@ -42,6 +42,7 @@ LoginWindow::LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent
             this, SLOT(onShowPrompt(QString,QLightDM::Greeter::PromptType)));
     connect(m_greeter.data(), SIGNAL(authenticationComplete()),
             this, SLOT(onAuthenticationComplete()));
+    connect(m_greeter.data(), SIGNAL(startSessionFailed()), this, SLOT(startAuthentication())); //启动会话失败，重新开始认证
 
     m_timer->setInterval(100);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(updatePixmap()));
@@ -53,46 +54,43 @@ void LoginWindow::initUI()
         this->setObjectName(QStringLiteral("this"));
     this->resize(520, 135);
 
+    /* 返回按钮 */
     m_backLabel = new QPushButton(this);
     m_backLabel->setObjectName(QStringLiteral("backButton"));
     m_backLabel->setGeometry(QRect(0, 0, 32, 32));
-    m_backLabel->setShortcut(Qt::Key_Escape);
+    m_backLabel->setFocusPolicy(Qt::NoFocus);
     connect(m_backLabel, &QPushButton::clicked, this, &LoginWindow::backToUsers);
-//    m_backLabel->setPixmap(scaledPixmap(32, 32, ":/resource/arrow_left.png"));
-//    m_backLabel->installEventFilter(this);
 
+    /* 头像 */
     m_faceLabel = new QLabel(this);
     m_faceLabel->setObjectName(QStringLiteral("faceLabel"));
     m_faceLabel->setGeometry(QRect(60, 0, 132, 132));
     m_faceLabel->setFocusPolicy(Qt::NoFocus);
 
+    /* session选择按钮 */
     m_sessionLabel = new QPushButton(this);
     m_sessionLabel->setObjectName(QStringLiteral("sessionButton"));
     m_sessionLabel->setGeometry(QRect(width()-26, 0, 26, 26));
     m_sessionLabel->hide();
     connect(m_sessionLabel, &QPushButton::clicked, this, &LoginWindow::onSessionButtonClicked);
-//    m_sessionLabel->installEventFilter(this);
-//    m_sessionLabel->setFocusPolicy(Qt::StrongFocus);
 
-//    QPalette plt;
-//    plt.setColor(QPalette::WindowText, Qt::white);
-
+    /* 用户名 */
     m_nameLabel = new QLabel(this);
     m_nameLabel->setObjectName(QStringLiteral("nameLabel"));
     QRect nameRect(220, 0, 200, 25);
     m_nameLabel->setGeometry(nameRect);
-//    m_nameLabel->setPalette(plt);
     m_nameLabel->setFont(QFont("ubuntu", 12));
     m_nameLabel->setFocusPolicy(Qt::NoFocus);
 
+    /* 是否已登录 */
     m_isLoginLabel = new QLabel(this);
     m_isLoginLabel->setObjectName(QStringLiteral("isLoginLabel"));
     QRect loginRect(220, nameRect.bottom()+5, 200, 30);
     m_isLoginLabel->setGeometry(loginRect);
-//    m_isLoginLabel->setPalette(plt);
     m_isLoginLabel->setFont(QFont("ubuntu", 10));
     m_isLoginLabel->setFocusPolicy(Qt::NoFocus);
 
+    /* 密码框 */
     m_passwordEdit = new IconEdit(this);
     m_passwordEdit->setObjectName(QStringLiteral("passwordEdit"));
     QRect pwdRect(220, 90, 300, 40);
@@ -102,9 +100,6 @@ void LoginWindow::initUI()
     m_passwordEdit->installEventFilter(this);
     m_passwordEdit->hide(); //收到请求密码的prompt才显示出来
     connect(m_passwordEdit, SIGNAL(clicked(const QString&)), this, SLOT(onLogin(const QString&)));
-
-//    setTabOrder(m_passwordEdit, m_sessionLabel);
-//    setTabOrder(m_sessionLabel, m_backLabel);
 }
 
 void LoginWindow::showEvent(QShowEvent *e)
@@ -112,6 +107,17 @@ void LoginWindow::showEvent(QShowEvent *e)
     QWidget::showEvent(e);
     if(!m_passwordEdit->isHidden())
         m_passwordEdit->setFocus();
+}
+
+void LoginWindow::keyReleaseEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_S && (event->modifiers() & Qt::ControlModifier))
+        m_sessionLabel->click();
+    else if(event->key() == Qt::Key_Return){
+        if(m_sessionLabel->hasFocus())
+            m_sessionLabel->click();
+    }
+    QWidget::keyReleaseEvent(event);
 }
 
 /**
@@ -125,6 +131,7 @@ void LoginWindow::recover()
     m_passwordEdit->clear();
     m_passwordEdit->setType(QLineEdit::Password);
     m_passwordEdit->hide();
+    m_passwordEdit->setWaiting(false);
     clearMessage();
 }
 
@@ -250,20 +257,20 @@ void LoginWindow::setSession(QString session)
         }
         /* first session in session list */
         else if(m_sessionsModel && m_sessionsModel->rowCount() > 0) {
-            session = m_sessionsModel->index(0, 0).data().toString();
+            session = m_sessionsModel->index(0, 0).data(QLightDM::SessionsModel::KeyRole).toString();
         }
         else {
             session = "";
         }
     }
     m_session = session;
+    m_greeter->setSession(m_session);
 
     sessionIcon = IMAGE_DIR + QString("badges/%1_badge.png").arg(session.toLower());
     QFile iconFile(sessionIcon);
     if(!iconFile.exists()){
         sessionIcon = IMAGE_DIR + QString("badges/unknown_badge.png");
     }
-//    m_sessionLabel->setPixmap(scaledPixmap(22, 22, sessionIcon));
     m_sessionLabel->setIcon(QIcon(sessionIcon));
     m_sessionLabel->setIconSize(QSize(22, 22));
 }
@@ -322,8 +329,8 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
         m_sessionLabel->show();
         setSession(index.data(QLightDM::UsersModel::SessionRole).toString());
     }
-
-    startAuthentication(name);
+    m_passwordEdit->hide();
+    startAuthentication();
 
     return true;
 }
@@ -384,14 +391,18 @@ void LoginWindow::onSessionSelected(const QString &session)
     }
 }
 
-void LoginWindow::startAuthentication(const QString &username)
+void LoginWindow::startAuthentication()
 {
     //用户认证
-    if(username == tr("Guest")) {                       //游客登录
+    if(m_name == "*guest") {                       //游客登录
         qDebug() << "guest login";
-        m_greeter->authenticateAsGuest();
+        m_passwordEdit->show();
+        m_passwordEdit->showIconButton("*");
+        m_passwordEdit->setWaiting(true);
+        m_passwordEdit->setPrompt(tr("login"));
     }
-    else if(username == tr("Login")) {                  //手动输入用户名
+    else if(m_name == "*login") {                  //手动输入用户名
+        m_passwordEdit->show();
         m_passwordEdit->setPrompt(tr("Username"));
         m_passwordEdit->setType(QLineEdit::Normal);
     }
@@ -434,16 +445,19 @@ void LoginWindow::updatePixmap()
 
 void LoginWindow::saveLastLoginUser()
 {
-    m_config->setValue("lastLoginUser", m_nameLabel->text());
+    m_greeter->setUserName(m_name);
+    m_config->setValue("lastLoginUser", m_name);    //记录的是登录用户的真名
     m_config->sync();
-    qDebug() << m_config->fileName();
 }
 
 void LoginWindow::onLogin(const QString &str)
 {
     clearMessage();
     QString name = m_nameLabel->text();
-    if(name == tr("Login")) {   //认证用户
+    if(name == tr("Guest")) {
+        m_greeter->authenticateAsGuest();
+    }
+    else if(name == tr("Login")) {   //认证用户
         m_nameLabel->setText(str);
         m_passwordEdit->setText("");
         m_passwordEdit->setType(QLineEdit::Password);
@@ -458,7 +472,6 @@ void LoginWindow::onLogin(const QString &str)
         startWaiting();
     }
     m_passwordEdit->setText("");
-
 }
 
 void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
@@ -482,6 +495,12 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
     else
         m_passwordEdit->setType(QLineEdit::Password);
 
+    if(text == "Password: ")
+        text = tr("Password: ");
+    if(text == "login:") {
+        text = tr("login:");
+        m_nameLabel->setText(tr("login"));
+    }
     m_passwordEdit->setPrompt(text);
 }
 
@@ -519,9 +538,8 @@ void LoginWindow::onAuthenticationComplete()
     stopWaiting();
     if(m_greeter->isAuthenticated()) {
         qDebug()<< "authentication success";
-//        m_greeter->startSession();
         saveLastLoginUser();
-        Q_EMIT authenticationSuccess();
+        m_greeter->startSession();
     } else {
         qDebug() << "authentication failed";
         onShowMessage(tr("Incorrect password, please input again"), QLightDM::Greeter::MessageTypeError);
@@ -529,3 +547,4 @@ void LoginWindow::onAuthenticationComplete()
         m_greeter->authenticate(m_name);
     }
 }
+

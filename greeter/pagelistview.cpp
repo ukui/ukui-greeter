@@ -66,8 +66,9 @@ void PageListView::keyReleaseEvent(QKeyEvent *event)
             goEnd();
             break;
         default:
-            QWidget::keyReleaseEvent(event);
+            break;
     }
+    QWidget::keyReleaseEvent(event);
 }
 
 void PageListView::resizeEvent(QResizeEvent *)
@@ -108,7 +109,7 @@ void PageListView::setModel(QSharedPointer<QAbstractItemModel> model)
     qDebug() << "lastLoginUser: " << lastUser;
 
     for(int i = 0; i < m_model->rowCount(); i++) {
-        QString user = m_model->index(i, 0).data().toString();
+        QString user = m_model->index(i, 0).data(QLightDM::UsersModel::NameRole).toString();
         if(lastUser == user) {
             m_curItem = i;
             break;

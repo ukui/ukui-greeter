@@ -49,8 +49,20 @@ QString GreeterWrapper::session()
     return m_session;
 }
 
+QString GreeterWrapper::userName()
+{
+    return m_userName;
+}
+
+void GreeterWrapper::setUserName(const QString &userName)
+{
+    m_userName = userName;
+}
+
 void GreeterWrapper::startSession()
 { 
+    if(isAuthenticated())
+        Q_EMIT authenticationSucess();
     //设置language
     if(!m_language.isEmpty()) {
         setLanguage(m_language);
@@ -58,8 +70,7 @@ void GreeterWrapper::startSession()
     qDebug() << "start session: " << m_session;
     //启动session
     if(!startSessionSync(m_session)) {
+        Q_EMIT startSessionFailed();
         Q_EMIT showMessage(tr("failed to start session."), QLightDM::Greeter::MessageTypeError);
-        //如果启动session失败，需要重新认证
-        authenticate(authenticationUser());
     }
 }

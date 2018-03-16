@@ -33,10 +33,12 @@ class SessionWindow : public QWidget
     Q_OBJECT
 public:
     explicit SessionWindow(const QString &session, QWidget *parent = 0);
-    bool eventFilter(QObject *, QEvent *);
-    void keyReleaseEvent(QKeyEvent *);
     void setSessionModel(QSharedPointer<QAbstractItemModel> model);
     void setSession(const QString&session);
+
+protected:
+    void keyReleaseEvent(QKeyEvent *);
+    void showEvent(QShowEvent *event);
 
 signals:
     void back();

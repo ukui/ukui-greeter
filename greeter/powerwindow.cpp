@@ -28,6 +28,7 @@
 #include <QImage>
 #include <QDebug>
 #include <QException>
+#include <QPropertyAnimation>
 #include "globalv.h"
 
 PowerWindow::PowerWindow(bool hasOpenSessions, QWidget *parent)
@@ -36,18 +37,20 @@ PowerWindow::PowerWindow(bool hasOpenSessions, QWidget *parent)
       m_power(new QLightDM::PowerInterface(this))
 {
     initUI();
-    setGeometry((parent->width()-width())/2, (parent->height()-height())/2, width(), height());
 }
 
 void PowerWindow::initUI()
 {
     setWindowFlags(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground, true);
+    setGeometry(parentWidget()->rect());
 
-    m_centerWidget = new QWidget(this);
+    m_borderWidget = new QWidget(this);
+    m_borderWidget->setObjectName(QStringLiteral("powerBorderWidget"));
+    m_centerWidget = new QWidget(m_borderWidget);
     m_centerWidget->setObjectName(QStringLiteral("powerCenterWidget"));
 
-    setFixedHeight(290);
+    m_borderWidget->setFixedHeight(290);
     QString text = tr("Goodbye. Would you like to…");
     if(m_hasOpenSessions) {
         QString text2 = tr("Other users are currently logged in to this computer, "
@@ -55,9 +58,9 @@ void PowerWindow::initUI()
         text = QString("%1\n\n%2").arg(text2).arg(text);
         //中文只有一行，英文有两行
         if(language == QLocale::Chinese)
-            this->setFixedHeight(330);
+            m_borderWidget->setFixedHeight(330);
         else
-            this->setFixedHeight(350);
+            m_borderWidget->setFixedHeight(350);
     }
     //重启和关机一定存在，根据是否能挂起和休眠确定窗口宽度
     int cnt = 0;
@@ -65,21 +68,20 @@ void PowerWindow::initUI()
         cnt++;
     if(m_power->canSuspend())
         cnt++;
-    this->setFixedWidth(455 + 188 * cnt);
-    m_centerWidget->setGeometry(QRect(24, 24, width()-24*2, height()-24*2));
+    m_borderWidget->setFixedWidth(455 + 188 * cnt);
+    m_borderWidget->setGeometry((width() - m_borderWidget->width())/2,
+                                (height() - m_borderWidget->height())/2,
+                                width(), height());
+    m_centerWidget->setGeometry(QRect(24, 24, m_borderWidget->width()-24*2, m_borderWidget->height()-24*2));
 
     QVBoxLayout *vbox = new QVBoxLayout(m_centerWidget);
     vbox->setContentsMargins(20, 10, 20, 2);
-
-//    QPalette plt;
-//    plt.setColor(QPalette::WindowText, Qt::white);
 
     m_prompt = new QLabel(m_centerWidget);
     m_prompt->adjustSize();
     m_prompt->setText(text);
     m_prompt->setWordWrap(true);
     m_prompt->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-//    m_prompt->setPalette(plt);
     m_prompt->setFont(QFont("Ubuntu Light 10"));
 
     vbox->addWidget(m_prompt);
@@ -87,36 +89,34 @@ void PowerWindow::initUI()
     QHBoxLayout *hbox = new QHBoxLayout();
     hbox->setSpacing(20);
 
+    /* 挂起 */
     if(m_power->canSuspend()){
         QVBoxLayout *vboxSuspend = new QVBoxLayout();
         m_suspend = new QLabel(m_centerWidget);
         m_suspend->setFixedSize(168, 168);
         m_suspend->setObjectName(QStringLiteral("suspend"));
-//        m_suspend->setStyleSheet("QLabel{background:url(:/resource/suspend.png); background-repeat:no-repeat}"
-//                                 "QLabel::hover{background:url(:/resource/suspend_highlight.png); background-repeat:no-repeat}");
         m_suspend->installEventFilter(this);
+
         m_suspendLabel = new QLabel(m_centerWidget);
         m_suspendLabel->setAlignment(Qt::AlignCenter);
         m_suspendLabel->setFixedSize(168, 30);
-//        m_suspendLabel->setPalette(plt);
 
         vboxSuspend->addWidget(m_suspend);
         vboxSuspend->addWidget(m_suspendLabel);
 
         hbox->addLayout(vboxSuspend);
     }
+    /* 休眠 */
     if(m_power->canHibernate()) {
         QVBoxLayout *vboxHibernate = new QVBoxLayout();
         m_hibernate = new QLabel(m_centerWidget);
         m_hibernate->setFixedSize(168, 168);
         m_hibernate->setObjectName(QStringLiteral("hibernate"));
-//        m_hibernate->setStyleSheet("QLabel{background:url(:/resource/hibernate.png); background-repeat:no-repeat}"
-//                                 "QLabel::hover{background:url(:/resource/hibernate_highlight.png); background-repeat:no-repeat}");
         m_hibernate->installEventFilter(this);
+
         m_hibernateLabel = new QLabel(m_centerWidget);
         m_hibernateLabel->setAlignment(Qt::AlignCenter);
         m_hibernateLabel->setFixedSize(168, 30);
-//        m_hibernateLabel->setPalette(plt);
 
         vboxHibernate->addWidget(m_hibernate);
         vboxHibernate->addWidget(m_hibernateLabel);
@@ -124,31 +124,31 @@ void PowerWindow::initUI()
         hbox->addLayout(vboxHibernate);
     }
 
+    /* 重启 */
     QVBoxLayout *vboxStart = new QVBoxLayout();
     m_restart = new QLabel(m_centerWidget);
     m_restart->setFixedSize(168, 168);
     m_restart->setObjectName(QStringLiteral("restart"));
-//    m_restart->setStyleSheet("QLabel{background:url(:/resource/restart.png); background-repeat:no-repeat}"
-//                             "QLabel::hover{background:url(:/resource/restart_highlight.png); background-repeat:no-repeat}");
     m_restart->installEventFilter(this);
+
     m_restartLabel = new QLabel(m_centerWidget);
     m_restartLabel->setAlignment(Qt::AlignCenter);
     m_restartLabel->setFixedSize(168, 30);
-//    m_restartLabel->setPalette(plt);
+
     vboxStart->addWidget(m_restart);
     vboxStart->addWidget(m_restartLabel);
 
+    /* 关机 */
     QVBoxLayout *vboxShutdown = new QVBoxLayout();
     m_shutdown = new QLabel(m_centerWidget);
     m_shutdown->setFixedSize(168, 168);
     m_shutdown->setObjectName(QStringLiteral("shutdown"));
-//    m_shutdown->setStyleSheet("QLabel{background:url(:/resource/shutdown.png); background-repeat:no-repeat}"
-//                              "QLabel::hover{background:url(:/resource/shutdown_highlight.png); background-repeat:no-repeat}");
     m_shutdown->installEventFilter(this);
+
     m_shutdownLabel = new QLabel(m_centerWidget);
     m_shutdownLabel->setAlignment(Qt::AlignCenter);
     m_shutdownLabel->setFixedSize(168, 30);
-//    m_shutdownLabel->setPalette(plt);
+
     vboxShutdown->addWidget(m_shutdown);
     vboxShutdown->addWidget(m_shutdownLabel);
 
@@ -158,54 +158,43 @@ void PowerWindow::initUI()
     vbox->addLayout(hbox);
     vbox->addStretch();
 
-    m_close = new QPushButton(this);
+    /* 窗口关闭按钮 */
+    m_close = new QPushButton(m_borderWidget);
     m_close->setObjectName(QStringLiteral("close"));
     m_close->setGeometry(QRect(0, 0, 24, 24));
     connect(m_close, &QPushButton::clicked, this, &PowerWindow::close);
-//    m_close->setStyleSheet("QLabel{background:url(:/resource/dialog_close.png); background-repeat:no-repeat}"
-//                           "QLabel::hover{background:url(:/resource/dialog_close_highlight.png); background-repeat:no-repeat}");
-//    m_close->installEventFilter(this);
+}
+
+void PowerWindow::resizeEvent(QResizeEvent *event)
+{
+
 }
 
 void PowerWindow::paintEvent(QPaintEvent *e)
 {
     QPainter painter(this);
     painter.setPen(Qt::transparent);
-    painter.setBrush(QColor(255, 255, 255, 20));
+    painter.setBrush(QColor(0, 0, 0, m_opacity));
     painter.drawRect(rect());
 
-//    QRect center = QRect(24, 24, width()-24 * 2, height()-24*2);
-//    painter.setBrush(QColor(46, 39, 101, 250));
-//    painter.drawRect(center);
     QWidget::paintEvent(e);
 }
 
-void PowerWindow::closeEvent(QCloseEvent *e)
+void PowerWindow::close()
 {
-    emit aboutToClose();
-    QWidget::closeEvent(e);
+    m_borderWidget->close();
+    startBackground(80, 0, false);
 }
+
+void PowerWindow::showEvent(QShowEvent *)
+{
+    startBackground(0, 80, true);
+}
+
 
 bool PowerWindow::eventFilter(QObject *obj, QEvent *event)
 {
-    /*if(obj == m_close) {
-        if(event->type() == QEvent::MouseButtonPress) {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-            if(mouseEvent->button() == Qt::LeftButton) {
-                m_close->setStyleSheet("QLabel{background:url(:/resource/dialog_close_press.png)}");
-                return true;
-            }
-        }
-        if(event->type() == QEvent::MouseButtonRelease) {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-            if(mouseEvent->button() == Qt::LeftButton) {
-                m_close->setStyleSheet("QLabel{background:url(:/resource/dialog_close.png)}"
-                                       "QLabel::hover{background:url(:/resource/dialog_close_highlight.png)}");
-                this->close();
-                return true;
-            }
-        }
-    } else*/ if(obj == m_suspend) {
+    if(obj == m_suspend) {
         if(event->type() == QEvent::Enter) {
             m_suspendLabel->setText(tr("suspend"));
         } else if(event->type() == QEvent::Leave) {
@@ -216,7 +205,7 @@ bool PowerWindow::eventFilter(QObject *obj, QEvent *event)
                 m_power->suspend();
                 close();
             }catch(QException &e) {
-
+                qWarning() << e.what();
             }
         }
     }else if(obj == m_hibernate) {
@@ -230,7 +219,7 @@ bool PowerWindow::eventFilter(QObject *obj, QEvent *event)
                 m_power->hibernate();
                 close();
             }catch(QException &e) {
-
+                qWarning() << e.what();
             }
         }
     } else if(obj == m_restart) {
@@ -244,7 +233,7 @@ bool PowerWindow::eventFilter(QObject *obj, QEvent *event)
                 m_power->restart();
                 close();
             }catch(QException &e) {
-
+                qWarning() << e.what();
             }
         }
     } else if(obj == m_shutdown) {
@@ -258,9 +247,38 @@ bool PowerWindow::eventFilter(QObject *obj, QEvent *event)
                 m_power->shutdown();
                 close();
             }catch(QException &e) {
-
+                qWarning() << e.what();
             }
         }
     }
     return QWidget::eventFilter(obj, event);
+}
+
+void PowerWindow::mousePressEvent(QMouseEvent *event)
+{
+    if(!m_borderWidget->geometry().contains(event->pos()))
+        close();
+}
+
+void PowerWindow::startBackground(int begin, int end, bool show)
+{
+    QPropertyAnimation *animation = new QPropertyAnimation(this, "opacity");
+    animation->setDuration(300);
+    animation->setStartValue(begin);
+    animation->setEndValue(end);
+    if(!show)
+        connect(animation, &QPropertyAnimation::finished, this, &QWidget::close);
+
+    animation->start();
+}
+
+void PowerWindow::setOpacity(int opacity)
+{
+    m_opacity = opacity;
+    update();
+}
+
+int PowerWindow::opacity()
+{
+    return m_opacity;
 }

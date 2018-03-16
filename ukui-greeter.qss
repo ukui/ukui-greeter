@@ -67,6 +67,9 @@ QPushButton#loginButton{
     background-repeat: no-repeat;
     background-position: center;
 }
+/*QPushButton::hover#loginButton{
+    background: transparent;
+}*/
 /* 登录错误提示 */
 QLabel#errorMsgLabel{
     color: rgb(255, 0, 0, 200);
@@ -119,6 +122,9 @@ QLabel::hover#shutdown{
 /* 电源对话框中间区域 */
 QWidget#powerCenterWidget{
     background: #2D698E
+}
+QWidget#powerBorderWidget{
+    background: rgb(0, 0, 0, 50);
 }
 
 QListWidget{

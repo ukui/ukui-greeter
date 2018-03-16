@@ -44,7 +44,6 @@ public:
     void setSessionsModel(QSharedPointer<QAbstractItemModel> model);
     bool setSessionIndex(const QModelIndex& index);
     void setGreeter(QSharedPointer<GreeterWrapper> greeter);
-
     void setUserName(const QString& userName);
     QString getUserName();
     void setFace(const QString& faceFile);
@@ -53,17 +52,18 @@ public:
     QString getPassword();
     void setSession(QString);
     QString getSession();
+    void recover();
 
 private:
     void initUI();    
     int sessionIndex(const QString &session);
     void saveLastLoginUser();
     void backToUsers();
-    void recover();
     void clearMessage();
 
 protected:
     void showEvent(QShowEvent *);
+    void keyReleaseEvent(QKeyEvent *event);
 
 signals:
     void back();
@@ -71,7 +71,7 @@ signals:
     void authenticationSuccess();
 
 public slots:
-    void startAuthentication(const QString& username);
+    void startAuthentication();
     void startWaiting();
     void stopWaiting();
     void updatePixmap();
@@ -87,7 +87,7 @@ private:
     QSharedPointer<QAbstractItemModel> m_sessionsModel;
     QSharedPointer<GreeterWrapper> m_greeter;
     QString     m_session;  //session的标识
-    QString     m_name;     //m_nameLabel显示的是全名(显示的),m_name保存的是用户名(用于登录的)
+    QString     m_name;     //m_nameLabel显示的是全名(显示的),m_name保存的是真名(用于登录的)
     QSettings  *m_config;
     QTimer     *m_timer;
     QPixmap     m_waiting;

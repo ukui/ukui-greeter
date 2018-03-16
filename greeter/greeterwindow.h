@@ -30,6 +30,7 @@
 
 class PowerWindow;
 class QProcess;
+class QGraphicsOpacityEffect;
 class GreeterWindow : public QWidget
 {
     Q_OBJECT
@@ -38,10 +39,13 @@ public:
     GreeterWindow(QWidget *parent = 0);
     virtual ~GreeterWindow();
     void initUI();
-    bool eventFilter(QObject *, QEvent *);
-    void resizeEvent(QResizeEvent *);
     void setOpacity(qreal);
     qreal opacity();
+
+protected:
+    bool eventFilter(QObject *, QEvent *);
+    void resizeEvent(QResizeEvent *);
+    void keyReleaseEvent(QKeyEvent *event);
 
 private slots:
     void onSelectedUserChanged(const QModelIndex &);
@@ -50,8 +54,8 @@ private slots:
     void onSelectSession(const QString&);
     void onMenuItemClicked(QAction *action);
     void timedAutologin();
-    void setRootImage();
     void startTransparent();
+    void onStartSessionFailed();
 
 private:
     void switchWnd(int);
@@ -63,7 +67,6 @@ private:
     LoginWindow     *m_loginWnd;
     SessionWindow   *m_sessionWnd;
     PowerWindow     *m_powerWnd;
-    QWidget         *m_blackbgWnd;
     QPushButton     *m_keyboardLB;
     QPushButton     *m_powerLB;
     QPushButton     *m_languageLB;
@@ -73,6 +76,7 @@ private:
     QSharedPointer<QAbstractItemModel> m_sessionsModel;
     QSharedPointer<GreeterWrapper> m_greeter;
     qreal            m_opacity;
+    bool             m_show;
 };
 
 #endif // GREETERWINDOW_H
