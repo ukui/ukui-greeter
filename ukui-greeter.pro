@@ -84,5 +84,10 @@ target.path = /usr/sbin/
 
 INSTALLS += target configfile desktopfile resourcefiles qm_file manfile
 
+greaterThan(QT_MAJOR_VERSION, 4){
+    greaterThan(QT_MINOR_VERSION, 4){
+        DEFINES+=VERSION_ENOUGH
+    }
+}
 
 

@@ -165,9 +165,8 @@ void PowerWindow::initUI()
     connect(m_close, &QPushButton::clicked, this, &PowerWindow::close);
 }
 
-void PowerWindow::resizeEvent(QResizeEvent *event)
+void PowerWindow::resizeEvent(QResizeEvent *)
 {
-
 }
 
 void PowerWindow::paintEvent(QPaintEvent *e)

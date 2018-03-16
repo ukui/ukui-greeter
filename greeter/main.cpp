@@ -37,7 +37,6 @@
 #include <X11/extensions/Xrandr.h>
 #include "globalv.h"
 #include "mainwindow.h"
-#include "userentry.h"
 
 QString configFile;
 QLocale::Language language;
@@ -74,9 +73,11 @@ void outputMessage(QtMsgType type, const QMessageLogContext &context, const QStr
     case QtDebugMsg:
         fprintf(stderr, "%s Debug: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
         break;
+#ifdef VERSION_ENOUGH
     case QtInfoMsg:
         fprintf(stderr, "%s Info: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
         break;
+#endif
     case QtWarningMsg:
         fprintf(stderr, "%s Warnning: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
         break;
