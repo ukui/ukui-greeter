@@ -94,7 +94,6 @@ void GreeterWindow::initUI()
         m_loginWnd->hide();
     connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBacktoUsers()));
     connect(m_loginWnd, SIGNAL(selectSession(QString)), this, SLOT(onSelectSession(QString)));
-    connect(m_loginWnd, SIGNAL(authenticationSuccess()), this, SLOT(startTransparent()));
 
     //语言选择按钮
     m_languageLB = new QPushButton(this);
@@ -382,34 +381,4 @@ void GreeterWindow::timedAutologin()
     }
     else
         m_greeter->authenticateAutologin();
-}
-
-void GreeterWindow::startTransparent()
-{
-    qDebug() << "startTransparent";
-    QPropertyAnimation *animation = new QPropertyAnimation(this, "opacity");
-    connect(animation, &QPropertyAnimation::finished, m_greeter.data(), &GreeterWrapper::startSession);
-    animation->setDuration(1);
-    animation->setStartValue(1.0);
-    animation->setEndValue(0.0);
-
-    animation->start();
-}
-
-void GreeterWindow::setOpacity(qreal opacity)
-{
-    m_opacity = opacity;
-    QGraphicsOpacityEffect  *pGraphicsOpacityEffect = new QGraphicsOpacityEffect;
-    pGraphicsOpacityEffect->setOpacity(m_opacity);
-    this->setGraphicsEffect(pGraphicsOpacityEffect);
-}
-
-qreal GreeterWindow::opacity()
-{
-    return m_opacity;
-}
-
-void GreeterWindow::onStartSessionFailed()
-{
-    setOpacity(1.0);
 }

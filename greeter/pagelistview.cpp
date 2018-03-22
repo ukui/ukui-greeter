@@ -148,7 +148,7 @@ void PageListView::drawPage()
         }
     }
 //    if(m_itemCount < 5)
-        m_layout->addStretch();
+//        m_layout->addStretch();
 
     for(int i = begin; i <= m_end; i++)
     {
@@ -159,8 +159,8 @@ void PageListView::drawPage()
             m_itemList.insert(i, createEntry(i));
         }
         m_itemList[i]->show();
-        m_layout->addWidget(m_itemList[i], 0);
-        m_layout->addStretch();
+        m_layout->insertWidget(i - begin, m_itemList[i], 0);
+//        m_layout->addStretch();
     }
 
     if(m_itemList.size() > 0) {
@@ -372,6 +372,7 @@ void PageListView::onUserChanged(const QModelIndex & topLeft,
             m_itemList[i]->setUserName(index.data().toString());
             m_itemList[i]->setFace(index.data(QLightDM::UsersModel::ImagePathRole).toString());
             m_itemList[i]->setLogin(index.data(QLightDM::UsersModel::LoggedInRole).toBool());
+            qDebug() << "user " << index.data().toString() <<"changed";
         }
     }
 }

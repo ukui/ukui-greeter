@@ -57,7 +57,6 @@ void waitMonitorsReady()
         }
         //启动xrandr，打开视频输出， 自动设置最佳分辨率
         QProcess enableMonitors;
-        QStringList arg{"--auto"};
         enableMonitors.start("xrandr --auto");
         enableMonitors.waitForFinished(-1);
     }

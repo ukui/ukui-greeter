@@ -70,7 +70,7 @@ void MainWindow::paintEvent(QPaintEvent *e)
         painter.drawRect(rect);
         //绘制logo
         painter.setOpacity(0.5);
-        QRect logoRect(rect.left() + 50, rect.bottom()-80, m_logo.width(), m_logo.height());
+        QRect logoRect(rect.left(), rect.bottom()-80, m_logo.width(), m_logo.height());
         painter.drawPixmap(logoRect, m_logo);
 
         //在没有登录窗口的屏幕上显示图标

@@ -34,13 +34,10 @@ class QGraphicsOpacityEffect;
 class GreeterWindow : public QWidget
 {
     Q_OBJECT
-    Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity)
 public:
     GreeterWindow(QWidget *parent = 0);
     virtual ~GreeterWindow();
     void initUI();
-    void setOpacity(qreal);
-    qreal opacity();
 
 protected:
     bool eventFilter(QObject *, QEvent *);
@@ -54,8 +51,6 @@ private slots:
     void onSelectSession(const QString&);
     void onMenuItemClicked(QAction *action);
     void timedAutologin();
-    void startTransparent();
-    void onStartSessionFailed();
 
 private:
     void switchWnd(int);

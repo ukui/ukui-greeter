@@ -21,8 +21,13 @@
 #include <QDebug>
 #include <QRect>
 #include <QPixmap>
+#include <QIcon>
 #include <QFontMetrics>
 #include <QPainter>
+#include <QProcess>
+#include <QStandardPaths>
+#include <QImageReader>
+#include <QtSvg/QSvgRenderer>
 #include <X11/Xlib.h>
 #include <X11/XKBlib.h>
 
@@ -41,7 +46,30 @@ QPixmap scaledPixmap(int width, int height, QString url)
         qDebug()<< "not find the pixmap file";
         return QPixmap();
     }
-    QPixmap pixmap(url);
+    QImage image(url);
+    QPixmap pixmap = QPixmap::fromImage(image);
+    if(pixmap.isNull()) {
+        qDebug() << "pixmap is null";
+        QProcess exec;
+        QString program("file " + url);
+        exec.start(program);
+        exec.waitForFinished(1000);
+        QString output = exec.readAllStandardOutput();
+        qDebug() << output;
+        if(output.contains("SVG")){
+            qDebug() << "image format is SVG";
+            QSvgRenderer render(url);
+            QImage image(width, height, QImage::Format_ARGB32);
+            image.fill(Qt::transparent);
+            QPainter painter(&image);
+            render.render(&painter, image.rect());
+            pixmap.convertFromImage(image);
+        } else if(output.contains("TIFF")) {
+            qDebug() << "image format is TIFF";
+
+        }
+    }
+
     return pixmap.scaled(width, height, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
 }
 
@@ -79,6 +107,13 @@ QString getSystemVersion()
     return release;
 }
 
+QString getSystemDistrib()
+{
+    QSettings settings("/etc/lsb-release", QSettings::IniFormat);
+    QString distribId = settings.value("DISTRIB_ID").toString();
+    return distribId;
+}
+
 /**
  * @brief logoGenerator
  * @param text
@@ -87,6 +122,9 @@ QString getSystemVersion()
  */
 QPixmap logoGenerator(const QString &text)
 {
+    if(getSystemDistrib() == "Kylin")
+        return QPixmap(":/resource/kylin-logo.png");
+
     QString logoFile(IMAGE_DIR + "logo.png");
     if(QFile(logoFile).exists())
     {
@@ -94,24 +132,25 @@ QPixmap logoGenerator(const QString &text)
         return logo;
     }
     QPixmap logoBare;
-    logoBare.load(":/resource/logo-bare.png");
+    logoBare.load(":/resource/uk-logo.png");
 
     QFont font("ubuntu", 18);
     QFontMetrics fm(font);
     int textPixelSize = fm.width(text);
 
-    QPixmap logo(logoBare.width() + textPixelSize + 3, logoBare.height());
+    QPixmap logo(logoBare.width() + textPixelSize + 3 + 30, logoBare.height());
     logo.fill(Qt::transparent);
 
+    QRect logoBareRect(30 , 0, logoBare.width(), logoBare.height());
     QPainter painter;
     painter.begin(&logo);
-    painter.drawPixmap(logoBare.rect(), logoBare, logoBare.rect());
+    painter.drawPixmap(logoBareRect, logoBare, logoBare.rect());
 
     painter.setPen(Qt::white);
     painter.setFont(font);
     QTextOption option(Qt::AlignLeft | Qt::AlignVCenter);
     option.setWrapMode(QTextOption::WordWrap);
-    QRect versionRect(logoBare.rect().right()+3, 3, logo.width() - logoBare.width(), logo.height());
+    QRect versionRect(logoBareRect.right()+3, 3, logo.width() - logoBare.width(), logo.height());
     painter.drawText(versionRect, text, option);
 
     return logo;

@@ -68,7 +68,6 @@ protected:
 signals:
     void back();
     void selectSession(const QString& );
-    void authenticationSuccess();
 
 public slots:
     void startAuthentication();

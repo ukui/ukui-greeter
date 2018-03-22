@@ -28,7 +28,9 @@
 #include <QImage>
 #include <QDebug>
 #include <QException>
+#include <QFontMetrics>
 #include <QPropertyAnimation>
+#include <qmath.h>
 #include "globalv.h"
 
 PowerWindow::PowerWindow(bool hasOpenSessions, QWidget *parent)
@@ -50,18 +52,7 @@ void PowerWindow::initUI()
     m_centerWidget = new QWidget(m_borderWidget);
     m_centerWidget->setObjectName(QStringLiteral("powerCenterWidget"));
 
-    m_borderWidget->setFixedHeight(290);
-    QString text = tr("Goodbye. Would you like to…");
-    if(m_hasOpenSessions) {
-        QString text2 = tr("Other users are currently logged in to this computer, "
-                   "shutting down now will also close these other sessions.");
-        text = QString("%1\n\n%2").arg(text2).arg(text);
-        //中文只有一行，英文有两行
-        if(language == QLocale::Chinese)
-            m_borderWidget->setFixedHeight(330);
-        else
-            m_borderWidget->setFixedHeight(350);
-    }
+
     //重启和关机一定存在，根据是否能挂起和休眠确定窗口宽度
     int cnt = 0;
     if(m_power->canHibernate())
@@ -69,20 +60,39 @@ void PowerWindow::initUI()
     if(m_power->canSuspend())
         cnt++;
     m_borderWidget->setFixedWidth(455 + 188 * cnt);
+    m_centerWidget->setFixedWidth(m_borderWidget->width()-24*2);
+//    m_borderWidget->setFixedHeight(290);
+    //根据提示内容的长度确定窗口的高度
+    QFont font("ubuntu", 12);
+    QString text = tr("Goodbye. Would you like to…");
+    int lineNum = 1;
+    if(m_hasOpenSessions) {
+        QString text2 = tr("Other users are currently logged in to this computer, "
+                   "shutting down now will also close these other sessions.");
+        text = QString("%1\n\n%2").arg(text2).arg(text);
+        QFontMetrics fm(font);
+        int textWide = fm.width(text2);
+        lineNum = qCeil(textWide * 1.0 / m_centerWidget->width()) + 1 + lineNum;
+        qDebug() << lineNum;
+    }
+
+    m_borderWidget->setFixedHeight(280 + 20*lineNum);
+    m_centerWidget->setFixedHeight(m_borderWidget->height()-24*2);
     m_borderWidget->setGeometry((width() - m_borderWidget->width())/2,
                                 (height() - m_borderWidget->height())/2,
                                 width(), height());
-    m_centerWidget->setGeometry(QRect(24, 24, m_borderWidget->width()-24*2, m_borderWidget->height()-24*2));
+    m_centerWidget->move(24, 24);
 
     QVBoxLayout *vbox = new QVBoxLayout(m_centerWidget);
     vbox->setContentsMargins(20, 10, 20, 2);
+    vbox->setSpacing(20);
 
     m_prompt = new QLabel(m_centerWidget);
     m_prompt->adjustSize();
     m_prompt->setText(text);
     m_prompt->setWordWrap(true);
     m_prompt->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    m_prompt->setFont(QFont("Ubuntu Light 10"));
+    m_prompt->setFont(font);
 
     vbox->addWidget(m_prompt);
 

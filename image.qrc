@@ -23,7 +23,6 @@
         <file>resource/suspend.png</file>
         <file>resource/waiting.png</file>
         <file>resource/warn.png</file>
-        <file>resource/logo-bare.png</file>
         <file>resource/badges/gnome_badge.png</file>
         <file>resource/badges/lubuntu_badge.png</file>
         <file>resource/badges/mate_badge.png</file>
@@ -33,5 +32,10 @@
         <file>resource/badges/xfce_badge.png</file>
         <file>resource/badges/xubuntu_badge.png</file>
         <file>ukui-greeter.qss</file>
+        <file>resource/background.jpg</file>
+        <file>resource/kylin-logo.png</file>
+        <file>resource/next_hl.png</file>
+        <file>resource/prev_hl.png</file>
+        <file>resource/uk-logo.png</file>
     </qresource>
 </RCC>
