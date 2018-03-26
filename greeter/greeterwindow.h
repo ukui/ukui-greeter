@@ -22,13 +22,13 @@
 #include <QWidget>
 #include <QStackedLayout>
 #include <QSharedPointer>
-#include "userwindow.h"
 #include "loginwindow.h"
 #include "sessionwindow.h"
 #include "usersmodel.h"
 #include "greeterwrapper.h"
 
 class PowerWindow;
+class UsersView;
 class QProcess;
 class QGraphicsOpacityEffect;
 class GreeterWindow : public QWidget
@@ -45,7 +45,7 @@ protected:
     void keyReleaseEvent(QKeyEvent *event);
 
 private slots:
-    void onSelectedUserChanged(const QModelIndex &);
+    void onUserSelected(const QModelIndex &);
     void onBacktoUsers();
     void onBacktoLogin();
     void onSelectSession(const QString&);
@@ -58,7 +58,7 @@ private:
     void showLanguageMenu();
     void showBoard();
 
-    UserWindow      *m_userWnd;
+    UsersView       *m_userWnd;
     LoginWindow     *m_loginWnd;
     SessionWindow   *m_sessionWnd;
     PowerWindow     *m_powerWnd;

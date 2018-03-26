@@ -33,7 +33,7 @@
 #include <QLightDM/SessionsModel>
 #include "globalv.h"
 #include "loginwindow.h"
-#include "userwindow.h"
+#include "usersview.h"
 #include "usersmodel.h"
 #include "powerwindow.h"
 
@@ -82,9 +82,9 @@ void GreeterWindow::initUI()
 {
     // 如果只用一个用户的话，直接进入登录界面，否则显示用户列表窗口
     if(m_usersModel->rowCount() > 1) {
-        m_userWnd = new UserWindow(this);
-        m_userWnd->setModel(m_usersModel);
-        connect(m_userWnd, SIGNAL(selectedChanged(QModelIndex)), this, SLOT(onSelectedUserChanged(QModelIndex)));
+        m_userWnd = new UsersView(this);
+        m_userWnd->setModel(m_usersModel.data());
+        connect(m_userWnd, &UsersView::userSelected, this, &GreeterWindow::onUserSelected);
     }
 
     //登录窗口
@@ -139,12 +139,13 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     //重新计算缩放比例
     scale = QString::number(size.width() / 1920.0, 'f', 1).toFloat();
     scale = scale > 0.5 ? scale : (width() >= 800 ? 0.5 : scale);
+
     //字体大小
     fontSize = scale > 0.5 ? 10 : 8;
 
     qDebug() << "GreeterWindow resize to " << size;
     if(m_userWnd){
-        m_userWnd->setFixedSize(1100 * scale, 130 * scale + 75);
+        m_userWnd->resize(USERSVIEW_WIDTH, USERSVIEW_HEIGHT);
         QRect userRect((rect().width()-m_userWnd->width())/2,
                        (rect().height()-m_userWnd->height())/2,
                        m_userWnd->width(), m_userWnd->height());
@@ -211,8 +212,9 @@ void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
 }
 
 
-void GreeterWindow::onSelectedUserChanged(const QModelIndex &index)
+void GreeterWindow::onUserSelected(const QModelIndex &index)
 {
+    qDebug() << index.data().toString();
     m_loginWnd->setUserIndex(index);
 
     switchWnd(1);

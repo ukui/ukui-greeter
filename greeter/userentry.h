@@ -4,12 +4,19 @@
 #include <QWidget>
 #include <QLabel>
 
+#define SHADOW_WIDTH (scale > 0.5 ? 10 : 5)
+#define FACE_WIDDTH (130 * scale)
+#define IMG_WIDTH (128 * scale)
+#define ENTRY_HEIGHT (FACE_WIDDTH + SHADOW_WIDTH * 2 + 45)
+#define ENTRY_WIDTH (130 * scale + SHADOW_WIDTH * 2)
+
+extern float scale;
 
 class UserEntry : public QWidget
 {
     Q_OBJECT
 public:
-    UserEntry(const QString &facePath, const QString &name, bool isLogin, QWidget *parent);
+    UserEntry(const QString &name, const QString &facePath, bool isLogin, QWidget *parent);
     UserEntry(QWidget *parent=0);
 
     void setFace(const QString &facePath);
@@ -30,6 +37,7 @@ private:
 
 signals:
     void clicked(const QString&);
+    void pressed();
 
 private:
     QLabel *m_faceLabel;
@@ -39,10 +47,10 @@ private:
     QString m_face;
     QString m_name;
     bool m_login;
-    bool m_selected;
+    int id;
+    static int count;
+    static int selectedId;
 };
-
-
 
 
 

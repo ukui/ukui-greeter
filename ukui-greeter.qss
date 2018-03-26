@@ -17,9 +17,6 @@ QLabel{
     color: white;
     font-family: "Ubuntu"
 }
-QPushButton::focus{
-    background-color:rgb(0, 0, 0, 50);
-}
 
 /* 返回按钮 */
 QPushButton#backButton{
@@ -130,17 +127,16 @@ QWidget#powerBorderWidget{
 QListWidget{
     background:transparent;
 }
-QListWidget::item{
+QListWidget::item#sessionsList{
     height:40px
 }
-QListWidget::item:hover{
+QListWidget::item:hover#sessionsList{
     background:rgb(150, 150, 150, 50);
     border:1px solid white;
     border-radius:4px;
 }
-QListWidget::item:selected{
+QListWidget::item:selected#sessionsList{
     background:rgb(0, 0, 0, 150);
     border:1px solid white;
     border-radius:4px;
 }
-

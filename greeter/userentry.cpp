@@ -20,40 +20,38 @@
 #include <QPainter>
 #include <QBrush>
 #include <QFile>
-#include <QFontMetrics>
-#include <QApplication>
 #include <QMouseEvent>
-#include <QVBoxLayout>
 #include <QDebug>
 #include "globalv.h"
 
+int UserEntry::count = 0;
+int UserEntry::selectedId = 0;
 
 UserEntry::UserEntry(const QString &name, const QString &facePath, bool isLogin, QWidget *parent)
     : QWidget(parent),
-      m_selected(false)
+      id(count++)
 {
     initUI();
 
-    m_faceLabel->installEventFilter(this);
-
-    setFace(facePath);
     setUserName(name);
+    setFace(facePath);
     setLogin(isLogin);
 }
 
 UserEntry::UserEntry(QWidget *parent)
-    : UserEntry("", "", false, parent)
+    : UserEntry("kylin", "", true, parent)
 {
+    setUserName("Kylin"+QString::number(id));
 }
 
 void UserEntry::initUI()
 {
     if (objectName().isEmpty())
-        setObjectName(QString::fromUtf8("Entry"));   
-//    setFixedSize(130 * scale + 20, 130 * scale + 75);//不能用resize，否则放到layout中时，如果layout加有stretch，则该widget显示不出来
+        setObjectName(QString::fromUtf8("Entry")+QString::number(id));
     m_faceLabel = new QLabel(this);
     m_faceLabel->setObjectName(QString::fromUtf8("faceLabel"));
     m_faceLabel->setScaledContents(true);
+    m_faceLabel->installEventFilter(this);
 
     m_nameLabel = new QLabel(this);
     m_nameLabel->setObjectName(QString::fromUtf8("nameLabel"));
@@ -68,12 +66,11 @@ void UserEntry::initUI()
 void UserEntry::paintEvent(QPaintEvent *event)
 {
     //绘制阴影边框
-    if(this->selected())
+    if(id == selectedId)
     {
-        int shadowWidth = scale > 0.5 ? 10 : 5;
         QRect rect = m_faceLabel->geometry();
-        QRect border(rect.left()-shadowWidth, rect.top()-shadowWidth,
-                     rect.width()+shadowWidth*2, rect.height()+shadowWidth*2);
+        QRect border(rect.left() - SHADOW_WIDTH, rect.top() - SHADOW_WIDTH,
+                     rect.width() + SHADOW_WIDTH*2, rect.height() + SHADOW_WIDTH*2);
 
         QPainter painter(this);
         painter.setPen(QPen(QColor(255, 255, 255, 0), 1));
@@ -85,16 +82,17 @@ void UserEntry::paintEvent(QPaintEvent *event)
 
 void UserEntry::resizeEvent(QResizeEvent *)
 {
-    int shadowWidth = scale > 0.5 ? 10 : 5;
-    QRect faceRect(shadowWidth, shadowWidth, 130*scale, 130*scale);
+    QRect faceRect(SHADOW_WIDTH, SHADOW_WIDTH, FACE_WIDDTH, FACE_WIDDTH);
     m_faceLabel->setGeometry(faceRect);
-    this->m_faceLabel->setPixmap(scaledPixmap(128*scale, 128*scale, m_face));
+    QPixmap pixmap(this->m_face);
+    pixmap = pixmap.scaled(IMG_WIDTH, IMG_WIDTH, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    this->m_faceLabel->setPixmap(pixmap);
 
-    QRect nameRect(shadowWidth, faceRect.bottom()+shadowWidth, 130*scale, 20);
+    QRect nameRect(SHADOW_WIDTH, faceRect.bottom() + SHADOW_WIDTH, FACE_WIDDTH, 20);
     m_nameLabel->setGeometry(nameRect);
     m_nameLabel->setFont(QFont("Ubuntu", fontSize));
 
-    QRect loginRect(shadowWidth, nameRect.bottom()+5, 130*scale, 20);
+    QRect loginRect(SHADOW_WIDTH, nameRect.bottom()+5, FACE_WIDDTH, 20);
     m_loginLabel->setGeometry(loginRect);
     m_loginLabel->setFont(QFont("Ubuntu", fontSize));
 }
@@ -105,14 +103,13 @@ bool UserEntry::eventFilter(QObject *obj, QEvent *event)
         if(event->type() == QEvent::MouseButtonPress){
             QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
             if(mouseEvent->button() == Qt::LeftButton){
-                this->setSelected();
+                Q_EMIT pressed();
                 return true;
             }
-        }
-        if(event->type() == QEvent::MouseButtonRelease){
+        } else if(event->type() == QEvent::MouseButtonRelease){
             QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
             if(mouseEvent->button() == Qt::LeftButton){
-                emit clicked(m_name);
+                onClicked();
                 return true;
             }
         }
@@ -132,7 +129,9 @@ void UserEntry::setFace(const QString &facePath)
     QFile faceFile(facePath);
     if(!faceFile.exists())
         this->m_face = ":/resource/default_face.png";
-    m_faceLabel->setPixmap(scaledPixmap(128*scale, 128*scale, m_face));
+    QPixmap pixmap(m_face);
+    pixmap = pixmap.scaled(IMG_WIDTH, IMG_WIDTH, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    m_faceLabel->setPixmap(pixmap);
 }
 
 const QString& UserEntry::userName()
@@ -156,19 +155,19 @@ void UserEntry::setUserName(const QString &name)
 void UserEntry::setLogin(bool isLogin)
 {
     if(m_login != isLogin)
-    {
         m_login = isLogin;
-        this->m_loginLabel->setText(m_login ? tr("logged in") : "");
-    }
+    this->m_loginLabel->setText(m_login ? tr("logged in") : "");
 }
 
 void UserEntry::setSelected(bool selected)
 {
-    this->m_selected = selected;
+    if(selected) {
+        selectedId = this->id;
+    }
     update();
 }
 
 bool UserEntry::selected()
 {
-    return this->m_selected;
+    return id == selectedId;
 }

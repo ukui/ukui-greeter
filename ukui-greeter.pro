@@ -23,33 +23,31 @@ SOURCES += \
     greeter/iconedit.cpp \
     greeter/loginwindow.cpp \
     greeter/main.cpp \
-    greeter/pagelistview.cpp \
-    greeter/userentry.cpp \
     greeter/usersmodel.cpp \
-    greeter/userwindow.cpp \
     greeter/greeterwrapper.cpp \
     greeter/globalv.cpp \
     greeter/screenmodel.cpp \
     greeter/mainwindow.cpp \
     greeter/sessionwindow.cpp \
     greeter/powerwindow.cpp \
-    greeter/proxymodel.cpp
+    greeter/proxymodel.cpp \
+    greeter/userentry.cpp \
+    greeter/usersview.cpp
 
 HEADERS  += \
     greeter/greeterwindow.h \
     greeter/iconedit.h \
     greeter/loginwindow.h \
-    greeter/pagelistview.h \
-    greeter/userentry.h \
     greeter/usersmodel.h \
-    greeter/userwindow.h \
     greeter/greeterwrapper.h \
     greeter/globalv.h \
     greeter/screenmodel.h \
     greeter/mainwindow.h \
     greeter/sessionwindow.h \
     greeter/powerwindow.h \
-    greeter/proxymodel.h
+    greeter/proxymodel.h \
+    greeter/userentry.h \
+    greeter/usersview.h
 
 CONFIG += c++11 debug
 

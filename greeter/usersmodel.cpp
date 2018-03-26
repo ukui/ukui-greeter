@@ -34,7 +34,7 @@ void UsersModel::setShowGuest(bool isShowGuest)
     m_showGuest = isShowGuest;
     if(m_showGuest)
     {
-        QStandardItem *guest = new QStandardItem(tr("Guest"));
+        QStandardItem *guest = new QStandardItem(tr("Guest Session"));
         guest->setData("*guest", QLightDM::UsersModel::NameRole);
         extraRowModel()->appendRow(guest);
     }
@@ -43,7 +43,7 @@ void UsersModel::setShowGuest(bool isShowGuest)
         QStandardItemModel *model = extraRowModel();
         for(int i = 0; i < model->rowCount(); i++){
             QStandardItem *item = model->item(i, 0);
-            if(item->text() == tr("Guest")){
+            if(item->text() == tr("Guest Session")){
                 model->removeRow(i);
             }
         }
