@@ -265,7 +265,6 @@ void GreeterWindow::switchWnd(int index)
         break;
     case 2:
         m_sessionWnd->show();
-//        m_sessionWnd->setFocus();
         break;
     default:
         break;
@@ -278,6 +277,11 @@ void GreeterWindow::switchWnd(int index)
  */
 void GreeterWindow::showPowerWnd()
 {
+    //如果已经打开了电源对话框则关闭
+    if(m_powerWnd && !m_powerWnd->isHidden()){
+        m_powerWnd->close();
+        return;
+    }
     //判断是否已经有用户登录
     bool hasOpenSessions = false;
     for(int i = 0; i < m_usersModel->rowCount(); i++) {
