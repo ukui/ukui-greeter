@@ -18,6 +18,8 @@ DEFINES += QT_MESSAGELOGCONTEXT \    #使用qInstallMessageHandler定制日志�
            RESOURCE_PATH=$${PREFIX} \
            QT_DISABLE_DEPRECATED_BEFORE=0
 
+include(display-switch/display-switch.pri)
+
 SOURCES += \
     greeter/greeterwindow.cpp \
     greeter/iconedit.cpp \
@@ -49,13 +51,12 @@ HEADERS  += \
     greeter/userentry.h \
     greeter/usersview.h
 
-CONFIG += c++11 debug
+CONFIG += c++11 debug link_pkgconfig
 
-INCLUDEPATH += /usr/include/lightdm-qt5-3
+QMAKE_CXXFLAGS += -Wdeprecated-declarations
 
-LIBS += /usr/lib/x86_64-linux-gnu/liblightdm-qt5-3.so \
-        /usr/lib/x86_64-linux-gnu/libX11.so.6 \
-        /usr/lib/x86_64-linux-gnu/libXrandr.so
+
+PKGCONFIG += liblightdm-qt5-3 x11 xrandr xtst
 
 RESOURCES += image.qrc
 
@@ -81,11 +82,3 @@ manfile.path = /usr/share/man/man1/
 target.path = /usr/sbin/
 
 INSTALLS += target configfile desktopfile resourcefiles qm_file manfile
-
-greaterThan(QT_MAJOR_VERSION, 4){
-    greaterThan(QT_MINOR_VERSION, 4){
-        DEFINES+=VERSION_ENOUGH
-    }
-}
-
-

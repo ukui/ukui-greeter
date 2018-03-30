@@ -126,6 +126,7 @@ QWidget#powerBorderWidget{
 
 QListWidget{
     background:transparent;
+    border: 0px;
 }
 QListWidget::item#sessionsList{
     height:40px
@@ -140,3 +141,36 @@ QListWidget::item:selected#sessionsList{
     border:1px solid white;
     border-radius:4px;
 }
+
+/**
+ * display-switch qss
+**/
+
+QLabel#bg_mode_1{
+    background-image:url(:res/btn1.png);
+}
+QLabel#bg_mode_2{
+    background-image:url(:res/btn2.png);
+}
+QLabel#bg_mode_3{
+    background-image:url(:res/btn3.png);
+}
+QLabel#bg_mode_4{
+    background-image:url(:res/btn4.png);
+}
+
+QLabel#lb_mode{
+    color:black;
+    font-family:'droid-fallback'
+}
+
+QLabel#split{
+    background-image:url(:res/split.png);
+    border:0px;
+}
+
+QPushButton#mode{
+    background-image:url(:res/hover.png);
+    border:0px;
+}
+

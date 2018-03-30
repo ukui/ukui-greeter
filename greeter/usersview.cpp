@@ -91,10 +91,8 @@ void UsersView::keyReleaseEvent(QKeyEvent *event)
     switch(event->key()) {
     case Qt::Key_Down:
     case Qt::Key_Right:
-        qDebug() << "current row: " << usersList->currentRow();
         if(usersList->currentRow() < usersList->count()-1)
             setCurrentRow(usersList->currentRow() + 1);
-        qDebug() << "current row: " << usersList->currentRow();
         break;
     case Qt::Key_Up:
     case Qt::Key_Left:

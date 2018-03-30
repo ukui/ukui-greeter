@@ -73,7 +73,6 @@ void PowerWindow::initUI()
         QFontMetrics fm(font);
         int textWide = fm.width(text2);
         lineNum = qCeil(textWide * 1.0 / m_centerWidget->width()) + 1 + lineNum;
-        qDebug() << lineNum;
     }
 
     m_borderWidget->setFixedHeight(280 + 20*lineNum);

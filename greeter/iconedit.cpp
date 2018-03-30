@@ -40,6 +40,13 @@ void TipEdit::paintEvent(QPaintEvent *event)
         drawTip();
     }
 }
+void TipEdit::keyPressEvent(QKeyEvent *event)
+{
+    /* 屏蔽掉按下Super键时的按键 */
+    if(event->modifiers() == Qt::META)
+        return;
+    return QLineEdit::keyPressEvent(event);
+}
 
 void TipEdit::keyReleaseEvent(QKeyEvent *event)
 {

@@ -24,43 +24,21 @@
 #include <QResource>
 #include <QTranslator>
 #include <QLocale>
-#include <QDesktopWidget>
-#include <QRect>
 #include <QDateTime>
 #include <QDebug>
 #include <QStandardPaths>
 #include <QX11Info>
-#include <QThread>
 #include <QProcess>
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
 #include <X11/extensions/Xrandr.h>
 #include "globalv.h"
 #include "mainwindow.h"
+#include "display-switch/displayswitch.h"
+
 
 QString configFile;
 QLocale::Language language;
-
-void waitMonitorsReady()
-{
-    int n;
-    Display *dpy = XOpenDisplay(NULL);
-    int screen = DefaultScreen(dpy);
-    Window root = RootWindow(dpy, screen);
-    while(true){
-        XRRGetMonitors(dpy, root, false, &n);
-        if(n == -1)
-            qWarning() << "get monitors failed";
-        else if(n > 0){
-            qDebug() << "found " << n << " monitors";
-            return;
-        }
-        //启动xrandr，打开视频输出， 自动设置最佳分辨率
-        QProcess enableMonitors;
-        enableMonitors.start("xrandr --auto");
-        enableMonitors.waitForFinished(-1);
-    }
-}
 
 void outputMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -72,7 +50,7 @@ void outputMessage(QtMsgType type, const QMessageLogContext &context, const QStr
     case QtDebugMsg:
         fprintf(stderr, "%s Debug: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
         break;
-#ifdef VERSION_ENOUGH
+#if QT_VERSION >= QT_VERSION_CHECK(5, 5, 0)
     case QtInfoMsg:
         fprintf(stderr, "%s Info: %s:%u: %s\n", time.constData(), context.file, context.line, localMsg.constData());
         break;
@@ -88,6 +66,27 @@ void outputMessage(QtMsgType type, const QMessageLogContext &context, const QStr
         abort();
     }
 
+}
+
+void waitMonitorsReady()
+{
+    int n;
+//    Display *dpy = XOpenDisplay(NULL);
+//    int screen = DefaultScreen(dpy);
+//    Window root = RootWindow(dpy, screen);
+    while(true){
+        XRRGetMonitors(QX11Info::display(), QX11Info::appRootWindow(), false, &n);
+        if(n == -1)
+            qWarning() << "get monitors failed";
+        else if(n > 0){
+            qDebug() << "found " << n << " monitors";
+            return;
+        }
+        //启动xrandr，打开视频输出， 自动设置最佳分辨率
+        QProcess enableMonitors;
+        enableMonitors.start("xrandr --auto");
+        enableMonitors.waitForFinished(-1);
+    }
 }
 
 int main(int argc, char *argv[])
@@ -133,6 +132,9 @@ int main(int argc, char *argv[])
     w.show();
     //在没有窗口管理器的情况下，需要激活窗口，行为类似于用鼠标点击窗口
     w.activateWindow();
+
+    DisplaySwitch ds(&w);
+    ds.connect(&w, &MainWindow::activeScreenChanged, &ds, &DisplaySwitch::onPositionChanged);
 
     return a.exec();
 }

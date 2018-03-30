@@ -21,6 +21,7 @@
 #include <QApplication>
 #include <QPainter>
 #include <QMouseEvent>
+#include <QKeyEvent>
 #include <QDebug>
 #include <QDir>
 #include "globalv.h"
@@ -36,15 +37,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     //设置窗口大小
     QDesktopWidget *dw = QApplication::desktop();
-    resize(dw->rect().width(), dw->rect().height());
+    setFixedSize(dw->rect().width(), dw->rect().height());
+    qDebug() << geometry();
 
     //设置监控鼠标移动
     setMouseTracking(true);
 
     //激活屏幕(即Greeter窗口所在屏幕位置)
-    m_activeScreen = dw->primaryScreen();
     m_greeterWnd = new GreeterWindow(this);
-    m_greeterWnd->setGeometry(m_screenModel->index(m_activeScreen, 0).data(Qt::UserRole).toRect());
+    moveToScreen(dw->primaryScreen());
     m_greeterWnd->initUI();
 
     //logo
@@ -55,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent)
     QStringList names{"background*"};
     QStringList files = dir.entryList(names, QDir::Files);
     if(files.size() > 0)
-        m_background.load(IMAGE_DIR + files[0]);
+        backgroundPath = IMAGE_DIR + files[0];
 }
 
 void MainWindow::paintEvent(QPaintEvent *e)
@@ -63,11 +64,9 @@ void MainWindow::paintEvent(QPaintEvent *e)
     for(int i = 0; i < m_screenModel->rowCount(); i++){
         //在每个屏幕上绘制背景
         QRect rect = m_screenModel->index(i, 0).data(Qt::UserRole).toRect();
-        m_background = m_background.scaled(rect.width(), rect.height(),
-                                       Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+        QPixmap background = scaledPixmap(rect.width(), rect.height(), backgroundPath);
         QPainter painter(this);
-        painter.setBrush(QBrush(m_background));
-        painter.drawRect(rect);
+        painter.drawPixmap(rect, background);
         //绘制logo
         painter.setOpacity(0.5);
         QRect logoRect(rect.left(), rect.bottom()-80, m_logo.width(), m_logo.height());
@@ -77,8 +76,8 @@ void MainWindow::paintEvent(QPaintEvent *e)
         if(i != m_activeScreen)
         {
             QPixmap cof(":/resource/cof.png");
-            QRect cofRect((rect.left()+rect.width()-cof.width())/2,
-                          (rect.top()+rect.height()-cof.height())/2,
+            QRect cofRect(rect.left() + (rect.width()-cof.width())/2,
+                          rect.top() + (rect.height()-cof.height())/2,
                           cof.width(), cof.height());
             painter.drawPixmap(cofRect, cof);
         }
@@ -101,12 +100,14 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
             curScreen = i;
         }
     } 
-    if(curScreen != m_activeScreen && curScreen > 0){
+    if(curScreen != m_activeScreen && curScreen >= 0){
         qDebug() << "active screen: from " << m_activeScreen << "to " << curScreen;
+        Q_EMIT activeScreenChanged(QRect(m_screenModel->index(curScreen, 0).data(Qt::UserRole).toRect()));
         moveToScreen(curScreen);
     }
     return QWidget::mouseMoveEvent(e);
 }
+
 
 /**
  * @brief MainWindow::onScreenResized
@@ -119,8 +120,11 @@ void MainWindow::onScreenResized(const QModelIndex &topLeft, const QModelIndex &
     Q_UNUSED(topLeft)
     Q_UNUSED(bottomRight)
     QDesktopWidget *dw = QApplication::desktop();
-    resize(dw->width(), dw->height());
-    update();
+    setFixedSize(dw->width(), dw->height());
+    move(0, 0);
+    qDebug() << "screen resize to " << dw->geometry();
+
+    qDebug() << m_activeScreen;
     moveToScreen(m_activeScreen);
 }
 
@@ -130,10 +134,10 @@ void MainWindow::onScreenResized(const QModelIndex &topLeft, const QModelIndex &
  */
 void MainWindow::onScreenCountChanged()
 {
+    qDebug() << "screen count changed to " << m_screenModel->rowCount();
     QDesktopWidget *dw = QApplication::desktop();
-    resize(dw->width(), dw->height());
-    qDebug() << "screen changed to " << rect();
-    update();
+    setFixedSize(dw->width(), dw->height());
+    move(0, 0);
     moveToScreen(dw->primaryScreen());
 }
 

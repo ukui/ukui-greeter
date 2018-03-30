@@ -36,6 +36,7 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
+    void keyPressEvent(QKeyEvent *) Q_DECL_OVERRIDE;
     void keyReleaseEvent(QKeyEvent *) Q_DECL_OVERRIDE;
     void focusInEvent(QFocusEvent *) Q_DECL_OVERRIDE;
 

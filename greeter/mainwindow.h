@@ -33,7 +33,8 @@ public:
     void mouseMoveEvent(QMouseEvent *);
 
 signals:
-    void capslockChanged(bool);
+//    void capslockChanged(bool);
+    void activeScreenChanged(const QRect& rect);
 
 public slots:
     void onScreenResized(const QModelIndex&, const QModelIndex&);
@@ -45,7 +46,7 @@ private:
     GreeterWindow   *m_greeterWnd;
     int              m_activeScreen;
     QPixmap          m_logo;
-    QPixmap          m_background;
+    QString          backgroundPath;
 };
 
 #endif // MAINWINDOW_H

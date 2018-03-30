@@ -45,5 +45,6 @@ extern QLocale::Language language;
 QPixmap scaledPixmap(int width, int height, QString url);
 QPixmap logoGenerator(const QString &);
 QString getSystemVersion();
+void waitMonitorsReady();
 #endif // GLOBALV_H
 

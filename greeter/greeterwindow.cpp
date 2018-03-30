@@ -17,19 +17,13 @@
  * 02110-1301, USA.
 **/
 #include "greeterwindow.h"
-#include <QApplication>
-#include <QDesktopWidget>
-#include <QMouseEvent>
-#include <QVBoxLayout>
 #include <QMenu>
 #include <QDebug>
 #include <QProcess>
+#include <QStandardPaths>
+#include <QResizeEvent>
 #include <QtDBus/QDBusInterface>
 #include <QtDBus/QDBusConnection>
-#include <QStandardPaths>
-#include <QScreen>
-#include <QPropertyAnimation>
-#include <QGraphicsOpacityEffect>
 #include <QLightDM/SessionsModel>
 #include "globalv.h"
 #include "loginwindow.h"
@@ -144,6 +138,8 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     fontSize = scale > 0.5 ? 10 : 8;
 
     qDebug() << "GreeterWindow resize to " << size;
+    qDebug() << "scale: " << scale;
+
     if(m_userWnd){
         m_userWnd->resize(USERSVIEW_WIDTH, USERSVIEW_HEIGHT);
         QRect userRect((rect().width()-m_userWnd->width())/2,

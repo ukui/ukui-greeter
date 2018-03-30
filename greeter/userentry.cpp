@@ -84,9 +84,7 @@ void UserEntry::resizeEvent(QResizeEvent *)
 {
     QRect faceRect(SHADOW_WIDTH, SHADOW_WIDTH, FACE_WIDDTH, FACE_WIDDTH);
     m_faceLabel->setGeometry(faceRect);
-    QPixmap pixmap(this->m_face);
-    pixmap = pixmap.scaled(IMG_WIDTH, IMG_WIDTH, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-    this->m_faceLabel->setPixmap(pixmap);
+    m_faceLabel->setPixmap(scaledPixmap(IMG_WIDTH, IMG_WIDTH, m_face));
 
     QRect nameRect(SHADOW_WIDTH, faceRect.bottom() + SHADOW_WIDTH, FACE_WIDDTH, 20);
     m_nameLabel->setGeometry(nameRect);
@@ -129,9 +127,7 @@ void UserEntry::setFace(const QString &facePath)
     QFile faceFile(facePath);
     if(!faceFile.exists())
         this->m_face = ":/resource/default_face.png";
-    QPixmap pixmap(m_face);
-    pixmap = pixmap.scaled(IMG_WIDTH, IMG_WIDTH, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-    m_faceLabel->setPixmap(pixmap);
+    m_faceLabel->setPixmap(scaledPixmap(IMG_WIDTH, IMG_WIDTH, m_face));
 }
 
 const QString& UserEntry::userName()

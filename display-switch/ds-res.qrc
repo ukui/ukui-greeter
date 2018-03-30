@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/bg.png</file>
+        <file>res/bg2.png</file>
+        <file>res/bg_f5.png</file>
+        <file>res/btn1.png</file>
+        <file>res/btn2.png</file>
+        <file>res/btn3.png</file>
+        <file>res/btn4.png</file>
+        <file>res/bt_off.png</file>
+        <file>res/bt_on.png</file>
+        <file>res/hover.png</file>
+        <file>res/hover2.png</file>
+        <file>res/hover3.png</file>
+        <file>res/split.png</file>
+        <file>res/touchpad-off.png</file>
+        <file>res/touchpad-on.png</file>
+        <file>res/wifi_off.png</file>
+        <file>res/wifi-off_.png</file>
+        <file>res/wifi_on.png</file>
+        <file>res/wifi-on_.png</file>
+    </qresource>
+</RCC>
