@@ -124,7 +124,6 @@ void MainWindow::onScreenResized(const QModelIndex &topLeft, const QModelIndex &
     move(0, 0);
     qDebug() << "screen resize to " << dw->geometry();
 
-    qDebug() << m_activeScreen;
     moveToScreen(m_activeScreen);
 }
 

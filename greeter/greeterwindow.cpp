@@ -22,6 +22,7 @@
 #include <QProcess>
 #include <QStandardPaths>
 #include <QResizeEvent>
+#include <QWindow>
 #include <QtDBus/QDBusInterface>
 #include <QtDBus/QDBusConnection>
 #include <QLightDM/SessionsModel>
@@ -30,6 +31,7 @@
 #include "usersview.h"
 #include "usersmodel.h"
 #include "powerwindow.h"
+#include <X11/Xlib.h>
 
 float scale;
 int fontSize;
@@ -351,10 +353,17 @@ void GreeterWindow::showBoard()
 {
     if(m_board == nullptr){
         m_board = new QProcess();
-        QString program(QStandardPaths::findExecutable("onboard"));
-        QStringList arg{"--xid"};
-        m_board->setArguments(arg);
-        m_board->start(program);
+        m_board->start("/bin/sh -c onboard --xid");
+        connect(m_board, &QProcess::readyReadStandardOutput, this, [&]{
+            QByteArray output = m_board->readAllStandardOutput();
+            unsigned xid = output.trimmed().toInt();
+            qDebug() << "onBoard xid: " << xid;
+            QWindow *boardWind = QWindow::fromWinId(xid);
+            m_boardWidget = QWidget::createWindowContainer(boardWind, this, Qt::ForeignWindow);
+            m_boardWidget->setFixedSize(width(), 200);
+            m_boardWidget->move(0, height() - 200);
+            m_boardWidget->show();
+        });
     }
 
     if(m_board->state() == QProcess::Running){

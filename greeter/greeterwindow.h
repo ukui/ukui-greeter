@@ -67,10 +67,10 @@ private:
     QPushButton     *m_languageLB;
     QMenu           *m_languageMenu;
     QProcess        *m_board;
+    QWidget         *m_boardWidget;
     QSharedPointer<UsersModel> m_usersModel;
     QSharedPointer<QAbstractItemModel> m_sessionsModel;
     QSharedPointer<GreeterWrapper> m_greeter;
-    qreal            m_opacity;
     bool             m_show;
 };
 
