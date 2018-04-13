@@ -32,6 +32,10 @@
 #include "iconedit.h"
 #include "greeterwrapper.h"
 
+class BioDeviceView;
+class BioAuthenticationView;
+struct DeviceInfo;
+
 class LoginWindow : public QWidget
 {
     Q_OBJECT
@@ -60,6 +64,7 @@ private:
     void saveLastLoginUser();
     void backToUsers();
     void clearMessage();
+    bool enableBioAuthentication(QString &message);
 
 protected:
     void showEvent(QShowEvent *);
@@ -80,6 +85,9 @@ public slots:
     void onAuthenticationComplete();
     void onLogin(const QString &str);
     void onSessionButtonClicked();
+    void onBioStartVerification(const DeviceInfo& deviceInfo);
+    void onBioAuthenticationReslut(bool result);
+    void onBioBackToPassword();
 
 private:
     QSharedPointer<QAbstractItemModel> m_usersModel;
@@ -87,9 +95,11 @@ private:
     QSharedPointer<GreeterWrapper> m_greeter;
     QString     m_session;  //session的标识
     QString     m_name;     //m_nameLabel显示的是全名(显示的),m_name保存的是真名(用于登录的)
+    qint32      m_uid;      //用户id
     QSettings  *m_config;
     QTimer     *m_timer;
     QPixmap     m_waiting;
+    bool        isManual;   //设置该标志的原因是判断是不是手动输入用户，如果输入了无法登录的用户，就会一直输出密码错误信息
 
     // UI
     QPushButton *m_backLabel;         //返回用户列表
@@ -99,6 +109,9 @@ private:
     QLabel      *m_isLoginLabel;      //提示是否已登录
     QVector<QLabel*> m_messageLabels;      //提示信息
     IconEdit   *m_passwordEdit;       //密码输入框
+    BioDeviceView *bioDeviceView;      //生物识别设备列表窗口
+    BioAuthenticationView *bioAuthenticationView;   //生物识别窗口
+    QPushButton *bioButton;
 };
 
 #endif // LOGINWINDOW_H

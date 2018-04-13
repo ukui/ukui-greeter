@@ -27,13 +27,18 @@
 #include <QWindow>
 #include <QLightDM/SessionsModel>
 #include "globalv.h"
+#include "bio-verify/biodeviceview.h"
+#include "bio-verify/bioauthenticationview.h"
 
 LoginWindow::LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent)
     : QWidget(parent),
       m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions, this)),
       m_greeter(greeter),
       m_config(new QSettings(configFile, QSettings::IniFormat)),
-      m_timer(new QTimer(this))
+      m_timer(new QTimer(this)),
+      isManual(false),
+      bioAuthenticationView(nullptr),
+      bioButton(nullptr)
 {    
     initUI();
     connect(m_greeter.data(), SIGNAL(showMessage(QString,QLightDM::Greeter::MessageType)),
@@ -52,7 +57,6 @@ void LoginWindow::initUI()
 {
     if (this->objectName().isEmpty())
         this->setObjectName(QStringLiteral("this"));
-    this->resize(520, 135);
 
     /* 返回按钮 */
     m_backLabel = new QPushButton(this);
@@ -100,6 +104,18 @@ void LoginWindow::initUI()
     m_passwordEdit->installEventFilter(this);
     m_passwordEdit->hide(); //收到请求密码的prompt才显示出来
     connect(m_passwordEdit, SIGNAL(clicked(const QString&)), this, SLOT(onLogin(const QString&)));
+
+    /* 生物识别窗口 */
+    bioDeviceView = new BioDeviceView(0, this);
+    bioDeviceView->setObjectName(QStringLiteral("bioDeviceView"));
+    QRect bdvRect(220, 132 - BIODEVICEVIEW_HEIGHT, BIODEVICEVIEW_WIDTH, BIODEVICEVIEW_HEIGHT);
+    bioDeviceView->setGeometry(bdvRect);
+    bioDeviceView->hide();
+    connect(bioDeviceView, &BioDeviceView::startVerification, this, &LoginWindow::onBioStartVerification);
+    connect(bioDeviceView, &BioDeviceView::backToPasswd, this, &LoginWindow::onBioBackToPassword);
+
+
+    this->setFixedSize(220+350, 135);
 }
 
 void LoginWindow::showEvent(QShowEvent *e)
@@ -126,12 +142,16 @@ void LoginWindow::keyReleaseEvent(QKeyEvent *event)
  */
 void LoginWindow::recover()
 {
+    isManual = false;
     m_nameLabel->clear();
     m_isLoginLabel->clear();
     m_passwordEdit->clear();
     m_passwordEdit->setType(QLineEdit::Password);
     m_passwordEdit->hide();
     m_passwordEdit->setWaiting(false);
+    bioDeviceView->hide();
+    if(bioButton)
+        bioButton->hide();
     clearMessage();
 }
 
@@ -311,6 +331,9 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
     if(!index.isValid()){
         return false;
     }
+    //先清空设置
+    recover();
+
     //设置用户名
     QString name = index.data(Qt::DisplayRole).toString();
     m_name = index.data(QLightDM::UsersModel::NameRole).toString();
@@ -329,6 +352,9 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
         m_sessionLabel->show();
         setSession(index.data(QLightDM::UsersModel::SessionRole).toString());
     }
+    //设置生物识别设备窗口的uid
+    m_uid = index.data(QLightDM::UsersModel::UidRole).toInt();
+
     m_passwordEdit->hide();
     startAuthentication();
 
@@ -451,18 +477,27 @@ void LoginWindow::saveLastLoginUser()
 void LoginWindow::onLogin(const QString &str)
 {
     clearMessage();
-//    QString name = m_nameLabel->text();
-    qDebug() << str;
+
     if(m_name == "*guest") {
         m_greeter->authenticateAsGuest();
     }
     else if(m_name == "*login") {   //用户输入用户名
+        isManual = true;
         m_name = str;
+        //获取该用户的uid
+        for(int i = 0; i < m_usersModel->rowCount(); i++){
+            QModelIndex index = m_usersModel->index(i, 0);
+            QString name = index.data(QLightDM::UsersModel::NameRole).toString();
+            if(name == m_name){
+                setUserIndex(index);
+                return;
+            }
+        }
         m_nameLabel->setText(str);
         m_passwordEdit->setText("");
         m_passwordEdit->setType(QLineEdit::Password);
-        m_greeter->authenticate(str);
-        qDebug() << "login: " << str;
+
+        startAuthentication();
     }
     else {  //发送密码
         m_greeter->respond(str);
@@ -477,14 +512,10 @@ void LoginWindow::onLogin(const QString &str)
 void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
 {
     qDebug()<< "prompt: "<< text;
-//    if(text == "") {    //显示生物识别窗口
-//        int bioWid;
-//        QWindow *bioWindow = QWindow::fromWinId(bioWid);
-//        QWidget *bioWidget = QWidget::createWindowContainer(bioWindow, this, Qt::Widget);
-//        bioWidget->setGeometry(m_passwordEdit->geometry());
-//        bioWidget->show();
-//        return;
-//    }
+
+    if(enableBioAuthentication(text))
+        return;
+
     if(m_timer->isActive())
         stopWaiting();
     if(!text.isEmpty())
@@ -508,6 +539,7 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
 void LoginWindow::onShowMessage(QString text, QLightDM::Greeter::MessageType type)
 {
     qDebug()<< "message: "<< text;
+
     int lineNum = text.count('\n') + 1;
     int height = 20 * lineNum;  //label的高度
     if(m_messageLabels.size() >= 1) {
@@ -538,14 +570,110 @@ void LoginWindow::onAuthenticationComplete()
 {
     stopWaiting();
     if(m_greeter->isAuthenticated()) {
+        // 认证成功，启动session
         qDebug()<< "authentication success";
         saveLastLoginUser();
         m_greeter->startSession();
     } else {
+        // 认证失败，重新开始用户的认证
         qDebug() << "authentication failed";
         onShowMessage(tr("Incorrect password, please input again"), QLightDM::Greeter::MessageTypeError);
         m_passwordEdit->clear();
-        m_greeter->authenticate(m_name);
+
+        //如果用户输入了不存在的用户名导致的认证失败，让用户重新输入用户名
+        if(isManual)
+            m_name = "*login";
+        startAuthentication();
     }
 }
 
+/**
+ * @brief LoginWindow::enableBioAuthentication
+ * @param message
+ * 确定是否启用生物识别认证
+ * 同时满足以下条件才会启用生物识别认证：
+ *   1. 收到生物识别PAM模块的消息；
+ *   2. 存在生物识别设备，且可用；
+ *   3. 设备录入了生物识别特征
+ */
+bool LoginWindow::enableBioAuthentication(QString &prompt)
+{
+    /* 是否是来自生物识别PAM模块的消息 */
+    if(prompt != BIOMETRIC_PAM)
+        return false;
+    /* 该用户是否有录入了生物特征的可用设备 */
+    bioDeviceView->setUid(m_uid);
+    if(prompt == BIOMETRIC_PAM &&
+       bioDeviceView->usedDeviceNum() > 0) {
+        qDebug() << "启用生物识别认证";
+        onShowMessage(tr("Please select the type of authentication"),
+                      QLightDM::Greeter::MessageTypeInfo);
+
+        m_passwordEdit->hide();
+        if(bioButton && !bioButton->isHidden())
+            bioButton->hide();
+        bioDeviceView->show();
+    } else{
+        qDebug() << "直接进入密码认证";
+        m_greeter->respond(BIOMETRIC_IGNORE);
+    }
+    return true;
+}
+
+void LoginWindow::onBioStartVerification(const DeviceInfo &deviceInfo)
+{
+    this->hide();
+
+    int uid = 0;
+    for(int i = 0; i < m_usersModel->rowCount(); i++) {
+        QModelIndex index = m_usersModel->index(i, 0);
+        QString userName = index.data(QLightDM::UsersModel::NameRole).toString();
+        if(userName == m_name) {
+            uid = index.data(QLightDM::UsersModel::UidRole).toInt();
+            break;
+        }
+    }
+
+    if(bioAuthenticationView == nullptr)
+    {
+        bioAuthenticationView = new BioAuthenticationView(parentWidget());
+        connect(bioAuthenticationView, &BioAuthenticationView::authenticationResult,
+                this, &LoginWindow::onBioAuthenticationReslut);
+        connect(bioAuthenticationView, &BioAuthenticationView::back, this, [&]{
+           this->show();
+            bioDeviceView->setFocus();
+        });
+    }
+    bioAuthenticationView->setUid(uid);
+    bioAuthenticationView->setDeviceInfo(deviceInfo);
+    bioAuthenticationView->startVerification();
+}
+
+void LoginWindow::onBioBackToPassword()
+{
+    clearMessage();
+    m_greeter->respond(BIOMETRIC_IGNORE);
+    bioDeviceView->hide();
+
+    bioButton = new QPushButton(this);
+    bioButton->setObjectName(QStringLiteral("bioButton"));
+    QRect bioBtnRect(m_passwordEdit->geometry().right() + 5,
+                     m_passwordEdit->geometry().top() + 1,
+                     38, 38);
+    bioButton->setGeometry(bioBtnRect);
+    bioButton->setIcon(QIcon(":/resource/fingerprint-icon.png"));
+    bioButton->setIconSize(QSize(38,38));
+    bioButton->show();
+    connect(bioButton, &QPushButton::clicked, this, &LoginWindow::startAuthentication);
+}
+
+void LoginWindow::onBioAuthenticationReslut(bool result)
+{
+    if(result){
+        qDebug() << "biometric authentication success";
+        /* 返回消息给生物识别PAM模块 */
+        m_greeter->respond(BIOMETRIC_SUCESS);
+    } else {
+        qDebug() << "biometric authentication failed";
+    }
+}

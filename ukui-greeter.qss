@@ -4,7 +4,7 @@ QPushButton{
     border: none;
     outline: none;
     font-family: 'Ubuntu';
-    font-size: 22px;
+/*    font-size: 22px;*/
 }
 QPushButton:flat{
     border: none;
@@ -25,12 +25,12 @@ QPushButton#backButton{
 QPushButton::hover#backButton{
     background: url(:/resource/arrow_left_prelight.png);
 }
-QPushButton::focus#backButton{
+/*QPushButton::focus#backButton{
     background: url(:/resource/arrow_left_prelight.png);
-}
-QPushButton::pressed#backButton{
+}*/
+/*QPushButton::pressed#backButton{
     background: url(:/resource/arrow_left_active.png);
-}
+}*/
 /* session选择按钮 */
 QPushButton::hover#sessionButton{
     border-width: 2px;
@@ -70,6 +70,9 @@ QPushButton#loginButton{
 /* 登录错误提示 */
 QLabel#errorMsgLabel{
     color: rgb(255, 0, 0, 200);
+}
+QLabel#infoMsgLabel{
+    color: #27408B
 }
 /* 电源对话框关闭按钮 */
 QPushButton#close{
@@ -143,7 +146,7 @@ QListWidget::item:selected#sessionsList{
 }
 
 /**
- * display-switch qss
+ * 显示切换模块qss
 **/
 
 QLabel#bg_mode_1{
@@ -174,3 +177,38 @@ QPushButton#mode{
     border:0px;
 }
 
+/**
+ * 生物识别模块qss
+**/
+
+/*QLabel{
+    border:1px solid rgba(255, 255, 255, 100);
+}
+QLabel::hover{
+    background:white;
+}
+QLabel::focus{
+    background:white;
+}*/
+QPushButton#bioButton{
+    border:1px solid white
+}
+QPushButton::hover#bioButton{
+    background:white;
+}
+QPushButton#bioPrevButton{
+    background:url(:/resource/previous.png);
+    background-repeat:non-repeat;
+    border:1px solid rgba(0, 0, 0, 100)}
+QPushButton::hover#bioPrevButton{
+    background:url(:/resource/previous-hl.png);
+}
+
+QPushButton#bioNextButton{
+    background:url(:/resource/next.png);
+    background-repeat:non-repeat;
+    border:1px solid rgba(0, 0, 0, 100)；
+}
+QPushButton::hover#bioNextButton{
+    background:url(:/resource/previous-hl.png);
+}

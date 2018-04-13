@@ -93,8 +93,10 @@ int main(int argc, char *argv[])
 {
     qInstallMessageHandler(outputMessage);
     QApplication a(argc, argv);
+    a.setQuitOnLastWindowClosed(true);
 
     QResource::registerResource("image.qrc");
+    QResource::registerResource("bioverify.qrc");
 
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QTextCodec::setCodecForLocale(codec);

@@ -19,7 +19,7 @@ DEFINES += QT_MESSAGELOGCONTEXT \    #使用qInstallMessageHandler定制日志�
            QT_DISABLE_DEPRECATED_BEFORE=0
 
 include(display-switch/display-switch.pri)
-
+include(bio-verify/bio-verify.pri)
 SOURCES += \
     greeter/greeterwindow.cpp \
     greeter/iconedit.cpp \
@@ -58,7 +58,8 @@ QMAKE_CXXFLAGS += -Wdeprecated-declarations
 
 PKGCONFIG += liblightdm-qt5-3 x11 xrandr xtst
 
-RESOURCES += image.qrc
+RESOURCES += image.qrc \
+    qss.qrc
 
 TRANSLATIONS += translations/zh_CN.ts
 
