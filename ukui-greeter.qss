@@ -199,7 +199,8 @@ QPushButton::hover#bioButton{
 QPushButton#bioPrevButton{
     background:url(:/resource/previous.png);
     background-repeat:non-repeat;
-    border:1px solid rgba(0, 0, 0, 100)}
+    border:1px solid #026096;
+}
 QPushButton::hover#bioPrevButton{
     background:url(:/resource/previous-hl.png);
 }
@@ -207,8 +208,8 @@ QPushButton::hover#bioPrevButton{
 QPushButton#bioNextButton{
     background:url(:/resource/next.png);
     background-repeat:non-repeat;
-    border:1px solid rgba(0, 0, 0, 100)；
+    border:1px solid #026096；
 }
 QPushButton::hover#bioNextButton{
-    background:url(:/resource/previous-hl.png);
+    background:url(:/resource/next-hl.png);
 }

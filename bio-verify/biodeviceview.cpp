@@ -33,7 +33,7 @@ void BioDeviceView::setUid(qint32 uid)
     this->uid = uid;
     getFeaturesList();
 
-    deviceCount = deviceFeaturesNum.size() + 1;
+    deviceCount = savedFeaturesNum[uid] + 1;
 
 #ifdef TEST
     addTestDevices();
@@ -76,7 +76,12 @@ void BioDeviceView::getDevicesList()
  */
 void BioDeviceView::getFeaturesList()
 {
-    deviceFeaturesNum.clear();
+    if(savedFeaturesNum.contains(uid)){
+        qDebug() << "saved";
+        return;
+    }
+
+    savedFeaturesNum[uid] = 0;
 
     for(int i = 0; i < deviceInfos.size(); i++) {
         DeviceInfo *deviceInfo = deviceInfos.at(i);
@@ -87,10 +92,10 @@ void BioDeviceView::getFeaturesList()
             continue;
         }
         int featuresNum = msg.arguments().at(0).toInt();
-        if(featuresNum > 0)
-            deviceFeaturesNum[deviceInfo->device_id] = featuresNum;
+
+        savedFeaturesNum[uid] += featuresNum;
     }
-    qDebug() << "存在" << deviceFeaturesNum.size() << "个录入了生物特征额设备";
+    qDebug() << "存在" << savedFeaturesNum[uid] << "个录入了生物特征设备";
 }
 
 /**
@@ -110,7 +115,7 @@ int BioDeviceView::deviceNum()
  */
 int BioDeviceView::usedDeviceNum()
 {
-    return deviceFeaturesNum.size();
+    return savedFeaturesNum[uid];
 }
 
 void BioDeviceView::initUI()
@@ -125,12 +130,21 @@ void BioDeviceView::initUI()
     devicesList->setFocusPolicy(Qt::NoFocus);
     devicesList->setSelectionMode(QListWidget::NoSelection);
     devicesList->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    devicesList->setFixedHeight(ITEM_SIZE);
+    devicesList->setFixedSize(LISTWIDGET_WIDTH, LISTWIDGET_HEIGHT);
     connect(devicesList, &QListWidget::currentItemChanged, this, [&]{
         currentIndex = devicesList->currentRow();
         QListWidgetItem *item = devicesList->currentItem();
         devicesList->itemWidget(item)->setFocus();
+        setPromptText(currentIndex);
     });
+
+    int itemSize;
+    if(deviceCount <= MAX_NUM)
+        itemSize = (LISTWIDGET_WIDTH - deviceCount * 10) / deviceCount;
+    else
+        itemSize = (LISTWIDGET_WIDTH - MAX_NUM * 10) / MAX_NUM;
+#define LABEL_WIDTH itemSize
+#define ITEM_WIDTH (LABEL_WIDTH + 10)
 
     /* 为每一个设备添加一个icon到table中 */
     for(int i = 0; i < deviceCount; i++){
@@ -143,12 +157,12 @@ void BioDeviceView::initUI()
             iconName = QString(":/resource/%1-icon.png").arg(deviceType);
         }
 
-        QLabel *iconLabel = new QLabel(devicesList);
+        QLabel *iconLabel = new QLabel(this);
         iconLabel->setObjectName(QString("bioIconLabel")+QString::number(i));
         iconLabel->installEventFilter(this);
-        iconLabel->setFixedSize(ITEM_SIZE, ITEM_SIZE);
-        iconLabel->setStyleSheet("QLabel{border:1px solid rgba(255, 255, 255, 100);}"
-                                 "QLabel::hover{background:white;}"
+        iconLabel->setFixedSize(LABEL_WIDTH, ITEM_SIZE);
+        iconLabel->setStyleSheet("QLabel{border:1px solid #026096;}"
+                                 "QLabel::hover{background:rgb(255, 255, 255, 100);}"
                                  "QLabel::focus{background:white;}");
         QPixmap icon(iconName);
         icon = icon.scaled(ICON_SIZE, ICON_SIZE, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
@@ -156,14 +170,19 @@ void BioDeviceView::initUI()
         iconLabel->setAlignment(Qt::AlignCenter);
 
         QListWidgetItem *item = new QListWidgetItem(devicesList);
-        item->setSizeHint(QSize(ITEM_SIZE * 2, ITEM_SIZE));
+        item->setSizeHint(QSize(ITEM_WIDTH, ITEM_SIZE));
         devicesList->insertItem(i, item);
         devicesList->setItemWidget(item, iconLabel);
 
-        setCurrentRow(0);
     }
 
-    devicesList->resize(ITEM_SIZE*MAX_NUM*2, ITEM_SIZE);
+    promptLabel = new QLabel(this);
+    QRect promptLbRect(devicesList->geometry().left(),
+                       devicesList->geometry().bottom()+10,
+                       devicesList->width(), 40);
+    promptLabel->setGeometry(promptLbRect);
+
+    setCurrentRow(0);
 
     if(deviceCount > MAX_NUM) {
         prevButton = new QPushButton(this);
@@ -172,12 +191,16 @@ void BioDeviceView::initUI()
                           devicesList->geometry().bottom() - ARROW_SIZE,
                           ARROW_SIZE, ARROW_SIZE);
         prevButton->setGeometry(prevBtnRect);
+        prevButton->setFocusPolicy(Qt::NoFocus);
+        connect(prevButton, &QPushButton::clicked, this, &BioDeviceView::pageUp);
 
         nextButton = new QPushButton(this);
         nextButton->setObjectName(QStringLiteral("bioNextButton"));
         QRect nextBtnRect(prevBtnRect.right(), prevBtnRect.top(),
                           ARROW_SIZE, ARROW_SIZE);
         nextButton->setGeometry(nextBtnRect);
+        nextButton->setFocusPolicy(Qt::NoFocus);
+        connect(nextButton, &QPushButton::clicked, this, &BioDeviceView::pageDown);
     }
 
     resize(350, BIODEVICEVIEW_HEIGHT);
@@ -191,6 +214,12 @@ void BioDeviceView::keyReleaseEvent(QKeyEvent *event)
         break;
     case Qt::Key_Down:
         setCurrentRow(currentIndex+1);
+        break;
+    case Qt::Key_PageUp:
+        pageUp();
+        break;
+    case Qt::Key_PageDown:
+        pageDown();
         break;
     case Qt::Key_Return:
         onDeviceIconClicked(currentIndex);
@@ -209,14 +238,19 @@ void BioDeviceView::focusInEvent(QFocusEvent *event)
 bool BioDeviceView::eventFilter(QObject *obj, QEvent *event)
 {
     QString objName = obj->objectName();
-    if(objName.left(12) == "bioIconLabel" && event->type() == QEvent::MouseButtonRelease) {
-        QMouseEvent *e = static_cast<QMouseEvent*>(event);
-        if(e->button() == Qt::LeftButton){
-            int index = objName.right(objName.size() - 12).toInt();
-            qDebug() << index;
-            setCurrentRow(index);
-            onDeviceIconClicked(index);
-            return true;
+    if(objName.left(12) == "bioIconLabel"){
+        int index = objName.right(objName.size() - 12).toInt();
+        if(event->type() == QEvent::MouseButtonRelease) {
+            QMouseEvent *e = static_cast<QMouseEvent*>(event);
+            if(e->button() == Qt::LeftButton){
+                qDebug() << index;
+                setCurrentRow(index);
+                onDeviceIconClicked(index);
+                return true;
+            }
+        } else if(event->type() == QEvent::Enter){
+
+            setPromptText(index);
         }
     }
     return QWidget::eventFilter(obj, event);
@@ -227,8 +261,31 @@ void BioDeviceView::setCurrentRow(int row)
     if(row >= devicesList->count() || row < 0)
         return;
     currentIndex = row;
-    QListWidgetItem *item = devicesList->item(currentIndex);
-    devicesList->setCurrentItem(item);
+//    QListWidgetItem *item = devicesList->item(currentIndex);
+    devicesList->setCurrentRow(currentIndex);
+    setPromptText(currentIndex);
+}
+
+void BioDeviceView::setPromptText(int index)
+{
+    if(index == 0)
+        promptLabel->setText(tr("password login"));
+    else{
+        DeviceInfo *deviceInfo = deviceInfos.at(index-1);
+        QString deviceType;
+        switch(deviceInfo->biotype){
+        case BIOTYPE_FINGERPRINT:
+            deviceType = tr("fingerprint");
+            break;
+        case BIOTYPE_FINGERVEIN:
+            deviceType = tr("fingerevin");
+            break;
+        case BIOTYPE_IRIS:
+            deviceType = tr("iris");
+            break;
+        }
+        promptLabel->setText(deviceType + ": " + deviceInfo->device_fullname);
+    }
 }
 
 void BioDeviceView::onDeviceIconClicked(int index)
@@ -250,20 +307,35 @@ void BioDeviceView::onDeviceIconClicked(int index)
     DeviceInfo *deviceInfo = deviceInfos.at(index-1);
 
     Q_EMIT startVerification(*deviceInfo);
+}
 
+void BioDeviceView::pageUp()
+{
+    if(devicesList->currentRow() >= MAX_NUM)
+        setCurrentRow(currentIndex - MAX_NUM);
+    else
+        setCurrentRow(0);
+}
+
+void BioDeviceView::pageDown()
+{
+    if(devicesList->count() - devicesList->currentRow() >= MAX_NUM)
+        setCurrentRow(currentIndex + MAX_NUM);
+    else
+        setCurrentRow(devicesList->count()-1);
 }
 
 #ifdef TEST
 void BioDeviceView::addTestDevices()
 {
-    for(int i = 0; i < 3; i++){
+    for(int i = 0; i < 2; i++){
         DeviceInfo *info = new DeviceInfo;
         info->biotype = BIOTYPE_FINGERPRINT;
         info->driver_enable = 1;
         info->device_available = 1;
         deviceInfos.push_back(info);
     }
-    for(int i = 0; i < 3; i++){
+    for(int i = 0; i < 2; i++){
         DeviceInfo *info = new DeviceInfo;
         info->biotype = BIOTYPE_IRIS;
         info->driver_enable = 1;

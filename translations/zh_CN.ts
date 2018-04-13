@@ -7,6 +7,26 @@
         <source>password login&lt;&lt;</source>
         <translation type="vanished">密码登录&lt;&lt;</translation>
     </message>
+    <message>
+        <location filename="../bio-verify/biodeviceview.cpp" line="251"/>
+        <source>password login</source>
+        <translation>密码登录</translation>
+    </message>
+    <message>
+        <location filename="../bio-verify/biodeviceview.cpp" line="257"/>
+        <source>fingerprint</source>
+        <translation>指纹设备</translation>
+    </message>
+    <message>
+        <location filename="../bio-verify/biodeviceview.cpp" line="260"/>
+        <source>fingerevin</source>
+        <translation>指静脉设备</translation>
+    </message>
+    <message>
+        <location filename="../bio-verify/biodeviceview.cpp" line="263"/>
+        <source>iris</source>
+        <translation>虹膜设备</translation>
+    </message>
 </context>
 <context>
     <name>GreeterWindow</name>
@@ -50,18 +70,18 @@
 <context>
     <name>LoginWindow</name>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="238"/>
+        <location filename="../greeter/loginwindow.cpp" line="239"/>
         <source>logged in</source>
         <translation>已登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="428"/>
-        <location filename="../greeter/loginwindow.cpp" line="534"/>
+        <location filename="../greeter/loginwindow.cpp" line="429"/>
+        <location filename="../greeter/loginwindow.cpp" line="535"/>
         <source>login</source>
         <translation>登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="609"/>
+        <location filename="../greeter/loginwindow.cpp" line="613"/>
         <source>Please select the type of authentication</source>
         <translation>请选择认证方式</translation>
     </message>
@@ -74,12 +94,12 @@
         <translation type="vanished">游客登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="530"/>
+        <location filename="../greeter/loginwindow.cpp" line="531"/>
         <source>Password: </source>
         <translation>密码：</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="532"/>
+        <location filename="../greeter/loginwindow.cpp" line="533"/>
         <source>login:</source>
         <translation>登录：</translation>
     </message>
@@ -88,12 +108,12 @@
         <translation type="obsolete">密码：</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="580"/>
+        <location filename="../greeter/loginwindow.cpp" line="581"/>
         <source>Incorrect password, please input again</source>
         <translation>密码错误，请重新输入</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="206"/>
+        <location filename="../greeter/loginwindow.cpp" line="207"/>
         <source>Login</source>
         <translation>登录</translation>
     </message>

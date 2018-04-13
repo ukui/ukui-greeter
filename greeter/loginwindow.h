@@ -99,7 +99,12 @@ private:
     QSettings  *m_config;
     QTimer     *m_timer;
     QPixmap     m_waiting;
-    bool        isManual;   //设置该标志的原因是判断是不是手动输入用户，如果输入了无法登录的用户，就会一直输出密码错误信息
+    //手动输入用户标记，设置该标记的原因是判断是不是手动输入用户，
+    //如果输入了无法登录的用户，就会一直输出密码错误信息
+    bool        isManual;
+    //密码错误标记，设置该标志的原因是，在有生物识别模块的情况下用户选择了密码登录，输入了错误的密码，
+    //此时应该直接进入密码登录，而不是再次进入登录生物识别设备选择界面
+    bool        isPasswordError;
 
     // UI
     QPushButton *m_backLabel;         //返回用户列表
