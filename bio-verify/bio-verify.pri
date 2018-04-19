@@ -4,13 +4,15 @@ greaterThan(QT_MAJOR_VERSION, 4)
 
 HEADERS += \
     $$PWD/biodeviceview.h \
-    $$PWD/bioauthenticationview.h \
-    $$PWD/biocustomtype.h
+    $$PWD/biocustomtype.h \
+    $$PWD/biodevices.h \
+    $$PWD/bioauthentication.h
 
 SOURCES += \
     $$PWD/biodeviceview.cpp \
-    $$PWD/bioauthenticationview.cpp \
-    $$PWD/biocustomtype.cpp
+    $$PWD/biocustomtype.cpp \
+    $$PWD/biodevices.cpp \
+    $$PWD/bioauthentication.cpp
 
 RESOURCES += \
     $$PWD/bioverify.qrc

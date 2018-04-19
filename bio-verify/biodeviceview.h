@@ -5,8 +5,9 @@
 #include <QList>
 #include <QVector>
 #include "biocustomtype.h"
+#include "biodevices.h"
 
-#define TEST 1
+//#define TEST 1
 
 #define ICON_SIZE 32
 #define ITEM_SIZE (ICON_SIZE + 4)
@@ -15,13 +16,14 @@
 #define LISTWIDGET_WIDTH (ITEM_SIZE * MAX_NUM * 2)
 #define LISTWIDGET_HEIGHT ITEM_SIZE
 #define BIODEVICEVIEW_WIDTH (LISTWIDGET_WIDTH + ARROW_SIZE * 2)
-#define BIODEVICEVIEW_HEIGHT (ITEM_SIZE + 50)
+#define BIODEVICEVIEW_HEIGHT (ITEM_SIZE + 40)
 
 class QDBusInterface;
 class QTableWidget;
 class QLabel;
 class QListWidget;
 class QPushButton;
+class BioAuthentication;
 
 typedef QVector<QString> QStringVector;
 
@@ -31,11 +33,6 @@ class BioDeviceView : public QWidget
 
 public:
     explicit BioDeviceView(qint32 uid=0, QWidget *parent=nullptr);
-    void setUid(qint32 uid);
-    void getDevicesList();
-    void getFeaturesList();
-    int deviceNum();
-    int usedDeviceNum();
     void initUI();
     void pageUp();
     void pageDown();
@@ -46,6 +43,7 @@ public:
 protected:
     void keyReleaseEvent(QKeyEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);
+//    void showEvent(QShowEvent *event);
     void focusInEvent(QFocusEvent *event);
     void setCurrentRow(int row);
     void setPromptText(int index);
@@ -55,22 +53,23 @@ private slots:
 
 signals:
     void backToPasswd();
-    void startVerification(const DeviceInfo &deviceInfo);
+    void authenticationComplete(bool);
+    void notify(const QString& message);
 
 private:
 
     QListWidget         *devicesList;
     QLabel              *promptLabel;
+    QLabel              *notifyLabel;
     QPushButton         *prevButton;
     QPushButton         *nextButton;
 
     QStringVector       deviceTypes;
-    QDBusInterface      *serviceInterface;
-    QList<DeviceInfo*>  deviceInfos;
-    QMap<int, int>      savedFeaturesNum;       //[uid, featuresNum]
+    QList<DeviceInfo>   deviceInfos;
     qint32              uid;
     int                 deviceCount;
     int                 currentIndex;
+    BioAuthentication   *authControl;
 };
 
 #endif // BIODEVICEVIEW_H

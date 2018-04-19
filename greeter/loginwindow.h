@@ -33,7 +33,6 @@
 #include "greeterwrapper.h"
 
 class BioDeviceView;
-class BioAuthenticationView;
 struct DeviceInfo;
 
 class LoginWindow : public QWidget
@@ -85,9 +84,10 @@ public slots:
     void onAuthenticationComplete();
     void onLogin(const QString &str);
     void onSessionButtonClicked();
-    void onBioStartVerification(const DeviceInfo& deviceInfo);
+//    void onBioStartVerification(const DeviceInfo& deviceInfo);
     void onBioAuthenticationReslut(bool result);
     void onBioBackToPassword();
+    void onBioNotify(const QString &message);
 
 private:
     QSharedPointer<QAbstractItemModel> m_usersModel;
@@ -115,7 +115,6 @@ private:
     QVector<QLabel*> m_messageLabels;      //提示信息
     IconEdit   *m_passwordEdit;       //密码输入框
     BioDeviceView *bioDeviceView;      //生物识别设备列表窗口
-    BioAuthenticationView *bioAuthenticationView;   //生物识别窗口
     QPushButton *bioButton;
 };
 

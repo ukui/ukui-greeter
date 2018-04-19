@@ -28,7 +28,6 @@
 #include <QLightDM/SessionsModel>
 #include "globalv.h"
 #include "bio-verify/biodeviceview.h"
-#include "bio-verify/bioauthenticationview.h"
 
 LoginWindow::LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent)
     : QWidget(parent),
@@ -38,7 +37,7 @@ LoginWindow::LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent
       m_timer(new QTimer(this)),
       isManual(false),
       isPasswordError(false),
-      bioAuthenticationView(nullptr),
+      bioDeviceView(nullptr),
       bioButton(nullptr)
 {    
     initUI();
@@ -106,14 +105,7 @@ void LoginWindow::initUI()
     m_passwordEdit->hide(); //收到请求密码的prompt才显示出来
     connect(m_passwordEdit, SIGNAL(clicked(const QString&)), this, SLOT(onLogin(const QString&)));
 
-    /* 生物识别窗口 */
-    bioDeviceView = new BioDeviceView(0, this);
-    bioDeviceView->setObjectName(QStringLiteral("bioDeviceView"));
-    QRect bdvRect(220, 132 - LISTWIDGET_HEIGHT, BIODEVICEVIEW_WIDTH, BIODEVICEVIEW_HEIGHT);
-    bioDeviceView->setGeometry(bdvRect);
-    bioDeviceView->hide();
-    connect(bioDeviceView, &BioDeviceView::startVerification, this, &LoginWindow::onBioStartVerification);
-    connect(bioDeviceView, &BioDeviceView::backToPasswd, this, &LoginWindow::onBioBackToPassword);
+
 
 
     this->setFixedSize(220+350, 135 + BIODEVICEVIEW_HEIGHT);
@@ -150,7 +142,10 @@ void LoginWindow::recover()
     m_passwordEdit->setType(QLineEdit::Password);
     m_passwordEdit->hide();
     m_passwordEdit->setWaiting(false);
-    bioDeviceView->hide();
+    if(bioDeviceView){
+        delete bioDeviceView;
+        bioDeviceView = nullptr;
+    }
     if(bioButton)
         bioButton->hide();
     clearMessage();
@@ -356,7 +351,6 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
     //设置生物识别设备窗口的uid
     m_uid = index.data(QLightDM::UsersModel::UidRole).toInt();
 
-    m_passwordEdit->hide();
     startAuthentication();
 
     return true;
@@ -541,6 +535,12 @@ void LoginWindow::onShowMessage(QString text, QLightDM::Greeter::MessageType typ
 {
     qDebug()<< "message: "<< text;
 
+    //来自生物识别认证的消息
+    if(!bioDeviceView->isHidden()) {
+        clearMessage();
+
+    }
+
     int lineNum = text.count('\n') + 1;
     int height = 20 * lineNum;  //label的高度
     if(m_messageLabels.size() >= 1) {
@@ -605,18 +605,30 @@ bool LoginWindow::enableBioAuthentication(QString &prompt)
     if(prompt != BIOMETRIC_PAM)
         return false;
     /* 该用户是否有录入了生物特征的可用设备 */
-    bioDeviceView->setUid(m_uid);
-    if(!isPasswordError &&
-       prompt == BIOMETRIC_PAM &&
-       bioDeviceView->usedDeviceNum() > 0) {
-        qDebug() << "启用生物识别认证";
-        onShowMessage(tr("Please select the type of authentication"),
-                      QLightDM::Greeter::MessageTypeInfo);
+    /* 生物识别窗口 */
+    BioDevices bioDevices;
+    if(!isPasswordError && bioDevices.featuresNum(m_uid) > 0){
+        if(bioDeviceView == nullptr){
+            bioDeviceView = new BioDeviceView(m_uid, this);
+            bioDeviceView->setObjectName(QStringLiteral("bioDeviceView"));
+            QRect bdvRect(220, 132 - LISTWIDGET_HEIGHT, BIODEVICEVIEW_WIDTH, BIODEVICEVIEW_HEIGHT);
+            bioDeviceView->setGeometry(bdvRect);
+            bioDeviceView->hide();
+            connect(bioDeviceView, &BioDeviceView::authenticationComplete,
+                    this, &LoginWindow::onBioAuthenticationReslut);
+            connect(bioDeviceView, &BioDeviceView::backToPasswd,
+                    this, &LoginWindow::onBioBackToPassword);
+            connect(bioDeviceView, &BioDeviceView::notify,
+                    this, &LoginWindow::onBioNotify);
+        }
+        onShowMessage(tr("please select the type of authentication"), QLightDM::Greeter::MessageTypeInfo);
 
         m_passwordEdit->hide();
-        if(bioButton && !bioButton->isHidden())
+        if(bioButton)
             bioButton->hide();
         bioDeviceView->show();
+        bioDeviceView->setFocus();
+        qDebug() << "启用生物识别认证";
     } else{
         qDebug() << "直接进入密码认证";
         m_greeter->respond(BIOMETRIC_IGNORE);
@@ -625,54 +637,27 @@ bool LoginWindow::enableBioAuthentication(QString &prompt)
     return true;
 }
 
-void LoginWindow::onBioStartVerification(const DeviceInfo &deviceInfo)
-{
-    this->hide();
-
-    int uid = 0;
-    for(int i = 0; i < m_usersModel->rowCount(); i++) {
-        QModelIndex index = m_usersModel->index(i, 0);
-        QString userName = index.data(QLightDM::UsersModel::NameRole).toString();
-        if(userName == m_name) {
-            uid = index.data(QLightDM::UsersModel::UidRole).toInt();
-            break;
-        }
-    }
-
-    if(bioAuthenticationView == nullptr)
-    {
-        bioAuthenticationView = new BioAuthenticationView(parentWidget());
-        connect(bioAuthenticationView, &BioAuthenticationView::authenticationResult,
-                this, &LoginWindow::onBioAuthenticationReslut);
-        connect(bioAuthenticationView, &BioAuthenticationView::back, this, [&]{
-            this->show();
-            bioDeviceView->setFocus();
-        });
-    }
-    bioAuthenticationView->setUid(uid);
-    bioAuthenticationView->setDeviceInfo(deviceInfo);
-    bioAuthenticationView->startVerification();
-}
-
 void LoginWindow::onBioBackToPassword()
 {
     clearMessage();
     m_greeter->respond(BIOMETRIC_IGNORE);
     bioDeviceView->hide();
 
-    bioButton = new QPushButton(this);
-    bioButton->setObjectName(QStringLiteral("bioButton"));
-    QRect bioBtnRect(m_passwordEdit->geometry().right() + 5,
-                     m_passwordEdit->geometry().top() + 1,
-                     38, 38);
-    bioButton->setGeometry(bioBtnRect);
-    bioButton->setIcon(QIcon(":/resource/fingerprint-icon.png"));
-    bioButton->setIconSize(QSize(38,38));
+    if(bioButton == nullptr){
+        bioButton = new QPushButton(this);
+        bioButton->setObjectName(QStringLiteral("bioButton"));
+        QRect bioBtnRect(m_passwordEdit->geometry().right() + 5,
+                         m_passwordEdit->geometry().top() + 1,
+                         38, 38);
+        bioButton->setGeometry(bioBtnRect);
+        bioButton->setIcon(QIcon(":/resource/fingerprint-icon.png"));
+        bioButton->setIconSize(QSize(38,38));
+        connect(bioButton, &QPushButton::clicked, this, [&]{
+            clearMessage();
+            startAuthentication();
+        });
+    }
     bioButton->show();
-    connect(bioButton, &QPushButton::clicked, this, [&]{
-        clearMessage();
-        startAuthentication();
-    });
 }
 
 void LoginWindow::onBioAuthenticationReslut(bool result)
@@ -684,4 +669,10 @@ void LoginWindow::onBioAuthenticationReslut(bool result)
     } else {
         qDebug() << "biometric authentication failed";
     }
+}
+
+void LoginWindow::onBioNotify(const QString &message)
+{
+    if(!bioDeviceView->isHidden())
+        onShowMessage(message, QLightDM::Greeter::MessageTypeInfo);
 }

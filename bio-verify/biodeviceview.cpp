@@ -9,117 +9,33 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QKeyEvent>
-
+#include "bioauthentication.h"
 
 BioDeviceView::BioDeviceView(qint32 uid, QWidget *parent)
     : QWidget(parent),
+      devicesList(nullptr),
+      promptLabel(nullptr),
+      prevButton(nullptr),
+      nextButton(nullptr),
       uid(uid),
-      currentIndex(0)
+      currentIndex(0),
+      authControl(nullptr)
 {
-    qRegisterMetaType<DeviceInfo>();
+    BioDevices bioDevices;
+    deviceInfos = bioDevices.getAvaliableDevices(uid);
+    deviceCount = deviceInfos.size() + 1;
 
-    deviceTypes << "fingerprint" << "fingervein" << "iris";
-
-    serviceInterface = new QDBusInterface("cn.kylinos.Biometric", "/cn/kylinos/Biometric",
-                                          "cn.kylinos.Biometric", QDBusConnection::systemBus());
-    serviceInterface->setTimeout(2147483647);
-
-    getDevicesList();
-
-}
-
-void BioDeviceView::setUid(qint32 uid)
-{
-    this->uid = uid;
-    getFeaturesList();
-
-    deviceCount = savedFeaturesNum[uid] + 1;
-
-#ifdef TEST
-    addTestDevices();
-#endif
-
-    initUI();
-}
-
-/**
- * @brief BioDeviceView::getDevicesList
- * 获取设备列表
- */
-void BioDeviceView::getDevicesList()
-{
-    /* 返回值为 i -- int 和 av -- array of variant */
-    QDBusMessage msg = serviceInterface->call("GetDrvList");
-    if(msg.type() == QDBusMessage::ErrorMessage){
-        qDebug() << msg.errorMessage();
-        return;
+    if(deviceCount > 1){
+        deviceTypes << "fingerprint" << "fingervein" << "iris";
+        initUI();
     }
-    /* 设备数量 */
-    int deviceNum = msg.arguments().at(0).toInt();
-
-    /* 读取设备详细信息，并存储到列表中 */
-    QDBusArgument argument = msg.arguments().at(1).value<QDBusArgument>();
-    QList<QVariant> infos;
-    argument >> infos;
-    for(int i = 0; i < deviceNum; i++) {
-        DeviceInfo *deviceInfo = new DeviceInfo;
-        infos.at(0).value<QDBusArgument>() >> *deviceInfo;
-
-        if(deviceInfo->device_available > 0)     //设备可用
-            deviceInfos.push_back(deviceInfo);
-    }
-}
-
-/**
- * @brief BioDeviceView::getFeaturesList
- * 获取设备中的生物特征数量
- */
-void BioDeviceView::getFeaturesList()
-{
-    if(savedFeaturesNum.contains(uid)){
-        qDebug() << "saved";
-        return;
-    }
-
-    savedFeaturesNum[uid] = 0;
-
-    for(int i = 0; i < deviceInfos.size(); i++) {
-        DeviceInfo *deviceInfo = deviceInfos.at(i);
-        QDBusMessage msg = serviceInterface->call("GetFeatureList", QVariant(deviceInfo->device_id),
-                               QVariant(uid), QVariant(0), QVariant(-1));
-        if(msg.type() == QDBusMessage::ErrorMessage){
-            qDebug() << msg.errorMessage();
-            continue;
-        }
-        int featuresNum = msg.arguments().at(0).toInt();
-
-        savedFeaturesNum[uid] += featuresNum;
-    }
-    qDebug() << "存在" << savedFeaturesNum[uid] << "个录入了生物特征设备";
-}
-
-/**
- * @brief BioDeviceView::devicesNum
- * @return
- * 返回可用的生物识别设备的数量
- */
-int BioDeviceView::deviceNum()
-{
-    return deviceInfos.size();
-}
-
-/**
- * @brief BioDeviceView::featuresNum
- * @return
- * 返回录入了生物特征的可用生物识别设备的数量
- */
-int BioDeviceView::usedDeviceNum()
-{
-    return savedFeaturesNum[uid];
 }
 
 void BioDeviceView::initUI()
 {
+#ifdef TEST
+    addTestDevices();
+#endif
     /* 只为该用户显示录入了生物特征的设备 */
 
     devicesList = new QListWidget(this);
@@ -138,6 +54,7 @@ void BioDeviceView::initUI()
         setPromptText(currentIndex);
     });
 
+
     int itemSize;
     if(deviceCount <= MAX_NUM)
         itemSize = (LISTWIDGET_WIDTH - deviceCount * 10) / deviceCount;
@@ -152,10 +69,13 @@ void BioDeviceView::initUI()
         if(i == 0)
             iconName = QString(":/resource/password-icon.png");
         else{
-            DeviceInfo *deviceInfo = deviceInfos.at(i - 1);
-            QString deviceType = deviceTypes.at(deviceInfo->biotype);
+            DeviceInfo deviceInfo = deviceInfos.at(i - 1);
+            QString deviceType = deviceTypes.at(deviceInfo.biotype);
             iconName = QString(":/resource/%1-icon.png").arg(deviceType);
         }
+
+        QListWidgetItem *item = new QListWidgetItem(devicesList);
+        item->setSizeHint(QSize(ITEM_WIDTH, ITEM_SIZE));
 
         QLabel *iconLabel = new QLabel(this);
         iconLabel->setObjectName(QString("bioIconLabel")+QString::number(i));
@@ -169,41 +89,47 @@ void BioDeviceView::initUI()
         iconLabel->setPixmap(icon);
         iconLabel->setAlignment(Qt::AlignCenter);
 
-        QListWidgetItem *item = new QListWidgetItem(devicesList);
-        item->setSizeHint(QSize(ITEM_WIDTH, ITEM_SIZE));
         devicesList->insertItem(i, item);
         devicesList->setItemWidget(item, iconLabel);
-
     }
 
+    /* 设备名称提示 */
     promptLabel = new QLabel(this);
     QRect promptLbRect(devicesList->geometry().left(),
-                       devicesList->geometry().bottom()+10,
-                       devicesList->width(), 40);
+                       devicesList->geometry().bottom() + 10,
+                       devicesList->width(), 25);
     promptLabel->setGeometry(promptLbRect);
 
     setCurrentRow(0);
 
+    /* 操作提示 */
+    notifyLabel = new QLabel(this);
+    QRect notifyLbRect(promptLbRect.left(), promptLbRect.bottom() + 10,
+                       promptLbRect.width(), 25);
+    notifyLabel->setGeometry(notifyLbRect);
+    notifyLabel->setText("this is a notify label");
+
+    /* 翻页按键 */
     if(deviceCount > MAX_NUM) {
         prevButton = new QPushButton(this);
         prevButton->setObjectName(QStringLiteral("bioPrevButton"));
+        prevButton->setFocusPolicy(Qt::NoFocus);
+        connect(prevButton, &QPushButton::clicked, this, &BioDeviceView::pageUp);
         QRect prevBtnRect(devicesList->geometry().right(),
                           devicesList->geometry().bottom() - ARROW_SIZE,
                           ARROW_SIZE, ARROW_SIZE);
         prevButton->setGeometry(prevBtnRect);
-        prevButton->setFocusPolicy(Qt::NoFocus);
-        connect(prevButton, &QPushButton::clicked, this, &BioDeviceView::pageUp);
 
         nextButton = new QPushButton(this);
         nextButton->setObjectName(QStringLiteral("bioNextButton"));
+        nextButton->setFocusPolicy(Qt::NoFocus);
+        connect(nextButton, &QPushButton::clicked, this, &BioDeviceView::pageDown);
         QRect nextBtnRect(prevBtnRect.right(), prevBtnRect.top(),
                           ARROW_SIZE, ARROW_SIZE);
         nextButton->setGeometry(nextBtnRect);
-        nextButton->setFocusPolicy(Qt::NoFocus);
-        connect(nextButton, &QPushButton::clicked, this, &BioDeviceView::pageDown);
     }
 
-    resize(350, BIODEVICEVIEW_HEIGHT);
+    resize(BIODEVICEVIEW_WIDTH, BIODEVICEVIEW_HEIGHT);
 }
 
 void BioDeviceView::keyReleaseEvent(QKeyEvent *event)
@@ -227,7 +153,6 @@ void BioDeviceView::keyReleaseEvent(QKeyEvent *event)
     }
     return QWidget::keyReleaseEvent(event);
 }
-
 void BioDeviceView::focusInEvent(QFocusEvent *event)
 {
     QListWidgetItem *item = devicesList->item(currentIndex);
@@ -243,7 +168,6 @@ bool BioDeviceView::eventFilter(QObject *obj, QEvent *event)
         if(event->type() == QEvent::MouseButtonRelease) {
             QMouseEvent *e = static_cast<QMouseEvent*>(event);
             if(e->button() == Qt::LeftButton){
-                qDebug() << index;
                 setCurrentRow(index);
                 onDeviceIconClicked(index);
                 return true;
@@ -271,9 +195,9 @@ void BioDeviceView::setPromptText(int index)
     if(index == 0)
         promptLabel->setText(tr("password login"));
     else{
-        DeviceInfo *deviceInfo = deviceInfos.at(index-1);
+        DeviceInfo deviceInfo = deviceInfos.at(index-1);
         QString deviceType;
-        switch(deviceInfo->biotype){
+        switch(deviceInfo.biotype){
         case BIOTYPE_FINGERPRINT:
             deviceType = tr("fingerprint");
             break;
@@ -284,15 +208,21 @@ void BioDeviceView::setPromptText(int index)
             deviceType = tr("iris");
             break;
         }
-        promptLabel->setText(deviceType + ": " + deviceInfo->device_fullname);
+        promptLabel->setText(deviceType + ": " + deviceInfo.device_fullname);
     }
 }
 
 void BioDeviceView::onDeviceIconClicked(int index)
 {
-    qDebug() << index;
     if(index > deviceInfos.size())
         return;
+
+    //每次认证时都会停止之前的认证
+    if(authControl){
+        authControl->stopAuthentication();
+        delete authControl;
+        authControl = nullptr;
+    }
 
     if(index == 0){
         qDebug() << "密码登录";
@@ -304,9 +234,13 @@ void BioDeviceView::onDeviceIconClicked(int index)
         return;
     }
 
-    DeviceInfo *deviceInfo = deviceInfos.at(index-1);
+    DeviceInfo deviceInfo = deviceInfos.at(index-1);
 
-    Q_EMIT startVerification(*deviceInfo);
+    authControl = new BioAuthentication(uid, deviceInfo, this);
+    authControl->startAuthentication();
+    connect(authControl, &BioAuthentication::authenticationComplete,
+            this, &BioDeviceView::authenticationComplete);
+    connect(authControl, &BioAuthentication::notify, this, &BioDeviceView::notify);
 }
 
 void BioDeviceView::pageUp()
@@ -329,17 +263,17 @@ void BioDeviceView::pageDown()
 void BioDeviceView::addTestDevices()
 {
     for(int i = 0; i < 2; i++){
-        DeviceInfo *info = new DeviceInfo;
-        info->biotype = BIOTYPE_FINGERPRINT;
-        info->driver_enable = 1;
-        info->device_available = 1;
+        DeviceInfo info;
+        info.biotype = BIOTYPE_FINGERPRINT;
+        info.driver_enable = 1;
+        info.device_available = 1;
         deviceInfos.push_back(info);
     }
     for(int i = 0; i < 2; i++){
-        DeviceInfo *info = new DeviceInfo;
-        info->biotype = BIOTYPE_IRIS;
-        info->driver_enable = 1;
-        info->device_available = 1;
+        DeviceInfo info;
+        info.biotype = BIOTYPE_IRIS;
+        info.driver_enable = 1;
+        info.device_available = 1;
         deviceInfos.push_back(info);
     }
     deviceCount += 4;
