@@ -102,7 +102,6 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
     } 
     if(curScreen != m_activeScreen && curScreen >= 0){
         qDebug() << "active screen: from " << m_activeScreen << "to " << curScreen;
-        Q_EMIT activeScreenChanged(QRect(m_screenModel->index(curScreen, 0).data(Qt::UserRole).toRect()));
         moveToScreen(curScreen);
     }
     return QWidget::mouseMoveEvent(e);
@@ -148,10 +147,8 @@ void MainWindow::onScreenCountChanged()
 void MainWindow::moveToScreen(int screen)
 {
     m_activeScreen = screen;
-    m_greeterWnd->setGeometry(m_screenModel->index(m_activeScreen, 0).data(Qt::UserRole).toRect());
-    //计算缩放比例
-//    QRect screen = m_screenModel->index(m_activeScreen, 0).data(Qt::UserRole).toRect();
-//    scale = QString::number(screen.width() / 1920.0, 'f', 1).toFloat();
-//    scale = scale > 1.0 ? 1.0 : (scale < 0.6 ? 0.6 : scale);
-//    qDebug() <<"ScreenSize:" << screen.width() << " "<< screen.height()<< ", scale: "<< scale;
+    QRect activeScreenRect = m_screenModel->index(m_activeScreen, 0).data(Qt::UserRole).toRect();
+    m_greeterWnd->setGeometry(activeScreenRect);
+    Q_EMIT activeScreenChanged(activeScreenRect);
+
 }

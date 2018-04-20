@@ -107,19 +107,15 @@ IconEdit::IconEdit(QWidget *parent)
     m_edit->setObjectName(QStringLiteral("passwdEdit"));
     m_edit->setAttribute(Qt::WA_InputMethodEnabled, false); //禁用输入法
     m_edit->setContextMenuPolicy(Qt::NoContextMenu);    //禁用右键菜单
-    m_edit->setTextMargins(1, 1, height(), 1);   // 设置输入框中文件输入区，不让输入的文字在被隐藏在按钮下
 
     m_capsIcon = new QLabel(this);
     m_capsIcon->setObjectName(QStringLiteral("capsIcon"));
-    m_capsIcon->setFixedSize(height(), height());
     m_capsIcon->hide();
 
     m_iconButton = new QPushButton(this);
     m_iconButton->setObjectName(QStringLiteral("loginButton"));
     m_iconButton->setFocusPolicy(Qt::NoFocus);
-    m_iconButton->setFixedSize(height(), height());
     m_iconButton->setIcon(QIcon(":resource/arrow_right.png"));
-    m_iconButton->setIconSize(QSize(height(), height()));
     m_iconButton->setCursor(QCursor(Qt::PointingHandCursor));
     m_iconButton->hide();
 
@@ -155,6 +151,14 @@ void IconEdit::keyReleaseEvent ( QKeyEvent * event )
         return clicked_cb();
     }
     return QWidget::keyReleaseEvent(event);
+}
+
+void IconEdit::resizeEvent(QResizeEvent *)
+{
+    m_edit->setTextMargins(1, 1, height(), 1);   // 设置输入框中文件输入区，不让输入的文字在被隐藏在按钮下
+    m_capsIcon->setFixedSize(height(), height());
+    m_iconButton->setFixedSize(height(), height());
+    m_iconButton->setIconSize(QSize(height(), height()));
 }
 
 void IconEdit::clicked_cb()

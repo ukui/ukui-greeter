@@ -536,9 +536,8 @@ void LoginWindow::onShowMessage(QString text, QLightDM::Greeter::MessageType typ
     qDebug()<< "message: "<< text;
 
     //来自生物识别认证的消息
-    if(!bioDeviceView->isHidden()) {
+    if(bioDeviceView && !bioDeviceView->isHidden()) {
         clearMessage();
-
     }
 
     int lineNum = text.count('\n') + 1;

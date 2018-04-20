@@ -71,6 +71,7 @@ public:
 
 protected:
     void keyReleaseEvent ( QKeyEvent *event ) Q_DECL_OVERRIDE;
+    void resizeEvent(QResizeEvent *) Q_DECL_OVERRIDE;
 
 signals:
     void clicked(const QString &);
