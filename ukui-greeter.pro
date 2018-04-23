@@ -90,6 +90,3 @@ INSTALLS += target configfile desktopfile resourcefiles qm_file manfile
 
 DISTFILES += \
     common/common.pri
-
-FORMS += \
-    greeter/usertypeselectview.ui
