@@ -20,6 +20,8 @@ DEFINES += QT_MESSAGELOGCONTEXT \    #使用qInstallMessageHandler定制日志�
 
 include(display-switch/display-switch.pri)
 include(bio-verify/bio-verify.pri)
+include(common/common.pri)
+
 SOURCES += \
     greeter/greeterwindow.cpp \
     greeter/iconedit.cpp \
@@ -34,7 +36,8 @@ SOURCES += \
     greeter/powerwindow.cpp \
     greeter/proxymodel.cpp \
     greeter/userentry.cpp \
-    greeter/usersview.cpp
+    greeter/usersview.cpp \
+    greeter/usertypeselectview.cpp
 
 HEADERS  += \
     greeter/greeterwindow.h \
@@ -49,7 +52,8 @@ HEADERS  += \
     greeter/powerwindow.h \
     greeter/proxymodel.h \
     greeter/userentry.h \
-    greeter/usersview.h
+    greeter/usersview.h \
+    greeter/usertypeselectview.h
 
 CONFIG += c++11 debug link_pkgconfig
 
@@ -83,3 +87,9 @@ manfile.path = /usr/share/man/man1/
 target.path = /usr/sbin/
 
 INSTALLS += target configfile desktopfile resourcefiles qm_file manfile
+
+DISTFILES += \
+    common/common.pri
+
+FORMS += \
+    greeter/usertypeselectview.ui

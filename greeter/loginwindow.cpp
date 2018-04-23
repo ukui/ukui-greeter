@@ -29,10 +29,11 @@
 #include "globalv.h"
 #include "bio-verify/biodeviceview.h"
 
-LoginWindow::LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent)
+LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
     : QWidget(parent),
-      m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions, this)),
       m_greeter(greeter),
+      m_usersModel(nullptr),
+      m_sessionsModel(nullptr),
       m_config(new QSettings(configFile, QSettings::IniFormat)),
       m_timer(new QTimer(this)),
       isManual(false),
@@ -41,13 +42,13 @@ LoginWindow::LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent
       bioButton(nullptr)
 {    
     initUI();
-    connect(m_greeter.data(), SIGNAL(showMessage(QString,QLightDM::Greeter::MessageType)),
+    connect(m_greeter, SIGNAL(showMessage(QString,QLightDM::Greeter::MessageType)),
             this, SLOT(onShowMessage(QString,QLightDM::Greeter::MessageType)));
-    connect(m_greeter.data(), SIGNAL(showPrompt(QString,QLightDM::Greeter::PromptType)),
+    connect(m_greeter, SIGNAL(showPrompt(QString,QLightDM::Greeter::PromptType)),
             this, SLOT(onShowPrompt(QString,QLightDM::Greeter::PromptType)));
-    connect(m_greeter.data(), SIGNAL(authenticationComplete()),
+    connect(m_greeter, SIGNAL(authenticationComplete()),
             this, SLOT(onAuthenticationComplete()));
-    connect(m_greeter.data(), SIGNAL(startSessionFailed()), this, SLOT(startAuthentication())); //启动会话失败，重新开始认证
+    connect(m_greeter, SIGNAL(startSessionFailed()), this, SLOT(startAuthentication())); //启动会话失败，重新开始认证
 
     m_timer->setInterval(100);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(updatePixmap()));
@@ -130,10 +131,10 @@ void LoginWindow::keyReleaseEvent(QKeyEvent *event)
 }
 
 /**
- * @brief LoginWindow::recover
+ * @brief LoginWindow::reset
  * 复原UI
  */
-void LoginWindow::recover()
+void LoginWindow::reset()
 {
     isManual = false;
     m_nameLabel->clear();
@@ -176,7 +177,7 @@ void LoginWindow::onSessionButtonClicked()
  */
 void LoginWindow::backToUsers()
 {
-    recover();
+    reset();
     Q_EMIT back();
 }
 
@@ -310,9 +311,9 @@ QString LoginWindow::getSession()
     return sessionKey;
 }
 
-void LoginWindow::setUsersModel(QSharedPointer<QAbstractItemModel> model)
+void LoginWindow::setUsersModel(QAbstractItemModel *model)
 {
-    if(model.isNull())
+    if(model == nullptr)
         return;
     m_usersModel = model;
 
@@ -328,7 +329,7 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
         return false;
     }
     //先清空设置
-    recover();
+    reset();
 
     //设置用户名
     QString name = index.data(Qt::DisplayRole).toString();
@@ -344,7 +345,7 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
     setLoggedIn(isLoggedIn);
 
     //显示session图标
-    if(!m_sessionsModel.isNull() && m_sessionsModel->rowCount() > 1) {
+    if(m_sessionsModel && m_sessionsModel->rowCount() > 1) {
         m_sessionLabel->show();
         setSession(index.data(QLightDM::UsersModel::SessionRole).toString());
     }
@@ -356,16 +357,16 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
     return true;
 }
 
-void LoginWindow::setSessionsModel(QSharedPointer<QAbstractItemModel> model)
+void LoginWindow::setSessionsModel(QAbstractItemModel *model)
 {
-    if(model.isNull()){
+    if(model == nullptr){
         return ;
     }
     m_sessionsModel = model;
     //如果session有多个，则显示session图标，默认显示用户上次登录的session
     //如果当前还没有设置用户，则默认显示第一个session
     if(m_sessionsModel->rowCount() > 1) {
-        if(!m_usersModel.isNull() && !m_nameLabel->text().isEmpty()) {
+        if(m_usersModel && !m_nameLabel->text().isEmpty()) {
             for(int i = 0; i < m_usersModel->rowCount(); i++){
                 QModelIndex index = m_usersModel->index(i, 0);
                 if(index.data(Qt::DisplayRole).toString() == m_nameLabel->text()){

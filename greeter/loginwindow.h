@@ -39,14 +39,14 @@ class LoginWindow : public QWidget
 {
     Q_OBJECT
 public:
-    explicit LoginWindow(QSharedPointer<GreeterWrapper> greeter, QWidget *parent = 0);
+    explicit LoginWindow(GreeterWrapper *greeter, QWidget *parent = 0);
     ~LoginWindow(){}
 
-    void setUsersModel(QSharedPointer<QAbstractItemModel> model);
+    void setUsersModel(QAbstractItemModel *model);
     bool setUserIndex(const QModelIndex& index);
-    void setSessionsModel(QSharedPointer<QAbstractItemModel> model);
+    void setSessionsModel(QAbstractItemModel *model);
     bool setSessionIndex(const QModelIndex& index);
-    void setGreeter(QSharedPointer<GreeterWrapper> greeter);
+    void setGreeter(GreeterWrapper *greeter);
     void setUserName(const QString& userName);
     QString getUserName();
     void setFace(const QString& faceFile);
@@ -55,7 +55,7 @@ public:
     QString getPassword();
     void setSession(QString);
     QString getSession();
-    void recover();
+    void reset();
 
 private:
     void initUI();    
@@ -84,15 +84,14 @@ public slots:
     void onAuthenticationComplete();
     void onLogin(const QString &str);
     void onSessionButtonClicked();
-//    void onBioStartVerification(const DeviceInfo& deviceInfo);
     void onBioAuthenticationReslut(bool result);
     void onBioBackToPassword();
     void onBioNotify(const QString &message);
 
 private:
-    QSharedPointer<QAbstractItemModel> m_usersModel;
-    QSharedPointer<QAbstractItemModel> m_sessionsModel;
-    QSharedPointer<GreeterWrapper> m_greeter;
+    GreeterWrapper      *m_greeter;
+    QAbstractItemModel  *m_usersModel;
+    QAbstractItemModel  *m_sessionsModel;
     QString     m_session;  //session的标识
     QString     m_name;     //m_nameLabel显示的是全名(显示的),m_name保存的是真名(用于登录的)
     qint32      m_uid;      //用户id
@@ -107,15 +106,15 @@ private:
     bool        isPasswordError;
 
     // UI
-    QPushButton *m_backLabel;         //返回用户列表
-    QPushButton *m_sessionLabel;      //session图标
-    QLabel      *m_faceLabel;         //头像
-    QLabel      *m_nameLabel;         //用户名
-    QLabel      *m_isLoginLabel;      //提示是否已登录
+    QPushButton     *m_backLabel;         //返回用户列表
+    QPushButton     *m_sessionLabel;      //session图标
+    QLabel          *m_faceLabel;         //头像
+    QLabel          *m_nameLabel;         //用户名
+    QLabel          *m_isLoginLabel;      //提示是否已登录
     QVector<QLabel*> m_messageLabels;      //提示信息
-    IconEdit   *m_passwordEdit;       //密码输入框
-    BioDeviceView *bioDeviceView;      //生物识别设备列表窗口
-    QPushButton *bioButton;
+    IconEdit        *m_passwordEdit;       //密码输入框
+    BioDeviceView   *bioDeviceView;      //生物识别设备列表窗口
+    QPushButton     *bioButton;
 };
 
 #endif // LOGINWINDOW_H

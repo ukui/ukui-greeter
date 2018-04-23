@@ -23,7 +23,7 @@
 #include <QPainter>
 #include <QDebug>
 #include <QListWidget>
-#include <QLightDM/SessionsModel>
+//#include <QLightDM/SessionsModel>
 #include "globalv.h"
 
 class IconLabel : public QWidget
@@ -59,8 +59,8 @@ private:
 
 SessionWindow::SessionWindow(const QString& session, QWidget *parent)
     : QWidget(parent),
-      m_defaultSession(session),
-      m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions))
+      m_defaultSession(session)
+//      m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions))
 
 {
     for(int i = 0; i < m_sessionsModel->rowCount(); i++){
@@ -137,9 +137,9 @@ void SessionWindow::saveAndBack()
     emit back();
 }
 
-void SessionWindow::setSessionModel(QSharedPointer<QAbstractItemModel> model)
+void SessionWindow::setSessionModel(QAbstractItemModel *model)
 {
-    if(model.isNull()) {
+    if(model == nullptr) {
         return ;
     }
     m_sessionsModel = model;

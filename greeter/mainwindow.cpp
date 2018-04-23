@@ -30,7 +30,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent),
       m_screenModel(new ScreenModel(this)),
-      m_activeScreen(0)
+      m_activeScreen(0),
+      needPaint(true)
 {
     connect(m_screenModel, &ScreenModel::dataChanged, this, &MainWindow::onScreenResized);
     connect(m_screenModel, &ScreenModel::modelReset, this, &MainWindow::onScreenCountChanged);
@@ -57,6 +58,8 @@ MainWindow::MainWindow(QWidget *parent)
     QStringList files = dir.entryList(names, QDir::Files);
     if(files.size() > 0)
         backgroundPath = IMAGE_DIR + files[0];
+
+    background = scaledPixmap(width(), height(), backgroundPath);
 }
 
 void MainWindow::paintEvent(QPaintEvent *e)
@@ -64,7 +67,6 @@ void MainWindow::paintEvent(QPaintEvent *e)
     for(int i = 0; i < m_screenModel->rowCount(); i++){
         //在每个屏幕上绘制背景
         QRect rect = m_screenModel->index(i, 0).data(Qt::UserRole).toRect();
-        QPixmap background = scaledPixmap(rect.width(), rect.height(), backgroundPath);
         QPainter painter(this);
         painter.drawPixmap(rect, background);
         //绘制logo
@@ -85,39 +87,36 @@ void MainWindow::paintEvent(QPaintEvent *e)
     return QWidget::paintEvent(e);
 }
 
+
 /**
- * @brief MainWindow::mouseMoveEvent
- * @param e
  * 根据鼠标指针移动位置移动Greeter窗口所在屏幕
  */
 void MainWindow::mouseMoveEvent(QMouseEvent *e)
 {
-    QPoint point = e->pos();
-    int curScreen = -1;
-    for(int i = 0; i< m_screenModel->rowCount(); i++){
-        QRect screenRect = m_screenModel->index(i, 0).data(Qt::UserRole).toRect();
-        if(screenRect.contains(point)) {
-            curScreen = i;
+    if(m_screenModel->rowCount() > 1){
+        QPoint point = e->pos();
+        int curScreen = -1;
+        for(int i = 0; i< m_screenModel->rowCount(); i++){
+            QRect screenRect = m_screenModel->index(i, 0).data(Qt::UserRole).toRect();
+            if(screenRect.contains(point)) {
+                curScreen = i;
+                break;
+            }
         }
-    } 
-    if(curScreen != m_activeScreen && curScreen >= 0){
-        qDebug() << "active screen: from " << m_activeScreen << "to " << curScreen;
-        moveToScreen(curScreen);
+        if(curScreen != m_activeScreen && curScreen >= 0){
+            qDebug() << "active screen: from " << m_activeScreen << "to " << curScreen;
+            moveToScreen(curScreen);
+        }
     }
     return QWidget::mouseMoveEvent(e);
 }
 
 
 /**
- * @brief MainWindow::onScreenResized
- * @param topLeft
- * @param bottomRight
  * 有屏幕分辨率发生改变,移动Greeter窗口位置
  */
-void MainWindow::onScreenResized(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+void MainWindow::onScreenResized(const QModelIndex &, const QModelIndex &)
 {
-    Q_UNUSED(topLeft)
-    Q_UNUSED(bottomRight)
     QDesktopWidget *dw = QApplication::desktop();
     setFixedSize(dw->width(), dw->height());
     move(0, 0);
@@ -127,7 +126,6 @@ void MainWindow::onScreenResized(const QModelIndex &topLeft, const QModelIndex &
 }
 
 /**
- * @brief MainWindow::onScreenCountChanged
  * 有屏幕插拔,移动GreeterWindow到主屏幕
  */
 void MainWindow::onScreenCountChanged()
@@ -140,8 +138,6 @@ void MainWindow::onScreenCountChanged()
 }
 
 /**
- * @brief MainWindow::moveToScreen
- * @param screen
  * 移动Greeter窗口到第screen个屏幕上
  */
 void MainWindow::moveToScreen(int screen)
@@ -150,5 +146,4 @@ void MainWindow::moveToScreen(int screen)
     QRect activeScreenRect = m_screenModel->index(m_activeScreen, 0).data(Qt::UserRole).toRect();
     m_greeterWnd->setGeometry(activeScreenRect);
     Q_EMIT activeScreenChanged(activeScreenRect);
-
 }

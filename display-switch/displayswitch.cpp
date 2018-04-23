@@ -4,13 +4,13 @@
 #include <QDebug>
 #include <QDesktopWidget>
 #include "displayservice.h"
-#include "keyeventmonitor.h"
+#include "common/keyeventmonitor.h"
 
 DisplaySwitch::DisplaySwitch(QWidget *parent)
     : QMainWindow(parent),
       ui(new Ui::MainWindow()),
       currentMode(0),
-      keyEventMonitor(new KeyEventMonitor(this))
+      keyEventMonitor(KeyEventMonitor::instance(this))
 {
     keyEventMonitor->start();
     connect(keyEventMonitor, &KeyEventMonitor::displaySwitchSelect, this, &DisplaySwitch::onDisplaySwitchSelect);

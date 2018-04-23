@@ -58,20 +58,20 @@ private:
     void showLanguageMenu();
     void showBoard();
 
-    UsersView       *m_userWnd;
-    LoginWindow     *m_loginWnd;
-    SessionWindow   *m_sessionWnd;
-    PowerWindow     *m_powerWnd;
-    QPushButton     *m_keyboardLB;
-    QPushButton     *m_powerLB;
-    QPushButton     *m_languageLB;
-    QMenu           *m_languageMenu;
-    QProcess        *m_board;
-    QWidget         *m_boardWidget;
-    QSharedPointer<UsersModel> m_usersModel;
-    QSharedPointer<QAbstractItemModel> m_sessionsModel;
-    QSharedPointer<GreeterWrapper> m_greeter;
-    bool             m_show;
+    UsersView               *m_userWnd;
+    LoginWindow             *m_loginWnd;
+    SessionWindow           *m_sessionWnd;
+    PowerWindow             *m_powerWnd;
+    QPushButton             *m_keyboardLB;
+    QPushButton             *m_powerLB;
+    QPushButton             *m_languageLB;
+    QMenu                   *m_languageMenu;
+    QProcess                *m_board;
+    QWidget                 *m_boardWidget;
+
+    GreeterWrapper          *m_greeter;
+    UsersModel              *m_usersModel;
+    QAbstractItemModel      *m_sessionsModel;
 };
 
 #endif // GREETERWINDOW_H

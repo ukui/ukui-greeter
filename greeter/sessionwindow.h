@@ -33,7 +33,7 @@ class SessionWindow : public QWidget
     Q_OBJECT
 public:
     explicit SessionWindow(const QString &session, QWidget *parent = 0);
-    void setSessionModel(QSharedPointer<QAbstractItemModel> model);
+    void setSessionModel(QAbstractItemModel *model);
     void setSession(const QString&session);
 
 protected:
@@ -53,11 +53,13 @@ private:
     void addSessionLabels();
     void testAddSessionLabels();
 
-    QPushButton     *m_backLabel;
-    QLabel          *m_prompt;
-    QListWidget     *m_sessionsList;
-    QString          m_defaultSession;
-    QSharedPointer<QAbstractItemModel> m_sessionsModel;
+    QString              m_defaultSession;
+    QAbstractItemModel  *m_sessionsModel;
+
+    //UI
+    QPushButton         *m_backLabel;
+    QLabel              *m_prompt;
+    QListWidget         *m_sessionsList;
 };
 
 #endif // SESSIONWINDOW_H

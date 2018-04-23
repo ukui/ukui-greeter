@@ -37,12 +37,9 @@ public:
 protected:
     void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
     void keyPressEvent(QKeyEvent *) Q_DECL_OVERRIDE;
-    void keyReleaseEvent(QKeyEvent *) Q_DECL_OVERRIDE;
-    void focusInEvent(QFocusEvent *) Q_DECL_OVERRIDE;
 
 private:
     void drawTip();
-    void checkCapsState();
 
 
 signals:
@@ -52,6 +49,7 @@ private:
     QString m_tip;
 };
 
+class KeyEventMonitor;
 class IconEdit : public QWidget
 {
     Q_OBJECT
@@ -70,7 +68,6 @@ public:
     void setWaiting(bool);
 
 protected:
-    void keyReleaseEvent ( QKeyEvent *event ) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent *) Q_DECL_OVERRIDE;
 
 signals:
@@ -80,11 +77,12 @@ signals:
 public slots:
     void clicked_cb();
     void showIconButton(const QString &);
-    void onCapsStateChanged(bool);
+    void onCapsStateChanged(int);
 private:
     TipEdit         *m_edit;
     QLabel          *m_capsIcon;
     QPushButton     *m_iconButton;
+    KeyEventMonitor *keyMonitor;
 };
 
 #endif // ICONEDIT_H

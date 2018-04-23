@@ -1,15 +1,25 @@
 #include "keyeventmonitor.h"
 #include <X11/Xlibint.h>
 #include <X11/keysym.h>
+#include <X11/XKBlib.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+KeyEventMonitor *KeyEventMonitor::instance_ = nullptr;
 
 KeyEventMonitor::KeyEventMonitor(QObject *parent)
     : QThread(parent),
       hasModifer(false)
 {
-	// 鼠标按下标志位，用于识别鼠标的拖拽操作
-//	isRelease = false;
+
+}
+
+KeyEventMonitor *KeyEventMonitor::instance(QObject *parent)
+{
+    if(instance_ == nullptr)
+        instance_ = new KeyEventMonitor(parent);
+
+    return instance_;
 }
 
 KeyEventMonitor::~KeyEventMonitor()
@@ -19,8 +29,23 @@ KeyEventMonitor::~KeyEventMonitor()
     wait();
 }
 
+bool KeyEventMonitor::checkCapsState()
+{
+    //判断大写键状态
+    Display *display = XOpenDisplay(NULL);
+    bool capsState = false;
+    if(display) {
+        unsigned int n;
+        XkbGetIndicatorState(display, XkbUseCoreKbd, &n);
+        capsState = (n & 0x01) == 1;
+    }
+    return capsState;
+}
+
 void KeyEventMonitor::run()
 {
+    isCapsLock = checkCapsState();
+
     while(!isInterruptionRequested()) {
 	// 创建记录 XRecord 协议的 X 专用连接
 	Display* display = XOpenDisplay(0);
@@ -107,6 +132,11 @@ void KeyEventMonitor::handleRecordEvent(XRecordInterceptData* data)
 		case KeyPress:
 //            printf("X11 KeyPress %s \n",  XKeysymToString(XKeycodeToKeysym(display, keycode, 0)));
             switch(XKeycodeToKeysym(display, keycode, 0)) {
+            case XK_Caps_Lock:
+//                printf("cap lock");
+                isCapsLock = !isCapsLock;
+                Q_EMIT CapsLockChanged(isCapsLock);
+                break;
             case XK_Super_L:
                 hasModifer = true;
 //                printf("SUPER pressed\n");
@@ -148,15 +178,4 @@ void KeyEventMonitor::handleRecordEvent(XRecordInterceptData* data)
 
 	fflush(stdout);
 	XRecordFreeData(data);
-}
-
-//void KeyEventMonitor::keyRelease(int code)
-//{
-//	this->isReleaseAlt(code);
-//}
-
-void KeyEventMonitor::isReleaseAlt(int code)
-{
-    if (code == 64);
-//		emit KeyAltRelease();
 }

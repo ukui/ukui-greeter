@@ -33,7 +33,6 @@ public:
     void mouseMoveEvent(QMouseEvent *);
 
 signals:
-//    void capslockChanged(bool);
     void activeScreenChanged(const QRect& rect);
 
 public slots:
@@ -47,6 +46,8 @@ private:
     int              m_activeScreen;
     QPixmap          m_logo;
     QString          backgroundPath;
+    bool             needPaint;
+    QPixmap          background;
 };
 
 #endif // MAINWINDOW_H

@@ -43,10 +43,10 @@ GreeterWindow::GreeterWindow(QWidget *parent)
       m_powerWnd(nullptr),
       m_languageMenu(nullptr),
       m_board(nullptr),
-      m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions)),
-      m_greeter(new GreeterWrapper())
+      m_greeter(new GreeterWrapper()),
+      m_usersModel(new UsersModel(m_greeter->hideUsersHint())),
+      m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions))
 {
-    m_usersModel = QSharedPointer<UsersModel>(new UsersModel(m_greeter->hideUsersHint()));
     if(m_greeter->hasGuestAccountHint()){    //允许游客登录
         qDebug() << "allow guest";
         m_usersModel->setShowGuest(true);
@@ -56,9 +56,9 @@ GreeterWindow::GreeterWindow(QWidget *parent)
         m_usersModel->setShowManualLogin(true);
     }
 
-    connect(m_greeter.data(), SIGNAL(autologinTimerExpired()),this, SLOT(timedAutologin()));
-    connect(m_greeter.data(), SIGNAL(authenticationSucess()), this, SLOT(hide()));
-    connect(m_greeter.data(), SIGNAL(startSessionFailed()), this, SLOT(show()));
+    connect(m_greeter, SIGNAL(autologinTimerExpired()),this, SLOT(timedAutologin()));
+    connect(m_greeter, SIGNAL(authenticationSucess()), this, SLOT(hide()));
+    connect(m_greeter, SIGNAL(startSessionFailed()), this, SLOT(show()));
     installEventFilter(this);
 }
 
@@ -79,13 +79,14 @@ void GreeterWindow::initUI()
     // 如果只用一个用户的话，直接进入登录界面，否则显示用户列表窗口
     if(m_usersModel->rowCount() > 1) {
         m_userWnd = new UsersView(this);
-        m_userWnd->setModel(m_usersModel.data());
+        m_userWnd->setModel(m_usersModel);
         connect(m_userWnd, &UsersView::userSelected, this, &GreeterWindow::onUserSelected);
     }
 
     //登录窗口
     m_loginWnd = new LoginWindow(m_greeter, this);
     m_loginWnd->setUsersModel(m_usersModel);
+    m_loginWnd->setSessionsModel(m_sessionsModel);
     if(m_usersModel->rowCount() > 1)    //如果显示了用户选择窗口，则先隐藏登录窗口
         m_loginWnd->hide();
     connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBacktoUsers()));
@@ -190,21 +191,30 @@ bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
 
 void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
 {
-    if(e->key() == Qt::Key_L &&(e->modifiers() & Qt::ControlModifier))
-        m_languageLB->click();
-    else if(e->key() == Qt::Key_K &&(e->modifiers() & Qt::ControlModifier))
-        m_keyboardLB->click();
-    else if(e->key() == Qt::Key_P &&(e->modifiers() & Qt::ControlModifier))
-        m_powerLB->click();
-    else if(e->key() == Qt::Key_Escape) {
+    switch(e->key())
+    {
+    case Qt::Key_L:
+        if(e->modifiers() & Qt::ControlModifier)
+            m_languageLB->click();
+    break;
+    case Qt::Key_K:
+        if(e->modifiers() & Qt::ControlModifier)
+            m_keyboardLB->click();
+    break;
+    case Qt::Key_P:
+        if(e->modifiers() & Qt::ControlModifier)
+            m_powerLB->click();
+    break;
+    case Qt::Key_Escape:
         if(m_powerWnd && !m_powerWnd->isHidden())
             m_powerWnd->close();
         else if(m_loginWnd && !m_loginWnd->isHidden()){
-            m_loginWnd->recover();
+            m_loginWnd->reset();
             switchWnd(0);
         }
         else if(m_sessionWnd && !m_sessionWnd->isHidden())
             switchWnd(1);
+    break;
     }
     QWidget::keyReleaseEvent(e);
 }
@@ -212,7 +222,6 @@ void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
 
 void GreeterWindow::onUserSelected(const QModelIndex &index)
 {
-    qDebug() << index.data().toString();
     m_loginWnd->setUserIndex(index);
 
     switchWnd(1);

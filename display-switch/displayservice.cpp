@@ -3,7 +3,6 @@
 #include <QDebug>
 #include <QProcess>
 #include <QStandardPaths>
-#include <X11/extensions/Xrandr.h>
 
 DisplayService::DisplayService(QObject *parent) : QObject(parent)
 {

@@ -23,8 +23,8 @@
 #include <QFile>
 #include <QKeyEvent>
 #include <QDebug>
-#include <X11/Xlib.h>
-#include <X11/XKBlib.h>
+#include "common/keyeventmonitor.h"
+
 
 ///////////////////////////// TipEdit的成员 ////////////////////////////////////////
 TipEdit::TipEdit(QWidget *parent)
@@ -48,20 +48,6 @@ void TipEdit::keyPressEvent(QKeyEvent *event)
     return QLineEdit::keyPressEvent(event);
 }
 
-void TipEdit::keyReleaseEvent(QKeyEvent *event)
-{
-    if(event->key() == Qt::Key_CapsLock) {
-        checkCapsState();
-    }
-    return QLineEdit::keyReleaseEvent(event);
-}
-
-void TipEdit::focusInEvent(QFocusEvent *event)
-{
-    checkCapsState();
-    return QLineEdit::focusInEvent(event);
-}
-
 /**
  * @brief TipEdit::drawTip
  * 绘制提示（和placeholder不同）
@@ -79,30 +65,17 @@ void TipEdit::drawTip()
 
     painter.drawText(tipRect, m_tip, option);
 }
-/**
- * @brief TipEdit::checkCapsState
- * 监测大写键开关状态，并发送信号
- */
-void TipEdit::checkCapsState()
-{
-    //判断大写键状态
-    Display *display = XOpenDisplay(NULL);
-    bool capsState = false;
-    if(display) {
-        unsigned int n;
-        XkbGetIndicatorState(display, XkbUseCoreKbd, &n);
-        capsState = (n & 0x01) == 1;
-    }
-    Q_EMIT capsStateChanged(capsState);
-}
 
 
 //////////////////////////// IconEdit的成员 ////////////////////////////////////////
 
 
 IconEdit::IconEdit(QWidget *parent)
-    :QWidget(parent)
+    : QWidget(parent),
+      keyMonitor(KeyEventMonitor::instance(this))
 {
+    keyMonitor->start();
+
     m_edit = new TipEdit(this);
     m_edit->setObjectName(QStringLiteral("passwdEdit"));
     m_edit->setAttribute(Qt::WA_InputMethodEnabled, false); //禁用输入法
@@ -127,8 +100,10 @@ IconEdit::IconEdit(QWidget *parent)
     layout->addWidget(m_iconButton);
 
     connect(m_edit, &TipEdit::textChanged, this, &IconEdit::showIconButton);
-    connect(m_edit, &TipEdit::capsStateChanged, this, &IconEdit::onCapsStateChanged);
+    connect(m_edit, &TipEdit::returnPressed, this, &IconEdit::clicked_cb);
     connect(m_iconButton, &QPushButton::clicked, this, &IconEdit::clicked_cb);
+    connect(keyMonitor, &KeyEventMonitor::CapsLockChanged, this, &IconEdit::onCapsStateChanged);
+
     setFocusProxy(m_edit);
 }
 
@@ -142,15 +117,6 @@ void IconEdit::setText(const QString &text)
     if(m_edit->echoMode() == QLineEdit::Normal){
         m_edit->setText(text);
     }
-}
-
-void IconEdit::keyReleaseEvent ( QKeyEvent * event )
-{
-    if(event->key() == Qt::Key_Return)
-    {
-        return clicked_cb();
-    }
-    return QWidget::keyReleaseEvent(event);
 }
 
 void IconEdit::resizeEvent(QResizeEvent *)
@@ -171,7 +137,7 @@ void IconEdit::showIconButton(const QString &text)
     m_iconButton->setVisible(!text.isEmpty());
 }
 
-void IconEdit::onCapsStateChanged(bool capsState)
+void IconEdit::onCapsStateChanged(int capsState)
 {
     m_capsIcon->setVisible(capsState);
     m_edit->setTextMargins(1, 1, capsState ? height() * 2 : height(), 1);

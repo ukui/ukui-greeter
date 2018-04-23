@@ -7,14 +7,11 @@ FORMS +=
 HEADERS += \
     $$PWD/displayservice.h \
     $$PWD/displayswitch.h \
-    $$PWD/mainwindow.h \
-    $$PWD/ui_mainwindow.h \
-    $$PWD/keyeventmonitor.h
+    $$PWD/ui_mainwindow.h
 
 SOURCES += \
     $$PWD/displayservice.cpp \
-    $$PWD/displayswitch.cpp \
-    $$PWD/keyeventmonitor.cpp
+    $$PWD/displayswitch.cpp
 
 RESOURCES += \
     $$PWD/ds-res.qrc

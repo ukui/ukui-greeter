@@ -9,16 +9,18 @@ class KeyEventMonitor : public QThread
 {
 	Q_OBJECT
 
+private:
+    explicit KeyEventMonitor(QObject *parent = 0);
+    bool checkCapsState();
+
 public:
-	KeyEventMonitor(QObject *parent = 0);
     ~KeyEventMonitor();
+    static KeyEventMonitor *instance(QObject *parent = 0);
 
 Q_SIGNALS:
+    void CapsLockChanged(int);
     void displaySwitchSelect();
     void displaySwitchConfirm();
-
-public Q_SLOTS:
-	void isReleaseAlt(int code);
 
 protected:
 	static void callback(XPointer trash, XRecordInterceptData* data);
@@ -26,8 +28,9 @@ protected:
 	void run();
 
 private:
-//    bool isRelease;
-    bool hasModifer;
+    bool                    hasModifer;
+    bool                    isCapsLock;
+    static KeyEventMonitor *instance_;
 };
 
 #endif // KEYEVENTMONITOR_H
