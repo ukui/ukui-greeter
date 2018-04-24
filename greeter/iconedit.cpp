@@ -129,6 +129,7 @@ void IconEdit::resizeEvent(QResizeEvent *)
 
 void IconEdit::clicked_cb()
 {
+    m_iconButton->setFocus();       //按回车后输入框光标会消失或者不再闪烁，先让其他控件获取焦点，就会解决该问题
     emit clicked(m_edit->text());
 }
 

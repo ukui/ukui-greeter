@@ -43,7 +43,7 @@ public:
 protected:
     void keyReleaseEvent(QKeyEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);
-//    void showEvent(QShowEvent *event);
+    void showEvent(QShowEvent *event);
     void focusInEvent(QFocusEvent *event);
     void setCurrentRow(int row);
     void setPromptText(int index);

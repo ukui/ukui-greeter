@@ -7,9 +7,9 @@
         <file>resource/fingerprint-icon.png</file>
         <file>resource/fingervein-icon.png</file>
         <file>resource/password-icon.png</file>
-        <file>resource/next-hl.png</file>
-        <file>resource/next.png</file>
-        <file>resource/previous-hl.png</file>
-        <file>resource/previous.png</file>
+        <file>resource/tri-next_hl.png</file>
+        <file>resource/tri-next.png</file>
+        <file>resource/tri-prev_hl.png</file>
+        <file>resource/tri-prev.png</file>
     </qresource>
 </RCC>

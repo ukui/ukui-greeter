@@ -159,6 +159,11 @@ void BioDeviceView::focusInEvent(QFocusEvent *event)
     devicesList->itemWidget(item)->setFocus();
     return QWidget::focusInEvent(event);
 }
+void BioDeviceView::showEvent(QShowEvent *event)
+{
+    this->setFocus();
+    return QWidget::showEvent(event);
+}
 
 bool BioDeviceView::eventFilter(QObject *obj, QEvent *event)
 {

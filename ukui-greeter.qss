@@ -197,19 +197,19 @@ QPushButton::hover#bioButton{
     background:white;
 }
 QPushButton#bioPrevButton{
-    background:url(:/resource/previous.png);
+    background:url(:/resource/tri-prev.png);
     background-repeat:non-repeat;
     border:1px solid #026096;
 }
 QPushButton::hover#bioPrevButton{
-    background:url(:/resource/previous-hl.png);
+    background:url(:/resource/tri-prev_hl.png);
 }
 
 QPushButton#bioNextButton{
-    background:url(:/resource/next.png);
+    background:url(:/resource/tri-next.png);
     background-repeat:non-repeat;
     border:1px solid #026096；
 }
 QPushButton::hover#bioNextButton{
-    background:url(:/resource/next-hl.png);
+    background:url(:/resource/tri-next_hl.png);
 }
