@@ -242,6 +242,7 @@ void GreeterWindow::onSelectSession(const QString &sessionName)
     qDebug() << "selection session";
     if(!m_sessionWnd) {
         m_sessionWnd = new SessionWindow(m_greeter->defaultSessionHint(), this);
+        m_sessionWnd->setSessionModel(m_sessionsModel);
         m_sessionWnd->setGeometry((rect().width()-m_sessionWnd->width())/2,
                                   (rect().height()-m_sessionWnd->height())/2,
                                   m_sessionWnd->width(), m_sessionWnd->height());

@@ -58,58 +58,57 @@ void LoginWindow::initUI()
 {
     if (this->objectName().isEmpty())
         this->setObjectName(QStringLiteral("this"));
+    this->setFixedSize(220+350, 135 + BIODEVICEVIEW_HEIGHT);
 
     /* 返回按钮 */
     m_backLabel = new QPushButton(this);
-    m_backLabel->setObjectName(QStringLiteral("backButton"));
-    m_backLabel->setGeometry(QRect(0, 0, 32, 32));
+    m_backLabel->setObjectName(QStringLiteral("backButton"));    
     m_backLabel->setFocusPolicy(Qt::NoFocus);
     connect(m_backLabel, &QPushButton::clicked, this, &LoginWindow::backToUsers);
 
     /* 头像 */
     m_faceLabel = new QLabel(this);
     m_faceLabel->setObjectName(QStringLiteral("faceLabel"));
-    m_faceLabel->setGeometry(QRect(60, 0, 132, 132));
     m_faceLabel->setFocusPolicy(Qt::NoFocus);
 
     /* session选择按钮 */
     m_sessionLabel = new QPushButton(this);
     m_sessionLabel->setObjectName(QStringLiteral("sessionButton"));
-    m_sessionLabel->setGeometry(QRect(width()-26, 0, 26, 26));
     m_sessionLabel->hide();
     connect(m_sessionLabel, &QPushButton::clicked, this, &LoginWindow::onSessionButtonClicked);
 
     /* 用户名 */
     m_nameLabel = new QLabel(this);
     m_nameLabel->setObjectName(QStringLiteral("nameLabel"));
-    QRect nameRect(220, 0, 200, 25);
-    m_nameLabel->setGeometry(nameRect);
     m_nameLabel->setFont(QFont("ubuntu", 12));
     m_nameLabel->setFocusPolicy(Qt::NoFocus);
 
     /* 是否已登录 */
     m_isLoginLabel = new QLabel(this);
     m_isLoginLabel->setObjectName(QStringLiteral("isLoginLabel"));
-    QRect loginRect(220, nameRect.bottom()+5, 200, 30);
-    m_isLoginLabel->setGeometry(loginRect);
     m_isLoginLabel->setFont(QFont("ubuntu", 10));
     m_isLoginLabel->setFocusPolicy(Qt::NoFocus);
 
     /* 密码框 */
     m_passwordEdit = new IconEdit(this);
-    m_passwordEdit->setObjectName(QStringLiteral("passwordEdit"));
-    QRect pwdRect(220, 90, 300, 40);
-    m_passwordEdit->setGeometry(pwdRect);
+    m_passwordEdit->setObjectName(QStringLiteral("passwordEdit"));   
     m_passwordEdit->resize(QSize(300, 40));
     m_passwordEdit->setFocusPolicy(Qt::StrongFocus);
     m_passwordEdit->installEventFilter(this);
     m_passwordEdit->hide(); //收到请求密码的prompt才显示出来
     connect(m_passwordEdit, SIGNAL(clicked(const QString&)), this, SLOT(onLogin(const QString&)));
 
+    m_backLabel->setGeometry(QRect(0, 0, 32, 32));
+    m_faceLabel->setGeometry(QRect(60, 0, 132, 132));
+    QRect nameRect(220, 0, 200, 25);
+    m_nameLabel->setGeometry(nameRect);
+    QRect loginRect(220, nameRect.bottom()+5, 200, 30);
+    m_isLoginLabel->setGeometry(loginRect);
+    QRect pwdRect(220, 90, 300, 40);
+    m_passwordEdit->setGeometry(pwdRect);
+    QRect sessionRect(pwdRect.right() - 26, 0, 26, 26);
+    m_sessionLabel->setGeometry(sessionRect);
 
-
-
-    this->setFixedSize(220+350, 135 + BIODEVICEVIEW_HEIGHT);
 }
 
 void LoginWindow::showEvent(QShowEvent *e)

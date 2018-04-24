@@ -23,8 +23,11 @@
 #include <QPainter>
 #include <QDebug>
 #include <QListWidget>
-//#include <QLightDM/SessionsModel>
 #include "globalv.h"
+
+#define ICON_SIZE 22
+#define PROMPT_LEFT 150
+#define LISTWIDGET_SAPCE 10
 
 class IconLabel : public QWidget
 {
@@ -34,13 +37,13 @@ public:
           m_iconLabel(new QLabel(this)),
           m_textLabel(new QLabel(this))
     {
-        m_iconLabel->setGeometry(3, (height-22)/2, 22, 22);
+        m_iconLabel->setGeometry(3, (height-ICON_SIZE)/2, ICON_SIZE, ICON_SIZE);
         m_textLabel->setGeometry(height+5, 0, width-height-5, height);
     }
 
     void setIcon(const QString& icon)
     {
-        m_iconLabel->setPixmap(QPixmap(icon));
+        m_iconLabel->setPixmap(scaledPixmap(ICON_SIZE, ICON_SIZE, icon));
     }
 
     void setText(const QString& text)
@@ -60,12 +63,7 @@ private:
 SessionWindow::SessionWindow(const QString& session, QWidget *parent)
     : QWidget(parent),
       m_defaultSession(session)
-//      m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions))
-
 {
-    for(int i = 0; i < m_sessionsModel->rowCount(); i++){
-        qDebug() << "session " << m_sessionsModel->index(i, 0).data(Qt::UserRole).toString() << " added";
-    }
     initUI();
 }
 
@@ -73,9 +71,7 @@ void SessionWindow::initUI()
 {
     if (objectName().isEmpty())
         setObjectName(QStringLiteral("SessionWnd"));
-    int sessionNum = m_sessionsModel->rowCount();
-    int height = 55 + 40 * sessionNum + 20 * (sessionNum - 1);
-    resize(550, height);
+
 
     m_backLabel = new QPushButton(this);
     m_backLabel->setObjectName(QStringLiteral("backButton"));
@@ -85,17 +81,34 @@ void SessionWindow::initUI()
 
     m_prompt = new QLabel(this);
     m_prompt->setObjectName(QStringLiteral("m_prompt"));
-    m_prompt->setGeometry(QRect(220, 0, 330, 30));
+    m_prompt->setGeometry(QRect(PROMPT_LEFT, 0, 330, 30));
     m_prompt->setFont(QFont("Ubuntu", 16));
     m_prompt->setText(tr("select the desktop environment"));
 
     m_sessionsList = new QListWidget(this);
     m_sessionsList->setObjectName(QStringLiteral("sessionsList"));
-    m_sessionsList->setSpacing(5);
-    m_sessionsList->setGeometry(220, 55, 300, 40*sessionNum+20*(sessionNum-1));
+    m_sessionsList->setSpacing(LISTWIDGET_SAPCE);
     connect(m_sessionsList, &QListWidget::itemClicked, this, &SessionWindow::saveAndBack);
+}
+
+
+void SessionWindow::setSessionModel(QAbstractItemModel *model)
+{
+    if(model == nullptr) {
+        return ;
+    }
+    m_sessionsModel = model;
+
+    int sessionNum = m_sessionsModel->rowCount();
+    int height = 55 + 40 * sessionNum + 20 * (sessionNum - 1);
+    resize(550, height);
+    m_sessionsList->setGeometry(PROMPT_LEFT - LISTWIDGET_SAPCE, 55,
+                                300, 40*sessionNum+20*(sessionNum-1));
+
     addSessionLabels();
-//    testAddSessionLabels();
+#ifdef TEST
+    testAddSessionLabels();
+#endif
 }
 
 void SessionWindow::addSessionLabels()
@@ -135,15 +148,6 @@ void SessionWindow::saveAndBack()
     //传递给loginWindow的是session的唯一标识
     emit sessionSelected(m_sessionsModel->index(currentRow, 0).data(Qt::UserRole).toString());
     emit back();
-}
-
-void SessionWindow::setSessionModel(QAbstractItemModel *model)
-{
-    if(model == nullptr) {
-        return ;
-    }
-    m_sessionsModel = model;
-    initUI();
 }
 
 void SessionWindow::setSession(const QString &session)
