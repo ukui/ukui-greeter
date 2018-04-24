@@ -36,8 +36,7 @@ SOURCES += \
     greeter/powerwindow.cpp \
     greeter/proxymodel.cpp \
     greeter/userentry.cpp \
-    greeter/usersview.cpp \
-    greeter/usertypeselectview.cpp
+    greeter/usersview.cpp
 
 HEADERS  += \
     greeter/greeterwindow.h \
@@ -52,8 +51,7 @@ HEADERS  += \
     greeter/powerwindow.h \
     greeter/proxymodel.h \
     greeter/userentry.h \
-    greeter/usersview.h \
-    greeter/usertypeselectview.h
+    greeter/usersview.h
 
 CONFIG += c++11 debug link_pkgconfig
 
