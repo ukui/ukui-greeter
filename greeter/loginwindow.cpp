@@ -137,6 +137,7 @@ void LoginWindow::keyReleaseEvent(QKeyEvent *event)
 void LoginWindow::reset()
 {
     isManual = false;
+    isPasswordError = false;
     m_nameLabel->clear();
     m_isLoginLabel->clear();
     m_passwordEdit->clear();
