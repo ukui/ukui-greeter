@@ -31,7 +31,7 @@
 #include "usersview.h"
 #include "usersmodel.h"
 #include "powerwindow.h"
-#include <X11/Xlib.h>
+#include "common/configuration.h"
 
 float scale;
 int fontSize;
@@ -45,7 +45,8 @@ GreeterWindow::GreeterWindow(QWidget *parent)
       m_board(nullptr),
       m_greeter(new GreeterWrapper()),
       m_usersModel(new UsersModel(m_greeter->hideUsersHint())),
-      m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions))
+      m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions)),
+      m_configuration(Configuration::instance())
 {
     if(m_greeter->hasGuestAccountHint()){    //允许游客登录
         qDebug() << "allow guest";
@@ -79,8 +80,10 @@ void GreeterWindow::initUI()
     // 如果只用一个用户的话，直接进入登录界面，否则显示用户列表窗口
     if(m_usersModel->rowCount() > 1) {
         m_userWnd = new UsersView(this);
-        m_userWnd->setModel(m_usersModel);
+        connect(m_userWnd, &UsersView::currentUserChanged, this, &GreeterWindow::onCurrentUserChanged);
         connect(m_userWnd, &UsersView::userSelected, this, &GreeterWindow::onUserSelected);
+
+        m_userWnd->setModel(m_usersModel);
     }
 
     //登录窗口
@@ -225,6 +228,12 @@ void GreeterWindow::onUserSelected(const QModelIndex &index)
     m_loginWnd->setUserIndex(index);
 
     switchWnd(1);
+}
+
+void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
+{
+    QString backgroundPath = index.data(QLightDM::UsersModel::BackgroundPathRole).toString();
+    Q_EMIT backgroundChanged(backgroundPath);
 }
 
 void GreeterWindow::onBacktoUsers()

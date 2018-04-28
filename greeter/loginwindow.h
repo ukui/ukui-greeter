@@ -49,6 +49,7 @@ public:
     void setGreeter(GreeterWrapper *greeter);
     void setUserName(const QString& userName);
     QString getUserName();
+    QString getRealName();
     void setFace(const QString& faceFile);
     void setLoggedIn(bool isLoggedIn);
     void setPrompt(const QString& text);
@@ -60,7 +61,6 @@ public:
 private:
     void initUI();    
     int sessionIndex(const QString &session);
-    void saveLastLoginUser();
     void backToUsers();
     void clearMessage();
     bool enableBioAuthentication(QString &message);
@@ -95,7 +95,6 @@ private:
     QString     m_session;  //session的标识
     QString     m_name;     //m_nameLabel显示的是全名(显示的),m_name保存的是真名(用于登录的)
     qint32      m_uid;      //用户id
-    QSettings  *m_config;
     QTimer     *m_timer;
     QPixmap     m_waiting;
     //手动输入用户标记，设置该标记的原因是判断是不是手动输入用户，

@@ -19,14 +19,9 @@
 #include "globalv.h"
 
 #include <QDebug>
-#include <QRect>
 #include <QPixmap>
-#include <QIcon>
-#include <QFontMetrics>
-#include <QPainter>
 #include <QProcess>
-#include <QStandardPaths>
-#include <QImageReader>
+#include <QPainter>
 #include <QtSvg/QSvgRenderer>
 
 /**
@@ -69,72 +64,4 @@ QPixmap scaledPixmap(int width, int height, QString url)
     }
 
     return pixmap.scaled(width, height, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-}
-
-
-
-
-
-/**
- * @brief getSystemVersion
- * @return
- * 获取系统版本号
- */
-QString getSystemVersion()
-{
-    QSettings settings("/etc/lsb-release", QSettings::IniFormat);
-    QString release = settings.value("DISTRIB_RELEASE").toString();
-    QString description = settings.value("DISTRIB_DESCRIPTION").toString();
-    if(description.right(3) == "LTS")
-        release = release + " LTS";
-    return release;
-}
-
-QString getSystemDistrib()
-{
-    QSettings settings("/etc/lsb-release", QSettings::IniFormat);
-    QString distribId = settings.value("DISTRIB_ID").toString();
-    return distribId;
-}
-
-/**
- * @brief logoGenerator
- * @param text
- * @return
- * 生成logo
- */
-QPixmap logoGenerator(const QString &text)
-{
-    if(getSystemDistrib() == "Kylin")
-        return QPixmap(":/resource/kylin-logo.png");
-
-    QString logoFile(IMAGE_DIR + "logo.png");
-    if(QFile(logoFile).exists())
-    {
-        QPixmap logo(IMAGE_DIR + "logo.png");
-        return logo;
-    }
-    QPixmap logoBare;
-    logoBare.load(":/resource/uk-logo.png");
-
-    QFont font("ubuntu", 18);
-    QFontMetrics fm(font);
-    int textPixelSize = fm.width(text);
-
-    QPixmap logo(logoBare.width() + textPixelSize + 3 + 30, logoBare.height());
-    logo.fill(Qt::transparent);
-
-    QRect logoBareRect(30 , 0, logoBare.width(), logoBare.height());
-    QPainter painter;
-    painter.begin(&logo);
-    painter.drawPixmap(logoBareRect, logoBare, logoBare.rect());
-
-    painter.setPen(Qt::white);
-    painter.setFont(font);
-    QTextOption option(Qt::AlignLeft | Qt::AlignVCenter);
-    option.setWrapMode(QTextOption::WordWrap);
-    QRect versionRect(logoBareRect.right()+3, 3, logo.width() - logoBare.width(), logo.height());
-    painter.drawText(versionRect, text, option);
-
-    return logo;
 }

@@ -28,13 +28,13 @@
 #include <QLightDM/SessionsModel>
 #include "globalv.h"
 #include "bio-verify/biodeviceview.h"
+#include "common/configuration.h"
 
 LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
     : QWidget(parent),
       m_greeter(greeter),
       m_usersModel(nullptr),
       m_sessionsModel(nullptr),
-      m_config(new QSettings(configFile, QSettings::IniFormat)),
       m_timer(new QTimer(this)),
       isManual(false),
       isPasswordError(false),
@@ -203,6 +203,16 @@ QString LoginWindow::getUserName()
     if(m_nameLabel->text() == tr("Login"))
         return "Login";
     return m_nameLabel->text();
+}
+
+/**
+ * @brief LoginWindow::getRealName
+ * @return
+ * 获取用户真名
+ */
+QString LoginWindow::getRealName()
+{
+    return m_name;
 }
 
 /**
@@ -463,12 +473,6 @@ void LoginWindow::updatePixmap()
     m_passwordEdit->setIcon(QIcon(m_waiting));
 }
 
-void LoginWindow::saveLastLoginUser()
-{
-    m_greeter->setUserName(m_name);
-    m_config->setValue("lastLoginUser", m_name);    //记录的是登录用户的真名
-    m_config->sync();
-}
 
 void LoginWindow::onLogin(const QString &str)
 {
@@ -573,7 +577,7 @@ void LoginWindow::onAuthenticationComplete()
     if(m_greeter->isAuthenticated()) {
         // 认证成功，启动session
         qDebug()<< "authentication success";
-        saveLastLoginUser();
+        Configuration::instance()->saveLastLoginUser(m_name);
         m_greeter->startSession();
     } else {
         // 认证失败，重新开始用户的认证

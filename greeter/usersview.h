@@ -39,6 +39,7 @@ private slots:
 
 signals:
     void userSelected(const QModelIndex&);
+    void currentUserChanged(const QModelIndex&);
 
 private:
     void insertUserEntry(int row);

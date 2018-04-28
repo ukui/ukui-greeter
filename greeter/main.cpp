@@ -36,10 +36,6 @@
 #include "mainwindow.h"
 #include "display-switch/displayswitch.h"
 
-
-QString configFile;
-QLocale::Language language;
-
 void outputMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     Q_UNUSED(context)
@@ -71,9 +67,7 @@ void outputMessage(QtMsgType type, const QMessageLogContext &context, const QStr
 void waitMonitorsReady()
 {
     int n;
-//    Display *dpy = XOpenDisplay(NULL);
-//    int screen = DefaultScreen(dpy);
-//    Window root = RootWindow(dpy, screen);
+
     while(true){
         XRRGetMonitors(QX11Info::display(), QX11Info::appRootWindow(), false, &n);
         if(n == -1)
@@ -101,6 +95,7 @@ int main(int argc, char *argv[])
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QTextCodec::setCodecForLocale(codec);
 
+    QLocale::Language language;
     language = QLocale::system().language();
     qDebug() << "current locale language: " << QLocale::languageToString(language);
 
@@ -121,8 +116,6 @@ int main(int argc, char *argv[])
     QApplication::setOrganizationName("Kylin");
     QApplication::setApplicationName("ukui-greeter");
 
-    configFile = QStandardPaths::displayName(QStandardPaths::CacheLocation) + "/ukui-greeter.conf";
-    qDebug() << "load configure file: "<< configFile;
 
     //设置鼠标指针样式
     XDefineCursor(QX11Info::display(), QX11Info::appRootWindow(), XCreateFontCursor(QX11Info::display(), XC_arrow));

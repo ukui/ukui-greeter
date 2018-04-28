@@ -31,6 +31,7 @@ class PowerWindow;
 class UsersView;
 class QProcess;
 class QGraphicsOpacityEffect;
+class Configuration;
 class GreeterWindow : public QWidget
 {
     Q_OBJECT
@@ -44,8 +45,12 @@ protected:
     void resizeEvent(QResizeEvent *);
     void keyReleaseEvent(QKeyEvent *event);
 
+signals:
+    void backgroundChanged(const QString& backgroundPath);
+
 private slots:
     void onUserSelected(const QModelIndex &);
+    void onCurrentUserChanged(const QModelIndex&);
     void onBacktoUsers();
     void onBacktoLogin();
     void onSelectSession(const QString&);
@@ -72,6 +77,7 @@ private:
     GreeterWrapper          *m_greeter;
     UsersModel              *m_usersModel;
     QAbstractItemModel      *m_sessionsModel;
+    Configuration           *m_configuration;
 };
 
 #endif // GREETERWINDOW_H

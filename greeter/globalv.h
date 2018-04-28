@@ -38,13 +38,7 @@ class QRect;
 
 extern float scale;     //缩放比例
 extern int fontSize;    //字体大小
-extern QFont font;      //字体
-extern QString configFile; //配置文件路径
-extern QLocale::Language language;
 
 QPixmap scaledPixmap(int width, int height, QString url);
-QPixmap logoGenerator(const QString &);
-QString getSystemVersion();
-void waitMonitorsReady();
 #endif // GLOBALV_H
 

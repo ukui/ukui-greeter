@@ -26,12 +26,13 @@
 #include <QDir>
 #include "globalv.h"
 #include "greeterwindow.h"
+#include "common/configuration.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent),
       m_screenModel(new ScreenModel(this)),
-      m_activeScreen(0),
-      needPaint(true)
+      m_configuration(Configuration::instance()),
+      m_activeScreen(0)
 {
     connect(m_screenModel, &ScreenModel::dataChanged, this, &MainWindow::onScreenResized);
     connect(m_screenModel, &ScreenModel::modelReset, this, &MainWindow::onScreenCountChanged);
@@ -44,22 +45,29 @@ MainWindow::MainWindow(QWidget *parent)
     //设置监控鼠标移动
     setMouseTracking(true);
 
+    //logo
+    m_logo = m_configuration->getLogo();
+
+    //背景图片 优先级：用户桌面背景、背景图片、背景颜色
+    m_defaultBackgroundPath = m_backgroundPath = IMAGE_DIR + "background.jpg";
+//    m_background = scaledPixmap(width(), height(), m_defaultBackgroundPath);
+
+    m_drawUserBackground = m_configuration->getValue("draw-user-background").toBool();
+    if(!m_drawUserBackground) {
+        m_backgroundPath = m_configuration->getValue("background").toString();
+        if(m_backgroundPath == "") {
+            m_backgroundColor = m_configuration->getValue("background-color").toString();
+            if(m_backgroundColor == "")
+                m_backgroundPath = m_defaultBackgroundPath;
+        }
+    }
+
     //激活屏幕(即Greeter窗口所在屏幕位置)
     m_greeterWnd = new GreeterWindow(this);
+    if(m_drawUserBackground)
+        connect(m_greeterWnd, &GreeterWindow::backgroundChanged, this, &MainWindow::onBackgoundChanged);
     moveToScreen(dw->primaryScreen());
     m_greeterWnd->initUI();
-
-    //logo
-    m_logo = logoGenerator(getSystemVersion());
-
-    //背景图片
-    QDir dir(IMAGE_DIR);
-    QStringList names{"background*"};
-    QStringList files = dir.entryList(names, QDir::Files);
-    if(files.size() > 0)
-        backgroundPath = IMAGE_DIR + files[0];
-
-    background = scaledPixmap(width(), height(), backgroundPath);
 }
 
 void MainWindow::paintEvent(QPaintEvent *e)
@@ -68,7 +76,16 @@ void MainWindow::paintEvent(QPaintEvent *e)
         //在每个屏幕上绘制背景
         QRect rect = m_screenModel->index(i, 0).data(Qt::UserRole).toRect();
         QPainter painter(this);
-        painter.drawPixmap(rect, background);
+        if(m_backgroundPath != ""){
+            QString resolution = QString("%1x%2").arg(rect.width()).arg(rect.height());
+            QPair<QString, QString> key( m_backgroundPath, resolution);
+            if(!m_backgrounds.contains(key))
+                m_backgrounds[key] = scaledPixmap(width(), height(), m_backgroundPath);
+            painter.drawPixmap(rect, m_backgrounds[key]);
+
+        } else {
+            painter.fillRect(rect, QColor(m_backgroundColor));
+        }
         //绘制logo
         painter.setOpacity(0.5);
         QRect logoRect(rect.left(), rect.bottom()-80, m_logo.width(), m_logo.height());
@@ -146,4 +163,20 @@ void MainWindow::moveToScreen(int screen)
     QRect activeScreenRect = m_screenModel->index(m_activeScreen, 0).data(Qt::UserRole).toRect();
     m_greeterWnd->setGeometry(activeScreenRect);
     Q_EMIT activeScreenChanged(activeScreenRect);
+}
+/**
+ * 当前用户选择焦点发生变化时，如果配置了绘制用户背景，则切换背景
+ */
+void MainWindow::onBackgoundChanged(const QString &bgPath)
+{
+    QString tmpBgPath = bgPath;
+
+    QFile bgfile(bgPath);
+    if(!bgfile.exists())
+        tmpBgPath = m_defaultBackgroundPath;
+
+    if(tmpBgPath != m_backgroundPath){
+        m_backgroundPath = tmpBgPath;
+        repaint();
+    }
 }

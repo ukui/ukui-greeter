@@ -3,9 +3,9 @@
 #include <QDebug>
 #include <QPushButton>
 #include <QKeyEvent>
-#include <QSettings>
 #include <QStandardPaths>
 #include <QLightDM/UsersModel>
+#include "common/configuration.h"
 
 UsersView::UsersView(QWidget *parent) :
     QWidget(parent)
@@ -52,9 +52,7 @@ void UsersView::setModel(QAbstractListModel *model)
     connect(usersModel, &QAbstractListModel::dataChanged, this, &UsersView::onUserChanged);
 
     //选中上一次登录的用户
-    QString recordFile = QStandardPaths::displayName(QStandardPaths::CacheLocation) + "/ukui-greeter.conf";
-    QSettings settings(recordFile, QSettings::IniFormat);
-    QString lastLoginUser = settings.value("lastLoginUser").toString();
+    QString lastLoginUser = Configuration::instance()->getLastLoginUser();
     qDebug() << "lastLoginUser: "<< lastLoginUser;
     for(int i = 0; i < usersModel->rowCount(); i++)
         insertUserEntry(i);
@@ -165,10 +163,6 @@ void UsersView::onUserPressed()
 void UsersView::onUserClicked(const QString& userName)
 {
     qDebug() << userName << " selected";
-//    QString recordFile = QStandardPaths::displayName(QStandardPaths::CacheLocation) + "/ukui-greeter.conf";
-//    QSettings settings(recordFile, QSettings::IniFormat);
-//    settings.setValue("lastLoginUser", userName);
-//    settings.sync();
     for(int i = 0; i < usersModel->rowCount(); i++){
         if(usersModel->index(i, 0).data(Qt::DisplayRole).toString() == userName) {
             QModelIndex index = usersModel->index(i);
@@ -225,6 +219,9 @@ void UsersView::setCurrentRow(int row)
     usersList->setCurrentRow(row);
     UserEntry *entry = static_cast<UserEntry*>(usersList->itemWidget(usersList->currentItem()));
     entry->setSelected();
+
+    QModelIndex index = usersModel->index(row, 0);
+    Q_EMIT currentUserChanged(index);
 }
 
 void UsersView::pageUp()

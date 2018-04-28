@@ -65,8 +65,6 @@ RESOURCES += image.qrc \
 
 TRANSLATIONS += translations/zh_CN.ts
 
-system(lrelease translations/zh_CN.ts -qm translations/zh_CN.qm)
-
 qm_file.files = translations/*.qm
 qm_file.path = $${PREFIX}/translations/
 
@@ -76,6 +74,9 @@ resourcefiles.path = $${PREFIX}/images/
 configfile.files = 95-ukui-greeter.conf
 configfile.path = /usr/share/lightdm/lightdm.conf.d/
 
+etcfile.files = ukui-greeter.conf
+etcfile.path = /etc/lightdm/
+
 desktopfile.files = ukui-greeter.desktop
 desktopfile.path = /usr/share/xgreeters/
 
@@ -84,7 +85,4 @@ manfile.path = /usr/share/man/man1/
 
 target.path = /usr/sbin/
 
-INSTALLS += target configfile desktopfile resourcefiles qm_file manfile
-
-DISTFILES += \
-    common/common.pri
+INSTALLS += target configfile etcfile desktopfile resourcefiles qm_file manfile
