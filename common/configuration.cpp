@@ -5,6 +5,7 @@
 #include <QFontMetrics>
 #include <QTextOption>
 #include <QPainter>
+#include <QDebug>
 
 #define CONFIG_FILE "/etc/lightdm/ukui-greeter.conf"
 
@@ -14,6 +15,7 @@ Configuration::Configuration(QObject *parent)
     : QObject(parent)
 {
     QString recodfile = QStandardPaths::displayName(QStandardPaths::CacheLocation) + "/ukui-greeter.conf";
+    qDebug() << recodfile;
 
     configSettings = new QSettings(CONFIG_FILE, QSettings::IniFormat, this);
     recordSettings = new QSettings(recodfile, QSettings::IniFormat, this);
@@ -55,6 +57,7 @@ void Configuration::saveLastLoginUser(const QString &userRealName)
     recordSettings->beginGroup("Greeter");
     recordSettings->setValue("lastLoginUser", userRealName);
     recordSettings->endGroup();
+    recordSettings->sync();
 }
 
 

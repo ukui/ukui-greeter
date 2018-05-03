@@ -56,9 +56,13 @@ void UsersView::setModel(QAbstractListModel *model)
     qDebug() << "lastLoginUser: "<< lastLoginUser;
     for(int i = 0; i < usersModel->rowCount(); i++)
         insertUserEntry(i);
-    for(int i = 0; i < usersModel->rowCount(); i++)
-        if(lastLoginUser == usersModel->index(i, 0).data(Qt::DisplayRole).toString())
+    setCurrentRow(0);   //默认选中第一位用户
+    for(int i = 0; i < usersModel->rowCount(); i++) {
+        if(lastLoginUser == usersModel->index(i, 0).data(Qt::DisplayRole).toString()) {
             setCurrentRow(i);
+            break;
+        }
+    }
 }
 
 void UsersView::resizeEvent(QResizeEvent *event)
