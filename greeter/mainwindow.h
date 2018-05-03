@@ -52,6 +52,7 @@ private:
     QString          m_backgroundPath;
     QString          m_backgroundColor;
     QPixmap          m_logo;
+    QPixmap          m_cof;
     //QMap<QPair<m_backgroundPath, resolution>, background>
     //对每张背景图片的不同分辨率进行缓存，减少CPU占用率（这里分辨率格式：1080x960）
     QMap<QPair<QString, QString>, QPixmap>   m_backgrounds;

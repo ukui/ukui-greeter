@@ -48,10 +48,11 @@ MainWindow::MainWindow(QWidget *parent)
     //logo
     m_logo = m_configuration->getLogo();
 
+    //cof
+    m_cof.load(m_configuration->getValue("cof").toString());
+
     //背景图片 优先级：用户桌面背景、背景图片、背景颜色
     m_defaultBackgroundPath = m_backgroundPath = IMAGE_DIR + "background.jpg";
-//    m_background = scaledPixmap(width(), height(), m_defaultBackgroundPath);
-
     m_drawUserBackground = m_configuration->getValue("draw-user-background").toBool();
     if(!m_drawUserBackground) {
         m_backgroundPath = m_configuration->getValue("background").toString();
@@ -94,11 +95,10 @@ void MainWindow::paintEvent(QPaintEvent *e)
         //在没有登录窗口的屏幕上显示图标
         if(i != m_activeScreen)
         {
-            QPixmap cof(":/resource/cof.png");
-            QRect cofRect(rect.left() + (rect.width()-cof.width())/2,
-                          rect.top() + (rect.height()-cof.height())/2,
-                          cof.width(), cof.height());
-            painter.drawPixmap(cofRect, cof);
+            QRect cofRect(rect.left() + (rect.width()-m_cof.width())/2,
+                          rect.top() + (rect.height()-m_cof.height())/2,
+                          m_cof.width(), m_cof.height());
+            painter.drawPixmap(cofRect, m_cof);
         }
     }
     return QWidget::paintEvent(e);
