@@ -33,8 +33,6 @@
         <file>resource/badges/xubuntu_badge.png</file>
         <file>resource/background.jpg</file>
         <file>resource/kylin-logo.png</file>
-        <file>resource/next_hl.png</file>
-        <file>resource/prev_hl.png</file>
         <file>resource/uk-logo.png</file>
     </qresource>
 </RCC>

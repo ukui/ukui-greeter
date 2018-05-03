@@ -1,8 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>resource/fingerprint.gif</file>
-        <file>resource/fingervein.gif</file>
-        <file>resource/iris.gif</file>
         <file>resource/iris-icon.png</file>
         <file>resource/fingerprint-icon.png</file>
         <file>resource/fingervein-icon.png</file>
