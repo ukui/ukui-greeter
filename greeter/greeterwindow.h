@@ -41,7 +41,6 @@ public:
     void initUI();
 
 protected:
-    bool eventFilter(QObject *, QEvent *);
     void resizeEvent(QResizeEvent *);
     void keyReleaseEvent(QKeyEvent *event);
 
@@ -54,13 +53,11 @@ private slots:
     void onBacktoUsers();
     void onBacktoLogin();
     void onSelectSession(const QString&);
-    void onMenuItemClicked(QAction *action);
     void timedAutologin();
 
 private:
     void switchWnd(int);
     void showPowerWnd();
-    void showLanguageMenu();
     void showBoard();
 
     UsersView               *m_userWnd;
@@ -70,7 +67,6 @@ private:
     QPushButton             *m_keyboardLB;
     QPushButton             *m_powerLB;
     QPushButton             *m_languageLB;
-    QMenu                   *m_languageMenu;
     QProcess                *m_board;
     QWidget                 *m_boardWidget;
 

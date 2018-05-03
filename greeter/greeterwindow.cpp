@@ -41,7 +41,6 @@ GreeterWindow::GreeterWindow(QWidget *parent)
       m_loginWnd(nullptr),
       m_sessionWnd(nullptr),
       m_powerWnd(nullptr),
-      m_languageMenu(nullptr),
       m_board(nullptr),
       m_greeter(new GreeterWrapper()),
       m_usersModel(new UsersModel(m_greeter->hideUsersHint())),
@@ -98,18 +97,25 @@ void GreeterWindow::initUI()
     //语言选择按钮
     m_languageLB = new QPushButton(this);
     m_languageLB->setObjectName(QStringLiteral("languageButton"));
-    m_languageLB->setMenu(m_languageMenu);
     m_languageLB->setFocusPolicy(Qt::NoFocus);
     m_languageLB->setFont(QFont("Ubuntu", 16));
     QString defaultLanguage = qgetenv("LANG").constData();
     if(defaultLanguage.contains("zh_CN")) {
-        m_languageLB->setText(tr("Zh"));
+        m_languageLB->setText(tr("CN"));
         m_greeter->setLang("zh_CN");
     } else {
-        m_languageLB->setText(tr("En"));
+        m_languageLB->setText(tr("EN"));
         m_greeter->setLang("en_US");
     }
-    connect(m_languageLB, &QPushButton::clicked, this, &GreeterWindow::showLanguageMenu);
+    connect(m_languageLB, &QPushButton::clicked, this, [&]{
+        if(m_languageLB->text()==tr("CN")){
+            m_languageLB->setText(tr("EN"));
+            m_greeter->setLang("en_US");
+        } else {
+            m_languageLB->setText(tr("CN"));
+            m_greeter->setLang("zh_CN");
+        }
+    });
 
     //虚拟键盘启动按钮
     m_keyboardLB = new QPushButton(this);
@@ -170,26 +176,6 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     m_languageLB->setGeometry(this->width() - 180, 20, 39, 39);
     m_keyboardLB->setGeometry(this->width() - 120, 20, 39, 39);
     m_powerLB->setGeometry(this->width() - 60, 20, 39, 39);
-}
-
-bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
-{
-    if(obj == m_languageMenu) {
-        if(event->type() == QEvent::Close) {
-            //当菜单关闭时需要重绘label，否则指针悬浮在label上产生的背景不会消失
-            repaint(m_languageLB->geometry());
-            return true;
-        } else if(event->type() == QEvent::MouseButtonRelease) {
-            //打开电源对话框后再打开语言选择菜单，单击菜单项接收不到triggered信号，
-            //需要双击菜单项才会生效，所以这里直接调用trigger函数
-            QAction *action = m_languageMenu->activeAction();
-            if(action)
-                action->trigger();
-            m_languageMenu->close();
-            return true;
-        }
-    }
-    return QWidget::eventFilter(obj, event);
 }
 
 void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
@@ -313,55 +299,6 @@ void GreeterWindow::showPowerWnd()
     m_powerWnd = new PowerWindow(hasOpenSessions, this);
     m_powerWnd->setObjectName(QStringLiteral("powerWnd"));
     m_powerWnd->show();
-}
-
-/**
- * @brief GreeterWindow::showLanguageMenu
- * 显示语言选择菜单
- */
-void GreeterWindow::showLanguageMenu()
-{
-    if(!m_languageMenu) {
-        // 目前只允许language设置为中文或者英文
-        m_languageMenu = new QMenu(this);
-
-        QAction *m_en = new QAction(tr("English"), m_languageMenu);
-        m_en->setCheckable(true);
-        QAction *m_zh = new QAction(tr("Chinese"), m_languageMenu);
-        m_zh->setCheckable(true);
-        QActionGroup *actgroup = new QActionGroup(m_languageMenu);
-        actgroup->addAction(m_en);
-        actgroup->addAction(m_zh);
-        actgroup->setExclusive(true);
-
-        m_languageMenu->addActions(actgroup->actions());
-        m_languageMenu->installEventFilter(this);
-        connect(m_languageMenu, SIGNAL(triggered(QAction*)), this, SLOT(onMenuItemClicked(QAction*)));
-
-        // 默认选项
-        if(m_greeter->lang() == "zh_CN")
-            m_zh->setChecked(true);
-        else
-            m_en->setChecked(true);
-    }
-    m_languageMenu->popup(mapToGlobal(m_languageLB->geometry().bottomLeft()));
-}
-
-/**
- * @brief GreeterWindow::onMenuItemClicked
- * @param action
- * 选择语言
- */
-void GreeterWindow::onMenuItemClicked(QAction *action)
-{
-    QString text = action->text();
-    if(text == tr("English")){
-        m_languageLB->setText(tr("En"));
-        m_greeter->setLang("en_US");
-    } else if(text == tr("Chinese")) {
-        m_languageLB->setText(tr("Zh"));
-        m_greeter->setLang("zh_CN");
-    }
 }
 
 /**
