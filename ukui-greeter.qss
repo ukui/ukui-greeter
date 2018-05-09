@@ -131,9 +131,9 @@ QListWidget{
     background:transparent;
     border: 0px;
 }
-QListWidget::item#sessionsList{
+/*QListWidget::item#sessionsList{
     height:40px
-}
+}*/
 QListWidget::item:hover#sessionsList{
     background:rgb(150, 150, 150, 50);
     border:1px solid white;

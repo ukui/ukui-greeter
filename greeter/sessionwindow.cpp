@@ -28,6 +28,10 @@
 #define ICON_SIZE 22
 #define PROMPT_LEFT 150
 #define LISTWIDGET_SAPCE 10
+#define ITEM_WIDTH 300
+#define ITEM_HEIGHT 40
+#define DISPLAY_ROWS 3  //只显示3行，可以通过上下键移动焦点
+#define LISTWIDGET_HEIGHT (DISPLAY_ROWS * (LISTWIDGET_SAPCE * 2 + ITEM_HEIGHT))
 
 class IconLabel : public QWidget
 {
@@ -87,8 +91,14 @@ void SessionWindow::initUI()
 
     m_sessionsList = new QListWidget(this);
     m_sessionsList->setObjectName(QStringLiteral("sessionsList"));
+    m_sessionsList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_sessionsList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_sessionsList->setSpacing(LISTWIDGET_SAPCE);
     connect(m_sessionsList, &QListWidget::itemClicked, this, &SessionWindow::saveAndBack);
+
+    m_sessionsList->setGeometry(PROMPT_LEFT - LISTWIDGET_SAPCE, 55, ITEM_WIDTH + 2, LISTWIDGET_HEIGHT + 2);
+
+    resize(550, LISTWIDGET_HEIGHT + 55);
 }
 
 
@@ -99,13 +109,8 @@ void SessionWindow::setSessionModel(QAbstractItemModel *model)
     }
     m_sessionsModel = model;
 
-    int sessionNum = m_sessionsModel->rowCount();
-    int height = 55 + 40 * sessionNum + 20 * (sessionNum - 1);
-    resize(550, height);
-    m_sessionsList->setGeometry(PROMPT_LEFT - LISTWIDGET_SAPCE, 55,
-                                300, 40*sessionNum+20*(sessionNum-1));
-
     addSessionLabels();
+
 #ifdef TEST
     testAddSessionLabels();
 #endif
@@ -116,13 +121,15 @@ void SessionWindow::addSessionLabels()
     for(int i = 0; i < m_sessionsModel->rowCount(); i++) {
         QString sessionName = m_sessionsModel->index(i, 0).data().toString();
         QString sessionKey = m_sessionsModel->index(i, 0).data(Qt::UserRole).toString();
-        IconLabel *sessionLabel = new IconLabel(300, 40, this);
+        IconLabel *sessionLabel = new IconLabel(ITEM_WIDTH, ITEM_HEIGHT, this);
         sessionLabel->setIcon(getSessionIcon(sessionKey));
         if(sessionKey == m_defaultSession)
             sessionLabel->setText(sessionName + tr(" (Default)"));
         else
             sessionLabel->setText(sessionName);
+
         QListWidgetItem *newItem = new QListWidgetItem();
+        newItem->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
         m_sessionsList->insertItem(i,newItem);
         m_sessionsList->setItemWidget(newItem, sessionLabel);
     }
@@ -182,10 +189,11 @@ void SessionWindow::testAddSessionLabels()
     QStringList sessionList{"MATE", "Ubuntu", "Xfce", "LUbuntu", "XUbuntu", "GNOME", "KDE", "Pantheon"};
     for(int i = 0; i < sessionList.size(); i++) {
         QString sessionName = sessionList[i];
-        IconLabel *sessionLabel = new IconLabel(300, 40, this);
+        IconLabel *sessionLabel = new IconLabel(ITEM_WIDTH, ITEM_HEIGHT, this);
         sessionLabel->setIcon(getSessionIcon(sessionName));
         sessionLabel->setText(sessionName);
         QListWidgetItem *newItem = new QListWidgetItem();
+        newItem->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
         m_sessionsList->insertItem(i,newItem);
         m_sessionsList->setItemWidget(newItem, sessionLabel);
     }
