@@ -49,6 +49,8 @@ struct DeviceInfo {
     int bustype;
     int dev_status;
     int ops_status;
+
+    bool operator==(const DeviceInfo&) const;
 };
 Q_DECLARE_METATYPE(DeviceInfo)
 

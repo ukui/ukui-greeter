@@ -28,3 +28,11 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, DeviceInfo &devic
     argument.endStructure();
     return argument;
 }
+
+bool DeviceInfo::operator==(const DeviceInfo &deviceInfo) const
+{
+    if(this->device_shortname == deviceInfo.device_shortname &&
+       this->device_available == deviceInfo.device_available)
+        return true;
+    return false;
+}

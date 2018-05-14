@@ -15,9 +15,6 @@ public:
     int deviceCount();
     int featuresNum(qint32 uid);
     QList<DeviceInfo> getAvaliableDevices(qint32 uid);
-signals:
-
-public slots:
 
 private:
     void connectToService();

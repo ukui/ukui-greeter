@@ -25,6 +25,7 @@
 #include <QWindow>
 #include <QtDBus/QDBusInterface>
 #include <QtDBus/QDBusConnection>
+#include <QtDBus/QDBusReply>
 #include <QLightDM/SessionsModel>
 #include "globalv.h"
 #include "loginwindow.h"
@@ -76,45 +77,15 @@ GreeterWindow::~GreeterWindow()
 
 void GreeterWindow::initUI()
 {
-    // 如果只用一个用户的话，直接进入登录界面，否则显示用户列表窗口
-    if(m_usersModel->rowCount() > 1) {
-        m_userWnd = new UsersView(this);
-        connect(m_userWnd, &UsersView::currentUserChanged, this, &GreeterWindow::onCurrentUserChanged);
-        connect(m_userWnd, &UsersView::userSelected, this, &GreeterWindow::onUserSelected);
-
-        m_userWnd->setModel(m_usersModel);
-    }
-
-    //登录窗口
-    m_loginWnd = new LoginWindow(m_greeter, this);
-    m_loginWnd->setUsersModel(m_usersModel);
-    m_loginWnd->setSessionsModel(m_sessionsModel);
-    if(m_usersModel->rowCount() > 1)    //如果显示了用户选择窗口，则先隐藏登录窗口
-        m_loginWnd->hide();
-    connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBacktoUsers()));
-    connect(m_loginWnd, SIGNAL(selectSession(QString)), this, SLOT(onSelectSession(QString)));
-
     //语言选择按钮
     m_languageLB = new QPushButton(this);
     m_languageLB->setObjectName(QStringLiteral("languageButton"));
     m_languageLB->setFocusPolicy(Qt::NoFocus);
     m_languageLB->setFont(QFont("Ubuntu", 16));
     QString defaultLanguage = qgetenv("LANG").constData();
-    if(defaultLanguage.contains("zh_CN")) {
-        m_languageLB->setText(tr("CN"));
-        m_greeter->setLang("zh_CN");
-    } else {
-        m_languageLB->setText(tr("EN"));
-        m_greeter->setLang("en_US");
-    }
+    setLanguage(defaultLanguage);
     connect(m_languageLB, &QPushButton::clicked, this, [&]{
-        if(m_languageLB->text()==tr("CN")){
-            m_languageLB->setText(tr("EN"));
-            m_greeter->setLang("en_US");
-        } else {
-            m_languageLB->setText(tr("CN"));
-            m_greeter->setLang("zh_CN");
-        }
+        setLanguage(m_languageLB->text());
     });
 
     //虚拟键盘启动按钮
@@ -132,6 +103,24 @@ void GreeterWindow::initUI()
     m_powerLB->setIconSize(QSize(39, 39));
     m_powerLB->setFocusPolicy(Qt::NoFocus);
     connect(m_powerLB, &QPushButton::clicked, this, &GreeterWindow::showPowerWnd);
+
+    // 如果只用一个用户的话，直接进入登录界面，否则显示用户列表窗口
+    if(m_usersModel->rowCount() > 1) {
+        m_userWnd = new UsersView(this);
+        connect(m_userWnd, &UsersView::currentUserChanged, this, &GreeterWindow::onCurrentUserChanged);
+        connect(m_userWnd, &UsersView::userSelected, this, &GreeterWindow::onUserSelected);
+
+        m_userWnd->setModel(m_usersModel);
+    }
+
+    //登录窗口
+    m_loginWnd = new LoginWindow(m_greeter, this);
+    m_loginWnd->setUsersModel(m_usersModel);
+    m_loginWnd->setSessionsModel(m_sessionsModel);
+    if(m_usersModel->rowCount() > 1)    //如果显示了用户选择窗口，则先隐藏登录窗口
+        m_loginWnd->hide();
+    connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBacktoUsers()));
+    connect(m_loginWnd, SIGNAL(selectSession(QString)), this, SLOT(onSelectSession(QString)));
 }
 
 /**
@@ -208,6 +197,17 @@ void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
     QWidget::keyReleaseEvent(e);
 }
 
+void GreeterWindow::setLanguage(const QString &language)
+{
+    if(language.contains("zh_CN")) {
+        m_languageLB->setText(tr("CN"));
+        m_greeter->setLang("zh_CN");
+    } else {
+        m_languageLB->setText(tr("EN"));
+        m_greeter->setLang("en_US");
+    }
+}
+
 
 void GreeterWindow::onUserSelected(const QModelIndex &index)
 {
@@ -220,6 +220,28 @@ void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
 {
     QString backgroundPath = index.data(QLightDM::UsersModel::BackgroundPathRole).toString();
     Q_EMIT backgroundChanged(backgroundPath);
+
+    //获取用户的session语言
+    QString language;
+    QString realName = index.data(QLightDM::UsersModel::NameRole).toString();
+    if(realName == "*guest" || realName == "*login")
+        return;
+    QDBusInterface iface("org.freedesktop.Accounts", "/org/freedesktop/Accounts",
+                         "org.freedesktop.Accounts",QDBusConnection::systemBus());
+    QDBusReply<QDBusObjectPath> userPath = iface.call("FindUserByName", realName);
+    if(!userPath.isValid())
+        qWarning() << "Get UserPath error:" << userPath.error();
+    else {
+        QDBusInterface userIface("org.freedesktop.Accounts", userPath.value().path(),
+                                 "org.freedesktop.DBus.Properties", QDBusConnection::systemBus());
+        QDBusReply<QDBusVariant> languageReply = userIface.call("Get", "org.freedesktop.Accounts.User", "Language");
+        if(!languageReply.isValid())
+            qWarning() << "Get User's language error" << languageReply.error();
+        else {
+            language = languageReply.value().variant().toString();
+            setLanguage(language);
+        }
+    }
 }
 
 void GreeterWindow::onBacktoUsers()

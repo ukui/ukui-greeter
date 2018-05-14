@@ -74,7 +74,7 @@ void BioDevices::getFeaturesList(qint32 uid)
         }
         int featuresNum = msg.arguments().at(0).toInt();
 
-        if(featuresNum > 0)
+        if(featuresNum > 0 && !savedDeviceInfos[uid].contains(*deviceInfo))
             savedDeviceInfos[uid].push_back(*deviceInfo);
     }
     qDebug() << "存在" << savedDeviceInfos[uid].size() << "个录入了生物特征设备";

@@ -59,6 +59,7 @@ private:
     void switchWnd(int);
     void showPowerWnd();
     void showBoard();
+    void setLanguage(const QString &language);
 
     UsersView               *m_userWnd;
     LoginWindow             *m_loginWnd;
