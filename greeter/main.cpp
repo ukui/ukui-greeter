@@ -29,6 +29,7 @@
 #include <QStandardPaths>
 #include <QX11Info>
 #include <QProcess>
+#include <QScreen>
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
 #include <X11/extensions/Xrandr.h>
@@ -68,13 +69,14 @@ void waitMonitorsReady()
 {
     int n;
 
-    while(true){
+    QScreen *screen = QApplication::primaryScreen();
+    while(n <= 0 && screen->geometry().x() <= 0 && screen->geometry().y() <= 0
+          && screen->geometry().width() <= 0 && screen->geometry().height() <= 0){
         XRRGetMonitors(QX11Info::display(), QX11Info::appRootWindow(), false, &n);
         if(n == -1)
             qWarning() << "get monitors failed";
         else if(n > 0){
             qDebug() << "found " << n << " monitors";
-            return;
         }
         //启动xrandr，打开视频输出， 自动设置最佳分辨率
         QProcess enableMonitors;
@@ -120,13 +122,16 @@ int main(int argc, char *argv[])
     //设置鼠标指针样式
     XDefineCursor(QX11Info::display(), QX11Info::appRootWindow(), XCreateFontCursor(QX11Info::display(), XC_arrow));
 
+
     //等待显示器准备完毕
-    waitMonitorsReady();
+    /*waitMonitorsReady();
+    qDebug() << "monitors ready"*/;
 
     MainWindow w;
-    w.show();
-    //在没有窗口管理器的情况下，需要激活窗口，行为类似于用鼠标点击窗口
-    w.activateWindow();
+
+//    w.show();
+//    //在没有窗口管理器的情况下，需要激活窗口，行为类似于用鼠标点击窗口
+//    w.activateWindow();
 
     DisplaySwitch ds(&w);
     ds.connect(&w, &MainWindow::activeScreenChanged, &ds, &DisplaySwitch::onPositionChanged);

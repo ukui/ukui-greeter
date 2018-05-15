@@ -25,6 +25,7 @@
 
 class GreeterWindow;
 class Configuration;
+class MonitorWatcher;
 class MainWindow : public QWidget
 {
     Q_OBJECT
@@ -37,16 +38,16 @@ signals:
     void activeScreenChanged(const QRect& rect);
 
 public slots:
-    void onScreenResized(const QModelIndex&, const QModelIndex&);
-    void onScreenCountChanged();
-    void moveToScreen(int screen = 0);
+    void onScreenResized();
+    void onScreenCountChanged(int newCount);
+    void moveToScreen(QScreen *screen = nullptr);
     void onBackgoundChanged(const QString &);
 
 private:
     ScreenModel     *m_screenModel;
     GreeterWindow   *m_greeterWnd;
     Configuration   *m_configuration;
-    int              m_activeScreen;
+    QScreen         *m_activeScreen;
     bool             m_drawUserBackground;
     QString          m_defaultBackgroundPath;
     QString          m_backgroundPath;
@@ -57,6 +58,8 @@ private:
     //对每张背景图片的不同分辨率进行缓存，减少CPU占用率（这里分辨率格式：1080x960）
     QMap<QPair<QString, QString>, QPixmap>   m_backgrounds;
 
+    static bool      m_first;
+    MonitorWatcher  *m_monitorWatcher;
 };
 
 #endif // MAINWINDOW_H

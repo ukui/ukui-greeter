@@ -24,24 +24,33 @@
 #include <QKeyEvent>
 #include <QDebug>
 #include <QDir>
+#include <QScreen>
+#include <QProcess>
 #include "globalv.h"
 #include "greeterwindow.h"
 #include "common/configuration.h"
+#include "common/monitorwatcher.h"
+#include "display-switch/displayservice.h"
+
+bool MainWindow::m_first = true;
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent),
       m_screenModel(new ScreenModel(this)),
       m_configuration(Configuration::instance()),
-      m_activeScreen(0)
+      m_activeScreen(nullptr),
+      m_monitorWatcher(new MonitorWatcher(this))
 {
-    connect(m_screenModel, &ScreenModel::dataChanged, this, &MainWindow::onScreenResized);
-    connect(m_screenModel, &ScreenModel::modelReset, this, &MainWindow::onScreenCountChanged);
+    QDesktopWidget *_desktop = QApplication::desktop();
+//    connect(_desktop, &QDesktopWidget::workAreaResized, this, &MainWindow::onScreenResized);
+    connect(_desktop, &QDesktopWidget::resized, this, &MainWindow::onScreenResized);
+//    connect(m_screenModel, &ScreenModel::dataChanged, this, &MainWindow::onScreenResized);
+//    connect(m_screenModel, &ScreenModel::modelReset, this, &MainWindow::onScreenResized);
+    /* QDesktopWidget对显示器的插拔的支持不好 */
+    connect(m_monitorWatcher, &MonitorWatcher::monitorCountChanged, this, &MainWindow::onScreenCountChanged);
 
     //设置窗口大小
-    QDesktopWidget *dw = QApplication::desktop();
-    setFixedSize(dw->rect().width(), dw->rect().height());
-    qDebug() << geometry();
-
+    setFixedSize(QApplication::primaryScreen()->virtualSize());
     //设置监控鼠标移动
     setMouseTracking(true);
 
@@ -67,15 +76,17 @@ MainWindow::MainWindow(QWidget *parent)
     m_greeterWnd = new GreeterWindow(this);
     if(m_drawUserBackground)
         connect(m_greeterWnd, &GreeterWindow::backgroundChanged, this, &MainWindow::onBackgoundChanged);
-    moveToScreen(dw->primaryScreen());
+    moveToScreen(QApplication::primaryScreen());
     m_greeterWnd->initUI();
+
+    m_monitorWatcher->start();
 }
 
 void MainWindow::paintEvent(QPaintEvent *e)
 {
-    for(int i = 0; i < m_screenModel->rowCount(); i++){
+    for(QScreen *screen : QApplication::screens()){
         //在每个屏幕上绘制背景
-        QRect rect = m_screenModel->index(i, 0).data(Qt::UserRole).toRect();
+        QRect rect = screen->geometry();
         QPainter painter(this);
         if(m_backgroundPath != ""){
             QString resolution = QString("%1x%2").arg(rect.width()).arg(rect.height());
@@ -93,7 +104,7 @@ void MainWindow::paintEvent(QPaintEvent *e)
         painter.drawPixmap(logoRect, m_logo);
 
         //在没有登录窗口的屏幕上显示图标
-        if(i != m_activeScreen)
+        if(screen != m_activeScreen)
         {
             QRect cofRect(rect.left() + (rect.width()-m_cof.width())/2,
                           rect.top() + (rect.height()-m_cof.height())/2,
@@ -110,17 +121,17 @@ void MainWindow::paintEvent(QPaintEvent *e)
  */
 void MainWindow::mouseMoveEvent(QMouseEvent *e)
 {
-    if(m_screenModel->rowCount() > 1){
+    if(QApplication::screens().count() > 1){
         QPoint point = e->pos();
-        int curScreen = -1;
-        for(int i = 0; i< m_screenModel->rowCount(); i++){
-            QRect screenRect = m_screenModel->index(i, 0).data(Qt::UserRole).toRect();
+        QScreen *curScreen = nullptr;
+        for(QScreen *screen : QApplication::screens()){
+            QRect screenRect = screen->geometry();
             if(screenRect.contains(point)) {
-                curScreen = i;
+                curScreen = screen;
                 break;
             }
         }
-        if(curScreen != m_activeScreen && curScreen >= 0){
+        if(curScreen != m_activeScreen && curScreen != nullptr){
             qDebug() << "active screen: from " << m_activeScreen << "to " << curScreen;
             moveToScreen(curScreen);
         }
@@ -128,41 +139,55 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
     return QWidget::mouseMoveEvent(e);
 }
 
-
 /**
  * 有屏幕分辨率发生改变,移动Greeter窗口位置
  */
-void MainWindow::onScreenResized(const QModelIndex &, const QModelIndex &)
+void MainWindow::onScreenResized()
 {
-    QDesktopWidget *dw = QApplication::desktop();
-    setFixedSize(dw->width(), dw->height());
-    move(0, 0);
-    qDebug() << "screen resize to " << dw->geometry();
+    setGeometry(QApplication::desktop()->geometry());
+    qDebug() << "screen resize to " << geometry();
 
-    moveToScreen(m_activeScreen);
+    moveToScreen(QApplication::primaryScreen());
 }
 
 /**
  * 有屏幕插拔,移动GreeterWindow到主屏幕
  */
-void MainWindow::onScreenCountChanged()
+void MainWindow::onScreenCountChanged(int newCount)
 {
-    qDebug() << "screen count changed to " << m_screenModel->rowCount();
-    QDesktopWidget *dw = QApplication::desktop();
-    setFixedSize(dw->width(), dw->height());
+    if(newCount < 2) {
+        QProcess enableMonitors;
+        enableMonitors.start("xrandr --auto");
+        enableMonitors.waitForFinished(-1);
+    } else {
+        DisplayService displayService;
+        displayService.switchDisplayMode(DISPLAY_MODE_EXTEND);
+    }
+    if(m_first){
+        show();
+        activateWindow();
+    }
+
     move(0, 0);
-    moveToScreen(dw->primaryScreen());
+    setFixedSize(m_monitorWatcher->getVirtualSize());
+    moveToScreen(QApplication::primaryScreen());
+    repaint();
+    qDebug() << "total screen resize to " << geometry();
 }
 
 /**
- * 移动Greeter窗口到第screen个屏幕上
+ * 移动Greeter窗口到screen屏幕上
  */
-void MainWindow::moveToScreen(int screen)
+void MainWindow::moveToScreen(QScreen *screen)
 {
     m_activeScreen = screen;
-    QRect activeScreenRect = m_screenModel->index(m_activeScreen, 0).data(Qt::UserRole).toRect();
+    QRect activeScreenRect = m_activeScreen->geometry();
+    if(m_monitorWatcher->getMonitorCount() == 1)
+        activeScreenRect = QRect(QPoint(0, 0), m_monitorWatcher->getVirtualSize());
     m_greeterWnd->setGeometry(activeScreenRect);
     Q_EMIT activeScreenChanged(activeScreenRect);
+
+    repaint();
 }
 /**
  * 当前用户选择焦点发生变化时，如果配置了绘制用户背景，则切换背景
@@ -180,3 +205,4 @@ void MainWindow::onBackgoundChanged(const QString &bgPath)
         repaint();
     }
 }
+

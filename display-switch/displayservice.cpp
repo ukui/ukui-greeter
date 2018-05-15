@@ -71,6 +71,7 @@ bool DisplayService::switchDisplayMode(DisplayMode targetMode)
         case DISPLAY_MODE_ONLY_OUT:
         {
             QString XRANDR_OUTONLY = "xrandr --output " + monitorNames[0] + " --off --output " + monitorNames[1] + " --auto";
+            qDebug() << "XRANDR_OUTONLY: " << XRANDR_OUTONLY;
 
             subProcess.start(XRANDR_OUTONLY, QIODevice::NotOpen);
             break;
