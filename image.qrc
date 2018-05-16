@@ -34,5 +34,7 @@
         <file>resource/background.jpg</file>
         <file>resource/kylin-logo.png</file>
         <file>resource/uk-logo.png</file>
+        <file>resource/show-password.png</file>
+        <file>resource/hide-password.png</file>
     </qresource>
 </RCC>

@@ -92,11 +92,25 @@ IconEdit::IconEdit(QWidget *parent)
     m_iconButton->setCursor(QCursor(Qt::PointingHandCursor));
     m_iconButton->hide();
 
+    m_modeButton = new QPushButton(this);
+    m_modeButton->setObjectName(QStringLiteral("modeButton"));
+    m_modeButton->setFocusPolicy(Qt::NoFocus);
+    m_modeButton->setCursor(QCursor(Qt::ArrowCursor));
+    m_modeButton->setStyleSheet("QPushButton{background:transparent;}");
+    connect(m_modeButton, &QPushButton::clicked, this, [&]{
+        if(m_edit->echoMode() == QLineEdit::Password) {
+            setType(QLineEdit::Normal);
+        } else {
+            setType(QLineEdit::Password);
+        }
+    });
+
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setContentsMargins(1, 1, 1, 1);
     layout->setSpacing(0);
     layout->addStretch();
     layout->addWidget(m_capsIcon);
+    layout->addWidget(m_modeButton);
     layout->addWidget(m_iconButton);
 
     connect(m_edit, &TipEdit::textChanged, this, &IconEdit::showIconButton);
@@ -110,6 +124,10 @@ IconEdit::IconEdit(QWidget *parent)
 void IconEdit::setType(QLineEdit::EchoMode type)
 {
     m_edit->setEchoMode(type);
+    if(type == QLineEdit::Password)
+        m_modeButton->setIcon(QIcon(":/resource/hide-password.png"));
+    else
+        m_modeButton->setIcon(QIcon(":/resource/show-password.png"));
 }
 
 void IconEdit::setText(const QString &text)

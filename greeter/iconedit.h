@@ -56,7 +56,6 @@ class IconEdit : public QWidget
 public:
     IconEdit(QWidget *parent = 0);
 
-
     void setIcon(const QString &filename);
     void setIcon(const QIcon &icon);
     void resize(const QSize& size);
@@ -82,6 +81,7 @@ private:
     TipEdit         *m_edit;
     QLabel          *m_capsIcon;
     QPushButton     *m_iconButton;
+    QPushButton     *m_modeButton;
     KeyEventMonitor *keyMonitor;
 };
 
