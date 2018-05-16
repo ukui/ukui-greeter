@@ -26,57 +26,13 @@
 #include "common/keyeventmonitor.h"
 
 
-///////////////////////////// TipEdit的成员 ////////////////////////////////////////
-TipEdit::TipEdit(QWidget *parent)
-    :QLineEdit(parent)
-{
-
-}
-
-void TipEdit::paintEvent(QPaintEvent *event)
-{
-    QLineEdit::paintEvent(event);
-    if(text().length() == 0 && m_tip.length() > 0){
-        drawTip();
-    }
-}
-void TipEdit::keyPressEvent(QKeyEvent *event)
-{
-    /* 屏蔽掉按下Super键时的按键 */
-    if(event->modifiers() == Qt::META)
-        return;
-    return QLineEdit::keyPressEvent(event);
-}
-
-/**
- * @brief TipEdit::drawTip
- * 绘制提示（和placeholder不同）
- */
-void TipEdit::drawTip()
-{
-    QRect csRect = cursorRect();
-    QRect tipRect(csRect.right()-3, rect().top(), rect().right(), rect().bottom());
-
-    QPainter painter(this);
-    painter.setPen(QColor("#888"));
-    painter.setFont(QFont("ubuntu", 10));
-    QTextOption option(Qt::AlignLeft | Qt::AlignVCenter);
-    option.setWrapMode(QTextOption::WordWrap);
-
-    painter.drawText(tipRect, m_tip, option);
-}
-
-
-//////////////////////////// IconEdit的成员 ////////////////////////////////////////
-
-
 IconEdit::IconEdit(QWidget *parent)
     : QWidget(parent),
       keyMonitor(KeyEventMonitor::instance(this))
 {
     keyMonitor->start();
 
-    m_edit = new TipEdit(this);
+    m_edit = new QLineEdit(this);
     m_edit->setObjectName(QStringLiteral("passwdEdit"));
     m_edit->setAttribute(Qt::WA_InputMethodEnabled, false); //禁用输入法
     m_edit->setContextMenuPolicy(Qt::NoContextMenu);    //禁用右键菜单
@@ -113,8 +69,8 @@ IconEdit::IconEdit(QWidget *parent)
     layout->addWidget(m_modeButton);
     layout->addWidget(m_iconButton);
 
-    connect(m_edit, &TipEdit::textChanged, this, &IconEdit::showIconButton);
-    connect(m_edit, &TipEdit::returnPressed, this, &IconEdit::clicked_cb);
+    connect(m_edit, &QLineEdit::textChanged, this, &IconEdit::showIconButton);
+    connect(m_edit, &QLineEdit::returnPressed, this, &IconEdit::clicked_cb);
     connect(m_iconButton, &QPushButton::clicked, this, &IconEdit::clicked_cb);
     connect(keyMonitor, &KeyEventMonitor::CapsLockChanged, this, &IconEdit::onCapsStateChanged);
 
@@ -186,8 +142,7 @@ void IconEdit::clear()
 
 void IconEdit::setPrompt(const QString &prompt)
 {
-    m_edit->setInnerTip(prompt);
-    update();   //不更新的话，第一次不会显示prompt
+    m_edit->setPlaceholderText(prompt);
 }
 
 const QString IconEdit::text()

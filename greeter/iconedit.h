@@ -25,29 +25,6 @@
 #include <QPushButton>
 #include <QPixmap>
 
-class TipEdit : public QLineEdit
-{
-    Q_OBJECT
-    Q_PROPERTY(QString innerTip READ innerTip WRITE setInnerTip)
-public:
-    TipEdit(QWidget *parent=0);
-    const QString& innerTip(){ return m_tip; }
-    void setInnerTip(const QString &tip){ m_tip = tip;}
-
-protected:
-    void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
-    void keyPressEvent(QKeyEvent *) Q_DECL_OVERRIDE;
-
-private:
-    void drawTip();
-
-
-signals:
-    void capsStateChanged(bool capsState);
-
-private:
-    QString m_tip;
-};
 
 class KeyEventMonitor;
 class IconEdit : public QWidget
@@ -78,7 +55,7 @@ public slots:
     void showIconButton(const QString &);
     void onCapsStateChanged(int);
 private:
-    TipEdit         *m_edit;
+    QLineEdit       *m_edit;
     QLabel          *m_capsIcon;
     QPushButton     *m_iconButton;
     QPushButton     *m_modeButton;
