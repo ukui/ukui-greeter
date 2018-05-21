@@ -63,11 +63,15 @@ void BioDevices::getDevicesList()
     argument >> infos;
     for(int i = 0; i < deviceNum; i++) {
         DeviceInfo *deviceInfo = new DeviceInfo;
-        infos.at(0).value<QDBusArgument>() >> *deviceInfo;
+        infos.at(i).value<QDBusArgument>() >> *deviceInfo;
 
         if(deviceInfo->device_available > 0)     //设备可用
             deviceInfos.push_back(deviceInfo);
     }
+    QStringList devicesName;
+    for(auto info : deviceInfos)
+        devicesName.push_back(info->device_shortname);
+    qDebug() << "devices: " << devicesName;
 }
 
 /**
