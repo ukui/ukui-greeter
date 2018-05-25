@@ -33,6 +33,7 @@ public:
     ProxyModel(QObject *parent = 0);
     QVariant data(const QModelIndex &index, int role) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    QHash<int, QByteArray> roleNames() const;
 
     void setSourceModel(QAbstractListModel *sourceModel);
     QStandardItemModel* extraRowModel();
@@ -47,7 +48,8 @@ public slots:
     void onExtraRowsRemoved ( const QModelIndex & parent, int start, int end );
 
 private:
-    QWeakPointer<QAbstractListModel> m_model;
+//    QWeakPointer<QAbstractListModel> m_model;
+    QAbstractListModel *m_model;
     QStandardItemModel *m_extraModel;
 
     int sourceRowCount() const;

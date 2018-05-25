@@ -405,7 +405,8 @@ int LoginWindow::sessionIndex(const QString &session)
         return -1;
     }
     for(int i = 0; i < m_sessionsModel->rowCount(); i++){
-        QString sessionName = m_sessionsModel->index(i, 0).data().toString();
+        QString sessionName = m_sessionsModel->index(i, 0)
+                .data(QLightDM::SessionsModel::KeyRole).toString();
         if(session.toLower() == sessionName.toLower()) {
             return i;
         }

@@ -20,6 +20,7 @@
 #include <QDebug>
 ProxyModel::ProxyModel(QObject *parent)
     : QAbstractListModel(parent),
+      m_model(nullptr),
       m_extraModel(new QStandardItemModel(this))
 {
     connect(m_extraModel, SIGNAL(rowsInserted(const QModelIndex&, int, int)),
@@ -34,7 +35,7 @@ ProxyModel::ProxyModel(QObject *parent)
 QVariant ProxyModel::data(const QModelIndex &index, int role) const
 {
     if(index.row() < sourceRowCount())
-        return m_model.data()->index(index.row(), 0).data(role);
+        return m_model->index(index.row(), 0).data(role);
     else
         return m_extraModel->index(index.row() - sourceRowCount(), 0).data(role);
 }
@@ -45,6 +46,11 @@ int ProxyModel::rowCount(const QModelIndex &parent) const
     return sourceRowCount() + m_extraModel->rowCount();
 }
 
+QHash<int, QByteArray> ProxyModel::roleNames() const
+{
+    return m_model == nullptr ? QHash<int, QByteArray>() : m_model->roleNames();
+}
+
 QStandardItemModel* ProxyModel::extraRowModel()
 {
     return m_extraModel;
@@ -52,31 +58,35 @@ QStandardItemModel* ProxyModel::extraRowModel()
 
 void ProxyModel::setSourceModel(QAbstractListModel *sourceModel)
 {
-    if(!m_model.isNull())
+    if(m_model)
     {
-        disconnect(m_model.data(), SIGNAL(rowsInserted(const QModelIndex&, int, int)),
+        disconnect(m_model, SIGNAL(rowsInserted(const QModelIndex&, int, int)),
                 this, SLOT(onSourceRowsInserted(const QModelIndex&, int, int)));
-        disconnect(m_model.data(), SIGNAL(rowsRemoved(const QModelIndex&, int, int)),
+        disconnect(m_model, SIGNAL(rowsRemoved(const QModelIndex&, int, int)),
                 this, SLOT(onSourceRowsRemoved(const QModelIndex&, int, int)));
-        disconnect(m_model.data(), SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+        disconnect(m_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
                    this, SLOT(onSourceDataChanged(const QModelIndex&, const QModelIndex&)));
 
     }
-    m_model = QWeakPointer<QAbstractListModel>(sourceModel);
-    reset();
-    setRoleNames(m_model.data()->roleNames());
+//    m_model = QWeakPointer<QAbstractListModel>(sourceModel);
+    m_model = sourceModel;
+//    reset();
+    beginResetModel();
+    endResetModel();
 
-    connect(m_model.data(), SIGNAL(rowsInserted(const QModelIndex&, int, int)),
+//    setRoleNames(m_model->roleNames());
+
+    connect(m_model, SIGNAL(rowsInserted(const QModelIndex&, int, int)),
             this, SLOT(onSourceRowsInserted(const QModelIndex&, int, int)));
-    connect(m_model.data(), SIGNAL(rowsRemoved(const QModelIndex&, int, int)),
+    connect(m_model, SIGNAL(rowsRemoved(const QModelIndex&, int, int)),
             this, SLOT(onSourceRowsRemoved(const QModelIndex&, int, int)));
-    connect(m_model.data(), SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+    connect(m_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
                this, SLOT(onSourceDataChanged(const QModelIndex&, const QModelIndex&)));
 }
 
 int ProxyModel::sourceRowCount() const
 {
-    return m_model.isNull() ? 0 : m_model.data()->rowCount();
+    return m_model == nullptr ? 0 : m_model->rowCount();
 }
 
 void ProxyModel::onSourceDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
