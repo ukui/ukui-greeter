@@ -61,7 +61,7 @@ void BioAuthentication::onSearchResult(QDBusPendingCallWatcher *watcher)
     qDebug() << result << " " << retUid;
 
     /* 识别生物特征成功，发送认证结果 */
-    if(result == DBUS_RESULT_SUCCESS && retUid == uid)
+    if(result >= DBUS_RESULT_SUCCESS && retUid == uid)
         Q_EMIT authenticationComplete(true);
 }
 
