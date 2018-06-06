@@ -135,3 +135,11 @@ QPixmap Configuration::getLogo()
 
     return logoGenerator(getSystemVersion());
 }
+
+QString Configuration::getDefaultBackgroundName()
+{
+    if(getSystemDistrib() == "Kylin")
+        return "background-kylin.png";
+    else
+        return "background-ubuntu.jpg";
+}

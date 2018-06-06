@@ -61,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_cof.load(m_configuration->getValue("cof").toString());
 
     //背景图片 优先级：用户桌面背景、背景图片、背景颜色
-    m_defaultBackgroundPath = m_backgroundPath = IMAGE_DIR + "background.jpg";
+    m_defaultBackgroundPath = m_backgroundPath = IMAGE_DIR + m_configuration->getDefaultBackgroundName();
     m_drawUserBackground = m_configuration->getValue("draw-user-background").toBool();
     if(!m_drawUserBackground) {
         m_backgroundPath = m_configuration->getValue("background").toString();

@@ -38,6 +38,7 @@ public:
     QString getLastLoginUser();
     void saveLastLoginUser(const QString &);
     QPixmap getLogo();
+    QString getDefaultBackgroundName();
 
 private:
     QSettings               *configSettings;

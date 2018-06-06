@@ -31,10 +31,11 @@
         <file>resource/badges/unknown_badge.png</file>
         <file>resource/badges/xfce_badge.png</file>
         <file>resource/badges/xubuntu_badge.png</file>
-        <file>resource/background.jpg</file>
         <file>resource/kylin-logo.png</file>
         <file>resource/uk-logo.png</file>
         <file>resource/show-password.png</file>
         <file>resource/hide-password.png</file>
+        <file>resource/background-kylin.png</file>
+        <file>resource/background-ubuntu.jpg</file>
     </qresource>
 </RCC>
