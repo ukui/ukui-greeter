@@ -208,7 +208,7 @@ QPushButton::hover#bioPrevButton{
 QPushButton#bioNextButton{
     background:url(:/resource/tri-next.png);
     background-repeat:non-repeat;
-    border:1px solid #026096；
+    border:1px solid #026096;
 }
 QPushButton::hover#bioNextButton{
     background:url(:/resource/tri-next_hl.png);

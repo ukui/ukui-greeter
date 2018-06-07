@@ -59,7 +59,7 @@ private:
     void switchWnd(int);
     void showPowerWnd();
     void showBoard();
-    void setLanguage(const QString &language);
+    void setLanguage(bool isChinese);
 
     UsersView               *m_userWnd;
     LoginWindow             *m_loginWnd;
@@ -75,6 +75,7 @@ private:
     UsersModel              *m_usersModel;
     QAbstractItemModel      *m_sessionsModel;
     Configuration           *m_configuration;
+    bool                     m_isChinese;
 };
 
 #endif // GREETERWINDOW_H

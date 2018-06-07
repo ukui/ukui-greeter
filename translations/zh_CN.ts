@@ -8,22 +8,22 @@
         <translation type="vanished">密码登录&lt;&lt;</translation>
     </message>
     <message>
-        <location filename="../bio-verify/biodeviceview.cpp" line="201"/>
+        <location filename="../bio-verify/biodeviceview.cpp" line="219"/>
         <source>password login</source>
         <translation>密码登录</translation>
     </message>
     <message>
-        <location filename="../bio-verify/biodeviceview.cpp" line="207"/>
+        <location filename="../bio-verify/biodeviceview.cpp" line="225"/>
         <source>fingerprint</source>
         <translation>指纹设备</translation>
     </message>
     <message>
-        <location filename="../bio-verify/biodeviceview.cpp" line="210"/>
+        <location filename="../bio-verify/biodeviceview.cpp" line="228"/>
         <source>fingerevin</source>
         <translation>指静脉设备</translation>
     </message>
     <message>
-        <location filename="../bio-verify/biodeviceview.cpp" line="213"/>
+        <location filename="../bio-verify/biodeviceview.cpp" line="231"/>
         <source>iris</source>
         <translation>虹膜设备</translation>
     </message>
@@ -51,15 +51,16 @@
         <translation type="vanished">汉语</translation>
     </message>
     <message>
-        <location filename="../greeter/greeterwindow.cpp" line="104"/>
-        <location filename="../greeter/greeterwindow.cpp" line="111"/>
-        <location filename="../greeter/greeterwindow.cpp" line="115"/>
+        <source>zh_CN</source>
+        <translation type="obsolete">中</translation>
+    </message>
+    <message>
+        <location filename="../greeter/greeterwindow.cpp" line="207"/>
         <source>CN</source>
         <translation>中</translation>
     </message>
     <message>
-        <location filename="../greeter/greeterwindow.cpp" line="107"/>
-        <location filename="../greeter/greeterwindow.cpp" line="112"/>
+        <location filename="../greeter/greeterwindow.cpp" line="210"/>
         <source>EN</source>
         <translation>英</translation>
     </message>
@@ -80,13 +81,13 @@
         <translation>已登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="434"/>
-        <location filename="../greeter/loginwindow.cpp" line="534"/>
+        <location filename="../greeter/loginwindow.cpp" line="435"/>
+        <location filename="../greeter/loginwindow.cpp" line="535"/>
         <source>login</source>
         <translation>登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="628"/>
+        <location filename="../greeter/loginwindow.cpp" line="629"/>
         <source>please select the type of authentication</source>
         <translation>请选择认证方式</translation>
     </message>
@@ -103,12 +104,12 @@
         <translation type="vanished">游客登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="530"/>
+        <location filename="../greeter/loginwindow.cpp" line="531"/>
         <source>Password: </source>
         <translation>密码：</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="532"/>
+        <location filename="../greeter/loginwindow.cpp" line="533"/>
         <source>login:</source>
         <translation>登录：</translation>
     </message>
@@ -117,7 +118,7 @@
         <translation type="obsolete">密码：</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="585"/>
+        <location filename="../greeter/loginwindow.cpp" line="586"/>
         <source>Incorrect password, please input again</source>
         <translation>密码错误，请重新输入</translation>
     </message>
@@ -142,7 +143,7 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../display-switch/ui_mainwindow.h" line="109"/>
+        <location filename="../display-switch/ui_mainwindow.h" line="127"/>
         <source>MainWindow</source>
         <translation type="unfinished"></translation>
     </message>
@@ -183,12 +184,12 @@
 <context>
     <name>SessionWindow</name>
     <message>
-        <location filename="../greeter/sessionwindow.cpp" line="86"/>
+        <location filename="../greeter/sessionwindow.cpp" line="90"/>
         <source>select the desktop environment</source>
         <translation>选择桌面环境</translation>
     </message>
     <message>
-        <location filename="../greeter/sessionwindow.cpp" line="122"/>
+        <location filename="../greeter/sessionwindow.cpp" line="127"/>
         <source> (Default)</source>
         <translation> （默认）</translation>
     </message>

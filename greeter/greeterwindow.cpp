@@ -83,9 +83,9 @@ void GreeterWindow::initUI()
     m_languageLB->setFocusPolicy(Qt::NoFocus);
     m_languageLB->setFont(QFont("Ubuntu", 16));
     QString defaultLanguage = qgetenv("LANG").constData();
-    setLanguage(defaultLanguage);
+    setLanguage(defaultLanguage.contains("zh_CN") ? true : false);
     connect(m_languageLB, &QPushButton::clicked, this, [&]{
-        setLanguage(m_languageLB->text());
+        setLanguage(!m_isChinese);
     });
 
     //虚拟键盘启动按钮
@@ -201,15 +201,16 @@ void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
     QWidget::keyReleaseEvent(e);
 }
 
-void GreeterWindow::setLanguage(const QString &language)
+void GreeterWindow::setLanguage(bool isChinese)
 {
-    if(language.contains("zh_CN")) {
+    if(isChinese) {
         m_languageLB->setText(tr("CN"));
         m_greeter->setLang("zh_CN");
     } else {
         m_languageLB->setText(tr("EN"));
         m_greeter->setLang("en_US");
     }
+    m_isChinese = isChinese;
 }
 
 
@@ -243,7 +244,7 @@ void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
             qWarning() << "Get User's language error" << languageReply.error();
         else {
             language = languageReply.value().variant().toString();
-            setLanguage(language);
+            setLanguage(language.contains("zh_CN") ? true : false);
         }
     }
 }
