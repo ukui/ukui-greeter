@@ -111,6 +111,10 @@ void GreeterWindow::initUI()
         connect(m_userWnd, &UsersView::userSelected, this, &GreeterWindow::onUserSelected);
 
         m_userWnd->setModel(m_usersModel);
+    } else {
+        QModelIndex index = m_usersModel->index(0, 0);
+        QString backgroundPath = index.data(QLightDM::UsersModel::BackgroundPathRole).toString();
+        Q_EMIT backgroundChanged(backgroundPath);
     }
 
     //登录窗口
