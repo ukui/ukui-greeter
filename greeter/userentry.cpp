@@ -68,9 +68,7 @@ void UserEntry::paintEvent(QPaintEvent *event)
     //绘制阴影边框
     if(id == selectedId)
     {
-        QRect rect = m_faceLabel->geometry();
-        QRect border(rect.left() - SHADOW_WIDTH, rect.top() - SHADOW_WIDTH,
-                     rect.width() + SHADOW_WIDTH*2, rect.height() + SHADOW_WIDTH*2);
+        QRect border(0, 0, BORDER_WIDTH, BORDER_WIDTH);
 
         QPainter painter(this);
         painter.setPen(QPen(QColor(255, 255, 255, 0), 1));
@@ -160,7 +158,7 @@ void UserEntry::setSelected(bool selected)
     if(selected) {
         selectedId = this->id;
     }
-    update();
+    repaint(geometry());
 }
 
 bool UserEntry::selected()

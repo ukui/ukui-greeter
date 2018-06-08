@@ -33,6 +33,7 @@
 #include "usersmodel.h"
 #include "powerwindow.h"
 #include "common/configuration.h"
+#include "mainwindow.h"
 
 float scale;
 int fontSize;
@@ -112,9 +113,7 @@ void GreeterWindow::initUI()
 
         m_userWnd->setModel(m_usersModel);
     } else {
-        QModelIndex index = m_usersModel->index(0, 0);
-        QString backgroundPath = index.data(QLightDM::UsersModel::BackgroundPathRole).toString();
-        Q_EMIT backgroundChanged(backgroundPath);
+        setBackground(m_usersModel->index(0, 0));
     }
 
     //登录窗口
@@ -147,8 +146,8 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
 
     if(m_userWnd){
         m_userWnd->resize(USERSVIEW_WIDTH, USERSVIEW_HEIGHT);
-        QRect userRect((rect().width()-m_userWnd->width())/2,
-                       (rect().height()-m_userWnd->height())/2,
+        QRect userRect(geometry().left() + (rect().width()-m_userWnd->width())/2,
+                       geometry().top() + (rect().height()-m_userWnd->height())/2,
                        m_userWnd->width(), m_userWnd->height());
         m_userWnd->setGeometry(userRect);
     }
@@ -160,8 +159,8 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     }
 
     if(m_sessionWnd){
-        QRect sessionRect((rect().width()-m_sessionWnd->width())/2,
-                          (rect().height()-m_sessionWnd->height())/2,
+        QRect sessionRect(geometry().left() + (rect().width()-m_sessionWnd->width())/2,
+                          geometry().top() + (rect().height()-m_sessionWnd->height())/2,
                           m_sessionWnd->width(), m_sessionWnd->height());
         m_sessionWnd->setGeometry(sessionRect);
     }
@@ -213,6 +212,14 @@ void GreeterWindow::setLanguage(bool isChinese)
     m_isChinese = isChinese;
 }
 
+void GreeterWindow::setBackground(const QModelIndex &index)
+{
+    QString backgroundPath = index.data(QLightDM::UsersModel::BackgroundPathRole).toString();
+    QSharedPointer<Background> background(new Background);
+    background->type = BACKGROUND_IMAGE;
+    background->image = backgroundPath;
+    static_cast<MainWindow*>(parentWidget())->setBackground(background);
+}
 
 void GreeterWindow::onUserSelected(const QModelIndex &index)
 {
@@ -223,8 +230,7 @@ void GreeterWindow::onUserSelected(const QModelIndex &index)
 
 void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
 {
-    QString backgroundPath = index.data(QLightDM::UsersModel::BackgroundPathRole).toString();
-    Q_EMIT backgroundChanged(backgroundPath);
+    setBackground(index);
 
     //获取用户的session语言
     QString language;

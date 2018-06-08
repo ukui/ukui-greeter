@@ -44,9 +44,6 @@ protected:
     void resizeEvent(QResizeEvent *);
     void keyReleaseEvent(QKeyEvent *event);
 
-signals:
-    void backgroundChanged(const QString& backgroundPath);
-
 private slots:
     void onUserSelected(const QModelIndex &);
     void onCurrentUserChanged(const QModelIndex&);
@@ -60,6 +57,7 @@ private:
     void showPowerWnd();
     void showBoard();
     void setLanguage(bool isChinese);
+    void setBackground(const QModelIndex &index);
 
     UsersView               *m_userWnd;
     LoginWindow             *m_loginWnd;

@@ -158,7 +158,6 @@ void UsersView::insertUserEntry(int row)
     item->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
     usersList->insertItem(row, item);
     usersList->setItemWidget(item, entry);
-    setCurrentRow(row);
 
     if(usersList->count() <= 5) {
         usersList->resize(ITEM_WIDTH * usersList->count() + 2, ITEM_HEIGHT);

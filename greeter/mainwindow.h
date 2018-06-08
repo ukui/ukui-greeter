@@ -23,25 +23,66 @@
 #include <QSharedPointer>
 #include "screenmodel.h"
 
+
+enum BackgroundMode
+{
+    DRAW_USER_BACKGROUND,
+    DRAW_BACKGROUND,
+    DRAW_COLOR,
+    DRAW_DEFAULT
+};
+
+enum BackgroundType
+{
+    BACKGROUND_IMAGE,
+    BACKGROUND_COLOR
+};
+
+struct Background
+{
+    BackgroundType type;
+    QColor color;
+    QString image;
+};
+
+struct Transition
+{
+    QSharedPointer<Background>  from;
+    QSharedPointer<Background>  to;
+    float       stage;
+    bool        started;
+};
+
 class GreeterWindow;
 class Configuration;
 class MonitorWatcher;
+class QTimer;
 class MainWindow : public QWidget
 {
     Q_OBJECT
 public:
     explicit MainWindow(QWidget *parent = 0);
+    void setBackground(QSharedPointer<Background> &);
+
+protected:
     void paintEvent(QPaintEvent *);
     void mouseMoveEvent(QMouseEvent *);
 
 signals:
     void activeScreenChanged(const QRect& rect);
 
-public slots:
+private slots:
     void onScreenResized();
     void onScreenCountChanged(int newCount);
+    void onTransition();
+
+private:
     void moveToScreen(QScreen *screen = nullptr);
-    void onBackgoundChanged(const QString &);
+    void startTransition(QSharedPointer<Background> &, QSharedPointer<Background> &);
+    void stopTransition();
+    void drawTransitionAlpha(const QRect &rect);
+    void drawBackground(QSharedPointer<Background> &, const QRect &, float alpha = 1.0);
+    QPixmap * getBackground(const QString &path, const QRect &rect);
 
 private:
     ScreenModel     *m_screenModel;
@@ -52,14 +93,22 @@ private:
     QString          m_defaultBackgroundPath;
     QString          m_backgroundPath;
     QString          m_backgroundColor;
+    QString          m_lastBackgroundPath;
     QPixmap          m_logo;
     QPixmap          m_cof;
     //QMap<QPair<m_backgroundPath, resolution>, background>
     //对每张背景图片的不同分辨率进行缓存，减少CPU占用率（这里分辨率格式：1080x960）
-    QMap<QPair<QString, QString>, QPixmap>   m_backgrounds;
+    QMap<QPair<QString, QString>, QPixmap*>   m_backgrounds;
 
     static bool      m_first;
     MonitorWatcher  *m_monitorWatcher;
+    QTimer          *m_timer;
+
+//    bool             m_switchBackground;
+    QSharedPointer<Background> m_background;
+    Transition       m_transition;
+//    QPainter        *m_painter;
+    BackgroundMode   m_backgroundMode;
 };
 
 #endif // MAINWINDOW_H

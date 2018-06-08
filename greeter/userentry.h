@@ -24,6 +24,7 @@
 
 #define SHADOW_WIDTH (scale > 0.5 ? 10 : 5)
 #define FACE_WIDDTH (130 * scale)
+#define BORDER_WIDTH FACE_WIDDTH + SHADOW_WIDTH * 2
 #define IMG_WIDTH (128 * scale)
 #define ENTRY_HEIGHT (FACE_WIDDTH + SHADOW_WIDTH * 2 + 45)
 #define ENTRY_WIDTH (130 * scale + SHADOW_WIDTH * 2)

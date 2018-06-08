@@ -26,6 +26,7 @@
 #include <QDir>
 #include <QScreen>
 #include <QProcess>
+#include <QtMath>
 #include "globalv.h"
 #include "greeterwindow.h"
 #include "common/configuration.h"
@@ -39,13 +40,12 @@ MainWindow::MainWindow(QWidget *parent)
       m_screenModel(new ScreenModel(this)),
       m_configuration(Configuration::instance()),
       m_activeScreen(nullptr),
-      m_monitorWatcher(new MonitorWatcher(this))
+      m_monitorWatcher(new MonitorWatcher(this)),
+      m_timer(nullptr),
+      m_background(nullptr)
 {
     QDesktopWidget *_desktop = QApplication::desktop();
-//    connect(_desktop, &QDesktopWidget::workAreaResized, this, &MainWindow::onScreenResized);
     connect(_desktop, &QDesktopWidget::resized, this, &MainWindow::onScreenResized);
-//    connect(m_screenModel, &ScreenModel::dataChanged, this, &MainWindow::onScreenResized);
-//    connect(m_screenModel, &ScreenModel::modelReset, this, &MainWindow::onScreenResized);
     /* QDesktopWidget对显示器的插拔的支持不好 */
     connect(m_monitorWatcher, &MonitorWatcher::monitorCountChanged, this, &MainWindow::onScreenCountChanged);
 
@@ -61,25 +61,45 @@ MainWindow::MainWindow(QWidget *parent)
     m_cof.load(m_configuration->getValue("cof").toString());
 
     //背景图片 优先级：用户桌面背景、背景图片、背景颜色
-    m_defaultBackgroundPath = m_backgroundPath = IMAGE_DIR + m_configuration->getDefaultBackgroundName();
-    m_drawUserBackground = m_configuration->getValue("draw-user-background").toBool();
-    if(!m_drawUserBackground) {
-        m_backgroundPath = m_configuration->getValue("background").toString();
-        if(m_backgroundPath == "") {
-            m_backgroundColor = m_configuration->getValue("background-color").toString();
-            if(m_backgroundColor == "")
-                m_backgroundPath = m_defaultBackgroundPath;
+    m_defaultBackgroundPath = IMAGE_DIR + m_configuration->getDefaultBackgroundName();
+    bool drawUserBackground = m_configuration->getValue("draw-user-background").toBool();
+    if(drawUserBackground) {
+        m_backgroundMode = DRAW_USER_BACKGROUND;
+    } else {
+        m_background = QSharedPointer<Background>(new Background);
+        QString backgroundPath = m_configuration->getValue("background").toString();
+        if(!backgroundPath.isEmpty()) {
+            m_backgroundMode = DRAW_BACKGROUND;
+
+            m_background->type = BACKGROUND_IMAGE;
+            m_background->image = backgroundPath;
+        } else {
+            QString color = m_configuration->getValue("background-color").toString();
+            if(!color.isEmpty()) {
+                m_backgroundMode = DRAW_COLOR;
+
+                m_background->type = BACKGROUND_COLOR;
+                m_background->color = color;
+            } else {
+                m_backgroundMode = DRAW_DEFAULT;
+
+                m_background->type = BACKGROUND_IMAGE;
+                m_background->image = m_defaultBackgroundPath;
+            }
         }
     }
 
+    m_timer = new QTimer(this);
+    m_transition.started = false;
+
     //激活屏幕(即Greeter窗口所在屏幕位置)
     m_greeterWnd = new GreeterWindow(this);
-    if(m_drawUserBackground)
-        connect(m_greeterWnd, &GreeterWindow::backgroundChanged, this, &MainWindow::onBackgoundChanged);
     moveToScreen(QApplication::primaryScreen());
     m_greeterWnd->initUI();
 
     m_monitorWatcher->start();
+
+    connect(m_timer, &QTimer::timeout, this, &MainWindow::onTransition);
 }
 
 void MainWindow::paintEvent(QPaintEvent *e)
@@ -87,17 +107,15 @@ void MainWindow::paintEvent(QPaintEvent *e)
     for(QScreen *screen : QApplication::screens()){
         //在每个屏幕上绘制背景
         QRect rect = screen->geometry();
-        QPainter painter(this);
-        if(m_backgroundPath != ""){
-            QString resolution = QString("%1x%2").arg(rect.width()).arg(rect.height());
-            QPair<QString, QString> key( m_backgroundPath, resolution);
-            if(!m_backgrounds.contains(key))
-                m_backgrounds[key] = scaledPixmap(width(), height(), m_backgroundPath);
-            painter.drawPixmap(rect, m_backgrounds[key]);
 
-        } else {
-            painter.fillRect(rect, QColor(m_backgroundColor));
+
+        if(m_transition.started)
+            drawTransitionAlpha(rect);
+        else {
+            drawBackground(m_background, rect);
         }
+
+        QPainter painter(this);
         //绘制logo
         painter.setOpacity(0.5);
         QRect logoRect(rect.left(), rect.bottom()-80, m_logo.width(), m_logo.height());
@@ -189,20 +207,100 @@ void MainWindow::moveToScreen(QScreen *screen)
 
     repaint();
 }
-/**
- * 当前用户选择焦点发生变化时，如果配置了绘制用户背景，则切换背景
- */
-void MainWindow::onBackgoundChanged(const QString &bgPath)
+
+void MainWindow::setBackground(QSharedPointer<Background> &background)
 {
-    QString tmpBgPath = bgPath;
+    if(m_backgroundMode != DRAW_USER_BACKGROUND)
+        return;
 
-    QFile bgfile(bgPath);
-    if(!bgfile.exists())
-        tmpBgPath = m_defaultBackgroundPath;
+    stopTransition();
 
-    if(tmpBgPath != m_backgroundPath){
-        m_backgroundPath = tmpBgPath;
+    if(background) {
+        if(background->image.isEmpty())
+            background->image = m_defaultBackgroundPath;
+    }
+
+    if(m_background && background &&
+       m_background->image == background->image){
         repaint();
+        return;
+    }
+
+    startTransition(m_background, background);
+
+    m_background = background;
+}
+
+void MainWindow::startTransition(QSharedPointer<Background> &from,
+                                 QSharedPointer<Background> &to)
+{
+    stopTransition();
+
+    m_transition.from = from;
+    m_transition.to = to;
+    m_transition.stage = 0.0;
+    m_transition.started = true;
+
+    m_timer->start(50);
+}
+
+void MainWindow::stopTransition()
+{
+    if(m_timer && m_timer->isActive())
+        m_timer->stop();
+    m_transition.stage = 1.0;
+    m_transition.started = false;
+}
+
+void MainWindow::onTransition()
+{
+    m_transition.stage += 0.05;//= (1 - cos(M_PI * m_transition.stage)) / 2;
+
+    if(m_transition.stage >= 1.0)
+        stopTransition();
+
+    repaint();
+}
+
+void MainWindow::drawTransitionAlpha(const QRect &rect)
+{
+    drawBackground(m_transition.from, rect, 1.0 - m_transition.stage);
+
+    drawBackground(m_transition.to, rect, m_transition.stage); 
+}
+
+void MainWindow::drawBackground(QSharedPointer<Background> &background,
+                                const QRect &rect, float alpha)
+{
+    if(background == nullptr)
+        return;
+
+    QPainter painter(this);
+    painter.setOpacity(alpha);
+
+    switch(background->type) {
+    case BACKGROUND_IMAGE:
+    {
+        QPixmap *pixmap = getBackground(background->image, rect);
+        painter.drawPixmap(rect, *pixmap);
+        break;
+    }
+    case BACKGROUND_COLOR:
+    {
+        painter.setBrush(background->color);
+        painter.drawRect(rect);
+        break;
+    }
     }
 }
 
+QPixmap * MainWindow::getBackground(const QString &path, const QRect &rect)
+{
+    QString resolution = QString("%1x%2").arg(rect.width()).arg(rect.height());
+    QPair<QString, QString> key(path, resolution);
+
+    if(!m_backgrounds.contains(key))
+        m_backgrounds[key] = new QPixmap(scaledPixmap(width(), height(), path));
+
+    return m_backgrounds[key];
+}
