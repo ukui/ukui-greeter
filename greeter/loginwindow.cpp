@@ -58,7 +58,7 @@ void LoginWindow::initUI()
 {
     if (this->objectName().isEmpty())
         this->setObjectName(QStringLiteral("this"));
-    this->setFixedSize(220+350, 135 + BIODEVICEVIEW_HEIGHT);
+    this->setFixedSize(220+450, 135 + BIODEVICEVIEW_HEIGHT);
 
     /* 返回按钮 */
     m_backLabel = new QPushButton(this);
@@ -92,7 +92,6 @@ void LoginWindow::initUI()
     /* 密码框 */
     m_passwordEdit = new IconEdit(this);
     m_passwordEdit->setObjectName(QStringLiteral("passwordEdit"));   
-    m_passwordEdit->resize(QSize(300, 40));
     m_passwordEdit->setFocusPolicy(Qt::StrongFocus);
     m_passwordEdit->installEventFilter(this);
     m_passwordEdit->hide(); //收到请求密码的prompt才显示出来
@@ -104,7 +103,7 @@ void LoginWindow::initUI()
     m_nameLabel->setGeometry(nameRect);
     QRect loginRect(220, nameRect.bottom()+5, 200, 30);
     m_isLoginLabel->setGeometry(loginRect);
-    QRect pwdRect(220, 90, 300, 40);
+    QRect pwdRect(220, 90, 380, 40);
     m_passwordEdit->setGeometry(pwdRect);
     QRect sessionRect(pwdRect.right() - 26, 0, 26, 26);
     m_sessionLabel->setGeometry(sessionRect);
@@ -460,10 +459,9 @@ void LoginWindow::stopWaiting()
 {
     m_timer->stop();
     m_passwordEdit->setWaiting(false);
-    m_passwordEdit->setIcon(":/resource/arrow_right.png");
+    m_passwordEdit->setIcon(tr("Login"));
     m_backLabel->setEnabled(true);
     m_sessionLabel->setEnabled(true);
-    m_passwordEdit->showIconButton("");
 }
 
 void LoginWindow::updatePixmap()

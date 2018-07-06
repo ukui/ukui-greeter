@@ -33,7 +33,7 @@ class IconEdit : public QWidget
 public:
     IconEdit(QWidget *parent = 0);
 
-    void setIcon(const QString &filename);
+    void setIcon(const QString &text);
     void setIcon(const QIcon &icon);
     void resize(const QSize& size);
     void clear();

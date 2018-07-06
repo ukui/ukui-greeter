@@ -51,7 +51,7 @@ QLabel#faceLabel{
 /* 密码输入框 */
 QLineEdit {
     border: 1px solid #026096;
-    lineedit-password-character:10043
+/*    lineedit-password-character:10043*/
 }
 QLabel#capsIcon{
     background: url(:/resource/warn.png);

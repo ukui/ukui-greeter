@@ -44,9 +44,8 @@ IconEdit::IconEdit(QWidget *parent)
     m_iconButton = new QPushButton(this);
     m_iconButton->setObjectName(QStringLiteral("loginButton"));
     m_iconButton->setFocusPolicy(Qt::NoFocus);
-    m_iconButton->setIcon(QIcon(":resource/arrow_right.png"));
     m_iconButton->setCursor(QCursor(Qt::PointingHandCursor));
-    m_iconButton->hide();
+    setIcon(tr("Login"));
 
     m_modeButton = new QPushButton(this);
     m_modeButton->setObjectName(QStringLiteral("modeButton"));
@@ -69,7 +68,6 @@ IconEdit::IconEdit(QWidget *parent)
     layout->addWidget(m_modeButton);
     layout->addWidget(m_iconButton);
 
-    connect(m_edit, &QLineEdit::textChanged, this, &IconEdit::showIconButton);
     connect(m_edit, &QLineEdit::returnPressed, this, &IconEdit::clicked_cb);
     connect(m_iconButton, &QPushButton::clicked, this, &IconEdit::clicked_cb);
     connect(keyMonitor, &KeyEventMonitor::CapsLockChanged, this, &IconEdit::onCapsStateChanged);
@@ -95,10 +93,11 @@ void IconEdit::setText(const QString &text)
 
 void IconEdit::resizeEvent(QResizeEvent *)
 {
-    m_edit->setTextMargins(1, 1, height(), 1);   // 设置输入框中文件输入区，不让输入的文字在被隐藏在按钮下
+    // 设置输入框中文件输入区，不让输入的文字在被隐藏在按钮下
+    m_edit->setTextMargins(1, 1, m_iconButton->width() + m_modeButton->width(), 1);
     m_capsIcon->setFixedSize(height(), height());
-    m_iconButton->setFixedSize(height(), height());
-    m_iconButton->setIconSize(QSize(height(), height()));
+    m_iconButton->setFixedSize(70, height()-2);
+    m_edit->setFixedSize(size());
 }
 
 void IconEdit::clicked_cb()
@@ -115,12 +114,31 @@ void IconEdit::showIconButton(const QString &text)
 void IconEdit::onCapsStateChanged(int capsState)
 {
     m_capsIcon->setVisible(capsState);
-    m_edit->setTextMargins(1, 1, capsState ? height() * 2 : height(), 1);
+    int w = m_iconButton->width() + m_modeButton->width();
+    m_edit->setTextMargins(1, 1, capsState ? w + m_capsIcon->width() : w, 1);
 }
 
-void IconEdit::setIcon(const QString &filename)
+void IconEdit::setIcon(const QString &text)
 {
-    m_iconButton->setIcon(QIcon(filename));
+    m_iconButton->setIcon(QIcon());
+    m_iconButton->setFixedWidth(70);
+    m_iconButton->setText(text);
+    m_iconButton->setStyleSheet(
+                "QPushButton {"
+                    "border:0px;"
+                    "color: black;"
+                    "background-color: #0078d7;"
+                    "font-size:14px;"
+                "}"
+                "QPushButton:hover {"
+                    "background-color: #3f8de0;"
+                "}"
+                "QPushButton:active {"
+                    "background-color: #2367b9;"
+                "}"
+                "QPushButton:disabled {"
+                    "background-color: #013C76;"
+                "}");
 }
 
 void IconEdit::setIcon(const QIcon &icon)
