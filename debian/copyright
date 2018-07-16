@@ -1,0 +1,46 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: ukui-greeter
+Upstream-Contact: yanghao <yanghaohao@kylinos.cn>
+Source: http://github.com/ukui/ukui-greeter/
+
+Files: AUTHORS
+       COPYING
+       image.qrc
+       ukui-greeter.pro
+       greeter/*.cpp
+	   greeter/*.h
+	   bio-verify/*
+	   bio-verify/resource/*.png
+	   common/*
+	   display-switch/*
+	   display-switch/res/*.png
+       resource/*.png
+       resource/*.jpg
+       resource/badges/*.svg
+       translations/*
+       man/*
+	   debian/*
+	   qss.qrc
+	   ukui-greeter.conf
+	   ukui-greeter.desktop
+	   ukui-greeter.qss
+	   95-ukui-greeter.conf
+Copyright: 2018, Tianjin KYLIN Information Technology Co., Ltd.
+License: GPL-2+
+
+License: GPL-2+
+ This package is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ .
+ This package is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU Genaral Public License for more details.
+ .
+ You should have received a copy og the GNU General Public License
+ along with this program. If not, see <http://www.gnu.org/licenses/>
+ .
+ On Debian systems, the complete text of the GNU General
+ Public License version 2 can be found in "/usr/share/common-licenses/GPL-2".
