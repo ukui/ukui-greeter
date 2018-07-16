@@ -65,6 +65,8 @@ RESOURCES += image.qrc \
 
 TRANSLATIONS += translations/zh_CN.ts
 
+system("lrelease translations/zh_CN.ts translations/zh_CN.qm")
+
 qm_file.files = translations/*.qm
 qm_file.path = $${PREFIX}/translations/
 
