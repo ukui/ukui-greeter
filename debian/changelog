@@ -1,3 +1,9 @@
+ukui-greeter (1.1.4~rc2) juniper; urgency=medium
+
+  * clear lineedit after received prompt
+
+ -- yanghao <yanghao@kylinos.cn>  Thu, 16 Aug 2018 11:15:54 +0800
+
 ukui-greeter (1.1.4~rc1) juniper; urgency=medium
 
   * update a translation
