@@ -44,7 +44,7 @@ BioDeviceView::BioDeviceView(qint32 uid, QWidget *parent)
     deviceCount = deviceInfos.size() + 1;
 
     if(deviceCount > 1){
-        deviceTypes << "fingerprint" << "fingervein" << "iris";
+        deviceTypes << "fingerprint" << "fingervein" << "iris" << "face" << "voiceprint";
         initUI();
     }
 }

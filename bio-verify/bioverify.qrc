@@ -8,5 +8,6 @@
         <file>resource/tri-next.png</file>
         <file>resource/tri-prev_hl.png</file>
         <file>resource/tri-prev.png</file>
+        <file>resource/voiceprint-icon.png</file>
     </qresource>
 </RCC>
