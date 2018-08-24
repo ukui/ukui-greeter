@@ -532,6 +532,7 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
         m_name = "*login";
         m_nameLabel->setText(tr("login"));
     }
+    m_passwordEdit->clear();
     m_passwordEdit->setPrompt(text);
 }
 
