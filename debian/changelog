@@ -1,3 +1,10 @@
+ukui-greeter (1.1.4~rc3) juniper; urgency=medium
+
+  * fix the bug that the greeter will crash if voiceprint
+    device has features.
+
+ -- yanghao <yanghao@kylinos.cn>  Fri, 24 Aug 2018 17:38:49 +0800
+
 ukui-greeter (1.1.4~rc2) juniper; urgency=medium
 
   * clear lineedit after received prompt
