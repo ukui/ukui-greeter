@@ -1,43 +1,5 @@
-ukui-greeter (1.1.4~rc3) juniper; urgency=medium
+ukui-greeter (1.1.4-1) unstable; urgency=medium
 
-  * fix the bug that the greeter will crash if voiceprint
-    device has features.
+  * Initial release.
 
- -- yanghao <yanghao@kylinos.cn>  Fri, 24 Aug 2018 17:38:49 +0800
-
-ukui-greeter (1.1.4~rc2) juniper; urgency=medium
-
-  * clear lineedit after received prompt
-
- -- yanghao <yanghao@kylinos.cn>  Thu, 16 Aug 2018 11:15:54 +0800
-
-ukui-greeter (1.1.4~rc1) juniper; urgency=medium
-
-  * update a translation
-
- -- yanghao <yanghao@kylinos.cn>  Mon, 16 Jul 2018 19:58:29 +0800
-
-ukui-greeter (1.1.3) juniper; urgency=medium
-
-  * Doesn't hide the login button and change the button's
-    icon to text
-
- -- yanghao <yanghao@kylinos.cn>  Mon, 09 Jul 2018 11:07:22 +0800
-
-ukui-greeter (1.1.2) juniper; urgency=medium
-
-  * display different background for kylin and ubuntu
-
- -- yanghao <yanghao@kylinos.cn>  Wed, 06 Jun 2018 10:57:41 +0800
-
-ukui-greeter (1.1.1) juniper; urgency=medium
-
-  *  add biometric authentication module
-
- -- yanghao <yanghao@kylinos.cn>  Wed, 09 May 2018 16:53:13 +0800
-
-ukui-greeter (1.1.0) juniper; urgency=medium
-
-  *  Init Release
-
- -- yanghao <yanghao@kylinos.cn>  Wed, 25 Apr 2018 11:00:22 +0800
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Fri, 07 Sep 2018 15:39:25 +0800
