@@ -26,7 +26,7 @@ ukui-greeter (1.1.3) juniper; urgency=medium
 
 ukui-greeter (1.1.2) juniper; urgency=medium
 
-  * display different background for kylin and ubuntu 
+  * display different background for kylin and ubuntu
 
  -- yanghao <yanghao@kylinos.cn>  Wed, 06 Jun 2018 10:57:41 +0800
 
