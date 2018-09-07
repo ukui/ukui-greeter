@@ -1,8 +1,7 @@
 Source: ukui-greeter
 Section: x11
 Priority: optional
-Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
-XSBC-Original-Maintainer: Kylin Team <ukui@kylinos.cn>
+Maintainer: yanghao <yanghao@kylinos.cn> 
 Uploaders: yanghao <yanghao@kylinos.cn>,
            handsome_feng <jianfengli@ubuntukylin.com>
 Build-Depends: debhelper (>=9),
