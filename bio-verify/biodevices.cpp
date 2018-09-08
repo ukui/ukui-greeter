@@ -37,8 +37,10 @@ void BioDevices::connectToService()
 {
     qRegisterMetaType<DeviceInfo>();
 
-    serviceInterface = new QDBusInterface("cn.kylinos.Biometric", "/cn/kylinos/Biometric",
-                                          "cn.kylinos.Biometric", QDBusConnection::systemBus());
+    serviceInterface = new QDBusInterface(DBUS_SERVICE,
+                                          DBUS_PATH,
+                                          DBUS_INTERFACE,
+                                          QDBusConnection::systemBus());
     serviceInterface->setTimeout(2147483647);
 }
 

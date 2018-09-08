@@ -297,6 +297,8 @@ void LoginWindow::setSession(QString session)
     if(!iconFile.exists()){
         sessionIcon = IMAGE_DIR + QString("badges/unknown_badge.png");
     }
+    if(m_sessionsModel && m_sessionsModel->rowCount() > 1)
+        m_sessionLabel->show();
     m_sessionLabel->setIcon(QIcon(sessionIcon));
     m_sessionLabel->setIconSize(QSize(22, 22));
 }
@@ -372,6 +374,7 @@ void LoginWindow::setSessionsModel(QAbstractItemModel *model)
         return ;
     }
     m_sessionsModel = model;
+    qDebug() << m_sessionsModel->rowCount();
     //如果session有多个，则显示session图标，默认显示用户上次登录的session
     //如果当前还没有设置用户，则默认显示第一个session
     if(m_sessionsModel->rowCount() > 1) {

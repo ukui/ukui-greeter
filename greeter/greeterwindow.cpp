@@ -58,6 +58,14 @@ GreeterWindow::GreeterWindow(QWidget *parent)
         m_usersModel->setShowManualLogin(true);
     }
 
+    for(int i = 0; i < m_usersModel->rowCount(); i++)
+        qDebug() << "load user " << m_usersModel->index(i).
+                    data(QLightDM::UsersModel::NameRole).toString();
+
+    for(int i = 0; i < m_sessionsModel->rowCount(); i++)
+        qDebug() << "load session " << m_sessionsModel->index(i, 0).
+                    data(QLightDM::SessionsModel::KeyRole).toString();
+
     connect(m_greeter, SIGNAL(autologinTimerExpired()),this, SLOT(timedAutologin()));
     connect(m_greeter, SIGNAL(authenticationSucess()), this, SLOT(hide()));
     connect(m_greeter, SIGNAL(startSessionFailed()), this, SLOT(show()));

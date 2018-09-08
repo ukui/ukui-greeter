@@ -24,8 +24,10 @@ BioAuthentication::BioAuthentication(qint32 uid, const DeviceInfo &deviceInfo, Q
       uid(uid),
       deviceInfo(deviceInfo)
 {
-    serviceInterface = new QDBusInterface("cn.kylinos.Biometric", "/cn/kylinos/Biometric",
-                                          "cn.kylinos.Biometric", QDBusConnection::systemBus());
+    serviceInterface = new QDBusInterface(DBUS_SERVICE,
+                                          DBUS_PATH,
+                                          DBUS_INTERFACE,
+                                          QDBusConnection::systemBus());
     connect(serviceInterface, SIGNAL(StatusChanged(int, int)),
             this, SLOT(onStatusChanged(int,int)));
     serviceInterface->setTimeout(2147483647);

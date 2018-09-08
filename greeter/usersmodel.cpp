@@ -18,6 +18,7 @@
 **/
 #include "usersmodel.h"
 #include <QLightDM/UsersModel>
+#include <QDebug>
 
 UsersModel::UsersModel(bool hideUsers, QObject *parent) :
     ProxyModel(parent),
@@ -25,6 +26,10 @@ UsersModel::UsersModel(bool hideUsers, QObject *parent) :
 {
     if(!hideUsers)
         setSourceModel(new QLightDM::UsersModel(this));
+    else {
+        qDebug() << "hide users, show manual";
+        setShowManualLogin(true);
+    }
 }
 
 void UsersModel::setShowGuest(bool isShowGuest)
