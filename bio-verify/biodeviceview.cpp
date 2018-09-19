@@ -198,6 +198,8 @@ bool BioDeviceView::eventFilter(QObject *obj, QEvent *event)
         } else if(event->type() == QEvent::Enter){
 
             setPromptText(index);
+        } else if(event->type() == QEvent::Leave) {
+            setPromptText(currentIndex);
         }
     }
     return QWidget::eventFilter(obj, event);
