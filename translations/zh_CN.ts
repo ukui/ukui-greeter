@@ -2,6 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN" sourcelanguage="en">
 <context>
+    <name>BioAuthentication</name>
+    <message>
+        <location filename="../bio-verify/bioauthentication.cpp" line="70"/>
+        <source>authentication failed, restart after 2 seconds</source>
+        <translation>认证失败，两秒后重新开始</translation>
+    </message>
+</context>
+<context>
     <name>BioDeviceView</name>
     <message>
         <source>password login&lt;&lt;</source>
@@ -55,12 +63,12 @@
         <translation type="obsolete">中</translation>
     </message>
     <message>
-        <location filename="../greeter/greeterwindow.cpp" line="206"/>
+        <location filename="../greeter/greeterwindow.cpp" line="214"/>
         <source>CN</source>
         <translation>中</translation>
     </message>
     <message>
-        <location filename="../greeter/greeterwindow.cpp" line="209"/>
+        <location filename="../greeter/greeterwindow.cpp" line="217"/>
         <source>EN</source>
         <translation>英</translation>
     </message>
@@ -89,13 +97,13 @@
         <translation>已登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="434"/>
-        <location filename="../greeter/loginwindow.cpp" line="533"/>
+        <location filename="../greeter/loginwindow.cpp" line="437"/>
+        <location filename="../greeter/loginwindow.cpp" line="536"/>
         <source>login</source>
         <translation>登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="627"/>
+        <location filename="../greeter/loginwindow.cpp" line="631"/>
         <source>please select the type of authentication</source>
         <translation>请选择认证方式</translation>
     </message>
@@ -112,12 +120,12 @@
         <translation type="vanished">游客登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="529"/>
+        <location filename="../greeter/loginwindow.cpp" line="532"/>
         <source>Password: </source>
         <translation>密码：</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="531"/>
+        <location filename="../greeter/loginwindow.cpp" line="534"/>
         <source>login:</source>
         <translation>登录：</translation>
     </message>
@@ -126,13 +134,13 @@
         <translation type="obsolete">密码：</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="584"/>
+        <location filename="../greeter/loginwindow.cpp" line="588"/>
         <source>Incorrect password, please input again</source>
         <translation>密码错误，请重新输入</translation>
     </message>
     <message>
         <location filename="../greeter/loginwindow.cpp" line="202"/>
-        <location filename="../greeter/loginwindow.cpp" line="462"/>
+        <location filename="../greeter/loginwindow.cpp" line="465"/>
         <source>Login</source>
         <translation>登录</translation>
     </message>
@@ -214,8 +222,8 @@
 <context>
     <name>UsersModel</name>
     <message>
-        <location filename="../greeter/usersmodel.cpp" line="37"/>
-        <location filename="../greeter/usersmodel.cpp" line="46"/>
+        <location filename="../greeter/usersmodel.cpp" line="42"/>
+        <location filename="../greeter/usersmodel.cpp" line="51"/>
         <source>Guest Session</source>
         <translation>游客登录</translation>
     </message>
@@ -224,8 +232,8 @@
         <translation type="vanished">游客登录</translation>
     </message>
     <message>
-        <location filename="../greeter/usersmodel.cpp" line="64"/>
-        <location filename="../greeter/usersmodel.cpp" line="72"/>
+        <location filename="../greeter/usersmodel.cpp" line="69"/>
+        <location filename="../greeter/usersmodel.cpp" line="77"/>
         <source>Login</source>
         <translation>登录</translation>
     </message>

@@ -65,6 +65,14 @@ void BioAuthentication::onSearchResult(QDBusPendingCallWatcher *watcher)
     /* 识别生物特征成功，发送认证结果 */
     if(result >= DBUS_RESULT_SUCCESS && retUid == uid)
         Q_EMIT authenticationComplete(true);
+    else {
+        /* 如果认证失败，则重新开始 */
+        Q_EMIT notify(tr("authentication failed, restart after 2 seconds"));
+        timer = new QTimer();
+        connect(timer, &QTimer::timeout, this, [&]{startAuthentication();});
+        timer->setSingleShot(true);
+        timer->start(2000);
+    }
 }
 
 
