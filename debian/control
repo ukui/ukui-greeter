@@ -4,6 +4,7 @@ Priority: optional
 Maintainer: Kylin Team <team+kylin@tracker.debian.org>
 Uploaders: handsome_feng <jianfengli@ubuntukylin.com>,
 Build-Depends: debhelper (>=11),
+               qt5-qmake,
                pkg-config,
                qtbase5-dev,
                libqt5x11extras5-dev,
