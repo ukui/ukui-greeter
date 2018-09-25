@@ -20,15 +20,7 @@ Vcs-Browser: https://github.com/ukui/ukui-greeter
 
 Package: ukui-greeter
 Architecture: any
-Depends: libqt5widgets5,
-         libqt5gui5,
-         libqt5core5a,
-         libqt5x11extras5,
-         libqt5svg5,
-         libx11-6,
-         libxrandr2,
-         liblightdm-qt5-3-0,
-         ${shlibs:Depends},
+Depends: ${shlibs:Depends},
          ${misc:Depends},
 Suggests: biometric-auth
 Description: Lightdm greeter for UKUI
