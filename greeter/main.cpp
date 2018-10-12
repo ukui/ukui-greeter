@@ -103,9 +103,10 @@ int main(int argc, char *argv[])
 
     //加载翻译文件
     QTranslator translator;
-    if(language == QLocale::Chinese) {
-        translator.load(QM_DIR + "zh_CN.qm");
-    }
+    QString qmFile = QM_DIR + QString("%1.qm").arg(QLocale::system().name());
+    translator.load(qmFile);
+    qDebug() << "load translation file " << qmFile;
+
     a.installTranslator(&translator);
 
     //加载qss文件

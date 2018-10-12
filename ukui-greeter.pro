@@ -63,9 +63,12 @@ PKGCONFIG += liblightdm-qt5-3 x11 xrandr xtst
 RESOURCES += image.qrc \
     qss.qrc
 
-TRANSLATIONS += translations/zh_CN.ts
+TRANSLATIONS += translations/zh_CN.ts \
+                translations/ru.ts \
+                translations/fr.ts \
+                translations/pt.ts
 
-system("lrelease translations/zh_CN.ts translations/zh_CN.qm")
+system("lrelease translations/*.ts")
 
 qm_file.files = translations/*.qm
 qm_file.path = $${PREFIX}/translations/
