@@ -181,10 +181,10 @@ void MainWindow::onScreenCountChanged(int newCount)
         DisplayService displayService;
         displayService.switchDisplayMode(DISPLAY_MODE_EXTEND);
     }
-    if(m_first){
-        show();
-        activateWindow();
-    }
+//    if(m_first){
+//        show();
+//        activateWindow();
+//    }
 
     move(0, 0);
     setFixedSize(m_monitorWatcher->getVirtualSize());
