@@ -49,7 +49,7 @@ protected:
 
 private slots:
     void onUserPressed();
-    void onUserClicked(const QString &);
+    void onUserClicked(int row);
     void onUserAdded(const QModelIndex&, int, int);
     void onUserRemoved(const QModelIndex&, int, int );
     void onUserChanged(const QModelIndex&, const QModelIndex&);

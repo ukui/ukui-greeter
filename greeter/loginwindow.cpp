@@ -343,9 +343,9 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
     reset();
 
     //设置用户名
-    QString name = index.data(Qt::DisplayRole).toString();
+    QString name = index.data(QLightDM::UsersModel::RealNameRole).toString();
     m_name = index.data(QLightDM::UsersModel::NameRole).toString();
-    setUserName(name);
+    setUserName(name.isEmpty() ? m_name : name);
 
     //设置头像
     QString facePath = index.data(QLightDM::UsersModel::ImagePathRole).toString();

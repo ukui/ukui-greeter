@@ -41,6 +41,7 @@ void UsersModel::setShowGuest(bool isShowGuest)
     {
         QStandardItem *guest = new QStandardItem(tr("Guest Session"));
         guest->setData("*guest", QLightDM::UsersModel::NameRole);
+        guest->setData(tr("Guest Session"), QLightDM::UsersModel::RealNameRole);
         extraRowModel()->appendRow(guest);
     }
     else
@@ -68,6 +69,7 @@ void UsersModel::setShowManualLogin(bool isShowManualLogin)
     if(m_showManualLogin){
         QStandardItem *manualLogin = new QStandardItem(tr("Login"));
         manualLogin->setData("*login", QLightDM::UsersModel::NameRole);
+        manualLogin->setData(tr("Login"), QLightDM::UsersModel::RealNameRole);
         extraRowModel()->appendRow(manualLogin);
     }
     else{
