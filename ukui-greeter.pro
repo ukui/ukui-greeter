@@ -66,7 +66,8 @@ RESOURCES += image.qrc \
 TRANSLATIONS += translations/zh_CN.ts \
                 translations/ru.ts \
                 translations/fr.ts \
-                translations/pt.ts
+                translations/pt.ts \
+                translations/es.ts
 
 system("lrelease translations/*.ts")
 
