@@ -18,7 +18,7 @@
 **/
 #include "configuration.h"
 #include <QFile>
-#include <QStandardPaths>
+#include <QDir>
 #include <QFont>
 #include <QFontMetrics>
 #include <QTextOption>
@@ -32,7 +32,7 @@ Configuration* Configuration::instance_ = nullptr;
 Configuration::Configuration(QObject *parent)
     : QObject(parent)
 {
-    QString recodfile = QStandardPaths::displayName(QStandardPaths::CacheLocation) + "/ukui-greeter.conf";
+    QString recodfile = QDir::homePath() + "/.cache/ukui-greeter.conf";
     qDebug() << recodfile;
 
     configSettings = new QSettings(CONFIG_FILE, QSettings::IniFormat, this);
