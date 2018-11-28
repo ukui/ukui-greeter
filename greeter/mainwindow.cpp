@@ -226,7 +226,9 @@ void MainWindow::setBackground(QSharedPointer<Background> &background)
         return;
     }
 
-    startTransition(m_background, background);
+    //如果是第一次绘制背景，则不需要渐变
+    if(!m_background.isNull())
+        startTransition(m_background, background);
 
     m_background = background;
 }
