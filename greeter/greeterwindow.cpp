@@ -34,6 +34,7 @@
 #include "powerwindow.h"
 #include "common/configuration.h"
 #include "mainwindow.h"
+#include "virtualkeyboard.h"
 
 float scale;
 int fontSize;
@@ -43,7 +44,7 @@ GreeterWindow::GreeterWindow(QWidget *parent)
       m_loginWnd(nullptr),
       m_sessionWnd(nullptr),
       m_powerWnd(nullptr),
-      m_board(nullptr),
+      m_virtualKeyboard(nullptr),
       m_greeter(new GreeterWrapper()),
       m_usersModel(new UsersModel(m_greeter->hideUsersHint())),
       m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions)),
@@ -72,18 +73,6 @@ GreeterWindow::GreeterWindow(QWidget *parent)
     installEventFilter(this);
 }
 
-GreeterWindow::~GreeterWindow()
-{
-    //先kill虚拟键盘进程，再销毁process对象
-    if(m_board && m_board->state() == QProcess::Running){
-        m_board->kill();
-        m_board->waitForFinished(100);
-    }
-    if(m_board){
-        delete(m_board);
-    }
-}
-
 void GreeterWindow::initUI()
 {
     //语言选择按钮
@@ -103,7 +92,8 @@ void GreeterWindow::initUI()
     m_keyboardLB->setIcon(QPixmap(":/resource/keyboard.png"));
     m_keyboardLB->setIconSize(QSize(39, 39));
     m_keyboardLB->setFocusPolicy(Qt::NoFocus);
-    connect(m_keyboardLB, &QPushButton::clicked, this, &GreeterWindow::showBoard);
+    connect(m_keyboardLB, &QPushButton::clicked,
+            this, &GreeterWindow::showVirtualKeyboard);
 
     //电源对话框打开按钮
     m_powerLB = new QPushButton(this);
@@ -359,34 +349,18 @@ void GreeterWindow::showPowerWnd()
 }
 
 /**
- * @brief GreeterWindow::showBoard
+ * @brief GreeterWindow::showVirtualKeyboard
  * 显示或隐藏虚拟键盘
  */
-void GreeterWindow::showBoard()
+void GreeterWindow::showVirtualKeyboard()
 {
-    if(m_board == nullptr){
-        m_board = new QProcess();
-        m_board->start("/bin/sh -c onboard --xid");
-        connect(m_board, &QProcess::readyReadStandardOutput, this, [&]{
-            QByteArray output = m_board->readAllStandardOutput();
-            unsigned xid = output.trimmed().toInt();
-            qDebug() << "onBoard xid: " << xid;
-            QWindow *boardWind = QWindow::fromWinId(xid);
-            m_boardWidget = QWidget::createWindowContainer(boardWind, this, Qt::ForeignWindow);
-            m_boardWidget->setFixedSize(width(), 200);
-            m_boardWidget->move(0, height() - 200);
-            m_boardWidget->show();
-        });
+    if(!m_virtualKeyboard)
+    {
+        m_virtualKeyboard = new VirtualKeyboard(this);
+        connect(m_virtualKeyboard, &VirtualKeyboard::aboutToClose,
+                m_virtualKeyboard, &VirtualKeyboard::close);
     }
-
-    if(m_board->state() == QProcess::Running){
-        QDBusInterface iface("org.onboard.Onboard", "/org/onboard/Onboard/Keyboard",
-                             "org.onboard.Onboard.Keyboard", QDBusConnection::sessionBus());
-        if(!iface.isValid()){
-            qDebug() << qPrintable(QDBusConnection::sessionBus().lastError().message());
-        }
-        iface.call("ToggleVisible");
-    }
+    m_virtualKeyboard->setVisible(!m_virtualKeyboard->isVisible());
 }
 
 /**

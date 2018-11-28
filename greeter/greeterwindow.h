@@ -32,12 +32,12 @@ class UsersView;
 class QProcess;
 class QGraphicsOpacityEffect;
 class Configuration;
+class VirtualKeyboard;
 class GreeterWindow : public QWidget
 {
     Q_OBJECT
 public:
     GreeterWindow(QWidget *parent = 0);
-    virtual ~GreeterWindow();
     void initUI();
 
 protected:
@@ -55,7 +55,7 @@ private slots:
 private:
     void switchWnd(int);
     void showPowerWnd();
-    void showBoard();
+    void showVirtualKeyboard();
     void setLanguage(bool isChinese);
     void setBackground(const QModelIndex &index);
 
@@ -66,8 +66,7 @@ private:
     QPushButton             *m_keyboardLB;
     QPushButton             *m_powerLB;
     QPushButton             *m_languageLB;
-    QProcess                *m_board;
-    QWidget                 *m_boardWidget;
+    VirtualKeyboard         *m_virtualKeyboard;
 
     GreeterWrapper          *m_greeter;
     UsersModel              *m_usersModel;

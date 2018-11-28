@@ -21,6 +21,7 @@ DEFINES += QT_MESSAGELOGCONTEXT \    #使用qInstallMessageHandler定制日志�
 include(display-switch/display-switch.pri)
 include(bio-verify/bio-verify.pri)
 include(common/common.pri)
+include(VirtualKeyboard/VirtualKeyboard.pri)
 
 SOURCES += \
     greeter/greeterwindow.cpp \
@@ -57,6 +58,7 @@ CONFIG += c++11 debug link_pkgconfig
 
 QMAKE_CXXFLAGS += -Wdeprecated-declarations
 
+INCLUDEPATH += VirtualKeyboard/src/
 
 PKGCONFIG += liblightdm-qt5-3 x11 xrandr xtst
 
