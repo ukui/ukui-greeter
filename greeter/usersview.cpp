@@ -26,7 +26,8 @@
 #include "common/configuration.h"
 
 UsersView::UsersView(QWidget *parent) :
-    QWidget(parent)
+    QWidget(parent),
+    usersModel(nullptr)
 {
     resize(USERSVIEW_WIDTH, USERSVIEW_HEIGHT);
     initUI();
@@ -79,6 +80,22 @@ void UsersView::setModel(QAbstractListModel *model)
         if(lastLoginUser == usersModel->index(i, 0).data(Qt::DisplayRole).toString()) {
             setCurrentRow(i);
             break;
+        }
+    }
+}
+
+void UsersView::setCurrentUser(const QString &userName)
+{
+    if(!usersModel)
+        return;
+    for(int i = 0; i < usersModel->rowCount(); i++)
+    {
+        QString name = usersModel->index(i).data(QLightDM::UsersModel::NameRole).toString();
+        if(name == userName)
+        {
+            setCurrentRow(i);
+            onUserClicked(i);
+            return;
         }
     }
 }

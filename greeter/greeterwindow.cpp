@@ -113,17 +113,6 @@ void GreeterWindow::initUI()
     m_powerLB->setFocusPolicy(Qt::NoFocus);
     connect(m_powerLB, &QPushButton::clicked, this, &GreeterWindow::showPowerWnd);
 
-    // 如果只用一个用户的话，直接进入登录界面，否则显示用户列表窗口
-    if(m_usersModel->rowCount() > 1) {
-        m_userWnd = new UsersView(this);
-        connect(m_userWnd, &UsersView::currentUserChanged, this, &GreeterWindow::onCurrentUserChanged);
-        connect(m_userWnd, &UsersView::userSelected, this, &GreeterWindow::onUserSelected);
-
-        m_userWnd->setModel(m_usersModel);
-    } else {
-        setBackground(m_usersModel->index(0, 0));
-    }
-
     //登录窗口
     m_loginWnd = new LoginWindow(m_greeter, this);
     m_loginWnd->setUsersModel(m_usersModel);
@@ -132,6 +121,32 @@ void GreeterWindow::initUI()
         m_loginWnd->hide();
     connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBacktoUsers()));
     connect(m_loginWnd, SIGNAL(selectSession(QString)), this, SLOT(onSelectSession(QString)));
+
+    // 如果只用一个用户的话，直接进入登录界面，否则显示用户列表窗口
+    if(m_usersModel->rowCount() > 1) {
+        m_userWnd = new UsersView(this);
+        connect(m_userWnd, &UsersView::currentUserChanged, this, &GreeterWindow::onCurrentUserChanged);
+        connect(m_userWnd, &UsersView::userSelected, this, &GreeterWindow::onUserSelected);
+
+        m_userWnd->setModel(m_usersModel);
+
+        //显示lightdm传过来的被选中的用户 -- SwitchToUser()
+        QString selectedUser = m_greeter->selectUserHint();
+        if(!selectedUser.isEmpty())
+        {
+            qDebug() << "SelectUserHint: " << selectedUser;
+            m_userWnd->setCurrentUser(selectedUser);
+        }
+
+        // SwitchToGuest()
+        if(m_greeter->selectGuestHint())
+        {
+            qDebug() << "SelectGuest";
+            m_userWnd->setCurrentUser("*guest");
+        }
+    } else {
+        setBackground(m_usersModel->index(0, 0));
+    }
 }
 
 /**
@@ -231,6 +246,7 @@ void GreeterWindow::setBackground(const QModelIndex &index)
 
 void GreeterWindow::onUserSelected(const QModelIndex &index)
 {
+    qDebug() << index.data(QLightDM::UsersModel::NameRole).toString() << "selected";
     m_loginWnd->setUserIndex(index);
 
     switchWnd(1);
