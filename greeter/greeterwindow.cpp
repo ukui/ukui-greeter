@@ -159,21 +159,21 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
 
     if(m_userWnd){
         m_userWnd->resize(USERSVIEW_WIDTH, USERSVIEW_HEIGHT);
-        QRect userRect(geometry().left() + (rect().width()-m_userWnd->width())/2,
-                       geometry().top() + (rect().height()-m_userWnd->height())/2,
+        QRect userRect((width()-m_userWnd->width())/2,
+                       (height()-m_userWnd->height())/2,
                        m_userWnd->width(), m_userWnd->height());
         m_userWnd->setGeometry(userRect);
     }
     if(m_loginWnd){
-        QRect loginRect(geometry().left() + (rect().width()-m_loginWnd->width())/2,
-                        geometry().top() + (rect().height()-m_loginWnd->height())/2,
+        QRect loginRect((width()-m_loginWnd->width())/2,
+                        (height()-m_loginWnd->height())/2,
                         m_loginWnd->width(), m_loginWnd->height());
         m_loginWnd->setGeometry(loginRect);
     }
 
     if(m_sessionWnd){
-        QRect sessionRect(geometry().left() + (rect().width()-m_sessionWnd->width())/2,
-                          geometry().top() + (rect().height()-m_sessionWnd->height())/2,
+        QRect sessionRect((rect().width()-m_sessionWnd->width())/2,
+                          (height()-m_sessionWnd->height())/2,
                           m_sessionWnd->width(), m_sessionWnd->height());
         m_sessionWnd->setGeometry(sessionRect);
     }
