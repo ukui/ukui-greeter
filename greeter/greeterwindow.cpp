@@ -181,6 +181,18 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     m_languageLB->setGeometry(this->width() - 180, 20, 39, 39);
     m_keyboardLB->setGeometry(this->width() - 120, 20, 39, 39);
     m_powerLB->setGeometry(this->width() - 60, 20, 39, 39);
+
+    setVirkeyboardPos();
+}
+
+void GreeterWindow::setVirkeyboardPos()
+{
+    if(m_virtualKeyboard)
+    {
+        m_virtualKeyboard->setGeometry((width() - m_virtualKeyboard->width()) / 2,
+                                       height() - m_virtualKeyboard->height(),
+                                       m_virtualKeyboard->width(), m_virtualKeyboard->height());
+    }
 }
 
 void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
@@ -361,6 +373,7 @@ void GreeterWindow::showVirtualKeyboard()
                 m_virtualKeyboard, &VirtualKeyboard::close);
     }
     m_virtualKeyboard->setVisible(!m_virtualKeyboard->isVisible());
+    setVirkeyboardPos();
 }
 
 /**

@@ -58,6 +58,7 @@ private:
     void showVirtualKeyboard();
     void setLanguage(bool isChinese);
     void setBackground(const QModelIndex &index);
+    void setVirkeyboardPos();
 
     UsersView               *m_userWnd;
     LoginWindow             *m_loginWnd;
