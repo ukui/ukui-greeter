@@ -131,18 +131,40 @@ QListWidget{
     background:transparent;
     border: 0px;
 }
-/*QListWidget::item#sessionsList{
-    height:40px
-}*/
-QListWidget::item:hover#sessionsList{
+
+QListWidget::item:hover#sessionsList,
+QListWidget::item:hover#languageList{
     background:rgb(150, 150, 150, 50);
     border:1px solid white;
     border-radius:4px;
 }
-QListWidget::item:selected#sessionsList{
+QListWidget::item:selected#sessionsList,
+QListWidget::item:selected#languageList{
     background:rgb(0, 0, 0, 150);
     border:1px solid white;
     border-radius:4px;
+}
+
+/*语言列表*/
+QListWidget#languageList{
+    border: 1px solid gray;
+    border-radius: 4px;
+    background: rgb(0, 0, 0, 20);
+}
+
+QListWidget::item#languageList{
+    height:30px;
+    color: white;
+    font-size: 14px;
+}
+
+#lblLanguagePrompt{
+    font-size: 22px;
+    color: rgb(255, 255, 255, 200);
+}
+
+#languageButton{
+    font-size: 18px;
 }
 
 /**

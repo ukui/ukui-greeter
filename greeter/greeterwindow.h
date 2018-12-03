@@ -33,6 +33,7 @@ class QProcess;
 class QGraphicsOpacityEffect;
 class Configuration;
 class VirtualKeyboard;
+class LanguageWidget;
 class GreeterWindow : public QWidget
 {
     Q_OBJECT
@@ -51,14 +52,16 @@ private slots:
     void onBacktoLogin();
     void onSelectSession(const QString&);
     void timedAutologin();
+    void showPowerWnd();
+    void showVirtualKeyboard();
+    void showLanguageWnd();
+    void onLanguageChanged(const QString &language);
 
 private:
     void switchWnd(int);
-    void showPowerWnd();
-    void showVirtualKeyboard();
-    void setLanguage(bool isChinese);
     void setBackground(const QModelIndex &index);
     void setVirkeyboardPos();
+    void setWindowPos(QWidget *widget, Qt::Alignment align = Qt::AlignCenter);
 
     UsersView               *m_userWnd;
     LoginWindow             *m_loginWnd;
@@ -68,6 +71,7 @@ private:
     QPushButton             *m_powerLB;
     QPushButton             *m_languageLB;
     VirtualKeyboard         *m_virtualKeyboard;
+    LanguageWidget          *m_languageWnd;
 
     GreeterWrapper          *m_greeter;
     UsersModel              *m_usersModel;

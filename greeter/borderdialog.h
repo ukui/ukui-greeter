@@ -10,6 +10,7 @@ class BorderDialog : public QWidget
     Q_PROPERTY(int opacity READ opacity WRITE setOpacity)
 public:
     explicit BorderDialog(QWidget *parent = 0);
+    virtual void close();
 
     void setBorderWidth(int width = 24);
     void setBorderColor(QColor color = QColor(0, 0, 0, 50));
@@ -18,12 +19,12 @@ public:
 
 protected:
     void initUI();
+    QWidget *center() const;
 
 private:
     void startBackground(int begin, int end, bool show);
     int opacity();
     void setOpacity(int);
-    void close();
     void setWidgetColor(QWidget *widget, QColor color);
 
 

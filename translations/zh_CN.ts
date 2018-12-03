@@ -63,14 +63,12 @@
         <translation type="obsolete">中</translation>
     </message>
     <message>
-        <location filename="../greeter/greeterwindow.cpp" line="214"/>
         <source>CN</source>
-        <translation>中</translation>
+        <translation type="vanished">中</translation>
     </message>
     <message>
-        <location filename="../greeter/greeterwindow.cpp" line="217"/>
         <source>EN</source>
-        <translation>英</translation>
+        <translation type="vanished">英</translation>
     </message>
 </context>
 <context>
@@ -87,6 +85,22 @@
         <location filename="../greeter/iconedit.cpp" line="48"/>
         <source>Login</source>
         <translation>登录</translation>
+    </message>
+</context>
+<context>
+    <name>KeyboardWidget</name>
+    <message>
+        <location filename="../VirtualKeyboard/src/keyboardwidget.ui" line="29"/>
+        <source>KeyboardWidget</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LanguageWidget</name>
+    <message>
+        <location filename="../greeter/languagewidget.cpp" line="32"/>
+        <source>Please select the language of session</source>
+        <translation type="unfinished">请选择桌面环境语言</translation>
     </message>
 </context>
 <context>
@@ -214,7 +228,7 @@
 <context>
     <name>UserEntry</name>
     <message>
-        <location filename="../greeter/userentry.cpp" line="153"/>
+        <location filename="../greeter/userentry.cpp" line="155"/>
         <source>logged in</source>
         <translation>已登录</translation>
     </message>
@@ -223,7 +237,8 @@
     <name>UsersModel</name>
     <message>
         <location filename="../greeter/usersmodel.cpp" line="42"/>
-        <location filename="../greeter/usersmodel.cpp" line="51"/>
+        <location filename="../greeter/usersmodel.cpp" line="44"/>
+        <location filename="../greeter/usersmodel.cpp" line="52"/>
         <source>Guest Session</source>
         <translation>游客登录</translation>
     </message>
@@ -232,8 +247,9 @@
         <translation type="vanished">游客登录</translation>
     </message>
     <message>
-        <location filename="../greeter/usersmodel.cpp" line="69"/>
-        <location filename="../greeter/usersmodel.cpp" line="77"/>
+        <location filename="../greeter/usersmodel.cpp" line="70"/>
+        <location filename="../greeter/usersmodel.cpp" line="72"/>
+        <location filename="../greeter/usersmodel.cpp" line="79"/>
         <source>Login</source>
         <translation>登录</translation>
     </message>

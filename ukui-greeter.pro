@@ -38,7 +38,10 @@ SOURCES += \
     greeter/proxymodel.cpp \
     greeter/userentry.cpp \
     greeter/usersview.cpp \
-    greeter/borderdialog.cpp
+    greeter/borderdialog.cpp \
+    greeter/language.cpp \
+    greeter/languagewidget.cpp
+
 
 HEADERS  += \
     greeter/greeterwindow.h \
@@ -54,7 +57,9 @@ HEADERS  += \
     greeter/proxymodel.h \
     greeter/userentry.h \
     greeter/usersview.h \
-    greeter/borderdialog.h
+    greeter/borderdialog.h \
+    greeter/language.h \
+    greeter/languagewidget.h
 
 CONFIG += c++11 debug link_pkgconfig
 

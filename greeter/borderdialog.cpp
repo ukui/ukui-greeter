@@ -12,11 +12,17 @@ BorderDialog::BorderDialog(QWidget *parent)
     initUI();
 }
 
+QWidget *BorderDialog::center() const
+{
+    return m_centerWidget;
+}
+
 
 void BorderDialog::initUI()
 {
     setWindowFlags(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground, true);
+    setAttribute(Qt::WA_DeleteOnClose, true);
     setGeometry(parentWidget()->rect());
 
     m_borderWidget = new QWidget(this);

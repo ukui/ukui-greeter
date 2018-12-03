@@ -35,6 +35,7 @@
 #include "common/configuration.h"
 #include "mainwindow.h"
 #include "virtualkeyboard.h"
+#include "languagewidget.h"
 
 float scale;
 int fontSize;
@@ -45,6 +46,7 @@ GreeterWindow::GreeterWindow(QWidget *parent)
       m_sessionWnd(nullptr),
       m_powerWnd(nullptr),
       m_virtualKeyboard(nullptr),
+      m_languageWnd(nullptr),
       m_greeter(new GreeterWrapper()),
       m_usersModel(new UsersModel(m_greeter->hideUsersHint())),
       m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions)),
@@ -75,16 +77,14 @@ GreeterWindow::GreeterWindow(QWidget *parent)
 
 void GreeterWindow::initUI()
 {
-    //语言选择按钮
-    m_languageLB = new QPushButton(this);
-    m_languageLB->setObjectName(QStringLiteral("languageButton"));
-    m_languageLB->setFocusPolicy(Qt::NoFocus);
-    m_languageLB->setFont(QFont("Ubuntu", 16));
-    QString defaultLanguage = qgetenv("LANG").constData();
-    setLanguage(defaultLanguage.contains("zh_CN") ? true : false);
-    connect(m_languageLB, &QPushButton::clicked, this, [&]{
-        setLanguage(!m_isChinese);
-    });
+    //电源对话框打开按钮
+    m_powerLB = new QPushButton(this);
+    m_powerLB->setObjectName(QStringLiteral("powerButton"));
+    m_powerLB->setIcon(QPixmap(":/resource/power.png"));
+    m_powerLB->setIconSize(QSize(39, 39));
+    m_powerLB->setFocusPolicy(Qt::NoFocus);
+    m_powerLB->setFixedSize(39, 39);
+    connect(m_powerLB, &QPushButton::clicked, this, &GreeterWindow::showPowerWnd);
 
     //虚拟键盘启动按钮
     m_keyboardLB = new QPushButton(this);
@@ -92,16 +92,19 @@ void GreeterWindow::initUI()
     m_keyboardLB->setIcon(QPixmap(":/resource/keyboard.png"));
     m_keyboardLB->setIconSize(QSize(39, 39));
     m_keyboardLB->setFocusPolicy(Qt::NoFocus);
+    m_keyboardLB->setFixedSize(39, 39);
     connect(m_keyboardLB, &QPushButton::clicked,
             this, &GreeterWindow::showVirtualKeyboard);
 
-    //电源对话框打开按钮
-    m_powerLB = new QPushButton(this);
-    m_powerLB->setObjectName(QStringLiteral("powerButton"));
-    m_powerLB->setIcon(QPixmap(":/resource/power.png"));
-    m_powerLB->setIconSize(QSize(39, 39));
-    m_powerLB->setFocusPolicy(Qt::NoFocus);
-    connect(m_powerLB, &QPushButton::clicked, this, &GreeterWindow::showPowerWnd);
+    //语言选择按钮
+    m_languageLB = new QPushButton(this);
+    m_languageLB->setObjectName(QStringLiteral("languageButton"));
+    m_languageLB->setFocusPolicy(Qt::NoFocus);
+    m_languageLB->setFont(QFont("Ubuntu", 16));
+    m_languageLB->setFixedHeight(39);
+    QString defaultLanguage = qgetenv("LANG").constData();
+    onLanguageChanged(defaultLanguage);
+    connect(m_languageLB, &QPushButton::clicked, this, &GreeterWindow::showLanguageWnd);  
 
     //登录窗口
     m_loginWnd = new LoginWindow(m_greeter, this);
@@ -178,9 +181,21 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
         m_sessionWnd->setGeometry(sessionRect);
     }
 
-    m_languageLB->setGeometry(this->width() - 180, 20, 39, 39);
-    m_keyboardLB->setGeometry(this->width() - 120, 20, 39, 39);
-    m_powerLB->setGeometry(this->width() - 60, 20, 39, 39);
+    if(m_languageWnd)
+    {
+        QRect languageWndRect((rect().width()-m_languageWnd->width())/2,
+                              (height()-m_languageWnd->height())/2,
+                              m_languageWnd->width(), m_languageWnd->height());
+        m_languageWnd->setGeometry(languageWndRect);
+    }
+
+    int x = m_powerLB->geometry().width() + 20;
+    int y = 20;
+    m_powerLB->move(this->width() - x, y);
+    x += (20 + m_keyboardLB->width());
+    m_keyboardLB->move(this->width() - x, y);
+    x += (20 + m_languageLB->width());
+    m_languageLB->move(this->width() - x, y);
 
     setVirkeyboardPos();
 }
@@ -225,18 +240,6 @@ void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
     QWidget::keyReleaseEvent(e);
 }
 
-void GreeterWindow::setLanguage(bool isChinese)
-{
-    if(isChinese) {
-        m_languageLB->setText(tr("CN"));
-        m_greeter->setLang("zh_CN");
-    } else {
-        m_languageLB->setText(tr("EN"));
-        m_greeter->setLang("en_US");
-    }
-    m_isChinese = isChinese;
-}
-
 void GreeterWindow::setBackground(const QModelIndex &index)
 {
     QString backgroundPath = index.data(QLightDM::UsersModel::BackgroundPathRole).toString();
@@ -276,7 +279,7 @@ void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
             qWarning() << "Get User's language error" << languageReply.error();
         else {
             language = languageReply.value().variant().toString();
-            setLanguage(language.contains("zh_CN") ? true : false);
+            onLanguageChanged(language);
         }
     }
 }
@@ -392,4 +395,63 @@ void GreeterWindow::timedAutologin()
     }
     else
         m_greeter->authenticateAutologin();
+}
+
+/**
+ * @brief GreeterWindow::showLanguageWnd
+ * 显示语言选择窗口
+ */
+void GreeterWindow::showLanguageWnd()
+{
+    m_languageWnd = new LanguageWidget(this);
+    m_languageWnd->setObjectName("languageWnd");
+
+    connect(m_languageWnd, &LanguageWidget::languageChanged,
+            this, &GreeterWindow::onLanguageChanged);
+
+    m_languageWnd->show();
+    m_languageWnd->setCurrentLanguage(m_languageLB->text());
+}
+
+void GreeterWindow::setWindowPos(QWidget *widget, Qt::Alignment align)
+{
+    QRect rect;
+    rect.setSize(widget->size());
+
+    if(align & Qt::AlignHCenter)
+    {
+        rect.setLeft((width() - widget->width())/2);
+    }
+    if(align & Qt::AlignVCenter)
+    {
+        rect.setTop((height() - widget->height())/2);
+    }
+    if(align & Qt::AlignBottom)
+    {
+        rect.setTop(height() - widget->height());
+    }
+    widget->setGeometry(rect);
+}
+
+void GreeterWindow::onLanguageChanged(const QString &language)
+{
+    qDebug() << "language changed: " << language;
+
+    if(m_greeter->lang() == language)
+    {
+        return;
+    }
+
+    m_greeter->setLang(language);
+
+    m_languageLB->setText(language);
+    if(language.length() > 2)
+    {
+        m_languageLB->setFixedWidth(55);
+    }
+    else
+    {
+        m_languageLB->setFixedWidth(39);
+    }
+    m_languageLB->move(m_keyboardLB->geometry().left() - 20 - m_languageLB->width(), 20);
 }
