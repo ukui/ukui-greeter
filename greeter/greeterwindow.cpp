@@ -124,11 +124,9 @@ void GreeterWindow::initUI()
     //登录窗口
     m_loginWnd = new LoginWindow(m_greeter, this);
     m_loginWnd->setUsersModel(m_usersModel);
-    m_loginWnd->setSessionsModel(m_sessionsModel);
     if(m_usersModel->rowCount() > 1)    //如果显示了用户选择窗口，则先隐藏登录窗口
         m_loginWnd->hide();
     connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBacktoUsers()));
-    connect(m_loginWnd, SIGNAL(selectSession(QString)), this, SLOT(onSelectSession(QString)));
 
     // 如果只用一个用户的话，直接进入登录界面，否则显示用户列表窗口
     if(m_usersModel->rowCount() > 1) {

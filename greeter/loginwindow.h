@@ -44,8 +44,6 @@ public:
 
     void setUsersModel(QAbstractItemModel *model);
     bool setUserIndex(const QModelIndex& index);
-    void setSessionsModel(QAbstractItemModel *model);
-    bool setSessionIndex(const QModelIndex& index);
     void setGreeter(GreeterWrapper *greeter);
     void setUserName(const QString& userName);
     QString getUserName();
@@ -54,36 +52,29 @@ public:
     void setLoggedIn(bool isLoggedIn);
     void setPrompt(const QString& text);
     QString getPassword();
-    void setSession(QString);
-    QString getSession();
     void reset();
 
 private:
     void initUI();    
-    int sessionIndex(const QString &session);
     void backToUsers();
     void clearMessage();
     bool enableBioAuthentication(QString &message);
 
 protected:
     void showEvent(QShowEvent *);
-    void keyReleaseEvent(QKeyEvent *event);
 
 signals:
     void back();
-    void selectSession(const QString& );
 
 public slots:
     void startAuthentication();
     void startWaiting();
     void stopWaiting();
     void updatePixmap();
-    void onSessionSelected(const QString&);
     void onShowMessage(QString text, QLightDM::Greeter::MessageType type);
     void onShowPrompt(QString text, QLightDM::Greeter::PromptType type);
     void onAuthenticationComplete();
     void onLogin(const QString &str);
-    void onSessionButtonClicked();
     void onBioAuthenticationReslut(bool result);
     void onBioBackToPassword();
     void onBioNotify(const QString &message);
@@ -91,8 +82,6 @@ public slots:
 private:
     GreeterWrapper      *m_greeter;
     QAbstractItemModel  *m_usersModel;
-    QAbstractItemModel  *m_sessionsModel;
-    QString     m_session;  //session的标识
     QString     m_name;     //m_nameLabel显示的是全名(显示的),m_name保存的是真名(用于登录的)
     qint32      m_uid;      //用户id
     QTimer     *m_timer;
@@ -106,7 +95,6 @@ private:
 
     // UI
     QPushButton     *m_backLabel;         //返回用户列表
-    QPushButton     *m_sessionLabel;      //session图标
     QLabel          *m_faceLabel;         //头像
     QLabel          *m_nameLabel;         //用户名
     QLabel          *m_isLoginLabel;      //提示是否已登录
