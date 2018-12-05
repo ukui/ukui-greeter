@@ -64,11 +64,12 @@ private:
 
 
 
-SessionWindow::SessionWindow(const QString& session, QWidget *parent)
-    : QWidget(parent),
-      m_defaultSession(session)
+SessionWindow::SessionWindow(QAbstractItemModel *model, QWidget *parent)
+    : BorderDialog(parent),
+      m_sessionsModel(model)
 {
     initUI();
+    setSessionModel(model);
 }
 
 void SessionWindow::initUI()
@@ -76,31 +77,28 @@ void SessionWindow::initUI()
     if (objectName().isEmpty())
         setObjectName(QStringLiteral("SessionWnd"));
 
+    setDialogSize(600, 400);
 
-    m_backLabel = new QPushButton(this);
-    m_backLabel->setObjectName(QStringLiteral("backButton"));
-    m_backLabel->setGeometry(QRect(0, 0, 32, 32));
-    m_backLabel->setFocusPolicy(Qt::NoFocus);
-    connect(m_backLabel, &QPushButton::clicked, this, &SessionWindow::back);
-
-    m_prompt = new QLabel(this);
-    m_prompt->setObjectName(QStringLiteral("m_prompt"));
-    m_prompt->setGeometry(QRect(PROMPT_LEFT, 0, 330, 30));
-    m_prompt->setFont(QFont("Ubuntu", 16));
+    m_prompt = new QLabel(center());
+    m_prompt->setObjectName(QStringLiteral("lblSessionPrompt"));
+    m_prompt->setGeometry(0, 10, center()->width(), 40);
+    m_prompt->setAlignment(Qt::AlignCenter);
     m_prompt->setText(tr("select the desktop environment"));
 
-    m_sessionsList = new QListWidget(this);
+    m_sessionsList = new QListWidget(center());
     m_sessionsList->setObjectName(QStringLiteral("sessionsList"));
-    m_sessionsList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_sessionsList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_sessionsList->setSpacing(LISTWIDGET_SAPCE);
-    connect(m_sessionsList, &QListWidget::itemClicked, this, &SessionWindow::saveAndBack);
-
-    m_sessionsList->setGeometry(PROMPT_LEFT - LISTWIDGET_SAPCE, 55, ITEM_WIDTH + 2, LISTWIDGET_HEIGHT + 2);
-
-    resize(550, LISTWIDGET_HEIGHT + 55);
+    m_sessionsList->setGeometry(m_prompt->x() + 10, m_prompt->y() + m_prompt->height() + 20,
+                                center()->width() - 20, center()->height() - m_prompt->height() - 40);
+    connect(m_sessionsList, &QListWidget::itemDoubleClicked,
+            this, &SessionWindow::onListCurrentItemDoubleClicked);
 }
 
+void SessionWindow::onListCurrentItemDoubleClicked(QListWidgetItem */*item*/)
+{
+    close();
+}
 
 void SessionWindow::setSessionModel(QAbstractItemModel *model)
 {
@@ -135,13 +133,6 @@ void SessionWindow::addSessionLabels()
     }
 }
 
-void SessionWindow::keyReleaseEvent(QKeyEvent *e)
-{
-    if(e->key() == Qt::Key_Return){
-        saveAndBack();
-    }
-    QWidget::keyReleaseEvent(e);
-}
 
 void SessionWindow::showEvent(QShowEvent *event)
 {
@@ -149,17 +140,17 @@ void SessionWindow::showEvent(QShowEvent *event)
     QWidget::showEvent(event);
 }
 
-void SessionWindow::saveAndBack()
+void SessionWindow::close()
 {
     int currentRow = m_sessionsList->currentRow();
     //传递给loginWindow的是session的唯一标识
-    emit sessionSelected(m_sessionsModel->index(currentRow, 0).data(Qt::UserRole).toString());
-    emit back();
+    emit sessionChanged(m_sessionsModel->index(currentRow, 0).data(Qt::UserRole).toString());
+
+    BorderDialog::close();
 }
 
-void SessionWindow::setSession(const QString &session)
+void SessionWindow::setCurrentSession(const QString &session)
 {
-    qDebug() << "current session: " << session;
     for(int i = 0; i < m_sessionsModel->rowCount(); i++){
         QString sessionKey = m_sessionsModel->index(i, 0).data(Qt::UserRole).toString();
         if(sessionKey == session){
@@ -171,8 +162,8 @@ void SessionWindow::setSession(const QString &session)
 
 QString SessionWindow::getSessionIcon(const QString &session)
 {
-    QString sessionIcon;
-    sessionIcon = IMAGE_DIR + QString("badges/%1_badge.png").arg(session.toLower());
+    QString sessionPrefix = session.left(session.indexOf('-'));
+    QString sessionIcon = IMAGE_DIR + QString("badges/%1_badge.png").arg(sessionPrefix.toLower());
     QFile iconFile(sessionIcon);
     if(!iconFile.exists()){
         sessionIcon = IMAGE_DIR + QString("badges/unknown_badge.png");

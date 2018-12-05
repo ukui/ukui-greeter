@@ -32,7 +32,7 @@ QPushButton::hover#backButton{
     background: url(:/resource/arrow_left_active.png);
 }*/
 /* session选择按钮 */
-QPushButton::hover#sessionButton{
+/*QPushButton::hover#sessionButton{
     border-width: 2px;
     border-style: solid;
     border-color: white;
@@ -43,7 +43,7 @@ QPushButton::focus#sessionButton{
     border-style: solid;
     border-color: white;
     border-radius: 5px
-}
+}*/
 /* 头像 */
 QLabel#faceLabel{
      border: 2px solid white;
@@ -146,7 +146,7 @@ QListWidget::item:selected#languageList{
 }
 
 /*语言列表*/
-QListWidget#languageList{
+QListWidget#languageList, #sessionsList{
     border: 1px solid gray;
     border-radius: 4px;
     background: rgb(0, 0, 0, 20);
@@ -158,7 +158,7 @@ QListWidget::item#languageList{
     font-size: 14px;
 }
 
-#lblLanguagePrompt{
+#lblLanguagePrompt, #lblSessionPrompt{
     font-size: 22px;
     color: rgb(255, 255, 255, 200);
 }

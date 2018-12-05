@@ -30,7 +30,7 @@ void LanguageWidget::initUI()
     lblPrompt = new QLabel(center());
     lblPrompt->setObjectName("lblLanguagePrompt");
     lblPrompt->setText(tr("Please select the language of session"));
-    lblPrompt->setGeometry(0, 0, center()->width(), 40);
+    lblPrompt->setGeometry(0, 10, center()->width(), 40);
     lblPrompt->setAlignment(Qt::AlignCenter);
 
     lwLanguages = new QListWidget(center());
@@ -54,14 +54,17 @@ void LanguageWidget::initUI()
 void LanguageWidget::close()
 {
     QListWidgetItem *item = lwLanguages->currentItem();
-    QString languageCode = item->data(Qt::UserRole).toString();
+    if(item)
+    {
+        QString languageCode = item->data(Qt::UserRole).toString();
 
-    auto iter = std::find_if(languagesVector.begin(), languagesVector.end(),
-                             [&](const Language &language) {
-        return language.code == languageCode;
-    });
+        auto iter = std::find_if(languagesVector.begin(), languagesVector.end(),
+                                 [&](const Language &language) {
+            return language.code == languageCode;
+        });
 
-    Q_EMIT languageChanged(*iter);
+        Q_EMIT languageChanged(*iter);
+    }
 
     BorderDialog::close();
 }

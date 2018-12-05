@@ -51,18 +51,20 @@ private slots:
     void onCurrentUserChanged(const QModelIndex&);
     void onBacktoUsers();
     void onBacktoLogin();
-    void onSelectSession(const QString&);
     void timedAutologin();
     void showPowerWnd();
     void showVirtualKeyboard();
     void showLanguageWnd();
     void onLanguageChanged(const Language &language);
+    void showSessionWnd();
+    void onSessionChanged(const QString &session);
 
 private:
     void switchWnd(int);
     void setBackground(const QModelIndex &index);
     void setVirkeyboardPos();
     void setWindowPos(QWidget *widget, Qt::Alignment align = Qt::AlignCenter);
+    bool sessionIsValid(const QString &session);
 
     UsersView               *m_userWnd;
     LoginWindow             *m_loginWnd;
@@ -70,6 +72,7 @@ private:
     PowerWindow             *m_powerWnd;
     QPushButton             *m_keyboardLB;
     QPushButton             *m_powerLB;
+    QPushButton             *m_sessionLB;
     QPushButton             *m_languageLB;
     VirtualKeyboard         *m_virtualKeyboard;
     LanguageWidget          *m_languageWnd;
@@ -78,7 +81,8 @@ private:
     UsersModel              *m_usersModel;
     QAbstractItemModel      *m_sessionsModel;
     Configuration           *m_configuration;
-    bool                     languageHasChanged;
+    bool                     m_languageHasChanged;
+    bool                     m_sessionHasChanged;
 };
 
 #endif // GREETERWINDOW_H
