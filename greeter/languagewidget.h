@@ -23,7 +23,7 @@ private Q_SLOTS:
     void onListCurrentItemChanged(QListWidgetItem *item);
 
 Q_SIGNALS:
-    void languageChanged(const QString &languageCode);
+    void languageChanged(const Language &language);
 
 private:
     LanguagesVector &languagesVector;
