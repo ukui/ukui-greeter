@@ -36,6 +36,7 @@
 #include "mainwindow.h"
 #include "virtualkeyboard.h"
 #include "languagewidget.h"
+#include "language.h"
 
 float scale;
 int fontSize;
@@ -103,7 +104,7 @@ void GreeterWindow::initUI()
     m_languageLB->setFont(QFont("Ubuntu", 16));
     m_languageLB->setFixedHeight(39);
     QString defaultLanguage = qgetenv("LANG").constData();
-    onLanguageChanged(defaultLanguage);
+    onLanguageChanged(getLanguage(defaultLanguage));
     connect(m_languageLB, &QPushButton::clicked, this, &GreeterWindow::showLanguageWnd);  
 
     //登录窗口
@@ -279,7 +280,7 @@ void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
             qWarning() << "Get User's language error" << languageReply.error();
         else {
             language = languageReply.value().variant().toString();
-            onLanguageChanged(language);
+            onLanguageChanged(getLanguage(language));
         }
     }
 }
@@ -410,7 +411,7 @@ void GreeterWindow::showLanguageWnd()
             this, &GreeterWindow::onLanguageChanged);
 
     m_languageWnd->show();
-    m_languageWnd->setCurrentLanguage(m_languageLB->text());
+    m_languageWnd->setCurrentLanguage(m_greeter->lang());
 }
 
 void GreeterWindow::setWindowPos(QWidget *widget, Qt::Alignment align)
@@ -433,25 +434,20 @@ void GreeterWindow::setWindowPos(QWidget *widget, Qt::Alignment align)
     widget->setGeometry(rect);
 }
 
-void GreeterWindow::onLanguageChanged(const QString &language)
+void GreeterWindow::onLanguageChanged(const Language &language)
 {
-    qDebug() << "language changed: " << language;
-
-    if(m_greeter->lang() == language)
+    if(m_greeter->lang() == language.code)
     {
         return;
     }
 
-    m_greeter->setLang(language);
+    m_greeter->setLang(language.code);
 
-    m_languageLB->setText(language);
-    if(language.length() > 2)
-    {
-        m_languageLB->setFixedWidth(55);
-    }
-    else
-    {
-        m_languageLB->setFixedWidth(39);
-    }
+    m_languageLB->setText(language.name);
+
+    const QFont &font = m_languageLB->font();
+    QFontMetrics fm(font);
+    int pixelWidth = fm.width(language.name);
+    m_languageLB->setFixedWidth(pixelWidth + 4);
     m_languageLB->move(m_keyboardLB->geometry().left() - 20 - m_languageLB->width(), 20);
 }

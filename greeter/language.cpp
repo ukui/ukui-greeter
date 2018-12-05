@@ -102,3 +102,21 @@ LanguagesVector& getLanguages()
     }
     return languagesVector;
 }
+
+Language &getLanguage(const QString &lang)
+{
+    LanguagesVector &languages = getLanguages();
+    QString code = lang;
+
+    if(code.toLower().lastIndexOf(".utf-8") != -1)
+    {
+        code = code.left(code.length() - 6);
+    }
+
+    auto iter = std::find_if(languages.begin(), languages.end(),
+                             [&](const Language &language){
+        return language.code == code;
+    });
+
+    return *iter;
+}

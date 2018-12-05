@@ -56,7 +56,12 @@ void LanguageWidget::close()
     QListWidgetItem *item = lwLanguages->currentItem();
     QString languageCode = item->data(Qt::UserRole).toString();
 
-    Q_EMIT languageChanged(languageCode);
+    auto iter = std::find_if(languagesVector.begin(), languagesVector.end(),
+                             [&](const Language &language) {
+        return language.code == languageCode;
+    });
+
+    Q_EMIT languageChanged(*iter);
 
     BorderDialog::close();
 }

@@ -34,6 +34,7 @@ class QGraphicsOpacityEffect;
 class Configuration;
 class VirtualKeyboard;
 class LanguageWidget;
+class Language;
 class GreeterWindow : public QWidget
 {
     Q_OBJECT
@@ -55,7 +56,7 @@ private slots:
     void showPowerWnd();
     void showVirtualKeyboard();
     void showLanguageWnd();
-    void onLanguageChanged(const QString &language);
+    void onLanguageChanged(const Language &language);
 
 private:
     void switchWnd(int);
