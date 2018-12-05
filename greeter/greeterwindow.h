@@ -78,7 +78,7 @@ private:
     UsersModel              *m_usersModel;
     QAbstractItemModel      *m_sessionsModel;
     Configuration           *m_configuration;
-    bool                     m_isChinese;
+    bool                     languageHasChanged;
 };
 
 #endif // GREETERWINDOW_H

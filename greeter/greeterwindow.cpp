@@ -51,7 +51,8 @@ GreeterWindow::GreeterWindow(QWidget *parent)
       m_greeter(new GreeterWrapper()),
       m_usersModel(new UsersModel(m_greeter->hideUsersHint())),
       m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions)),
-      m_configuration(Configuration::instance())
+      m_configuration(Configuration::instance()),
+      languageHasChanged(false)
 {
     if(m_greeter->hasGuestAccountHint()){    //允许游客登录
         qDebug() << "allow guest";
@@ -262,6 +263,11 @@ void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
 {
     setBackground(index);
 
+    if(languageHasChanged)
+    {
+        return;
+    }
+
     //获取用户的session语言
     QString language;
     QString realName = index.data(QLightDM::UsersModel::NameRole).toString();
@@ -410,6 +416,8 @@ void GreeterWindow::showLanguageWnd()
     connect(m_languageWnd, &LanguageWidget::languageChanged,
             this, &GreeterWindow::onLanguageChanged);
 
+    languageHasChanged = true;
+
     m_languageWnd->show();
     m_languageWnd->setCurrentLanguage(m_languageLB->text());
 }
@@ -450,4 +458,9 @@ void GreeterWindow::onLanguageChanged(const Language &language)
     int pixelWidth = fm.width(language.name);
     m_languageLB->setFixedWidth(pixelWidth + 4);
     m_languageLB->move(m_keyboardLB->geometry().left() - 20 - m_languageLB->width(), 20);
+
+    if(m_userWnd && !m_userWnd->isHidden())
+    {
+        m_userWnd->setFocus();
+    }
 }
