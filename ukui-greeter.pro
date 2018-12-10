@@ -23,6 +23,8 @@ include(bio-verify/bio-verify.pri)
 include(common/common.pri)
 include(VirtualKeyboard/VirtualKeyboard.pri)
 
+INCLUDEPATH += common/
+
 SOURCES += \
     greeter/greeterwindow.cpp \
     greeter/iconedit.cpp \
@@ -38,7 +40,6 @@ SOURCES += \
     greeter/proxymodel.cpp \
     greeter/userentry.cpp \
     greeter/usersview.cpp \
-    greeter/borderdialog.cpp \
     greeter/language.cpp \
     greeter/languagewidget.cpp
 
@@ -57,7 +58,6 @@ HEADERS  += \
     greeter/proxymodel.h \
     greeter/userentry.h \
     greeter/usersview.h \
-    greeter/borderdialog.h \
     greeter/language.h \
     greeter/languagewidget.h
 
