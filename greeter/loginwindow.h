@@ -32,7 +32,6 @@
 #include "iconedit.h"
 #include "greeterwrapper.h"
 
-class BioDeviceView;
 struct DeviceInfo;
 
 class LoginWindow : public QWidget
@@ -58,7 +57,6 @@ private:
     void initUI();    
     void backToUsers();
     void clearMessage();
-    bool enableBioAuthentication(QString &message);
 
 protected:
     void showEvent(QShowEvent *);
@@ -75,9 +73,6 @@ public slots:
     void onShowPrompt(QString text, QLightDM::Greeter::PromptType type);
     void onAuthenticationComplete();
     void onLogin(const QString &str);
-    void onBioAuthenticationReslut(bool result);
-    void onBioBackToPassword();
-    void onBioNotify(const QString &message);
 
 private:
     GreeterWrapper      *m_greeter;
@@ -100,8 +95,6 @@ private:
     QLabel          *m_isLoginLabel;      //提示是否已登录
     QVector<QLabel*> m_messageLabels;      //提示信息
     IconEdit        *m_passwordEdit;       //密码输入框
-    BioDeviceView   *bioDeviceView;      //生物识别设备列表窗口
-    QPushButton     *bioButton;
 };
 
 #endif // LOGINWINDOW_H
