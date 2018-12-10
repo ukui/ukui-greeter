@@ -58,6 +58,7 @@ private slots:
     void onLanguageChanged(const Language &language);
     void showSessionWnd();
     void onSessionChanged(const QString &session);
+    void onUserChangedByManual(const QString &userName);
 
 private:
     void switchWnd(int);

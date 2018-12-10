@@ -20,19 +20,16 @@
 #define LOGINWINDOW_H
 
 #include <QWidget>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QLabel>
-#include <QAbstractItemModel>
-#include <QSharedPointer>
-#include <QSettings>
-#include <QTimer>
 #include <QLightDM/Greeter>
 #include <QLightDM/UsersModel>
-#include "iconedit.h"
-#include "greeterwrapper.h"
 
-struct DeviceInfo;
+class QTimer;
+class QLabel;
+class QPushButton;
+class QListWidget;
+
+class GreeterWrapper;
+class IconEdit;
 
 class LoginWindow : public QWidget
 {
@@ -41,7 +38,6 @@ public:
     explicit LoginWindow(GreeterWrapper *greeter, QWidget *parent = 0);
     ~LoginWindow(){}
 
-    void setUsersModel(QAbstractItemModel *model);
     bool setUserIndex(const QModelIndex& index);
     void setGreeter(GreeterWrapper *greeter);
     void setUserName(const QString& userName);
@@ -53,30 +49,39 @@ public:
     QString getPassword();
     void reset();
 
-private:
-    void initUI();    
-    void backToUsers();
-    void clearMessage();
-
 protected:
     void showEvent(QShowEvent *);
+    void resizeEvent(QResizeEvent *);
 
 signals:
     void back();
 
+    /**
+     * @brief 手动输入用户名
+     * @param userName 用户名
+     */
+    void userChangedByManual(const QString &userName);
+
 public slots:
-    void startAuthentication();
-    void startWaiting();
-    void stopWaiting();
-    void updatePixmap();
     void onShowMessage(QString text, QLightDM::Greeter::MessageType type);
     void onShowPrompt(QString text, QLightDM::Greeter::PromptType type);
     void onAuthenticationComplete();
+
+private slots:
     void onLogin(const QString &str);
+    void onBackButtonClicked();
+    void updatePixmap();
+
+private:
+    void initUI();
+    void setChildrenGeometry();
+    void startAuthentication();
+    void startWaiting();
+    void stopWaiting();
+    void clearMessage();
 
 private:
     GreeterWrapper      *m_greeter;
-    QAbstractItemModel  *m_usersModel;
     QString     m_name;     //m_nameLabel显示的是全名(显示的),m_name保存的是真名(用于登录的)
     qint32      m_uid;      //用户id
     QTimer     *m_timer;
@@ -89,12 +94,16 @@ private:
     bool        isPasswordError;
 
     // UI
-    QPushButton     *m_backLabel;         //返回用户列表
+    QPushButton     *m_backButton;         //返回用户列表
+    QWidget         *m_userWidget;          //放置用户信息Label
     QLabel          *m_faceLabel;         //头像
     QLabel          *m_nameLabel;         //用户名
     QLabel          *m_isLoginLabel;      //提示是否已登录
-    QVector<QLabel*> m_messageLabels;      //提示信息
+
+    QWidget         *m_passwdWidget;        //放置密码输入框和信息列表
     IconEdit        *m_passwordEdit;       //密码输入框
+    QListWidget     *m_messageList;         //信息列表
+
 };
 
 #endif // LOGINWINDOW_H

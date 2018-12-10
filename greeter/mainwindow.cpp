@@ -27,6 +27,7 @@
 #include <QScreen>
 #include <QProcess>
 #include <QtMath>
+#include <QTimer>
 #include "globalv.h"
 #include "greeterwindow.h"
 #include "common/configuration.h"

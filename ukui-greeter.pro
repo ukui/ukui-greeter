@@ -21,6 +21,7 @@ DEFINES += QT_MESSAGELOGCONTEXT \    #使用qInstallMessageHandler定制日志�
 include(display-switch/display-switch.pri)
 include(common/common.pri)
 include(VirtualKeyboard/VirtualKeyboard.pri)
+include(BiometricAuth/BiometricAuth.pri)
 
 INCLUDEPATH += common/
 

@@ -123,10 +123,11 @@ void GreeterWindow::initUI()
 
     //登录窗口
     m_loginWnd = new LoginWindow(m_greeter, this);
-    m_loginWnd->setUsersModel(m_usersModel);
     if(m_usersModel->rowCount() > 1)    //如果显示了用户选择窗口，则先隐藏登录窗口
         m_loginWnd->hide();
     connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBacktoUsers()));
+    connect(m_loginWnd, &LoginWindow::userChangedByManual,
+            this, &GreeterWindow::onUserChangedByManual);
 
     // 如果只用一个用户的话，直接进入登录界面，否则显示用户列表窗口
     if(m_usersModel->rowCount() > 1) {
@@ -181,9 +182,8 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
         m_userWnd->setGeometry(userRect);
     }
     if(m_loginWnd){
-        QRect loginRect((width()-m_loginWnd->width())/2,
-                        (height()-m_loginWnd->height())/2,
-                        m_loginWnd->width(), m_loginWnd->height());
+        QRect loginRect((width()-m_loginWnd->width())/2, 0,
+                        m_loginWnd->width(), height());
         m_loginWnd->setGeometry(loginRect);
     }
 
@@ -308,6 +308,11 @@ void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
         QString session = index.data(QLightDM::UsersModel::SessionRole).toString();
         onSessionChanged(session);
     }
+}
+
+void GreeterWindow::onUserChangedByManual(const QString &userName)
+{
+    m_userWnd->setCurrentUser(userName);
 }
 
 void GreeterWindow::onBacktoUsers()

@@ -19,38 +19,24 @@ QLabel{
 }
 
 /* 返回按钮 */
-QPushButton#backButton{
+#backButton{
     background: url(:/resource/arrow_left.png);
 }
-QPushButton::hover#backButton{
+#backButton::hover{
     background: url(:/resource/arrow_left_prelight.png);
 }
-/*QPushButton::focus#backButton{
-    background: url(:/resource/arrow_left_prelight.png);
-}*/
-/*QPushButton::pressed#backButton{
-    background: url(:/resource/arrow_left_active.png);
-}*/
-/* session选择按钮 */
-/*QPushButton::hover#sessionButton{
-    border-width: 2px;
-    border-style: solid;
-    border-color: white;
-    border-radius: 5px
-}
-QPushButton::focus#sessionButton{
-    border-width: 2px;
-    border-style: solid;
-    border-color: white;
-    border-radius: 5px
-}*/
+
 /* 头像 */
-QLabel#faceLabel{
+#faceLabel{
      border: 2px solid white;
+}
+#login_nameLabel{
+    font-size: 22px;
 }
 /* 密码输入框 */
 QLineEdit {
     border: 1px solid #026096;
+    font-size: 14px;
 /*    lineedit-password-character:10043*/
 }
 QLabel#capsIcon{
@@ -64,9 +50,6 @@ QPushButton#loginButton{
     background-repeat: no-repeat;
     background-position: center;
 }
-/*QPushButton::hover#loginButton{
-    background: transparent;
-}*/
 /* 登录错误提示 */
 QLabel#errorMsgLabel{
     color: rgb(255, 0, 0, 200);

@@ -39,9 +39,9 @@ void UsersModel::setShowGuest(bool isShowGuest)
     m_showGuest = isShowGuest;
     if(m_showGuest)
     {
-        QStandardItem *guest = new QStandardItem(tr("Guest Session"));
+        QStandardItem *guest = new QStandardItem(tr("Guest"));
         guest->setData("*guest", QLightDM::UsersModel::NameRole);
-        guest->setData(tr("Guest Session"), QLightDM::UsersModel::RealNameRole);
+        guest->setData(tr("Guest"), QLightDM::UsersModel::RealNameRole);
         extraRowModel()->appendRow(guest);
     }
     else

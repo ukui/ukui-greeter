@@ -17,26 +17,28 @@
  * 02110-1301, USA.
 **/
 #include "loginwindow.h"
-#include <QMouseEvent>
 #include <QDebug>
-#include <QApplication>
-#include <QStandardPaths>
-#include <QScreen>
-#include <QProcess>
-#include <QFocusEvent>
-#include <QWindow>
+#include <QTimer>
+#include <QLabel>
+#include <QPushButton>
+#include <QListWidget>
+#include <QAbstractItemModel>
+
+
+#include "greeterwrapper.h"
+#include "iconedit.h"
 #include "globalv.h"
-#include "common/configuration.h"
+#include "configuration.h"
 
 LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
     : QWidget(parent),
       m_greeter(greeter),
-      m_usersModel(nullptr),
       m_timer(new QTimer(this)),
       isManual(false),
       isPasswordError(false)
 {    
     initUI();
+
     connect(m_greeter, SIGNAL(showMessage(QString,QLightDM::Greeter::MessageType)),
             this, SLOT(onShowMessage(QString,QLightDM::Greeter::MessageType)));
     connect(m_greeter, SIGNAL(showPrompt(QString,QLightDM::Greeter::PromptType)),
@@ -50,57 +52,96 @@ LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
 
 void LoginWindow::initUI()
 {
-    if (this->objectName().isEmpty())
-        this->setObjectName(QStringLiteral("this"));
+    setFixedWidth(400);
 
-    this->setFixedSize(220+450, 135);
-
-    /* 返回按钮 */
-    m_backLabel = new QPushButton(this);
-    m_backLabel->setObjectName(QStringLiteral("backButton"));    
-    m_backLabel->setFocusPolicy(Qt::NoFocus);
-    connect(m_backLabel, &QPushButton::clicked, this, &LoginWindow::backToUsers);
+    m_userWidget = new QWidget(this);
+    m_userWidget->setObjectName(QStringLiteral("userWidget"));
 
     /* 头像 */
-    m_faceLabel = new QLabel(this);
+    m_faceLabel = new QLabel(m_userWidget);
     m_faceLabel->setObjectName(QStringLiteral("faceLabel"));
     m_faceLabel->setFocusPolicy(Qt::NoFocus);
 
     /* 用户名 */
-    m_nameLabel = new QLabel(this);
-    m_nameLabel->setObjectName(QStringLiteral("nameLabel"));
-    m_nameLabel->setFont(QFont("ubuntu", 12));
+    m_nameLabel = new QLabel(m_userWidget);
+    m_nameLabel->setObjectName(QStringLiteral("login_nameLabel"));
     m_nameLabel->setFocusPolicy(Qt::NoFocus);
+    m_nameLabel->setAlignment(Qt::AlignCenter);
 
     /* 是否已登录 */
-    m_isLoginLabel = new QLabel(this);
+    m_isLoginLabel = new QLabel(m_userWidget);
     m_isLoginLabel->setObjectName(QStringLiteral("isLoginLabel"));
-    m_isLoginLabel->setFont(QFont("ubuntu", 10));
     m_isLoginLabel->setFocusPolicy(Qt::NoFocus);
+    m_isLoginLabel->setAlignment(Qt::AlignCenter);
+
+    /* 密码框所在窗口 */
+    m_passwdWidget = new QWidget(this);
+    m_passwdWidget->setObjectName(QStringLiteral("passwordWidget"));
 
     /* 密码框 */
-    m_passwordEdit = new IconEdit(this);
+    m_passwordEdit = new IconEdit(m_passwdWidget);
     m_passwordEdit->setObjectName(QStringLiteral("passwordEdit"));   
     m_passwordEdit->setFocusPolicy(Qt::StrongFocus);
     m_passwordEdit->installEventFilter(this);
     m_passwordEdit->hide(); //收到请求密码的prompt才显示出来
-    connect(m_passwordEdit, SIGNAL(clicked(const QString&)), this, SLOT(onLogin(const QString&)));
+    connect(m_passwordEdit, SIGNAL(clicked(const QString&)),
+            this, SLOT(onLogin(const QString&)));
 
-    m_backLabel->setGeometry(QRect(0, 0, 32, 32));
-    m_faceLabel->setGeometry(QRect(60, 0, 132, 132));
-    QRect nameRect(220, 0, 200, 25);
-    m_nameLabel->setGeometry(nameRect);
-    QRect loginRect(220, nameRect.bottom()+5, 200, 30);
-    m_isLoginLabel->setGeometry(loginRect);
-    QRect pwdRect(220, 90, 380, 40);
-    m_passwordEdit->setGeometry(pwdRect);
+    /* 密码认证信息显示列表 */
+    m_messageList = new QListWidget(m_passwdWidget);
+    m_messageList->setObjectName(QStringLiteral("messageListWidget"));
+    m_messageList->setFocusPolicy(Qt::NoFocus);
+    m_messageList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_messageList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_messageList->setSelectionMode(QAbstractItemView::NoSelection);
+
+    /* 返回按钮 */
+    m_backButton = new QPushButton(this);
+    m_backButton->setObjectName(QStringLiteral("backButton"));
+    m_backButton->setFocusPolicy(Qt::NoFocus);
+    connect(m_backButton, &QPushButton::clicked,
+            this, &LoginWindow::onBackButtonClicked);
 }
 
 void LoginWindow::showEvent(QShowEvent *e)
 {
     QWidget::showEvent(e);
     if(!m_passwordEdit->isHidden())
+    {
         m_passwordEdit->setFocus();
+    }
+}
+
+void LoginWindow::resizeEvent(QResizeEvent *)
+{
+    setChildrenGeometry();
+}
+
+void LoginWindow::setChildrenGeometry()
+{
+    // 用户信息显示位置
+    int userWidgetHeight = 175;
+    if(!m_isLoginLabel->text().isEmpty())
+    {
+        userWidgetHeight += 20;
+    }
+    m_userWidget->setGeometry(0, (height() - userWidgetHeight - 150) / 2,
+                              width(), userWidgetHeight);
+
+    m_faceLabel->setGeometry((width() - 128) / 2, 0, 128, 128);
+    m_nameLabel->setGeometry(0, m_faceLabel->geometry().bottom() + 5,
+                             width(), 40);
+    m_isLoginLabel->setGeometry(0, m_nameLabel->geometry().bottom(),
+                                width(), 20);
+
+    // 密码框和提示信息显示位置
+    m_passwdWidget->setFixedSize(width(), 150);
+    m_passwordEdit->setGeometry((m_passwdWidget->width() - 400)/2, 0, 400, 40);
+    m_messageList->setGeometry((m_passwdWidget->width() - 300)/2,
+                               m_passwordEdit->geometry().bottom()+3,
+                               300, 100);
+
+    m_backButton->setGeometry(0, m_userWidget->y(), 32, 32);
 }
 
 /**
@@ -109,8 +150,6 @@ void LoginWindow::showEvent(QShowEvent *e)
  */
 void LoginWindow::reset()
 {
-    isManual = false;
-    isPasswordError = false;
     m_nameLabel->clear();
     m_isLoginLabel->clear();
     m_passwordEdit->clear();
@@ -122,23 +161,14 @@ void LoginWindow::reset()
 
 void LoginWindow::clearMessage()
 {
-    //清除所有的message label
-    for(int i = 0; i < m_messageLabels.size(); i++) {
-        QLabel *msgLabel = m_messageLabels[i];
-        delete(msgLabel);
-    }
-    m_messageLabels.clear();
-    //恢复密码输入框的位置
-    m_passwordEdit->move(m_passwordEdit->geometry().left(), 90);
-    //恢复窗口大小
-    this->resize(520, 135);
+    m_messageList->clear();
 }
 
 /**
  * @brief LoginWindow::backToUsers
  * 返回到用户列表窗口
  */
-void LoginWindow::backToUsers()
+void LoginWindow::onBackButtonClicked()
 {
     reset();
     Q_EMIT back();
@@ -230,17 +260,6 @@ QString LoginWindow::getPassword()
     return m_passwordEdit->text();
 }
 
-void LoginWindow::setUsersModel(QAbstractItemModel *model)
-{
-    if(model == nullptr)
-        return;
-    m_usersModel = model;
-
-    if(m_usersModel->rowCount() == 1) {
-        m_backLabel->hide();
-        setUserIndex(m_usersModel->index(0,0));
-    }
-}
 
 bool LoginWindow::setUserIndex(const QModelIndex& index)
 {
@@ -266,6 +285,8 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
     //设置生物识别设备窗口的uid
     m_uid = index.data(QLightDM::UsersModel::UidRole).toInt();
 
+    setChildrenGeometry();
+
     startAuthentication();
 
     return true;
@@ -274,17 +295,20 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
 void LoginWindow::startAuthentication()
 {
     //用户认证
-    if(m_name == "*guest") {                       //游客登录
+    if(m_name == "*guest")
+    {                       //游客登录
         qDebug() << "guest login";
         m_passwordEdit->show();
         m_passwordEdit->showIconButton("*");
         m_passwordEdit->setWaiting(true);
-        m_passwordEdit->setPrompt(tr("login"));
+        setPrompt(tr("login"));
     }
-    else if(m_name == "*login") {                  //手动输入用户名
+    else if(m_name == "*login")
+    { //手动输入用户名
         m_greeter->authenticate("");
     }
-    else {
+    else
+    {
         qDebug() << "login: " << m_name;
         m_greeter->authenticate(m_name);
     }
@@ -298,7 +322,7 @@ void LoginWindow::startAuthentication()
 void LoginWindow::startWaiting()
 {
     m_passwordEdit->setWaiting(true);   //等待认证结果期间不能再输入密码
-    m_backLabel->setEnabled(false);
+    m_backButton->setEnabled(false);
     m_timer->start();
 }
 
@@ -307,7 +331,7 @@ void LoginWindow::stopWaiting()
     m_timer->stop();
     m_passwordEdit->setWaiting(false);
     m_passwordEdit->setIcon(tr("Login"));
-    m_backLabel->setEnabled(true);
+    m_backButton->setEnabled(true);
 }
 
 void LoginWindow::updatePixmap()
@@ -323,28 +347,16 @@ void LoginWindow::onLogin(const QString &str)
 {
     clearMessage();
 
-    if(m_name == "*guest") {
+    if(m_name == "*guest")
+    {
         m_greeter->authenticateAsGuest();
     }
-    else if(m_name == "*login") {   //用户输入用户名
-        isManual = true;
-        m_name = str;
-        //获取该用户的uid
-        for(int i = 0; i < m_usersModel->rowCount(); i++){
-            QModelIndex index = m_usersModel->index(i, 0);
-            QString name = index.data(QLightDM::UsersModel::NameRole).toString();
-            if(name == m_name){
-                setUserIndex(index);
-                return;
-            }
-        }
-        m_nameLabel->setText(str);
-        m_passwordEdit->setText("");
-        m_passwordEdit->setType(QLineEdit::Password);
-
-        startAuthentication();
+    else if(m_name == "*login")
+    {   //用户输入用户名
+        Q_EMIT userChangedByManual(str);
     }
-    else {  //发送密码
+    else
+    {  //发送密码
         m_greeter->respond(str);
         m_waiting.load(":/resource/waiting.png");
         m_passwordEdit->showIconButton("*");  //当没有输入密码登录时，也显示等待提示
@@ -362,6 +374,9 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
         stopWaiting();
     if(!text.isEmpty())
         m_passwordEdit->show();
+
+    m_passwdWidget->move(0, m_userWidget->geometry().bottom());
+
     m_passwordEdit->setFocus();
     if(type != QLightDM::Greeter::PromptTypeSecret)
         m_passwordEdit->setType(QLineEdit::Normal);
@@ -376,37 +391,21 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
         m_nameLabel->setText(tr("login"));
     }
     m_passwordEdit->clear();
-    m_passwordEdit->setPrompt(text);
+    setPrompt(text);
 }
 
 void LoginWindow::onShowMessage(QString text, QLightDM::Greeter::MessageType type)
 {
     qDebug()<< "message: "<< text;
 
-    int lineNum = text.count('\n') + 1;
-    int height = 20 * lineNum;  //label的高度
-    if(m_messageLabels.size() >= 1) {
-    //调整窗口大小
-        this->resize(this->width(), this->height()+height);
-    //移动密码输入框的位置
-        m_passwordEdit->move(m_passwordEdit->geometry().left(),
-                             m_passwordEdit->geometry().top() + height);
+    QListWidgetItem *item = new QListWidgetItem(text, m_messageList);
+    if(type == QLightDM::Greeter::MessageTypeError)
+    {
+        item->setForeground(QColor(255, 0, 0, 180));
     }
-    //每条message添加一个label
-    int top = m_passwordEdit->geometry().top() - height - 10;
-    QLabel *msgLabel = new QLabel(this);
-    msgLabel->setGeometry(QRect(220, top, 300, height));
+    item->setTextAlignment(Qt::AlignCenter);
 
-    if(type == QLightDM::Greeter::MessageTypeError)    {
-        msgLabel->setObjectName(QStringLiteral("errorMsgLabel"));
-    }
-    else if(type == QLightDM::Greeter::MessageTypeInfo)    {
-        msgLabel->setObjectName(QStringLiteral("infoMsgLabel"));
-    }
-    msgLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    msgLabel->setText(text);
-    msgLabel->show();
-    m_messageLabels.push_back(msgLabel);
+    m_messageList->addItem(item);
 }
 
 void LoginWindow::onAuthenticationComplete()
