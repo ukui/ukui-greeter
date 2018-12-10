@@ -136,8 +136,9 @@ void SessionWindow::addSessionLabels()
 
 void SessionWindow::showEvent(QShowEvent *event)
 {
+    BorderDialog::showEvent(event);
+
     m_sessionsList->setFocus();
-    QWidget::showEvent(event);
 }
 
 void SessionWindow::close()
