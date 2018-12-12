@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
 
     MainWindow w;
 
-    w.show();
+    w.showFullScreen();
     //在没有窗口管理器的情况下，需要激活窗口，行为类似于用鼠标点击窗口
     w.activateWindow();
 

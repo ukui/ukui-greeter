@@ -23,6 +23,8 @@
 #include <QLightDM/Greeter>
 #include <QLightDM/UsersModel>
 
+#include "biometricproxy.h"
+
 class QTimer;
 class QLabel;
 class QPushButton;
@@ -30,6 +32,9 @@ class QListWidget;
 
 class GreeterWrapper;
 class IconEdit;
+class BiometricProxy;
+class BiometricAuthWidget;
+class BiometricDevicesWidget;
 
 class LoginWindow : public QWidget
 {
@@ -71,14 +76,26 @@ private slots:
     void onLogin(const QString &str);
     void onBackButtonClicked();
     void updatePixmap();
+    void onBiometricButtonClicked();
+    void onPasswordButtonClicked();
+    void onOtherDevicesButtonClicked();
+    void onRetryButtonClicked();
+    void onDeviceChanged(const DeviceInfoPtr &deviceInfo);
+    void onBiometricAuthComplete(bool result);
 
 private:
     void initUI();
+    void initBiometricWidget();
+    void initBiometricButtonWidget();
     void setChildrenGeometry();
+    void setBiometricWidgetGeometry();
+    void setBiometricButtonWidgetGeometry();
     void startAuthentication();
     void startWaiting();
     void stopWaiting();
     void clearMessage();
+    void performBiometricAuth();
+    void performPasswordAuth();
 
 private:
     GreeterWrapper      *m_greeter;
@@ -91,7 +108,23 @@ private:
     bool        isManual;
     //密码错误标记，设置该标志的原因是，在有生物识别模块的情况下用户选择了密码登录，输入了错误的密码，
     //此时应该直接进入密码登录，而不是再次进入登录生物识别设备选择界面
-    bool        isPasswordError;
+//    bool        isPasswordError;
+    int         enableBiometricAuth;
+
+    enum AuthMode { PASSWORD, BIOMETRIC, UNKNOWN };
+
+    AuthMode authMode;
+    // 生物识别认证
+    QString                 m_deviceName;
+    DeviceInfoPtr           m_deviceInfo;
+    BiometricProxy          *m_biometricProxy;
+    BiometricAuthWidget     *m_biometricAuthWidget;
+    BiometricDevicesWidget  *m_biometricDevicesWidget;
+    QWidget                 *m_buttonsWidget;
+    QPushButton             *m_biometricButton;
+    QPushButton             *m_passwordButton;
+    QPushButton             *m_otherDeviceButton;
+    QPushButton             *m_retryButton;
 
     // UI
     QPushButton     *m_backButton;         //返回用户列表

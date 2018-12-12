@@ -88,6 +88,7 @@ void GreeterWindow::initUI()
     m_powerLB->setIconSize(QSize(39, 39));
     m_powerLB->setFocusPolicy(Qt::NoFocus);
     m_powerLB->setFixedSize(39, 39);
+    m_powerLB->setCursor(Qt::PointingHandCursor);
     connect(m_powerLB, &QPushButton::clicked, this, &GreeterWindow::showPowerWnd);
 
     //虚拟键盘启动按钮
@@ -97,6 +98,7 @@ void GreeterWindow::initUI()
     m_keyboardLB->setIconSize(QSize(39, 39));
     m_keyboardLB->setFocusPolicy(Qt::NoFocus);
     m_keyboardLB->setFixedSize(39, 39);
+    m_keyboardLB->setCursor(Qt::PointingHandCursor);
     connect(m_keyboardLB, &QPushButton::clicked,
             this, &GreeterWindow::showVirtualKeyboard);
 
@@ -108,6 +110,7 @@ void GreeterWindow::initUI()
         m_sessionLB->setIconSize(QSize(39, 39));
         m_sessionLB->setFocusPolicy(Qt::NoFocus);
         m_sessionLB->setFixedSize(39, 39);
+        m_sessionLB->setCursor(Qt::PointingHandCursor);
         connect(m_sessionLB, &QPushButton::clicked, this, &GreeterWindow::showSessionWnd);
     }
 
@@ -117,6 +120,7 @@ void GreeterWindow::initUI()
     m_languageLB->setFocusPolicy(Qt::NoFocus);
     m_languageLB->setFont(QFont("Ubuntu", 16));
     m_languageLB->setFixedHeight(39);
+    m_languageLB->setCursor(Qt::PointingHandCursor);
     QString defaultLanguage = qgetenv("LANG").constData();
     onLanguageChanged(getLanguage(defaultLanguage));
     connect(m_languageLB, &QPushButton::clicked, this, &GreeterWindow::showLanguageWnd);  

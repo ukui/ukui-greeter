@@ -23,7 +23,10 @@ include(common/common.pri)
 include(VirtualKeyboard/VirtualKeyboard.pri)
 include(BiometricAuth/BiometricAuth.pri)
 
-INCLUDEPATH += common/
+INCLUDEPATH += \
+            common \
+            VirtualKeyboard/src \
+            BiometricAuth
 
 SOURCES += \
     greeter/greeterwindow.cpp \
@@ -64,8 +67,6 @@ HEADERS  += \
 CONFIG += c++11 debug link_pkgconfig
 
 QMAKE_CXXFLAGS += -Wdeprecated-declarations
-
-INCLUDEPATH += VirtualKeyboard/src/
 
 PKGCONFIG += liblightdm-qt5-3 x11 xrandr xtst
 

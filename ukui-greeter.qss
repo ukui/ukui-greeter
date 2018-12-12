@@ -4,7 +4,6 @@ QPushButton{
     border: none;
     outline: none;
     font-family: 'Ubuntu';
-/*    font-size: 22px;*/
 }
 QPushButton:flat{
     border: none;
@@ -110,6 +109,9 @@ QWidget#powerBorderWidget{
     background: rgb(0, 0, 0, 50);
 }
 
+/**
+ * session选择对话框和language选择对话框
+**/
 QListWidget{
     background:transparent;
     border: 0px;
@@ -128,7 +130,6 @@ QListWidget::item:selected#languageList{
     border-radius:4px;
 }
 
-/*语言列表*/
 QListWidget#languageList, #sessionsList{
     border: 1px solid gray;
     border-radius: 4px;
@@ -148,6 +149,48 @@ QListWidget::item#languageList{
 
 #languageButton{
     font-size: 18px;
+}
+
+
+/**
+ * 生物识别模块
+**/
+#biometricButton, #passwordButton,
+#otherDeviceButton, #retryButton
+{
+    font-size: 14px;
+    border: 1px solid white;
+}
+
+QComboBox{
+    border: 1px solid rgb(255, 255, 255, 100);
+    background: rgba(0, 0, 0, 20);
+    font:18px;
+    color: white;
+    height: 50px;
+}
+QComboBox QAbstractItemView{
+    border: 1px solid white;
+    outline: 0px;
+    height: 100px;
+    background: rgb(1, 58, 80);
+    font: 22px;
+    color: white;
+}
+QComboBox QAbstractItemView::item:selected{
+    background-color: rgba(54, 98, 180);
+}
+QComboBox::down-arrow{
+    image:url(:/images/images/arrow_down.svg);
+}
+QComboBox::drop-down{
+    width: 30px;
+    border: none;
+}
+
+#OKButton {
+    border: 1px solid rgba(255, 255, 255, 150);
+    font-size: 14px;
 }
 
 /**
@@ -180,41 +223,4 @@ QLabel#split{
 QPushButton#mode{
     background-image:url(:res/hover.png);
     border:0px;
-}
-
-/**
- * 生物识别模块qss
-**/
-
-/*QLabel{
-    border:1px solid rgba(255, 255, 255, 100);
-}
-QLabel::hover{
-    background:white;
-}
-QLabel::focus{
-    background:white;
-}*/
-QPushButton#bioButton{
-    border:1px solid white
-}
-QPushButton::hover#bioButton{
-    background:white;
-}
-QPushButton#bioPrevButton{
-    background:url(:/resource/tri-prev.png);
-    background-repeat:non-repeat;
-    border:1px solid #026096;
-}
-QPushButton::hover#bioPrevButton{
-    background:url(:/resource/tri-prev_hl.png);
-}
-
-QPushButton#bioNextButton{
-    background:url(:/resource/tri-next.png);
-    background-repeat:non-repeat;
-    border:1px solid #026096;
-}
-QPushButton::hover#bioNextButton{
-    background:url(:/resource/tri-next_hl.png);
 }
