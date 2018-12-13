@@ -41,6 +41,7 @@ public:
           m_iconLabel(new QLabel(this)),
           m_textLabel(new QLabel(this))
     {
+        m_textLabel->setObjectName(QStringLiteral("sessionLabel"));
         m_iconLabel->setGeometry(3, (height-ICON_SIZE)/2, ICON_SIZE, ICON_SIZE);
         m_textLabel->setGeometry(height+5, 0, width-height-5, height);
     }
@@ -53,8 +54,6 @@ public:
     void setText(const QString& text)
     {
         m_textLabel->setText(text);
-        m_textLabel->setFont(QFont("Ubutnu", 14));
-        m_textLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     }
 
 private:
@@ -65,7 +64,7 @@ private:
 
 
 SessionWindow::SessionWindow(QAbstractItemModel *model, QWidget *parent)
-    : BorderDialog(parent),
+    : FakeDialog(parent),
       m_sessionsModel(model)
 {
     initUI();
@@ -79,18 +78,18 @@ void SessionWindow::initUI()
 
     setDialogSize(600, 400);
 
-    m_prompt = new QLabel(center());
+    m_prompt = new QLabel(centerWidget());
     m_prompt->setObjectName(QStringLiteral("lblSessionPrompt"));
-    m_prompt->setGeometry(0, 10, center()->width(), 40);
+    m_prompt->setGeometry(0, 10, centerWidget()->width(), 40);
     m_prompt->setAlignment(Qt::AlignCenter);
     m_prompt->setText(tr("select the desktop environment"));
 
-    m_sessionsList = new QListWidget(center());
+    m_sessionsList = new QListWidget(centerWidget());
     m_sessionsList->setObjectName(QStringLiteral("sessionsList"));
     m_sessionsList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_sessionsList->setSpacing(LISTWIDGET_SAPCE);
     m_sessionsList->setGeometry(m_prompt->x() + 10, m_prompt->y() + m_prompt->height() + 20,
-                                center()->width() - 20, center()->height() - m_prompt->height() - 40);
+                                centerWidget()->width() - 20, centerWidget()->height() - m_prompt->height() - 40);
     connect(m_sessionsList, &QListWidget::itemDoubleClicked,
             this, &SessionWindow::onListCurrentItemDoubleClicked);
 }
@@ -136,19 +135,19 @@ void SessionWindow::addSessionLabels()
 
 void SessionWindow::showEvent(QShowEvent *event)
 {
-    BorderDialog::showEvent(event);
-
+    FakeDialog::showEvent(event);
     m_sessionsList->setFocus();
 }
 
-void SessionWindow::close()
+void SessionWindow::closeEvent(QCloseEvent *event)
 {
     int currentRow = m_sessionsList->currentRow();
     //传递给loginWindow的是session的唯一标识
     emit sessionChanged(m_sessionsModel->index(currentRow, 0).data(Qt::UserRole).toString());
 
-    BorderDialog::close();
+    FakeDialog::closeEvent(event);
 }
+
 
 void SessionWindow::setCurrentSession(const QString &session)
 {

@@ -18,23 +18,17 @@
 **/
 #include "powerwindow.h"
 #include <QLabel>
-#include <QPushButton>
-#include <QPainter>
-#include <QApplication>
-#include <QDesktopWidget>
 #include <QMouseEvent>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QImage>
 #include <QDebug>
 #include <QException>
 #include <QFontMetrics>
-#include <QPropertyAnimation>
 #include <qmath.h>
 #include "globalv.h"
 
 PowerWindow::PowerWindow(bool hasOpenSessions, QWidget *parent)
-    : QWidget(parent),
+    : FakeDialog(parent),
       m_hasOpenSessions(hasOpenSessions),
       m_power(new QLightDM::PowerInterface(this))
 {
@@ -47,21 +41,14 @@ void PowerWindow::initUI()
     setAttribute(Qt::WA_TranslucentBackground, true);
     setGeometry(parentWidget()->rect());
 
-    m_borderWidget = new QWidget(this);
-    m_borderWidget->setObjectName(QStringLiteral("powerBorderWidget"));
-    m_centerWidget = new QWidget(m_borderWidget);
-    m_centerWidget->setObjectName(QStringLiteral("powerCenterWidget"));
-
-
     //重启和关机一定存在，根据是否能挂起和休眠确定窗口宽度
     int cnt = 0;
     if(m_power->canHibernate())
         cnt++;
     if(m_power->canSuspend())
         cnt++;
-    m_borderWidget->setFixedWidth(455 + 188 * cnt);
-    m_centerWidget->setFixedWidth(m_borderWidget->width()-24*2);
-//    m_borderWidget->setFixedHeight(290);
+
+    setDialogSize(455 + 188 * cnt, 290);
     //根据提示内容的长度确定窗口的高度
     QFont font("ubuntu", 12);
     QString text = tr("Goodbye. Would you like to…");
@@ -72,21 +59,15 @@ void PowerWindow::initUI()
         text = QString("%1\n\n%2").arg(text2).arg(text);
         QFontMetrics fm(font);
         int textWide = fm.width(text2);
-        lineNum = qCeil(textWide * 1.0 / m_centerWidget->width()) + 1 + lineNum;
+        lineNum = qCeil(textWide * 1.0 / centerWidget()->width()) + 1 + lineNum;
     }
+    setDialogSize(455 + 188 * cnt, 280 + 20*lineNum);
 
-    m_borderWidget->setFixedHeight(280 + 20*lineNum);
-    m_centerWidget->setFixedHeight(m_borderWidget->height()-24*2);
-    m_borderWidget->setGeometry((width() - m_borderWidget->width())/2,
-                                (height() - m_borderWidget->height())/2,
-                                width(), height());
-    m_centerWidget->move(24, 24);
-
-    QVBoxLayout *vbox = new QVBoxLayout(m_centerWidget);
+    QVBoxLayout *vbox = new QVBoxLayout(centerWidget());
     vbox->setContentsMargins(20, 10, 20, 2);
     vbox->setSpacing(20);
 
-    m_prompt = new QLabel(m_centerWidget);
+    m_prompt = new QLabel(centerWidget());
     m_prompt->adjustSize();
     m_prompt->setText(text);
     m_prompt->setWordWrap(true);
@@ -101,12 +82,12 @@ void PowerWindow::initUI()
     /* 挂起 */
     if(m_power->canSuspend()){
         QVBoxLayout *vboxSuspend = new QVBoxLayout();
-        m_suspend = new QLabel(m_centerWidget);
+        m_suspend = new QLabel(centerWidget());
         m_suspend->setFixedSize(168, 168);
         m_suspend->setObjectName(QStringLiteral("suspend"));
         m_suspend->installEventFilter(this);
 
-        m_suspendLabel = new QLabel(m_centerWidget);
+        m_suspendLabel = new QLabel(centerWidget());
         m_suspendLabel->setAlignment(Qt::AlignCenter);
         m_suspendLabel->setFixedSize(168, 30);
 
@@ -118,12 +99,12 @@ void PowerWindow::initUI()
     /* 休眠 */
     if(m_power->canHibernate()) {
         QVBoxLayout *vboxHibernate = new QVBoxLayout();
-        m_hibernate = new QLabel(m_centerWidget);
+        m_hibernate = new QLabel(centerWidget());
         m_hibernate->setFixedSize(168, 168);
         m_hibernate->setObjectName(QStringLiteral("hibernate"));
         m_hibernate->installEventFilter(this);
 
-        m_hibernateLabel = new QLabel(m_centerWidget);
+        m_hibernateLabel = new QLabel(centerWidget());
         m_hibernateLabel->setAlignment(Qt::AlignCenter);
         m_hibernateLabel->setFixedSize(168, 30);
 
@@ -135,12 +116,12 @@ void PowerWindow::initUI()
 
     /* 重启 */
     QVBoxLayout *vboxStart = new QVBoxLayout();
-    m_restart = new QLabel(m_centerWidget);
+    m_restart = new QLabel(centerWidget());
     m_restart->setFixedSize(168, 168);
     m_restart->setObjectName(QStringLiteral("restart"));
     m_restart->installEventFilter(this);
 
-    m_restartLabel = new QLabel(m_centerWidget);
+    m_restartLabel = new QLabel(centerWidget());
     m_restartLabel->setAlignment(Qt::AlignCenter);
     m_restartLabel->setFixedSize(168, 30);
 
@@ -149,12 +130,12 @@ void PowerWindow::initUI()
 
     /* 关机 */
     QVBoxLayout *vboxShutdown = new QVBoxLayout();
-    m_shutdown = new QLabel(m_centerWidget);
+    m_shutdown = new QLabel(centerWidget());
     m_shutdown->setFixedSize(168, 168);
     m_shutdown->setObjectName(QStringLiteral("shutdown"));
     m_shutdown->installEventFilter(this);
 
-    m_shutdownLabel = new QLabel(m_centerWidget);
+    m_shutdownLabel = new QLabel(centerWidget());
     m_shutdownLabel->setAlignment(Qt::AlignCenter);
     m_shutdownLabel->setFixedSize(168, 30);
 
@@ -166,39 +147,7 @@ void PowerWindow::initUI()
 
     vbox->addLayout(hbox);
     vbox->addStretch();
-
-    /* 窗口关闭按钮 */
-    m_close = new QPushButton(m_borderWidget);
-    m_close->setObjectName(QStringLiteral("close"));
-    m_close->setGeometry(QRect(0, 0, 24, 24));
-    connect(m_close, &QPushButton::clicked, this, &PowerWindow::close);
 }
-
-void PowerWindow::resizeEvent(QResizeEvent *)
-{
-}
-
-void PowerWindow::paintEvent(QPaintEvent *e)
-{
-    QPainter painter(this);
-    painter.setPen(Qt::transparent);
-    painter.setBrush(QColor(0, 0, 0, m_opacity));
-    painter.drawRect(rect());
-
-    QWidget::paintEvent(e);
-}
-
-void PowerWindow::close()
-{
-    m_borderWidget->close();
-    startBackground(80, 0, false);
-}
-
-void PowerWindow::showEvent(QShowEvent *)
-{
-    startBackground(0, 80, true);
-}
-
 
 bool PowerWindow::eventFilter(QObject *obj, QEvent *event)
 {
@@ -264,29 +213,6 @@ bool PowerWindow::eventFilter(QObject *obj, QEvent *event)
 
 void PowerWindow::mousePressEvent(QMouseEvent *event)
 {
-    if(!m_borderWidget->geometry().contains(event->pos()))
+    if(!dialog()->geometry().contains(event->pos()))
         close();
-}
-
-void PowerWindow::startBackground(int begin, int end, bool show)
-{
-    QPropertyAnimation *animation = new QPropertyAnimation(this, "opacity");
-    animation->setDuration(300);
-    animation->setStartValue(begin);
-    animation->setEndValue(end);
-    if(!show)
-        connect(animation, &QPropertyAnimation::finished, this, &QWidget::close);
-
-    animation->start();
-}
-
-void PowerWindow::setOpacity(int opacity)
-{
-    m_opacity = opacity;
-    update();
-}
-
-int PowerWindow::opacity()
-{
-    return m_opacity;
 }

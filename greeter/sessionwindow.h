@@ -22,24 +22,24 @@
 #include <QWidget>
 #include <QSharedPointer>
 #include <QAbstractItemModel>
-#include "borderdialog.h"
+#include "fakedialog.h"
 
 class QLabel;
 class QPushButton;
 class IconLabel;
 class QListWidget;
 class QListWidgetItem;
-class SessionWindow : public BorderDialog
+class SessionWindow : public FakeDialog
 {
     Q_OBJECT
 public:
     explicit SessionWindow(QAbstractItemModel *model, QWidget *parent = 0);
     void setSessionModel(QAbstractItemModel *model);
     void setCurrentSession(const QString &session);
-    void close();
 
 protected:
     void showEvent(QShowEvent *event);
+    void closeEvent(QCloseEvent *event);
 
 signals:
     void sessionChanged(const QString &session);

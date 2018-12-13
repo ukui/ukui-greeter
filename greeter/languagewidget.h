@@ -3,18 +3,20 @@
 
 #include <QWidget>
 #include "language.h"
-#include "borderdialog.h"
+#include "fakedialog.h"
 
 class QListWidget;
 class QListWidgetItem;
 class QLabel;
-class LanguageWidget : public BorderDialog
+class LanguageWidget : public FakeDialog
 {
     Q_OBJECT
 public:
     explicit LanguageWidget(QWidget *parent = nullptr);
     void setCurrentLanguage(const QString &language);
-    void close();
+
+protected:
+    void closeEvent(QCloseEvent *event);
 
 private:
     void initUI();

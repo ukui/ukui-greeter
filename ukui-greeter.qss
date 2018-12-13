@@ -3,7 +3,7 @@ QPushButton{
     color: rgb(255, 255, 255, 200);
     border: none;
     outline: none;
-    font-family: 'Ubuntu';
+/*    font-family: 'Ubuntu';*/
 }
 QPushButton:flat{
     border: none;
@@ -15,6 +15,30 @@ QPushButton::hover{
 QLabel{
     color: white;
     font-family: "Ubuntu"
+}
+
+#powerButton, #keyboardButton,
+#sessionButton, #languageButton
+{
+    border-radius: 6px;
+}
+
+/* FakeDialog */
+
+#fakeDialog{
+    background: rgb(100,100, 100);
+    border: none;
+    border-radius: 10px;
+}
+
+#closeButton{
+    background: url(:/resource/dialog_close.png);
+    background-repeat:no-repeat
+}
+#closeButton::hover{
+    border-radius: 11px;
+    background: url(:/resource/dialog_close_highlight.png);
+    background-repeat:no-repeat
 }
 
 /* 返回按钮 */
@@ -121,7 +145,7 @@ QListWidget::item:hover#sessionsList,
 QListWidget::item:hover#languageList{
     background:rgb(150, 150, 150, 50);
     border:1px solid white;
-    border-radius:4px;
+    border-radius:2px;
 }
 QListWidget::item:selected#sessionsList,
 QListWidget::item:selected#languageList{
@@ -137,9 +161,19 @@ QListWidget#languageList, #sessionsList{
 }
 
 QListWidget::item#languageList{
-    height:30px;
-    color: white;
-    font-size: 14px;
+    height:34px;
+}
+
+#sessionLabel {
+    font-size: 18px;
+    text-align: left center;
+    color: rgb(255, 255, 255, 200);
+}
+
+#languageLabel {
+    font-size: 16px;
+    margin-left: 8px;
+    color: rgb(255, 255, 255, 200);
 }
 
 #lblLanguagePrompt, #lblSessionPrompt{
