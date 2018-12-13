@@ -56,6 +56,11 @@ void LanguageWidget::initUI()
     connect(lwLanguages, &QListWidget::itemDoubleClicked,
             this, &LanguageWidget::onListCurrentItemChanged);
 }
+void LanguageWidget::showEvent(QShowEvent *event)
+{
+    FakeDialog::showEvent(event);
+    lwLanguages->setFocus();
+}
 
 void LanguageWidget::closeEvent(QCloseEvent *event)
 {

@@ -16,6 +16,7 @@ public:
     void setCurrentLanguage(const QString &language);
 
 protected:
+    void showEvent(QShowEvent *event);
     void closeEvent(QCloseEvent *event);
 
 private:
