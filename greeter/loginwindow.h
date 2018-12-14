@@ -135,7 +135,7 @@ private:
 
     QWidget         *m_passwdWidget;        //放置密码输入框和信息列表
     IconEdit        *m_passwordEdit;       //密码输入框
-    QListWidget     *m_messageList;         //信息列表
+    QLabel          *m_messageLabel;         //提示信息
 
 };
 

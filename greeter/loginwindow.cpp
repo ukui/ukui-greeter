@@ -98,12 +98,9 @@ void LoginWindow::initUI()
             this, SLOT(onLogin(const QString&)));
 
     /* 密码认证信息显示列表 */
-    m_messageList = new QListWidget(m_passwdWidget);
-    m_messageList->setObjectName(QStringLiteral("messageListWidget"));
-    m_messageList->setFocusPolicy(Qt::NoFocus);
-    m_messageList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_messageList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_messageList->setSelectionMode(QAbstractItemView::NoSelection);
+    m_messageLabel = new QLabel(m_passwdWidget);
+    m_messageLabel->setObjectName(QStringLiteral("messageLabel"));
+    m_messageLabel->setAlignment(Qt::AlignCenter);
 
     /* 返回按钮 */
     m_backButton = new QPushButton(this);
@@ -148,9 +145,9 @@ void LoginWindow::setChildrenGeometry()
     m_passwdWidget->setFixedSize(width(), 150);
     m_passwdWidget->move(0, m_userWidget->geometry().bottom());
     m_passwordEdit->setGeometry((m_passwdWidget->width() - 400)/2, 0, 400, 40);
-    m_messageList->setGeometry((m_passwdWidget->width() - 300)/2,
-                               m_passwordEdit->geometry().bottom()+3,
-                               300, 100);
+    m_messageLabel->setGeometry((m_passwdWidget->width() - 300)/2,
+                                m_passwordEdit->geometry().bottom()+3,
+                                300, 30);
 
     m_backButton->setGeometry(0, m_userWidget->y(), 32, 32);
 
@@ -183,7 +180,7 @@ void LoginWindow::reset()
 
 void LoginWindow::clearMessage()
 {
-    m_messageList->clear();
+    m_messageLabel->clear();
 }
 
 /**
@@ -432,14 +429,16 @@ void LoginWindow::onShowMessage(QString text, QLightDM::Greeter::MessageType typ
 {
     qDebug()<< "message: "<< text;
 
-    QListWidgetItem *item = new QListWidgetItem(text, m_messageList);
     if(type == QLightDM::Greeter::MessageTypeError)
     {
-        item->setForeground(QColor(255, 0, 0, 180));
+        m_messageLabel->setStyleSheet("#messageLabel{color: rgb(255, 0, 0, 180);}");
     }
-    item->setTextAlignment(Qt::AlignCenter);
+    else
+    {
+        m_messageLabel->setStyleSheet("#messageLabel{color: black;}");
+    }
 
-    m_messageList->addItem(item);
+    m_messageLabel->setText(text);
 }
 
 void LoginWindow::onAuthenticationComplete()
@@ -514,6 +513,7 @@ void LoginWindow::performBiometricAuth()
 
     //初始化生物识别认证UI
     initBiometricWidget();
+    clearMessage();
 
     if(!m_deviceInfo)
     {
@@ -553,7 +553,6 @@ void LoginWindow::performPasswordAuth()
         m_retryButton->setVisible(false);
     }
     m_passwdWidget->show();
-    m_messageList->clear();
 }
 
 void LoginWindow::initBiometricWidget()
