@@ -44,9 +44,7 @@ void LanguageWidget::initUI()
     {
         QString text = lang.name + (lang.territory.isEmpty() ? "" : ("-" + lang.territory));
         QLabel *label = new QLabel(text, this);
-//        label->setFont(QFont("Ubuntu", 12));
         label->setObjectName(QStringLiteral("languageLabel"));
-//        label->setContentsMargins(20, 0, 0, 0);
         QListWidgetItem *item = new QListWidgetItem(lwLanguages);
         item->setData(Qt::UserRole, lang.code);
         lwLanguages->insertItem(i++, item);

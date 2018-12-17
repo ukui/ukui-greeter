@@ -22,8 +22,16 @@
         <file>resource/suspend_highlight.png</file>
         <file>resource/suspend.png</file>
         <file>resource/waiting.png</file>
-        <file>resource/warn.png</file>
         <file>resource/show-password.png</file>
         <file>resource/hide-password.png</file>
+        <file>resource/login-button.png</file>
+        <file>resource/scrollbar_down.png</file>
+        <file>resource/scrollbar_down_clicked.png</file>
+        <file>resource/scrollbar_down_hover.png</file>
+        <file>resource/scrollbar_up.png</file>
+        <file>resource/scrollbar_up_clicked.png</file>
+        <file>resource/scrollbar_up_hover.png</file>
+        <file>resource/combobox_down.png</file>
+        <file>resource/capslock.png</file>
     </qresource>
 </RCC>

@@ -3,6 +3,8 @@
 #include <QPushButton>
 #include <QComboBox>
 #include <QDebug>
+#include <QAbstractItemView>
+#include <QStyledItemDelegate>
 
 
 BiometricDevicesWidget::BiometricDevicesWidget(BiometricProxy *proxy, QWidget *parent)
@@ -17,36 +19,39 @@ BiometricDevicesWidget::BiometricDevicesWidget(BiometricProxy *proxy, QWidget *p
         updateDevice();
     }
 
-    resize(400, 300);
+    resize(500, 500);
 }
 
 void BiometricDevicesWidget::initUI()
 {
     lblPrompt = new QLabel(this);
-    lblPrompt->setObjectName(QStringLiteral("lblPrompt"));
+    lblPrompt->setObjectName(QStringLiteral("lblBioetricDevicesPrompt"));
     lblPrompt->setText(tr("Please select the biometric device"));
     lblPrompt->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    lblPrompt->setStyleSheet("QLabel{font-size: 22px;}");
 
     lblDeviceType = new QLabel(this);
     lblDeviceType->setObjectName(QStringLiteral("lblDeviceType"));
     lblDeviceType->setText(tr("Device type:"));
     lblDeviceType->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    lblDeviceType->setStyleSheet("QLabel{ font-size: 16px;}");
+
+    QStyledItemDelegate* itemDelegate = new QStyledItemDelegate();
 
     cmbDeviceType = new QComboBox(this);
     cmbDeviceType->setObjectName(QStringLiteral("cmbDeviceType"));
+    cmbDeviceType->setMaxVisibleItems(5);
+    cmbDeviceType->setItemDelegate(itemDelegate);
     connect(cmbDeviceType, SIGNAL(currentIndexChanged(int)),
             this, SLOT(onCmbDeviceTypeCurrentIndexChanged(int)));
 
     lblDeviceName = new QLabel(this);
-    lblDeviceType->setObjectName(QStringLiteral("lblDeviceName"));
+    lblDeviceName->setObjectName(QStringLiteral("lblDeviceName"));
     lblDeviceName->setText(tr("Device name:"));
     lblDeviceName->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    lblDeviceName->setStyleSheet("QLabel{font-size: 16px;}");
 
     cmbDeviceName = new QComboBox(this);
     cmbDeviceName->setObjectName(QStringLiteral("cmbDeviceName"));
+    cmbDeviceName->setMaxVisibleItems(5);
+    cmbDeviceName->setItemDelegate(itemDelegate);
 
     btnOK = new QPushButton(tr("OK"), this);
     btnOK->setObjectName(QStringLiteral("OKButton"));
@@ -59,14 +64,14 @@ void BiometricDevicesWidget::resizeEvent(QResizeEvent */*event*/)
 {
     lblPrompt->setGeometry(0, 0, width(), 40);
     lblDeviceType->setGeometry(0, lblPrompt->geometry().bottom() + 40,
-                               100, 30);
-    cmbDeviceType->setGeometry(0, lblDeviceType->geometry().bottom(),
-                               300, 30);
-    lblDeviceName->setGeometry(0, cmbDeviceType->geometry().bottom() + 30,
-                               100, 30);
-    cmbDeviceName->setGeometry(0, lblDeviceName->geometry().bottom(),
-                               300, 30);
-    btnOK->setGeometry(0, cmbDeviceName->geometry().bottom() + 30, 80, 30);
+                               120, 20);
+    cmbDeviceType->setGeometry(0, lblDeviceType->geometry().bottom() + 15,
+                               300, 40);
+    lblDeviceName->setGeometry(0, cmbDeviceType->geometry().bottom() + 80,
+                               120, 20);
+    cmbDeviceName->setGeometry(0, lblDeviceName->geometry().bottom() + 15,
+                               300, 40);
+    btnOK->setGeometry(0, cmbDeviceName->geometry().bottom() + 80, 140, 38);
 
 }
 
@@ -82,7 +87,10 @@ void BiometricDevicesWidget::updateDevice()
     cmbDeviceType->clear();
     for(int type : deviceMap.keys())
     {
-        cmbDeviceType->addItem(DeviceType::getDeviceType_tr(type), type);
+        QString iconPath = QString(UKUI_BIOMETRIC_IMAGES_PATH"icon/%1.png")
+                .arg(DeviceType::getDeviceType(type));
+        qDebug() << iconPath;
+        cmbDeviceType->addItem(QIcon(iconPath), DeviceType::getDeviceType_tr(type), type);
     }
     if(deviceMap.size() > 0)
     {

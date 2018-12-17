@@ -25,9 +25,9 @@
 #include <QListWidget>
 #include "globalv.h"
 
-#define ICON_SIZE 22
+#define ICON_SIZE 18
 #define PROMPT_LEFT 150
-#define LISTWIDGET_SAPCE 10
+#define LISTWIDGET_SAPCE 3
 #define ITEM_WIDTH 300
 #define ITEM_HEIGHT 40
 #define DISPLAY_ROWS 3  //只显示3行，可以通过上下键移动焦点
@@ -42,7 +42,7 @@ public:
           m_textLabel(new QLabel(this))
     {
         m_textLabel->setObjectName(QStringLiteral("sessionLabel"));
-        m_iconLabel->setGeometry(3, (height-ICON_SIZE)/2, ICON_SIZE, ICON_SIZE);
+        m_iconLabel->setGeometry(25, (height-ICON_SIZE)/2, ICON_SIZE, ICON_SIZE);
         m_textLabel->setGeometry(height+5, 0, width-height-5, height);
     }
 
@@ -82,7 +82,7 @@ void SessionWindow::initUI()
     m_prompt->setObjectName(QStringLiteral("lblSessionPrompt"));
     m_prompt->setGeometry(0, 10, centerWidget()->width(), 40);
     m_prompt->setAlignment(Qt::AlignCenter);
-    m_prompt->setText(tr("select the desktop environment"));
+    m_prompt->setText(tr("Please select the desktop environment"));
 
     m_sessionsList = new QListWidget(centerWidget());
     m_sessionsList->setObjectName(QStringLiteral("sessionsList"));

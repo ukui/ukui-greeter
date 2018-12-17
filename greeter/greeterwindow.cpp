@@ -138,6 +138,7 @@ void GreeterWindow::initUI()
         m_userWnd = new UsersView(this);
         connect(m_userWnd, &UsersView::currentUserChanged, this, &GreeterWindow::onCurrentUserChanged);
         connect(m_userWnd, &UsersView::userSelected, this, &GreeterWindow::onUserSelected);
+        connect(m_userWnd, &UsersView::userNotFound, m_loginWnd, &LoginWindow::setUserNotInView);
 
         m_userWnd->setModel(m_usersModel);
 

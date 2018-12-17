@@ -92,7 +92,6 @@ int main(int argc, char *argv[])
     a.setQuitOnLastWindowClosed(true);
 
     QResource::registerResource("image.qrc");
-    QResource::registerResource("bioverify.qrc");
 
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QTextCodec::setCodecForLocale(codec);
@@ -129,6 +128,7 @@ int main(int argc, char *argv[])
     qDebug() << "monitors ready"*/;
 
     MainWindow w;
+
 
     w.showFullScreen();
     //在没有窗口管理器的情况下，需要激活窗口，行为类似于用鼠标点击窗口

@@ -87,6 +87,9 @@ qm_file.path = $${PREFIX}/translations/
 resourcefiles.files = resource/*
 resourcefiles.path = $${PREFIX}/images/
 
+badgefiles.files = resource/badges/*.png
+badgefiles.path = $${PREFIX}/images/badges/
+
 configfile.files = 95-ukui-greeter.conf
 configfile.path = /usr/share/lightdm/lightdm.conf.d/
 
@@ -101,4 +104,4 @@ manfile.path = /usr/share/man/man1/
 
 target.path = /usr/sbin/
 
-INSTALLS += target configfile etcfile desktopfile resourcefiles qm_file manfile
+INSTALLS += target configfile etcfile desktopfile resourcefiles qm_file manfile badgefiles

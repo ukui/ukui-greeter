@@ -71,11 +71,11 @@ public slots:
     void onShowMessage(QString text, QLightDM::Greeter::MessageType type);
     void onShowPrompt(QString text, QLightDM::Greeter::PromptType type);
     void onAuthenticationComplete();
+    void setUserNotInView(const QString &userName);
 
 private slots:
     void onLogin(const QString &str);
     void onBackButtonClicked();
-    void updatePixmap();
     void onBiometricButtonClicked();
     void onPasswordButtonClicked();
     void onOtherDevicesButtonClicked();
@@ -101,8 +101,6 @@ private:
     GreeterWrapper      *m_greeter;
     QString     m_name;     //m_nameLabel显示的是全名(显示的),m_name保存的是真名(用于登录的)
     qint32      m_uid;      //用户id
-    QTimer     *m_timer;
-    QPixmap     m_waiting;
     //手动输入用户标记，设置该标记的原因是判断是不是手动输入用户，
     //如果输入了无法登录的用户，就会一直输出密码错误信息
     bool        isManual;
@@ -135,7 +133,7 @@ private:
 
     QWidget         *m_passwdWidget;        //放置密码输入框和信息列表
     IconEdit        *m_passwordEdit;       //密码输入框
-    QLabel          *m_messageLabel;         //提示信息
+    QLabel          *m_messageLabel;         //PAM消息显示
 
 };
 

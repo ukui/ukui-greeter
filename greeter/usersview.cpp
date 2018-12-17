@@ -41,7 +41,7 @@ UsersView::~UsersView()
 void UsersView::initUI()
 {
     usersList = new QListWidget(this);
-    usersList->setObjectName(QStringLiteral("usersList"));
+    usersList->setObjectName(QStringLiteral("usersListWidget"));
     usersList->setFlow(QListWidget::LeftToRight);
     usersList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     usersList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -98,6 +98,7 @@ void UsersView::setCurrentUser(const QString &userName)
             return;
         }
     }
+    Q_EMIT userNotFound(userName);
 }
 
 void UsersView::resizeEvent(QResizeEvent *event)

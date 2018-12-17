@@ -94,6 +94,8 @@ void BiometricAuthWidget::onIdentifyComplete(QDBusPendingCallWatcher *watcher)
     if(reply.isError())
     {
         qWarning() << "Identify error: " << reply.error().message();
+        Q_EMIT authComplete(false);
+        updateImage(0);
         return;
     }
     int result = reply.argumentAt(0).toInt();
