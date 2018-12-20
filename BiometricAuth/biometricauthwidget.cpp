@@ -9,6 +9,7 @@ BiometricAuthWidget::BiometricAuthWidget(BiometricProxy *proxy, QWidget *parent)
     isInAuth(false),
     movieTimer(nullptr)
 {
+    qDebug() << "BiometricAuthWidget::BiometricAuthWidget";
     initUI();
     resize(400, 300);
 
@@ -65,7 +66,7 @@ void BiometricAuthWidget::startAuth(DeviceInfoPtr device, int uid)
 
     lblDevice->setText(tr("Current device: ") + device->shortName);
 
-    qDebug().noquote() << QString("Identify:[drvid: %1, uid: %2]").arg(1).arg(2);
+    qDebug().noquote() << QString("Identify:[drvid: %1, uid: %2]").arg(device->id).arg(uid);
 
     isInAuth = true;
 
@@ -100,6 +101,7 @@ void BiometricAuthWidget::onIdentifyComplete(QDBusPendingCallWatcher *watcher)
     }
     int result = reply.argumentAt(0).toInt();
     int authUid = reply.argumentAt(1).toInt();
+    qDebug() << result << authUid << uid;
 
     // 特征识别成功，而且用户id匹配
     if(result == DBUS_RESULT_SUCCESS && authUid == uid)

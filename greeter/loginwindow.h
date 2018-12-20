@@ -57,6 +57,7 @@ public:
 protected:
     void showEvent(QShowEvent *);
     void resizeEvent(QResizeEvent *);
+    void keyReleaseEvent(QKeyEvent *event);
 
 signals:
     void back();
@@ -95,7 +96,10 @@ private:
     void stopWaiting();
     void clearMessage();
     void performBiometricAuth();
-    void performPasswordAuth();
+    void skipBiometricAuth();
+    void showPasswordAuthWidget();
+    void showBiometricAuthWidget();
+    void showBiometricDeviceWidget();
 
 private:
     GreeterWrapper      *m_greeter;
@@ -107,12 +111,12 @@ private:
     //密码错误标记，设置该标志的原因是，在有生物识别模块的情况下用户选择了密码登录，输入了错误的密码，
     //此时应该直接进入密码登录，而不是再次进入登录生物识别设备选择界面
 //    bool        isPasswordError;
-    int         enableBiometricAuth;
 
     enum AuthMode { PASSWORD, BIOMETRIC, UNKNOWN };
 
     AuthMode authMode;
     // 生物识别认证
+    int                     m_deviceCount;
     QString                 m_deviceName;
     DeviceInfoPtr           m_deviceInfo;
     BiometricProxy          *m_biometricProxy;

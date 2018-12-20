@@ -26,6 +26,13 @@ public:
      */
     void stopAuth();
 
+    /**
+     * @brief 是否正在认证
+     * @return
+     */
+    bool isAuthenticating()
+    { return isInAuth; }
+
 protected:
     void resizeEvent(QResizeEvent *event);
 

@@ -11,6 +11,7 @@ BiometricDevicesWidget::BiometricDevicesWidget(BiometricProxy *proxy, QWidget *p
     : QWidget(parent),
       proxy(proxy)
 {
+    qDebug() << "BiometricDevicesWidget::BiometricDevicesWidget";
     initUI();
     if(proxy && proxy->isValid())
     {

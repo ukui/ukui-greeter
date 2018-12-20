@@ -149,7 +149,7 @@ public Q_SLOTS:
      * @param waiting   等待时间（秒）
      * @return
      */
-    int StopOps(int drvid, int waiting = -1);
+    int StopOps(int drvid, int waiting = 5);
     /**
      * @brief 获取已连接的设备列表
      * @return
