@@ -104,8 +104,8 @@ void GreeterWindow::initUI()
     m_languageLB->setFocusPolicy(Qt::NoFocus);
     m_languageLB->setFont(QFont("Ubuntu", 16));
     m_languageLB->setFixedHeight(39);
-    QString defaultLanguage = qgetenv("LANG").constData();
-    onLanguageChanged(getLanguage(defaultLanguage));
+//    QString defaultLanguage = qgetenv("LANG").constData();
+//    onLanguageChanged(getLanguage(defaultLanguage));
     connect(m_languageLB, &QPushButton::clicked, this, &GreeterWindow::showLanguageWnd);  
 
     //登录窗口
