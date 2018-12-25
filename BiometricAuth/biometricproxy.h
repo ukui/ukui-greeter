@@ -1,6 +1,7 @@
 #ifndef BIOMETRICPROXY_H
 #define BIOMETRICPROXY_H
 
+#include <memory>
 #include <QtDBus>
 #include <QDBusAbstractInterface>
 

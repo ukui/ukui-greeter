@@ -121,43 +121,47 @@ void GreeterWindow::initUI()
     m_languageLB->setFont(QFont("Ubuntu", 16));
     m_languageLB->setFixedHeight(39);
     m_languageLB->setCursor(Qt::PointingHandCursor);
-    QString defaultLanguage = qgetenv("LANG").constData();
-    onLanguageChanged(getLanguage(defaultLanguage));
     connect(m_languageLB, &QPushButton::clicked, this, &GreeterWindow::showLanguageWnd);  
+
+    //用户列表
+    m_userWnd = new UsersView(this);
+    connect(m_userWnd, &UsersView::currentUserChanged, this, &GreeterWindow::onCurrentUserChanged);
+    connect(m_userWnd, &UsersView::userSelected, this, &GreeterWindow::onUserSelected);
 
     //登录窗口
     m_loginWnd = new LoginWindow(m_greeter, this);
-    if(m_usersModel->rowCount() > 1)    //如果显示了用户选择窗口，则先隐藏登录窗口
-        m_loginWnd->hide();
+    m_loginWnd->hide();
     connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBacktoUsers()));
     connect(m_loginWnd, &LoginWindow::userChangedByManual,
             this, &GreeterWindow::onUserChangedByManual);
+    connect(m_userWnd, &UsersView::userNotFound, m_loginWnd, &LoginWindow::setUserNotInView);
 
-    // 如果只用一个用户的话，直接进入登录界面，否则显示用户列表窗口
-    if(m_usersModel->rowCount() > 1) {
-        m_userWnd = new UsersView(this);
-        connect(m_userWnd, &UsersView::currentUserChanged, this, &GreeterWindow::onCurrentUserChanged);
-        connect(m_userWnd, &UsersView::userSelected, this, &GreeterWindow::onUserSelected);
-        connect(m_userWnd, &UsersView::userNotFound, m_loginWnd, &LoginWindow::setUserNotInView);
+    m_userWnd->setModel(m_usersModel);
 
-        m_userWnd->setModel(m_usersModel);
-
-        //显示lightdm传过来的被选中的用户 -- SwitchToUser()
-        QString selectedUser = m_greeter->selectUserHint();
-        if(!selectedUser.isEmpty())
-        {
-            qDebug() << "SelectUserHint: " << selectedUser;
-            m_userWnd->setCurrentUser(selectedUser);
-        }
-
-        // SwitchToGuest()
-        if(m_greeter->selectGuestHint())
-        {
-            qDebug() << "SelectGuest";
-            m_userWnd->setCurrentUser("*guest");
-        }
-    } else {
-        setBackground(m_usersModel->index(0, 0));
+    //显示lightdm传过来的被选中的用户 -- SwitchToUser()
+    QString selectedUser = m_greeter->selectUserHint();
+    if(!selectedUser.isEmpty())
+    {
+        qDebug() << "SelectUserHint: " << selectedUser;
+        m_userWnd->setCurrentUser(selectedUser);
+    }
+    // SwitchToGuest()
+    else if(m_greeter->selectGuestHint())
+    {
+        qDebug() << "SelectGuest";
+        m_userWnd->setCurrentUser("*guest");
+    }
+    //如果只有一个用户，直接进入认证界面
+    else if(m_usersModel->rowCount() == 1)
+    {
+        QString userName = m_usersModel->index(0, 0).data(QLightDM::UsersModel::NameRole).toString();
+        m_userWnd->setCurrentUser(userName);
+    }
+    else
+    {
+        //选中上一次登录的用户
+        QString lastLoginUser = Configuration::instance()->getLastLoginUser();
+        m_userWnd->setCurrentUser(lastLoginUser);
     }
 }
 
