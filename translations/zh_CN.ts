@@ -34,30 +34,35 @@
 <context>
     <name>BiometricAuthWidget</name>
     <message>
-        <location filename="../BiometricAuth/biometricauthwidget.cpp" line="66"/>
+        <location filename="../BiometricAuth/biometricauthwidget.cpp" line="75"/>
         <source>Current device: </source>
         <translation>当前设备：</translation>
+    </message>
+    <message>
+        <location filename="../BiometricAuth/biometricauthwidget.cpp" line="131"/>
+        <source>Identify failed, Please retry.</source>
+        <translation>识别失败，请重试</translation>
     </message>
 </context>
 <context>
     <name>BiometricDevicesWidget</name>
     <message>
-        <location filename="../BiometricAuth/biometricdeviceswidget.cpp" line="29"/>
+        <location filename="../BiometricAuth/biometricdeviceswidget.cpp" line="30"/>
         <source>Please select the biometric device</source>
         <translation>请选择生物设备</translation>
     </message>
     <message>
-        <location filename="../BiometricAuth/biometricdeviceswidget.cpp" line="34"/>
+        <location filename="../BiometricAuth/biometricdeviceswidget.cpp" line="35"/>
         <source>Device type:</source>
         <translation>设备类型：</translation>
     </message>
     <message>
-        <location filename="../BiometricAuth/biometricdeviceswidget.cpp" line="48"/>
+        <location filename="../BiometricAuth/biometricdeviceswidget.cpp" line="49"/>
         <source>Device name:</source>
         <translation>设备型号：</translation>
     </message>
     <message>
-        <location filename="../BiometricAuth/biometricdeviceswidget.cpp" line="56"/>
+        <location filename="../BiometricAuth/biometricdeviceswidget.cpp" line="57"/>
         <source>OK</source>
         <translation>确定</translation>
     </message>
@@ -159,33 +164,33 @@
 <context>
     <name>LoginWindow</name>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="249"/>
+        <location filename="../greeter/loginwindow.cpp" line="276"/>
         <source>logged in</source>
         <translation>已登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="323"/>
-        <location filename="../greeter/loginwindow.cpp" line="407"/>
+        <location filename="../greeter/loginwindow.cpp" line="350"/>
+        <location filename="../greeter/loginwindow.cpp" line="434"/>
         <source>login</source>
         <translation>登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="578"/>
+        <location filename="../greeter/loginwindow.cpp" line="611"/>
         <source>Biometric Authentication</source>
         <translation>生物识别认证</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="590"/>
+        <location filename="../greeter/loginwindow.cpp" line="623"/>
         <source>Password Authentication</source>
         <translation>密码认证</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="602"/>
+        <location filename="../greeter/loginwindow.cpp" line="635"/>
         <source>Other Devices</source>
         <translation>其他设备</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="612"/>
+        <location filename="../greeter/loginwindow.cpp" line="645"/>
         <source>Retry</source>
         <translation>重试</translation>
     </message>
@@ -206,12 +211,12 @@
         <translation type="vanished">游客登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="403"/>
+        <location filename="../greeter/loginwindow.cpp" line="430"/>
         <source>Password: </source>
         <translation>密码：</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="405"/>
+        <location filename="../greeter/loginwindow.cpp" line="432"/>
         <source>login:</source>
         <translation>登录：</translation>
     </message>
@@ -220,12 +225,12 @@
         <translation type="obsolete">密码：</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="441"/>
+        <location filename="../greeter/loginwindow.cpp" line="469"/>
         <source>Incorrect password, please input again</source>
         <translation>密码错误，请重新输入</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="207"/>
+        <location filename="../greeter/loginwindow.cpp" line="234"/>
         <source>Login</source>
         <translation>登录</translation>
     </message>

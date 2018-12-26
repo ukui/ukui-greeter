@@ -52,6 +52,7 @@ private:
     void initUI();
     void updateImage(int type = 0);
     void setImage(const QString &path);
+    void startAuth_();
 
 private:
     QLabel          *lblNotify;
@@ -60,9 +61,11 @@ private:
 
     BiometricProxy      *proxy;
     int                 uid;
+    QString             userName;
     DeviceInfoPtr       device;
     bool                isInAuth;
     QTimer              *movieTimer;
+    int                 failedCount;
 };
 
 #endif // BIOMETRICAUTHWIDGET_H

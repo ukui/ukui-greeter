@@ -192,6 +192,12 @@ public Q_SLOTS:
      */
     StatusReslut UpdateStatus(int drvid);
 
+    /**
+     * @brief 获取失败后自动重新开始的最大次数
+     * @return
+     */
+    int GetMaxAutoRetry(const QString &userName);
+
 Q_SIGNALS:
     /**
      * @brief 设备状态发生变化
