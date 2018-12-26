@@ -158,6 +158,7 @@ QString BiometricProxy::GetDefaultDevice(const QString &userName)
 {
     QString configPath = QString("/home/%1/" UKUI_BIOMETRIC_CONFIG_PATH).arg(userName);
     QSettings settings(configPath, QSettings::IniFormat);
+	qDebug() << "configure path: " << settings.fileName();
 
     QString defaultDevice = settings.value("DefaultDevice").toString();
     if(defaultDevice.isEmpty())

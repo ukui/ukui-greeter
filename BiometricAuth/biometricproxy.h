@@ -10,8 +10,8 @@
 #define BIOMETRIC_DBUS_INTERFACE    "org.ukui.Biometric"
 
 #define UKUI_BIOMETRIC_IMAGES_PATH  "/usr/share/ukui-biometric/images/"
-#define UKUI_BIOMETRIC_CONFIG_PATH  ".config/ukui-biometric/biometric-auth.conf"
-#define UKUI_BIOMETRIC_SYS_CONFIG_PATH  "/usr/share/ukui-biometric/biometric-auth.conf"
+#define UKUI_BIOMETRIC_CONFIG_PATH  ".biometric_auth/ukui_biometric.conf"
+#define UKUI_BIOMETRIC_SYS_CONFIG_PATH  "/etc/biometric-auth/ukui-biometric.conf"
 
 #define BIOMETRIC_PAM       "BIOMETRIC_PAM"
 #define BIOMETRIC_IGNORE    "BIOMETRIC_IGNORE"

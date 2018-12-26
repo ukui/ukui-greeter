@@ -518,7 +518,7 @@ void LoginWindow::performBiometricAuth()
     {
         m_deviceName = m_biometricProxy->GetDefaultDevice(m_name);
     }
-
+    qDebug() << m_deviceName;
 //    qDebug() << (m_deviceInfo ? m_deviceInfo->shortName : "");
 
     //如果默认设备为空的话，第一次不启动生物识别认证
@@ -535,6 +535,7 @@ void LoginWindow::performBiometricAuth()
     }
     if(!m_deviceInfo)
     {
+        qDebug() << "Device Not found: " << m_deviceName;
         skipBiometricAuth();
         return;
     }
