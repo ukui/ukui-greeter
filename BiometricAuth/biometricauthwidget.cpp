@@ -121,8 +121,8 @@ void BiometricAuthWidget::onIdentifyComplete(QDBusPendingCallWatcher *watcher)
     {
         qDebug() << "Identify failed";
         failedCount++;
-//        qDebug() << "max auto retry: " << proxy->GetMaxAutoRetry(userName) << failedCount;
-        if(failedCount >= proxy->GetMaxAutoRetry(userName))
+//        qDebug() << "max auto retry: " << GetMaxAutoRetry(userName) << failedCount;
+        if(failedCount >= GetMaxAutoRetry(userName))
         {
             Q_EMIT authComplete(false);
         }

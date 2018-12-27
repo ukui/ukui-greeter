@@ -23,7 +23,7 @@
 #include <QLightDM/Greeter>
 #include <QLightDM/UsersModel>
 
-#include "biometricproxy.h"
+#include "biometricdeviceinfo.h"
 
 class QTimer;
 class QLabel;
