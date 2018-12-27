@@ -26,7 +26,6 @@
 #include <QPixmap>
 
 
-class KeyEventMonitor;
 class IconEdit : public QWidget
 {
     Q_OBJECT
@@ -41,6 +40,7 @@ public:
     void setType(QLineEdit::EchoMode type = QLineEdit::Password);
     void startWaiting();
     void stopWaiting();
+    void setCapsState(bool capsState);
 
 protected:
     void resizeEvent(QResizeEvent *) Q_DECL_OVERRIDE;
@@ -52,15 +52,15 @@ signals:
     void clicked(const QString &);
     void focusOut();
 
-public slots:
+private slots:
     void clicked_cb();
-    void onCapsStateChanged(int);
+    void onGlobalKeyRelease(const QString &key);
+
 private:
     QLineEdit       *m_edit;
     QLabel          *m_capsIcon;
     QPushButton     *m_iconButton;
     QPushButton     *m_modeButton;
-    KeyEventMonitor *keyMonitor;
     QTimer          *m_timer;
     QPixmap         m_waitingPixmap;
     QString         m_iconText;     //文字作为图标

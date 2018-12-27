@@ -24,16 +24,13 @@
 #include <QKeyEvent>
 #include <QDebug>
 #include <QTimer>
-#include "common/keyeventmonitor.h"
+#include "xeventmonitor.h"
 
 
 IconEdit::IconEdit(QWidget *parent)
     : QWidget(parent),
-      keyMonitor(KeyEventMonitor::instance(this)),
       m_timer(nullptr)
 {
-    keyMonitor->start();
-
     m_edit = new QLineEdit(this);
     m_edit->setObjectName(QStringLiteral("passwdEdit"));
     m_edit->setAttribute(Qt::WA_InputMethodEnabled, false); //禁用输入法
@@ -41,7 +38,6 @@ IconEdit::IconEdit(QWidget *parent)
 
     m_capsIcon = new QLabel(this);
     m_capsIcon->setObjectName(QStringLiteral("capsIconLabel"));
-    m_capsIcon->hide();
 
     m_iconButton = new QPushButton(this);
     m_iconButton->setObjectName(QStringLiteral("loginButton"));
@@ -67,9 +63,11 @@ IconEdit::IconEdit(QWidget *parent)
 
     connect(m_edit, &QLineEdit::returnPressed, this, &IconEdit::clicked_cb);
     connect(m_iconButton, &QPushButton::clicked, this, &IconEdit::clicked_cb);
-    connect(keyMonitor, &KeyEventMonitor::CapsLockChanged, this, &IconEdit::onCapsStateChanged);
+    connect(XEventMonitor::instance(), SIGNAL(keyRelease(const QString &)),
+            this, SLOT(onGlobalKeyRelease(const QString &)));
 
     setFocusProxy(m_edit);
+    setCapsState(checkCapsState());
 }
 
 void IconEdit::setType(QLineEdit::EchoMode type)
@@ -81,7 +79,8 @@ void IconEdit::setType(QLineEdit::EchoMode type)
 void IconEdit::resizeEvent(QResizeEvent *)
 {
     // 设置输入框中文件输入区，不让输入的文字在被隐藏在按钮下
-    m_edit->setTextMargins(1, 1, m_iconButton->width() + m_modeButton->width(), 1);
+    int w = m_iconButton->width() + m_modeButton->width();
+    m_edit->setTextMargins(1, 1, m_capsIcon->isVisible() ? w + m_capsIcon->width() : w, 1);
     m_edit->setFixedSize(size());
 }
 
@@ -92,7 +91,15 @@ void IconEdit::clicked_cb()
     emit clicked(m_edit->text());
 }
 
-void IconEdit::onCapsStateChanged(int capsState)
+void IconEdit::onGlobalKeyRelease(const QString &key)
+{
+    if(key == "Caps_Lock")
+    {
+        setCapsState(!m_capsIcon->isVisible());
+    }
+}
+
+void IconEdit::setCapsState(bool capsState)
 {
     m_capsIcon->setVisible(capsState);
     int w = m_iconButton->width() + m_modeButton->width();
