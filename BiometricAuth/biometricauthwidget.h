@@ -67,6 +67,7 @@ private:
     QTimer              *movieTimer;
     int                 failedCount;
     bool                beStopped;  //被强制终止
+    int                 timeoutCount;
 };
 
 #endif // BIOMETRICAUTHWIDGET_H

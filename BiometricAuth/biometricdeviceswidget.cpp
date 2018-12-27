@@ -90,7 +90,7 @@ void BiometricDevicesWidget::updateDevice()
     {
         QString iconPath = QString(UKUI_BIOMETRIC_IMAGES_PATH"icon/%1.png")
                 .arg(DeviceType::getDeviceType(type));
-        qDebug() << iconPath;
+//        qDebug() << iconPath;
         cmbDeviceType->addItem(QIcon(iconPath), DeviceType::getDeviceType_tr(type), type);
     }
     if(deviceMap.size() > 0)

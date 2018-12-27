@@ -9,7 +9,8 @@ BiometricAuthWidget::BiometricAuthWidget(BiometricProxy *proxy, QWidget *parent)
     isInAuth(false),
     movieTimer(nullptr),
     failedCount(0),
-    beStopped(false)
+    beStopped(false),
+    timeoutCount(0)
 {
     qDebug() << "BiometricAuthWidget::BiometricAuthWidget";
     initUI();
@@ -67,6 +68,7 @@ void BiometricAuthWidget::startAuth(DeviceInfoPtr device, int uid)
     this->uid = uid;
     this->userName = getpwuid(uid)->pw_name;
     this->failedCount = 0;
+    this->timeoutCount = 0;
     this->beStopped = false;
 
     startAuth_();
@@ -120,12 +122,13 @@ void BiometricAuthWidget::onIdentifyComplete(QDBusPendingCallWatcher *watcher)
         qDebug() << "Identify success";
         Q_EMIT authComplete(true);
     }
-    else
+    // 特征识别不匹配
+    else if(result == DBUS_RESULT_NOTMATCH)
     {
         qDebug() << "Identify failed";
         failedCount++;
-//        qDebug() << "max auto retry: " << GetMaxAutoRetry(userName) << failedCount;
-        if(failedCount >= GetMaxAutoRetry(userName))
+        qDebug() << "max auto retry: " << GetMaxFailedAutoRetry(userName) << failedCount;
+        if(failedCount >= GetMaxFailedAutoRetry(userName))
         {
             Q_EMIT authComplete(false);
         }
@@ -138,6 +141,29 @@ void BiometricAuthWidget::onIdentifyComplete(QDBusPendingCallWatcher *watcher)
                     startAuth_();
                 }
             });
+        }
+    }
+    //识别发生错误
+    else if(result == DBUS_RESULT_ERROR)
+    {
+        StatusReslut ret = proxy->UpdateStatus(device->id);
+        //识别操作超时
+        if(ret.result == 0 && ret.opsStatus == IDENTIFY_TIMEOUT)
+        {
+            timeoutCount++;
+            if(timeoutCount >= GetMaxTimeoutAutoRetry(userName))
+            {
+                Q_EMIT authComplete(false);
+            }
+            else
+            {
+                QTimer::singleShot(1000, [&]{
+                    if(!beStopped)
+                    {
+                        startAuth_();
+                    }
+                });
+            }
         }
     }
     updateImage(0);

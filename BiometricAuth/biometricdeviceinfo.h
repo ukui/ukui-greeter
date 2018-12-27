@@ -70,6 +70,18 @@ enum DBusResult {
 };
 
 /**
+ * @brief 识别操作（Identify）的ops状态
+ */
+enum IdentifyOpsStatus {
+    IDENTIFY_MATCH = 400,
+    IDENTIFY_NOTMATCH,
+    IDENTIFY_ERROR,
+    IDENTIFY_STOPBYUSER,
+    IDENTIFY_TIMEOUT,
+    IDENTIFY_MAX
+};
+
+/**
  * @brief 设备的信息
  */
 struct DeviceInfo
@@ -110,8 +122,16 @@ QString GetDefaultDevice(const QString &userName);
 
 /**
  * @brief 获取失败后自动重新开始的最大次数
+ * @param userName
  * @return
  */
-int GetMaxAutoRetry(const QString &userName);
+int GetMaxFailedAutoRetry(const QString &userName);
+
+/**
+ * @brief 获取超时后自动重新开始的最大次数
+ * @param userName
+ * @return
+ */
+int GetMaxTimeoutAutoRetry(const QString &userName);
 
 #endif // BIOMETRICDEVICEINFO_H

@@ -92,7 +92,7 @@ QString GetDefaultDevice(const QString &userName)
 {
     QString configPath = QString("/home/%1/" UKUI_BIOMETRIC_CONFIG_PATH).arg(userName);
     QSettings settings(configPath, QSettings::IniFormat);
-    qDebug() << "configure path: " << settings.fileName();
+//    qDebug() << "configure path: " << settings.fileName();
 
     QString defaultDevice = settings.value("DefaultDevice").toString();
     if(defaultDevice.isEmpty())
@@ -104,16 +104,35 @@ QString GetDefaultDevice(const QString &userName)
     return defaultDevice;
 }
 
-int GetMaxAutoRetry(const QString &userName)
+static int getValueFromSettings(const QString &userName, const QString &key, int defaultValue = 3)
 {
+    //从家目录下的配置文件中获取
     QString configPath = QString("/home/%1/" UKUI_BIOMETRIC_CONFIG_PATH).arg(userName);
     QSettings settings(configPath, QSettings::IniFormat);
+    QString valueStr = settings.value(key).toString();
 
-    int maxAutoRetry = settings.value("MaxAutoRetry").toInt();
-    if(maxAutoRetry == 0)
+    //如果没有获取到，则从系统配置文件中获取
+    if(valueStr.isEmpty())
     {
         QSettings sysSettings(UKUI_BIOMETRIC_SYS_CONFIG_PATH, QSettings::IniFormat);
-        maxAutoRetry = sysSettings.value("MaxAutoRetry", 3).toInt();
+        valueStr = sysSettings.value(key).toString();
     }
-    return maxAutoRetry;
+
+    bool ok;
+    int value = valueStr.toInt(&ok);
+    if( (value == 0 && !ok) || valueStr.isEmpty() )
+    {
+        value = defaultValue;
+    }
+    return value;
+}
+
+int GetMaxFailedAutoRetry(const QString &userName)
+{
+    return getValueFromSettings(userName, "MaxFailedAutoRetry");
+}
+
+int GetMaxTimeoutAutoRetry(const QString &userName)
+{
+    return getValueFromSettings(userName, "MaxTimeoutAutoRetry");
 }

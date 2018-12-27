@@ -9,6 +9,7 @@ BiometricProxy::BiometricProxy(QObject *parent)
                              parent)
 {
     registerMetaType();
+    setTimeout(2147483647);
 }
 
 QDBusPendingCall BiometricProxy::Identify(int drvid, int uid, int indexStart, int indexEnd)
