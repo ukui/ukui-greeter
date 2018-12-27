@@ -8,7 +8,8 @@ BiometricAuthWidget::BiometricAuthWidget(BiometricProxy *proxy, QWidget *parent)
     proxy(proxy),
     isInAuth(false),
     movieTimer(nullptr),
-    failedCount(0)
+    failedCount(0),
+    beStopped(false)
 {
     qDebug() << "BiometricAuthWidget::BiometricAuthWidget";
     initUI();
@@ -66,6 +67,7 @@ void BiometricAuthWidget::startAuth(DeviceInfoPtr device, int uid)
     this->uid = uid;
     this->userName = getpwuid(uid)->pw_name;
     this->failedCount = 0;
+    this->beStopped = false;
 
     startAuth_();
 }
@@ -88,6 +90,7 @@ void BiometricAuthWidget::startAuth_()
 
 void BiometricAuthWidget::stopAuth()
 {
+    beStopped = true;
     if(!isInAuth)
     {
         return;
@@ -130,7 +133,10 @@ void BiometricAuthWidget::onIdentifyComplete(QDBusPendingCallWatcher *watcher)
         {
             lblNotify->setText(tr("Identify failed, Please retry."));
             QTimer::singleShot(1000, [&]{
-                startAuth_();
+                if(!beStopped)
+                {
+                    startAuth_();
+                }
             });
         }
     }
