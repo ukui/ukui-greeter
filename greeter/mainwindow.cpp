@@ -27,6 +27,7 @@
 #include <QScreen>
 #include <QProcess>
 #include <QtMath>
+#include <QTimer>
 #include "globalv.h"
 #include "greeterwindow.h"
 #include "common/configuration.h"
@@ -53,9 +54,6 @@ MainWindow::MainWindow(QWidget *parent)
     setFixedSize(QApplication::primaryScreen()->virtualSize());
     //设置监控鼠标移动
     setMouseTracking(true);
-
-    //logo
-    m_logo = m_configuration->getLogo();
 
     //cof
     m_cof.load(m_configuration->getValue("cof").toString());
@@ -116,10 +114,6 @@ void MainWindow::paintEvent(QPaintEvent *e)
         }
 
         QPainter painter(this);
-        //绘制logo
-        painter.setOpacity(0.5);
-        QRect logoRect(rect.left(), rect.bottom()-80, m_logo.width(), m_logo.height());
-        painter.drawPixmap(logoRect, m_logo);
 
         //在没有登录窗口的屏幕上显示图标
         if(screen != m_activeScreen)

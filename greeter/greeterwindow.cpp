@@ -46,13 +46,15 @@ GreeterWindow::GreeterWindow(QWidget *parent)
       m_loginWnd(nullptr),
       m_sessionWnd(nullptr),
       m_powerWnd(nullptr),
+      m_sessionLB(nullptr),
       m_virtualKeyboard(nullptr),
       m_languageWnd(nullptr),
       m_greeter(new GreeterWrapper()),
       m_usersModel(new UsersModel(m_greeter->hideUsersHint())),
       m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions)),
       m_configuration(Configuration::instance()),
-      languageHasChanged(false)
+      m_languageHasChanged(false),
+      m_sessionHasChanged(false)
 {
     if(m_greeter->hasGuestAccountHint()){    //允许游客登录
         qDebug() << "allow guest";
@@ -86,6 +88,7 @@ void GreeterWindow::initUI()
     m_powerLB->setIconSize(QSize(39, 39));
     m_powerLB->setFocusPolicy(Qt::NoFocus);
     m_powerLB->setFixedSize(39, 39);
+    m_powerLB->setCursor(Qt::PointingHandCursor);
     connect(m_powerLB, &QPushButton::clicked, this, &GreeterWindow::showPowerWnd);
 
     //虚拟键盘启动按钮
@@ -95,8 +98,21 @@ void GreeterWindow::initUI()
     m_keyboardLB->setIconSize(QSize(39, 39));
     m_keyboardLB->setFocusPolicy(Qt::NoFocus);
     m_keyboardLB->setFixedSize(39, 39);
+    m_keyboardLB->setCursor(Qt::PointingHandCursor);
     connect(m_keyboardLB, &QPushButton::clicked,
             this, &GreeterWindow::showVirtualKeyboard);
+
+    //桌面环境选择按钮
+    if(m_sessionsModel->rowCount() > 1)
+    {
+        m_sessionLB = new QPushButton(this);
+        m_sessionLB->setObjectName((QStringLiteral("sessionButton")));
+        m_sessionLB->setIconSize(QSize(39, 39));
+        m_sessionLB->setFocusPolicy(Qt::NoFocus);
+        m_sessionLB->setFixedSize(39, 39);
+        m_sessionLB->setCursor(Qt::PointingHandCursor);
+        connect(m_sessionLB, &QPushButton::clicked, this, &GreeterWindow::showSessionWnd);
+    }
 
     //语言选择按钮
     m_languageLB = new QPushButton(this);
@@ -104,43 +120,48 @@ void GreeterWindow::initUI()
     m_languageLB->setFocusPolicy(Qt::NoFocus);
     m_languageLB->setFont(QFont("Ubuntu", 16));
     m_languageLB->setFixedHeight(39);
-//    QString defaultLanguage = qgetenv("LANG").constData();
-//    onLanguageChanged(getLanguage(defaultLanguage));
+    m_languageLB->setCursor(Qt::PointingHandCursor);
     connect(m_languageLB, &QPushButton::clicked, this, &GreeterWindow::showLanguageWnd);  
+
+    //用户列表
+    m_userWnd = new UsersView(this);
+    connect(m_userWnd, &UsersView::currentUserChanged, this, &GreeterWindow::onCurrentUserChanged);
+    connect(m_userWnd, &UsersView::userSelected, this, &GreeterWindow::onUserSelected);
 
     //登录窗口
     m_loginWnd = new LoginWindow(m_greeter, this);
-    m_loginWnd->setUsersModel(m_usersModel);
-    m_loginWnd->setSessionsModel(m_sessionsModel);
-    if(m_usersModel->rowCount() > 1)    //如果显示了用户选择窗口，则先隐藏登录窗口
-        m_loginWnd->hide();
+    m_loginWnd->hide();
     connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBacktoUsers()));
-    connect(m_loginWnd, SIGNAL(selectSession(QString)), this, SLOT(onSelectSession(QString)));
+    connect(m_loginWnd, &LoginWindow::userChangedByManual,
+            this, &GreeterWindow::onUserChangedByManual);
+    connect(m_userWnd, &UsersView::userNotFound, m_loginWnd, &LoginWindow::setUserNotInView);
 
-    // 如果只用一个用户的话，直接进入登录界面，否则显示用户列表窗口
-    if(m_usersModel->rowCount() > 1) {
-        m_userWnd = new UsersView(this);
-        connect(m_userWnd, &UsersView::currentUserChanged, this, &GreeterWindow::onCurrentUserChanged);
-        connect(m_userWnd, &UsersView::userSelected, this, &GreeterWindow::onUserSelected);
+    m_userWnd->setModel(m_usersModel);
 
-        m_userWnd->setModel(m_usersModel);
-
-        //显示lightdm传过来的被选中的用户 -- SwitchToUser()
-        QString selectedUser = m_greeter->selectUserHint();
-        if(!selectedUser.isEmpty())
-        {
-            qDebug() << "SelectUserHint: " << selectedUser;
-            m_userWnd->setCurrentUser(selectedUser);
-        }
-
-        // SwitchToGuest()
-        if(m_greeter->selectGuestHint())
-        {
-            qDebug() << "SelectGuest";
-            m_userWnd->setCurrentUser("*guest");
-        }
-    } else {
-        setBackground(m_usersModel->index(0, 0));
+    //显示lightdm传过来的被选中的用户 -- SwitchToUser()
+    QString selectedUser = m_greeter->selectUserHint();
+    if(!selectedUser.isEmpty())
+    {
+        qDebug() << "SelectUserHint: " << selectedUser;
+        m_userWnd->setCurrentUser(selectedUser);
+    }
+    // SwitchToGuest()
+    else if(m_greeter->selectGuestHint())
+    {
+        qDebug() << "SelectGuest";
+        m_userWnd->setCurrentUser("*guest");
+    }
+    //如果只有一个用户，直接进入认证界面
+    else if(m_usersModel->rowCount() == 1)
+    {
+        QString userName = m_usersModel->index(0, 0).data(QLightDM::UsersModel::NameRole).toString();
+        m_userWnd->setCurrentUser(userName);
+    }
+    else
+    {
+        //选中上一次登录的用户
+        QString lastLoginUser = Configuration::instance()->getLastLoginUser();
+        m_userWnd->setCurrentUser(lastLoginUser);
     }
 }
 
@@ -170,17 +191,9 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
         m_userWnd->setGeometry(userRect);
     }
     if(m_loginWnd){
-        QRect loginRect((width()-m_loginWnd->width())/2,
-                        (height()-m_loginWnd->height())/2,
-                        m_loginWnd->width(), m_loginWnd->height());
+        QRect loginRect((width()-m_loginWnd->width())/2, 0,
+                        m_loginWnd->width(), height());
         m_loginWnd->setGeometry(loginRect);
-    }
-
-    if(m_sessionWnd){
-        QRect sessionRect((rect().width()-m_sessionWnd->width())/2,
-                          (height()-m_sessionWnd->height())/2,
-                          m_sessionWnd->width(), m_sessionWnd->height());
-        m_sessionWnd->setGeometry(sessionRect);
     }
 
     if(m_languageWnd)
@@ -191,14 +204,27 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
         m_languageWnd->setGeometry(languageWndRect);
     }
 
+    //电源按钮位置
     int x = m_powerLB->geometry().width() + 20;
     int y = 20;
     m_powerLB->move(this->width() - x, y);
+
+    //虚拟键盘按钮位置
     x += (20 + m_keyboardLB->width());
     m_keyboardLB->move(this->width() - x, y);
+
+    //桌面环境选择按钮位置
+    if(m_sessionLB)
+    {
+        x += (20 + m_sessionLB->width());
+        m_sessionLB->move(this->width() - x, y);
+    }
+
+    //语言选择按钮位置
     x += (20 + m_languageLB->width());
     m_languageLB->move(this->width() - x, y);
 
+    //虚拟键盘位置
     setVirkeyboardPos();
 }
 
@@ -235,8 +261,6 @@ void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
             m_loginWnd->reset();
             switchWnd(0);
         }
-        else if(m_sessionWnd && !m_sessionWnd->isHidden())
-            switchWnd(1);
     break;
     }
     QWidget::keyReleaseEvent(e);
@@ -263,32 +287,41 @@ void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
 {
     setBackground(index);
 
-    if(languageHasChanged)
+    if(!m_languageHasChanged)
     {
-        return;
-    }
-
-    //获取用户的session语言
-    QString language;
-    QString realName = index.data(QLightDM::UsersModel::NameRole).toString();
-    if(realName == "*guest" || realName == "*login")
-        return;
-    QDBusInterface iface("org.freedesktop.Accounts", "/org/freedesktop/Accounts",
-                         "org.freedesktop.Accounts",QDBusConnection::systemBus());
-    QDBusReply<QDBusObjectPath> userPath = iface.call("FindUserByName", realName);
-    if(!userPath.isValid())
-        qWarning() << "Get UserPath error:" << userPath.error();
-    else {
-        QDBusInterface userIface("org.freedesktop.Accounts", userPath.value().path(),
-                                 "org.freedesktop.DBus.Properties", QDBusConnection::systemBus());
-        QDBusReply<QDBusVariant> languageReply = userIface.call("Get", "org.freedesktop.Accounts.User", "Language");
-        if(!languageReply.isValid())
-            qWarning() << "Get User's language error" << languageReply.error();
+        //获取用户的session语言
+        QString language;
+        QString realName = index.data(QLightDM::UsersModel::NameRole).toString();
+        if(realName == "*guest" || realName == "*login")
+            return;
+        QDBusInterface iface("org.freedesktop.Accounts", "/org/freedesktop/Accounts",
+                             "org.freedesktop.Accounts",QDBusConnection::systemBus());
+        QDBusReply<QDBusObjectPath> userPath = iface.call("FindUserByName", realName);
+        if(!userPath.isValid())
+            qWarning() << "Get UserPath error:" << userPath.error();
         else {
-            language = languageReply.value().variant().toString();
-            onLanguageChanged(getLanguage(language));
+            QDBusInterface userIface("org.freedesktop.Accounts", userPath.value().path(),
+                                     "org.freedesktop.DBus.Properties", QDBusConnection::systemBus());
+            QDBusReply<QDBusVariant> languageReply = userIface.call("Get", "org.freedesktop.Accounts.User", "Language");
+            if(!languageReply.isValid())
+                qWarning() << "Get User's language error" << languageReply.error();
+            else {
+                language = languageReply.value().variant().toString();
+                onLanguageChanged(getLanguage(language));
+            }
         }
     }
+
+    if(!m_sessionHasChanged && m_sessionsModel->rowCount() > 1)
+    {
+        QString session = index.data(QLightDM::UsersModel::SessionRole).toString();
+        onSessionChanged(session);
+    }
+}
+
+void GreeterWindow::onUserChangedByManual(const QString &userName)
+{
+    m_userWnd->setCurrentUser(userName);
 }
 
 void GreeterWindow::onBacktoUsers()
@@ -299,23 +332,6 @@ void GreeterWindow::onBacktoUsers()
 void GreeterWindow::onBacktoLogin()
 {
     switchWnd(1);
-}
-
-void GreeterWindow::onSelectSession(const QString &sessionName)
-{
-    qDebug() << "selection session";
-    if(!m_sessionWnd) {
-        m_sessionWnd = new SessionWindow(m_greeter->defaultSessionHint(), this);
-        m_sessionWnd->setSessionModel(m_sessionsModel);
-        m_sessionWnd->setGeometry((rect().width()-m_sessionWnd->width())/2,
-                                  (rect().height()-m_sessionWnd->height())/2,
-                                  m_sessionWnd->width(), m_sessionWnd->height());
-        connect(m_sessionWnd, SIGNAL(sessionSelected(QString)), m_loginWnd, SLOT(onSessionSelected(QString)));
-        connect(m_sessionWnd, SIGNAL(back()), this, SLOT(onBacktoLogin()));
-    }
-    m_sessionWnd->setSession(sessionName);
-
-    switchWnd(2);
 }
 
 /**
@@ -329,8 +345,6 @@ void GreeterWindow::switchWnd(int index)
         m_userWnd->hide();
     if(m_loginWnd)
         m_loginWnd->hide();
-    if(m_sessionWnd)
-        m_sessionWnd->hide();
 
     switch (index) {
     case 0:
@@ -338,9 +352,6 @@ void GreeterWindow::switchWnd(int index)
         break;
     case 1:
         m_loginWnd->show();
-        break;
-    case 2:
-        m_sessionWnd->show();
         break;
     default:
         break;
@@ -416,10 +427,10 @@ void GreeterWindow::showLanguageWnd()
     connect(m_languageWnd, &LanguageWidget::languageChanged,
             this, &GreeterWindow::onLanguageChanged);
 
-    languageHasChanged = true;
+    m_languageHasChanged = true;
 
     m_languageWnd->show();
-    m_languageWnd->setCurrentLanguage(m_languageLB->text());
+    m_languageWnd->setCurrentLanguage(m_greeter->lang());
 }
 
 void GreeterWindow::setWindowPos(QWidget *widget, Qt::Alignment align)
@@ -457,10 +468,86 @@ void GreeterWindow::onLanguageChanged(const Language &language)
     QFontMetrics fm(font);
     int pixelWidth = fm.width(language.name);
     m_languageLB->setFixedWidth(pixelWidth + 4);
-    m_languageLB->move(m_keyboardLB->geometry().left() - 20 - m_languageLB->width(), 20);
+
+    int x;
+    if(m_sessionLB)
+    {
+        x = m_sessionLB->geometry().left();
+    }
+    else
+    {
+        x = m_keyboardLB->geometry().left();
+    }
+    m_languageLB->move(x - 20 - m_languageLB->width(), 20);
 
     if(m_userWnd && !m_userWnd->isHidden())
     {
         m_userWnd->setFocus();
     }
+}
+
+void GreeterWindow::showSessionWnd()
+{
+    m_sessionWnd = new SessionWindow(m_sessionsModel, this);
+    connect(m_sessionWnd, &SessionWindow::sessionChanged,
+            this, &GreeterWindow::onSessionChanged);
+
+    m_sessionHasChanged = true;
+
+    m_sessionWnd->setCurrentSession(m_greeter->session());
+    m_sessionWnd->show();
+}
+
+void GreeterWindow::onSessionChanged(const QString &session)
+{
+    qDebug() << "session changed: " << session;
+    QString sessionTmp(session);
+    if(session.isEmpty() || !sessionIsValid(session))
+    {   //session不存在
+        QString defaultSession = m_greeter->defaultSessionHint();
+
+        //默认session存在
+        if(defaultSession != session && sessionIsValid(defaultSession))
+        {
+            sessionTmp = defaultSession;
+        }
+        //列表中的第一个session
+        else if(m_sessionsModel && m_sessionsModel->rowCount() > 0)
+        {
+            sessionTmp = m_sessionsModel->index(0, 0)
+                    .data(QLightDM::SessionsModel::KeyRole).toString();
+        }
+        else
+        {
+            sessionTmp = "";
+        }
+    }
+
+    QString sessionPrefix = sessionTmp.left(sessionTmp.indexOf('-'));
+    QString sessionIcon = IMAGE_DIR + QString("badges/%1_badge.png")
+            .arg(sessionPrefix.toLower());
+    QFile iconFile(sessionIcon);
+    if(!iconFile.exists()){
+        sessionIcon = IMAGE_DIR + QString("badges/unknown_badge.png");
+    }
+    qDebug() << sessionIcon;
+    m_sessionLB->setIcon(QIcon(sessionIcon));
+    m_greeter->setSession(sessionTmp);
+
+    if(m_userWnd && !m_userWnd->isHidden())
+    {
+        m_userWnd->setFocus();
+    }
+}
+
+bool GreeterWindow::sessionIsValid(const QString &session)
+{
+    for(int i = 0; i < m_sessionsModel->rowCount(); i++)
+    {
+        QString sessionKey = m_sessionsModel->index(i, 0)
+                .data(QLightDM::SessionsModel::KeyRole).toString();
+        if(sessionKey == session)
+            return true;
+    }
+    return false;
 }

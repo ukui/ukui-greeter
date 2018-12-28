@@ -1,4 +1,4 @@
-/* bioauthentication.h
+/**
  * Copyright (C) 2018 Tianjin KYLIN Information Technology Co., Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,36 +16,39 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301, USA.
 **/
-#ifndef BIOAUTHENTICATION_H
-#define BIOAUTHENTICATION_H
+#ifndef FAKEDIALOG_H
+#define FAKEDIALOG_H
 
-#include <QObject>
-#include <QTimer>
-#include "biocustomtype.h"
+#include <QWidget>
 
-class QDBusInterface;
-class BioAuthentication : public QObject
+class QPushButton;
+
+class FakeDialog : public QWidget
 {
     Q_OBJECT
 public:
-    explicit BioAuthentication(qint32 uid, const DeviceInfo &deviceInfo, QObject *parent = nullptr);
-    void startAuthentication();
-    void stopAuthentication();
+    explicit FakeDialog(QWidget *parent = nullptr);
+    void setDialogSize(int w, int h);
+    QWidget *centerWidget();
+    QWidget *dialog();
 
-signals:
-    void authenticationComplete(bool result);
-    void notify(const QString &message);
-
-private slots:
-    void onSearchResult(QDBusPendingCallWatcher *watcher);
-    void onStatusChanged(int deviceId, int statusType);
+protected:
+    void paintEvent(QPaintEvent *e);
+    void resizeEvent(QResizeEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
 
 private:
-    QDBusInterface      *serviceInterface;
+    void initUI();
 
-    qint32              uid;
-    DeviceInfo          deviceInfo;
-    QTimer              *timer;
+private:
+    int dialogWidth;
+    int dialogHeight;
+
+    QWidget         *m_dialog;
+    QWidget         *m_centerWidget;
+    QPushButton     *m_closeButton;
+//    QPushButton     *m_okButton;
+//    QPushButton     *m_cancelButton;
 };
 
-#endif // BIOAUTHENTICATION_H
+#endif // FAKEDIALOG_H

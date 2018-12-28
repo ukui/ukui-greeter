@@ -23,7 +23,6 @@
 #include <QKeyEvent>
 #include <QStandardPaths>
 #include <QLightDM/UsersModel>
-#include "common/configuration.h"
 
 UsersView::UsersView(QWidget *parent) :
     QWidget(parent),
@@ -41,7 +40,7 @@ UsersView::~UsersView()
 void UsersView::initUI()
 {
     usersList = new QListWidget(this);
-    usersList->setObjectName(QStringLiteral("usersList"));
+    usersList->setObjectName(QStringLiteral("usersListWidget"));
     usersList->setFlow(QListWidget::LeftToRight);
     usersList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     usersList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -70,23 +69,14 @@ void UsersView::setModel(QAbstractListModel *model)
     connect(usersModel, &QAbstractListModel::rowsRemoved, this, &UsersView::onUserRemoved);
     connect(usersModel, &QAbstractListModel::dataChanged, this, &UsersView::onUserChanged);
 
-    //选中上一次登录的用户
-    QString lastLoginUser = Configuration::instance()->getLastLoginUser();
-    qDebug() << "lastLoginUser: "<< lastLoginUser;
     for(int i = 0; i < usersModel->rowCount(); i++)
         insertUserEntry(i);
-    setCurrentRow(0);   //默认选中第一位用户
-    for(int i = 0; i < usersModel->rowCount(); i++) {
-        if(lastLoginUser == usersModel->index(i, 0).data(Qt::DisplayRole).toString()) {
-            setCurrentRow(i);
-            break;
-        }
-    }
+    setCurrentRow(0);   //默认选中第一位用户s
 }
 
 void UsersView::setCurrentUser(const QString &userName)
 {
-    if(!usersModel)
+    if(!usersModel || userName.isEmpty())
         return;
     for(int i = 0; i < usersModel->rowCount(); i++)
     {
@@ -98,6 +88,7 @@ void UsersView::setCurrentUser(const QString &userName)
             return;
         }
     }
+    Q_EMIT userNotFound(userName);
 }
 
 void UsersView::resizeEvent(QResizeEvent *event)

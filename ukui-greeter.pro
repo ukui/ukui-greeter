@@ -19,9 +19,14 @@ DEFINES += QT_MESSAGELOGCONTEXT \    #使用qInstallMessageHandler定制日志�
            QT_DISABLE_DEPRECATED_BEFORE=0
 
 include(display-switch/display-switch.pri)
-include(bio-verify/bio-verify.pri)
 include(common/common.pri)
 include(VirtualKeyboard/VirtualKeyboard.pri)
+include(BiometricAuth/BiometricAuth.pri)
+
+INCLUDEPATH += \
+            common \
+            VirtualKeyboard/src \
+            BiometricAuth
 
 SOURCES += \
     greeter/greeterwindow.cpp \
@@ -38,7 +43,6 @@ SOURCES += \
     greeter/proxymodel.cpp \
     greeter/userentry.cpp \
     greeter/usersview.cpp \
-    greeter/borderdialog.cpp \
     greeter/language.cpp \
     greeter/languagewidget.cpp
 
@@ -57,15 +61,12 @@ HEADERS  += \
     greeter/proxymodel.h \
     greeter/userentry.h \
     greeter/usersview.h \
-    greeter/borderdialog.h \
     greeter/language.h \
     greeter/languagewidget.h
 
 CONFIG += c++11 debug link_pkgconfig
 
 QMAKE_CXXFLAGS += -Wdeprecated-declarations
-
-INCLUDEPATH += VirtualKeyboard/src/
 
 PKGCONFIG += liblightdm-qt5-3 x11 xrandr xtst
 
@@ -86,6 +87,9 @@ qm_file.path = $${PREFIX}/translations/
 resourcefiles.files = resource/*
 resourcefiles.path = $${PREFIX}/images/
 
+badgefiles.files = resource/badges/*.png
+badgefiles.path = $${PREFIX}/images/badges/
+
 configfile.files = 95-ukui-greeter.conf
 configfile.path = /usr/share/lightdm/lightdm.conf.d/
 
@@ -100,4 +104,4 @@ manfile.path = /usr/share/man/man1/
 
 target.path = /usr/sbin/
 
-INSTALLS += target configfile etcfile desktopfile resourcefiles qm_file manfile
+INSTALLS += target configfile etcfile desktopfile resourcefiles qm_file manfile badgefiles

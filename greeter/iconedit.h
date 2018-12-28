@@ -26,7 +26,6 @@
 #include <QPixmap>
 
 
-class KeyEventMonitor;
 class IconEdit : public QWidget
 {
     Q_OBJECT
@@ -35,31 +34,37 @@ public:
 
     void setIcon(const QString &text);
     void setIcon(const QIcon &icon);
-    void resize(const QSize& size);
     void clear();
     void setPrompt(const QString &);
     const QString text();
     void setType(QLineEdit::EchoMode type = QLineEdit::Password);
-    void setText(const QString& text);
-    void setWaiting(bool);
+    void startWaiting();
+    void stopWaiting();
+    void setCapsState(bool capsState);
 
 protected:
     void resizeEvent(QResizeEvent *) Q_DECL_OVERRIDE;
+
+private:
+    void updatePixmap();
 
 signals:
     void clicked(const QString &);
     void focusOut();
 
-public slots:
+private slots:
     void clicked_cb();
-    void showIconButton(const QString &);
-    void onCapsStateChanged(int);
+    void onGlobalKeyRelease(const QString &key);
+
 private:
     QLineEdit       *m_edit;
     QLabel          *m_capsIcon;
     QPushButton     *m_iconButton;
     QPushButton     *m_modeButton;
-    KeyEventMonitor *keyMonitor;
+    QTimer          *m_timer;
+    QPixmap         m_waitingPixmap;
+    QString         m_iconText;     //文字作为图标
+    QIcon           m_icon;
 };
 
 #endif // ICONEDIT_H
