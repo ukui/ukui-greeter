@@ -22,30 +22,30 @@
 #include <QWidget>
 #include <QSharedPointer>
 #include <QAbstractItemModel>
+#include "fakedialog.h"
 
 class QLabel;
 class QPushButton;
 class IconLabel;
 class QListWidget;
 class QListWidgetItem;
-class SessionWindow : public QWidget
+class SessionWindow : public FakeDialog
 {
     Q_OBJECT
 public:
-    explicit SessionWindow(const QString &session, QWidget *parent = 0);
+    explicit SessionWindow(QAbstractItemModel *model, QWidget *parent = 0);
     void setSessionModel(QAbstractItemModel *model);
-    void setSession(const QString&session);
+    void setCurrentSession(const QString &session);
 
 protected:
-    void keyReleaseEvent(QKeyEvent *);
     void showEvent(QShowEvent *event);
+    void closeEvent(QCloseEvent *event);
 
 signals:
-    void back();
-    void sessionSelected(const QString& sessionName);
+    void sessionChanged(const QString &session);
 
-private slots:
-    void saveAndBack();
+private Q_SLOTS:
+    void onListCurrentItemDoubleClicked(QListWidgetItem *item);
 
 private:
     void initUI();
@@ -57,7 +57,6 @@ private:
     QAbstractItemModel  *m_sessionsModel;
 
     //UI
-    QPushButton         *m_backLabel;
     QLabel              *m_prompt;
     QListWidget         *m_sessionsList;
 };

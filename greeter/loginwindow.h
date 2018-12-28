@@ -20,20 +20,21 @@
 #define LOGINWINDOW_H
 
 #include <QWidget>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QLabel>
-#include <QAbstractItemModel>
-#include <QSharedPointer>
-#include <QSettings>
-#include <QTimer>
 #include <QLightDM/Greeter>
 #include <QLightDM/UsersModel>
-#include "iconedit.h"
-#include "greeterwrapper.h"
 
-class BioDeviceView;
-struct DeviceInfo;
+#include "biometricdeviceinfo.h"
+
+class QTimer;
+class QLabel;
+class QPushButton;
+class QListWidget;
+
+class GreeterWrapper;
+class IconEdit;
+class BiometricProxy;
+class BiometricAuthWidget;
+class BiometricDevicesWidget;
 
 class LoginWindow : public QWidget
 {
@@ -42,10 +43,7 @@ public:
     explicit LoginWindow(GreeterWrapper *greeter, QWidget *parent = 0);
     ~LoginWindow(){}
 
-    void setUsersModel(QAbstractItemModel *model);
     bool setUserIndex(const QModelIndex& index);
-    void setSessionsModel(QAbstractItemModel *model);
-    bool setSessionIndex(const QModelIndex& index);
     void setGreeter(GreeterWrapper *greeter);
     void setUserName(const QString& userName);
     QString getUserName();
@@ -54,66 +52,93 @@ public:
     void setLoggedIn(bool isLoggedIn);
     void setPrompt(const QString& text);
     QString getPassword();
-    void setSession(QString);
-    QString getSession();
     void reset();
-
-private:
-    void initUI();    
-    int sessionIndex(const QString &session);
-    void backToUsers();
-    void clearMessage();
-    bool enableBioAuthentication(QString &message);
 
 protected:
     void showEvent(QShowEvent *);
+    void resizeEvent(QResizeEvent *);
     void keyReleaseEvent(QKeyEvent *event);
 
 signals:
     void back();
-    void selectSession(const QString& );
+
+    /**
+     * @brief 手动输入用户名
+     * @param userName 用户名
+     */
+    void userChangedByManual(const QString &userName);
 
 public slots:
-    void startAuthentication();
-    void startWaiting();
-    void stopWaiting();
-    void updatePixmap();
-    void onSessionSelected(const QString&);
     void onShowMessage(QString text, QLightDM::Greeter::MessageType type);
     void onShowPrompt(QString text, QLightDM::Greeter::PromptType type);
     void onAuthenticationComplete();
+    void setUserNotInView(const QString &userName);
+
+private slots:
     void onLogin(const QString &str);
-    void onSessionButtonClicked();
-    void onBioAuthenticationReslut(bool result);
-    void onBioBackToPassword();
-    void onBioNotify(const QString &message);
+    void onBackButtonClicked();
+    void onBiometricButtonClicked();
+    void onPasswordButtonClicked();
+    void onOtherDevicesButtonClicked();
+    void onRetryButtonClicked();
+    void onDeviceChanged(const DeviceInfoPtr &deviceInfo);
+    void onBiometricAuthComplete(bool result);
+
+private:
+    void initUI();
+    void initBiometricWidget();
+    void initBiometricButtonWidget();
+    void setChildrenGeometry();
+    void setBiometricWidgetGeometry();
+    void setBiometricButtonWidgetGeometry();
+    void startAuthentication();
+    void startWaiting();
+    void stopWaiting();
+    void clearMessage();
+    void performBiometricAuth();
+    void skipBiometricAuth();
+    void showPasswordAuthWidget();
+    void showBiometricAuthWidget();
+    void showBiometricDeviceWidget();
 
 private:
     GreeterWrapper      *m_greeter;
-    QAbstractItemModel  *m_usersModel;
-    QAbstractItemModel  *m_sessionsModel;
-    QString     m_session;  //session的标识
     QString     m_name;     //m_nameLabel显示的是全名(显示的),m_name保存的是真名(用于登录的)
     qint32      m_uid;      //用户id
-    QTimer     *m_timer;
-    QPixmap     m_waiting;
     //手动输入用户标记，设置该标记的原因是判断是不是手动输入用户，
     //如果输入了无法登录的用户，就会一直输出密码错误信息
     bool        isManual;
     //密码错误标记，设置该标志的原因是，在有生物识别模块的情况下用户选择了密码登录，输入了错误的密码，
     //此时应该直接进入密码登录，而不是再次进入登录生物识别设备选择界面
-    bool        isPasswordError;
+//    bool        isPasswordError;
+
+    enum AuthMode { PASSWORD, BIOMETRIC, UNKNOWN };
+
+    AuthMode authMode;
+    // 生物识别认证
+    int                     m_deviceCount;
+    QString                 m_deviceName;
+    DeviceInfoPtr           m_deviceInfo;
+    BiometricProxy          *m_biometricProxy;
+    BiometricAuthWidget     *m_biometricAuthWidget;
+    BiometricDevicesWidget  *m_biometricDevicesWidget;
+    QWidget                 *m_buttonsWidget;
+    QPushButton             *m_biometricButton;
+    QPushButton             *m_passwordButton;
+    QPushButton             *m_otherDeviceButton;
+    QPushButton             *m_retryButton;
 
     // UI
-    QPushButton     *m_backLabel;         //返回用户列表
-    QPushButton     *m_sessionLabel;      //session图标
+    QPushButton     *m_backButton;         //返回用户列表
+    QWidget         *m_userWidget;          //放置用户信息Label
     QLabel          *m_faceLabel;         //头像
     QLabel          *m_nameLabel;         //用户名
     QLabel          *m_isLoginLabel;      //提示是否已登录
-    QVector<QLabel*> m_messageLabels;      //提示信息
+
+    QWidget         *m_passwdWidget;        //放置密码输入框和信息列表
     IconEdit        *m_passwordEdit;       //密码输入框
-    BioDeviceView   *bioDeviceView;      //生物识别设备列表窗口
-    QPushButton     *bioButton;
+    QLabel          *m_messageLabel;         //PAM消息显示
+
 };
 
 #endif // LOGINWINDOW_H

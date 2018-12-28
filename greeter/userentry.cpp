@@ -22,6 +22,8 @@
 #include <QFile>
 #include <QMouseEvent>
 #include <QDebug>
+
+#include <QLightDM/UsersModel>
 #include "globalv.h"
 
 int UserEntry::count = 0;
@@ -116,7 +118,7 @@ bool UserEntry::eventFilter(QObject *obj, QEvent *event)
 void UserEntry::onClicked()
 {
     this->setSelected();
-    emit clicked(m_name);
+    emit clicked(index.row());
 }
 
 void UserEntry::setFace(const QString &facePath)
@@ -164,4 +166,25 @@ void UserEntry::setSelected(bool selected)
 bool UserEntry::selected()
 {
     return id == selectedId;
+}
+
+
+void UserEntry::setUserIndex(const QPersistentModelIndex &index)
+{
+    Q_ASSERT(index.isValid());
+    this->index = index;
+
+    QString realName = index.data(QLightDM::UsersModel::RealNameRole).toString();
+    QString name = index.data(QLightDM::UsersModel::NameRole).toString();
+    QString facePath = index.data(QLightDM::UsersModel::ImagePathRole).toString();
+    bool isLoggedIn = index.data(QLightDM::UsersModel::LoggedInRole).toBool();
+
+    setUserName(realName.isEmpty() ? name : realName);
+    setFace(facePath);
+    setLogin(isLoggedIn);
+}
+
+QPersistentModelIndex UserEntry::userIndex()
+{
+    return index;
 }

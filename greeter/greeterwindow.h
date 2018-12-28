@@ -32,12 +32,14 @@ class UsersView;
 class QProcess;
 class QGraphicsOpacityEffect;
 class Configuration;
+class VirtualKeyboard;
+class LanguageWidget;
+class Language;
 class GreeterWindow : public QWidget
 {
     Q_OBJECT
 public:
     GreeterWindow(QWidget *parent = 0);
-    virtual ~GreeterWindow();
     void initUI();
 
 protected:
@@ -49,15 +51,21 @@ private slots:
     void onCurrentUserChanged(const QModelIndex&);
     void onBacktoUsers();
     void onBacktoLogin();
-    void onSelectSession(const QString&);
     void timedAutologin();
+    void showPowerWnd();
+    void showVirtualKeyboard();
+    void showLanguageWnd();
+    void onLanguageChanged(const Language &language);
+    void showSessionWnd();
+    void onSessionChanged(const QString &session);
+    void onUserChangedByManual(const QString &userName);
 
 private:
     void switchWnd(int);
-    void showPowerWnd();
-    void showBoard();
-    void setLanguage(bool isChinese);
     void setBackground(const QModelIndex &index);
+    void setVirkeyboardPos();
+    void setWindowPos(QWidget *widget, Qt::Alignment align = Qt::AlignCenter);
+    bool sessionIsValid(const QString &session);
 
     UsersView               *m_userWnd;
     LoginWindow             *m_loginWnd;
@@ -65,15 +73,17 @@ private:
     PowerWindow             *m_powerWnd;
     QPushButton             *m_keyboardLB;
     QPushButton             *m_powerLB;
+    QPushButton             *m_sessionLB;
     QPushButton             *m_languageLB;
-    QProcess                *m_board;
-    QWidget                 *m_boardWidget;
+    VirtualKeyboard         *m_virtualKeyboard;
+    LanguageWidget          *m_languageWnd;
 
     GreeterWrapper          *m_greeter;
     UsersModel              *m_usersModel;
     QAbstractItemModel      *m_sessionsModel;
     Configuration           *m_configuration;
-    bool                     m_isChinese;
+    bool                     m_languageHasChanged;
+    bool                     m_sessionHasChanged;
 };
 
 #endif // GREETERWINDOW_H

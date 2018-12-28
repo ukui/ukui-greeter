@@ -21,6 +21,7 @@
 
 #include <QWidget>
 #include <QLabel>
+#include <QPersistentModelIndex>
 
 #define SHADOW_WIDTH (scale > 0.5 ? 10 : 5)
 #define FACE_WIDDTH (130 * scale)
@@ -38,6 +39,8 @@ public:
     UserEntry(const QString &name, const QString &facePath, bool isLogin, QWidget *parent);
     UserEntry(QWidget *parent=0);
 
+    void setUserIndex(const QPersistentModelIndex &index);
+    QPersistentModelIndex userIndex();
     void setFace(const QString &facePath);
     const QString& userName();
     void setUserName(const QString &name);
@@ -55,13 +58,15 @@ private:
     void initUI();
 
 signals:
-    void clicked(const QString&);
+    void clicked(int row);
     void pressed();
 
 private:
     QLabel *m_faceLabel;
     QLabel *m_nameLabel;
     QLabel *m_loginLabel;
+
+    QPersistentModelIndex index;
 
     QString m_face;
     QString m_name;

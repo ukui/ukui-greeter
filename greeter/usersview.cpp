@@ -23,10 +23,10 @@
 #include <QKeyEvent>
 #include <QStandardPaths>
 #include <QLightDM/UsersModel>
-#include "common/configuration.h"
 
 UsersView::UsersView(QWidget *parent) :
-    QWidget(parent)
+    QWidget(parent),
+    usersModel(nullptr)
 {
     resize(USERSVIEW_WIDTH, USERSVIEW_HEIGHT);
     initUI();
@@ -40,7 +40,7 @@ UsersView::~UsersView()
 void UsersView::initUI()
 {
     usersList = new QListWidget(this);
-    usersList->setObjectName(QStringLiteral("usersList"));
+    usersList->setObjectName(QStringLiteral("usersListWidget"));
     usersList->setFlow(QListWidget::LeftToRight);
     usersList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     usersList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -69,18 +69,26 @@ void UsersView::setModel(QAbstractListModel *model)
     connect(usersModel, &QAbstractListModel::rowsRemoved, this, &UsersView::onUserRemoved);
     connect(usersModel, &QAbstractListModel::dataChanged, this, &UsersView::onUserChanged);
 
-    //选中上一次登录的用户
-    QString lastLoginUser = Configuration::instance()->getLastLoginUser();
-    qDebug() << "lastLoginUser: "<< lastLoginUser;
     for(int i = 0; i < usersModel->rowCount(); i++)
         insertUserEntry(i);
-    setCurrentRow(0);   //默认选中第一位用户
-    for(int i = 0; i < usersModel->rowCount(); i++) {
-        if(lastLoginUser == usersModel->index(i, 0).data(Qt::DisplayRole).toString()) {
+    setCurrentRow(0);   //默认选中第一位用户s
+}
+
+void UsersView::setCurrentUser(const QString &userName)
+{
+    if(!usersModel || userName.isEmpty())
+        return;
+    for(int i = 0; i < usersModel->rowCount(); i++)
+    {
+        QString name = usersModel->index(i).data(QLightDM::UsersModel::NameRole).toString();
+        if(name == userName)
+        {
             setCurrentRow(i);
-            break;
+            onUserClicked(i);
+            return;
         }
     }
+    Q_EMIT userNotFound(userName);
 }
 
 void UsersView::resizeEvent(QResizeEvent *event)
@@ -126,12 +134,8 @@ void UsersView::keyReleaseEvent(QKeyEvent *event)
         pageUp();
         break;
     case Qt::Key_Return:
-    {
-        QString userName = usersModel->index(usersList->currentRow(), 0)
-                .data(Qt::DisplayRole).toString();
-        onUserClicked(userName);
+        onUserClicked(usersList->currentRow());
         break;
-    }
     default:
         QWidget::keyReleaseEvent(event);
     }
@@ -148,10 +152,10 @@ void UsersView::showEvent(QShowEvent *event)
 void UsersView::insertUserEntry(int row)
 {
     QModelIndex index = usersModel->index(row, 0);
-    UserEntry *entry = new UserEntry(index.data(Qt::DisplayRole).toString(),
-                                     index.data(QLightDM::UsersModel::ImagePathRole).toString(),
-                                     index.data(QLightDM::UsersModel::LoggedInRole).toBool(),
-                                     this);
+    QPersistentModelIndex persistentIndex(index);
+    UserEntry *entry = new UserEntry(this);
+    entry->setUserIndex(persistentIndex);
+
     connect(entry, &UserEntry::pressed, this, &UsersView::onUserPressed);
     connect(entry, &UserEntry::clicked, this, &UsersView::onUserClicked);
     QListWidgetItem *item = new QListWidgetItem();
@@ -181,16 +185,9 @@ void UsersView::onUserPressed()
     update();
 }
 
-void UsersView::onUserClicked(const QString& userName)
+void UsersView::onUserClicked(int row)
 {
-    qDebug() << userName << " selected";
-    for(int i = 0; i < usersModel->rowCount(); i++){
-        if(usersModel->index(i, 0).data(Qt::DisplayRole).toString() == userName) {
-            QModelIndex index = usersModel->index(i);
-            Q_EMIT userSelected(index);
-        }
-    }
-
+    Q_EMIT userSelected(usersModel->index(row, 0));
 }
 
 void UsersView::onUserAdded(const QModelIndex &parent, int left, int right)

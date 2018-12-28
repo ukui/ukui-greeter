@@ -25,7 +25,6 @@ namespace Ui {
 class MainWindow;
 }
 
-class KeyEventMonitor;
 class DisplaySwitch : public QMainWindow
 {
     Q_OBJECT
@@ -39,11 +38,12 @@ public slots:
     void onDisplaySwitchSelect();
     void onDisplaySwitchConfirm();
     void onPositionChanged(const QRect&);
+    void onGlobalKeyRelease(const QString &key);
 
 private:
     Ui::MainWindow *ui;
     int     currentMode;
-    KeyEventMonitor *keyEventMonitor;
+    bool    selecting;
 };
 
 #endif // DISPLAYSWITCH_H

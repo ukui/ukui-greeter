@@ -22,20 +22,16 @@
         <file>resource/suspend_highlight.png</file>
         <file>resource/suspend.png</file>
         <file>resource/waiting.png</file>
-        <file>resource/warn.png</file>
-        <file>resource/badges/gnome_badge.png</file>
-        <file>resource/badges/lubuntu_badge.png</file>
-        <file>resource/badges/mate_badge.png</file>
-        <file>resource/badges/pantheon_badge.png</file>
-        <file>resource/badges/ubuntu_badge.png</file>
-        <file>resource/badges/unknown_badge.png</file>
-        <file>resource/badges/xfce_badge.png</file>
-        <file>resource/badges/xubuntu_badge.png</file>
-        <file>resource/kylin-logo.png</file>
-        <file>resource/uk-logo.png</file>
         <file>resource/show-password.png</file>
         <file>resource/hide-password.png</file>
-        <file>resource/background-kylin.png</file>
-        <file>resource/background-ubuntu.jpg</file>
+        <file>resource/login-button.png</file>
+        <file>resource/scrollbar_down.png</file>
+        <file>resource/scrollbar_down_clicked.png</file>
+        <file>resource/scrollbar_down_hover.png</file>
+        <file>resource/scrollbar_up.png</file>
+        <file>resource/scrollbar_up_clicked.png</file>
+        <file>resource/scrollbar_up_hover.png</file>
+        <file>resource/combobox_down.png</file>
+        <file>resource/capslock.png</file>
     </qresource>
 </RCC>

@@ -3,7 +3,7 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -12,12 +12,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, see <http://www.gnu.org/licenses/>.
- *
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
 **/
 #include "configuration.h"
 #include <QFile>
-#include <QStandardPaths>
+#include <QDir>
 #include <QFont>
 #include <QFontMetrics>
 #include <QTextOption>
@@ -31,7 +32,7 @@ Configuration* Configuration::instance_ = nullptr;
 Configuration::Configuration(QObject *parent)
     : QObject(parent)
 {
-    QString recodfile = QStandardPaths::displayName(QStandardPaths::CacheLocation) + "/ukui-greeter.conf";
+    QString recodfile = QDir::homePath() + "/.cache/ukui-greeter.conf";
     qDebug() << recodfile;
 
     configSettings = new QSettings(CONFIG_FILE, QSettings::IniFormat, this);

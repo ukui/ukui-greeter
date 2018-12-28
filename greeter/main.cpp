@@ -36,6 +36,7 @@
 #include "globalv.h"
 #include "mainwindow.h"
 #include "display-switch/displayswitch.h"
+#include "xeventmonitor.h"
 
 void outputMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -92,7 +93,6 @@ int main(int argc, char *argv[])
     a.setQuitOnLastWindowClosed(true);
 
     QResource::registerResource("image.qrc");
-    QResource::registerResource("bioverify.qrc");
 
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QTextCodec::setCodecForLocale(codec);
@@ -103,9 +103,10 @@ int main(int argc, char *argv[])
 
     //加载翻译文件
     QTranslator translator;
-    if(language == QLocale::Chinese) {
-        translator.load(QM_DIR + "zh_CN.qm");
-    }
+    QString qmFile = QM_DIR + QString("%1.qm").arg(QLocale::system().name());
+    translator.load(qmFile);
+    qDebug() << "load translation file " << qmFile;
+
     a.installTranslator(&translator);
 
     //加载qss文件
@@ -127,14 +128,19 @@ int main(int argc, char *argv[])
     /*waitMonitorsReady();
     qDebug() << "monitors ready"*/;
 
+    XEventMonitor::instance()->start();
+
     MainWindow w;
 
-//    w.show();
-//    //在没有窗口管理器的情况下，需要激活窗口，行为类似于用鼠标点击窗口
-//    w.activateWindow();
+
+    w.showFullScreen();
+    //在没有窗口管理器的情况下，需要激活窗口，行为类似于用鼠标点击窗口
+    w.activateWindow();
 
     DisplaySwitch ds(&w);
     ds.connect(&w, &MainWindow::activeScreenChanged, &ds, &DisplaySwitch::onPositionChanged);
+    QObject::connect(XEventMonitor::instance(), SIGNAL(keyRelease(QString)),
+                     &ds, SLOT(onGlobalKeyRelease(QString)));
 
     return a.exec();
 }

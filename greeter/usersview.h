@@ -39,6 +39,7 @@ public:
     ~UsersView();
     void initUI();
     void setModel(QAbstractListModel *);
+    void setCurrentUser(const QString &userName);
     void pageUp();
     void pageDown();
 
@@ -49,7 +50,7 @@ protected:
 
 private slots:
     void onUserPressed();
-    void onUserClicked(const QString &);
+    void onUserClicked(int row);
     void onUserAdded(const QModelIndex&, int, int);
     void onUserRemoved(const QModelIndex&, int, int );
     void onUserChanged(const QModelIndex&, const QModelIndex&);
@@ -58,6 +59,7 @@ private slots:
 signals:
     void userSelected(const QModelIndex&);
     void currentUserChanged(const QModelIndex&);
+    void userNotFound(const QString &userName);
 
 private:
     void insertUserEntry(int row);

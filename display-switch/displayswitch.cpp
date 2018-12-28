@@ -1,4 +1,4 @@
-﻿/* displayswitch.cpp
+/* displayswitch.cpp
  * Copyright (C) 2018 Tianjin KYLIN Information Technology Co., Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,18 +22,13 @@
 #include <QDebug>
 #include <QDesktopWidget>
 #include "displayservice.h"
-#include "common/keyeventmonitor.h"
 
 DisplaySwitch::DisplaySwitch(QWidget *parent)
     : QMainWindow(parent),
       ui(new Ui::MainWindow()),
       currentMode(0),
-      keyEventMonitor(KeyEventMonitor::instance(this))
+      selecting(false)
 {
-    keyEventMonitor->start();
-    connect(keyEventMonitor, &KeyEventMonitor::displaySwitchSelect, this, &DisplaySwitch::onDisplaySwitchSelect);
-    connect(keyEventMonitor, &KeyEventMonitor::displaySwitchConfirm, this, &DisplaySwitch::onDisplaySwitchConfirm);
-
     ui->setupUi(this);
     this->setAttribute(Qt::WA_TranslucentBackground);
     setWindowFlags(Qt::FramelessWindowHint | Qt::ToolTip);
@@ -105,4 +100,21 @@ void DisplaySwitch::onPositionChanged(const QRect &rect)
 {
     move(rect.left() + (rect.width() - width()) / 2,
                rect.top() + (rect.height() - height()) / 2);
+}
+
+void DisplaySwitch::onGlobalKeyRelease(const QString &key)
+{
+    if(key == "Super_L+p" || key == "Super_L+F3")
+    {
+        selecting = true;
+        onDisplaySwitchSelect();
+    }
+    else if(key == "Super_L")
+    {
+        if(selecting)
+        {
+            onDisplaySwitchConfirm();
+            selecting =  false;
+        }
+    }
 }
