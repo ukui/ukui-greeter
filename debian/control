@@ -11,7 +11,8 @@ Build-Depends: debhelper (>=11),
                liblightdm-qt5-3-dev,
                libx11-dev,
                libxtst-dev,
-               libxrandr-dev
+               libxrandr-dev,
+               qttools5-dev-tools
 Standards-Version: 4.2.1
 Homepage: http://www.ukui.org
 Vcs-Git: https://salsa.debian.org/kylin-team/ukui-greeter.git
