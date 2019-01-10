@@ -1,3 +1,10 @@
+ukui-greeter (1.2.0-2) juniper; urgency=medium
+
+  * Specify the default background in kylin.
+    - /usr/share/backgrounds/kylin-lightdm-default-backgrond.png
+
+ -- yanghao <yanghao@kylinos.cn>  Thu, 10 Jan 2019 13:52:22 +0800
+
 ukui-greeter (1.2.0-1) juniper; urgency=medium
 
   * New UI.
