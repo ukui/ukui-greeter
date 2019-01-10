@@ -86,6 +86,9 @@ MainWindow::MainWindow(QWidget *parent)
             }
         }
     }
+    qDebug() << "defautl background:" << m_defaultBackgroundPath;
+    if(m_background)
+        qDebug() << m_background->type << m_background->image;
 
     m_timer = new QTimer(this);
     m_transition.started = false;
@@ -204,6 +207,9 @@ void MainWindow::moveToScreen(QScreen *screen)
 
 void MainWindow::setBackground(QSharedPointer<Background> &background)
 {
+    if(background)
+        qDebug() << background->image;
+
     if(m_backgroundMode != DRAW_USER_BACKGROUND)
         return;
 
