@@ -35,7 +35,6 @@ SOURCES += \
     greeter/main.cpp \
     greeter/usersmodel.cpp \
     greeter/greeterwrapper.cpp \
-    greeter/globalv.cpp \
     greeter/screenmodel.cpp \
     greeter/mainwindow.cpp \
     greeter/sessionwindow.cpp \
@@ -53,7 +52,6 @@ HEADERS  += \
     greeter/loginwindow.h \
     greeter/usersmodel.h \
     greeter/greeterwrapper.h \
-    greeter/globalv.h \
     greeter/screenmodel.h \
     greeter/mainwindow.h \
     greeter/sessionwindow.h \
