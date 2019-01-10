@@ -15,14 +15,15 @@ Build-Depends: debhelper (>=12),
                qttools5-dev-tools
 Standards-Version: 4.3.0
 Homepage: http://www.ukui.org
-Vcs-Git: https://salsa.debian.org/kylin-team/ukui-greeter.git
-Vcs-Browser: https://salsa.debian.org/kylin-team/ukui-greeter
+Vcs-Git: https://github.com/ukui/ukui-greeter.git
+Vcs-Browser: https://github.com/ukui/ukui-greeter
 
 Package: ukui-greeter
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
 Suggests: biometric-auth
+Provides: lightdm-greeter
 Description: Lightdm greeter for UKUI
  A greeter for UKUI desktop environment written by Qt5.
  The greeter supports biometric authentication which is

@@ -1,3 +1,11 @@
+ukui-greeter (1.1.7-2) unstable; urgency=medium
+
+  * debian/control:
+    - Add provides lightdm-greeter.
+    - Update vcs-git and vcs-browser from salsa to github.
+
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Thu, 10 Jan 2019 11:46:45 +0800
+
 ukui-greeter (1.1.7-1) unstable; urgency=medium
 
   * Fix the crash when virtual keyboard is closed.
