@@ -65,6 +65,8 @@ GreeterWindow::GreeterWindow(QWidget *parent)
         m_usersModel->setShowManualLogin(true);
     }
 
+    m_greeter->setSession(m_greeter->defaultSessionHint());
+
     for(int i = 0; i < m_usersModel->rowCount(); i++)
         qDebug() << "load user " << m_usersModel->index(i).
                     data(QLightDM::UsersModel::NameRole).toString();
