@@ -24,6 +24,7 @@
 #include <QTextOption>
 #include <QPainter>
 #include <QDebug>
+#include "globalv.h"
 
 #define CONFIG_FILE "/etc/lightdm/ukui-greeter.conf"
 
@@ -157,7 +158,7 @@ QPixmap Configuration::getLogo()
 QString Configuration::getDefaultBackgroundName()
 {
     if(getSystemDistrib() == "Kylin")
-        return "background-kylin.png";
+        return "/usr/share/backgrounds/kylin-lightdm-default-background.png";
     else
-        return "background-ubuntu.jpg";
+        return IMAGE_DIR + "background-ubuntu.jpg";
 }

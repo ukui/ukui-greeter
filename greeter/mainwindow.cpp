@@ -59,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_cof.load(m_configuration->getValue("cof").toString());
 
     //背景图片 优先级：用户桌面背景、背景图片、背景颜色
-    m_defaultBackgroundPath = IMAGE_DIR + m_configuration->getDefaultBackgroundName();
+    m_defaultBackgroundPath = m_configuration->getDefaultBackgroundName();
     bool drawUserBackground = m_configuration->getValue("draw-user-background").toBool();
     if(drawUserBackground) {
         m_backgroundMode = DRAW_USER_BACKGROUND;
@@ -86,6 +86,9 @@ MainWindow::MainWindow(QWidget *parent)
             }
         }
     }
+    qDebug() << "default background:" << m_defaultBackgroundPath;
+    if(m_background)
+        qDebug() << m_background->type << m_background->image;
 
     m_timer = new QTimer(this);
     m_transition.started = false;
@@ -204,6 +207,9 @@ void MainWindow::moveToScreen(QScreen *screen)
 
 void MainWindow::setBackground(QSharedPointer<Background> &background)
 {
+    if(background)
+        qDebug() << background->image;
+
     if(m_backgroundMode != DRAW_USER_BACKGROUND)
         return;
 
