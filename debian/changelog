@@ -1,7 +1,8 @@
 ukui-greeter (1.1.8-0ubuntu1) disco; urgency=medium
 
-  * Fix the error while reading screen rect. (LP: #1822014)
-  * Fix the error while reading default session.
+  * Bugfix only:
+    - Fix the error while reading screen rect. (LP: #1822014)
+    - Fix the error while reading default session.
 
  -- handsome_feng <jianfengli@ubuntukylin.com>  Thu, 28 Mar 2019 13:41:10 +0800
 
