@@ -93,8 +93,12 @@ QSize MonitorWatcher::getMonitorMaxSize(const QString &drm)
     QFile drmModeFile(DRM_DIR + drm + "/modes");
     if(drmModeFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream in2(&drmModeFile);
-        QString maxMode = in2.readLine();
-        int xpos = maxMode.indexOf('x', 0);
+        QString maxMode;
+        do
+	{
+          maxMode = in2.readLine();
+	}while(maxMode=="preferred");
+	int xpos = maxMode.indexOf('x', 0);
         width = maxMode.left(xpos).toInt();
         int ipos = maxMode.indexOf('i', 0);
         if(ipos != -1)

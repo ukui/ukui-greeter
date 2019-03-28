@@ -178,10 +178,10 @@ void MainWindow::onScreenCountChanged(int newCount)
         DisplayService displayService;
         displayService.switchDisplayMode(DISPLAY_MODE_EXTEND);
     }
-//    if(m_first){
-//        show();
-//        activateWindow();
-//    }
+   // if(m_first){
+   //     show();
+   //     activateWindow();
+   // }
 
     move(0, 0);
     setFixedSize(m_monitorWatcher->getVirtualSize());
@@ -197,11 +197,16 @@ void MainWindow::moveToScreen(QScreen *screen)
 {
     m_activeScreen = screen;
     QRect activeScreenRect = m_activeScreen->geometry();
-    if(m_monitorWatcher->getMonitorCount() == 1)
-        activeScreenRect = QRect(QPoint(0, 0), m_monitorWatcher->getVirtualSize());
+
+    qDebug()<<"<moveToScreen activeScreenRect"<< activeScreenRect;
+    //if(m_monitorWatcher->getMonitorCount() == 1)
+    //    activeScreenRect = QRect(QPoint(0, 0), m_monitorWatcher->getVirtualSize());
+    
+    qDebug()<<"<moveToScreen="<<m_monitorWatcher->getMonitorCount();
     m_greeterWnd->setGeometry(activeScreenRect);
     Q_EMIT activeScreenChanged(activeScreenRect);
 
+    qDebug()<<"<moveToScreen activeScreenRect1"<< activeScreenRect;
     repaint();
 }
 
