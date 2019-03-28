@@ -1,0 +1,38 @@
+ukui-greeter (1.1.7-2) unstable; urgency=medium
+
+  * debian/control:
+    - Add provides lightdm-greeter.
+    - Update vcs-git and vcs-browser from salsa to github.
+
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Thu, 10 Jan 2019 11:46:45 +0800
+
+ukui-greeter (1.1.7-1) unstable; urgency=medium
+
+  * Fix the crash when virtual keyboard is closed.
+  * Replace the KeyEventMonitor with XEventMonitor.
+  * Auto retry if idenfity failed.
+  * Update translations.
+  * Replace BorderDialog with FakeDialog.
+  * Remove the session button and log.
+  * Adjust the UI.
+
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Sat, 05 Jan 2019 17:00:33 +0800
+
+ukui-greeter (1.1.6.1-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream release.
+
+ -- Aron Xu <aron@debian.org>  Wed, 14 Nov 2018 17:30:42 +0800
+
+ukui-greeter (1.1.5-2) unstable; urgency=medium
+
+  * Add qt5-qmake to Build-Depends.
+
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Wed, 31 Oct 2018 14:52:31 +0800
+
+ukui-greeter (1.1.5-1) unstable; urgency=medium
+
+  * Initial release. (Closes: #908194)
+
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Tue, 25 Sep 2018 14:13:11 +0800

@@ -1,0 +1,30 @@
+Source: ukui-greeter
+Section: x11
+Priority: optional
+Maintainer: Kylin Team <team+kylin@tracker.debian.org>
+Uploaders: handsome_feng <jianfengli@ubuntukylin.com>,
+Build-Depends: debhelper (>=12),
+               pkg-config,
+               qtbase5-dev,
+               libqt5x11extras5-dev,
+               libqt5svg5-dev,
+               liblightdm-qt5-3-dev,
+               libx11-dev,
+               libxtst-dev,
+               libxrandr-dev,
+               qttools5-dev-tools
+Standards-Version: 4.3.0
+Homepage: http://www.ukui.org
+Vcs-Git: https://github.com/ukui/ukui-greeter.git
+Vcs-Browser: https://github.com/ukui/ukui-greeter
+
+Package: ukui-greeter
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+Suggests: biometric-auth
+Provides: lightdm-greeter
+Description: Lightdm greeter for UKUI
+ A greeter for UKUI desktop environment written by Qt5.
+ The greeter supports biometric authentication which is
+ provided by biometric-authentication service.
