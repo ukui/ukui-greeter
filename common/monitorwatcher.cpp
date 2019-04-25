@@ -103,8 +103,16 @@ QSize MonitorWatcher::getMonitorMaxSize(const QString &drm)
         int ipos = maxMode.indexOf('i', 0);
         if(ipos != -1)
             height = maxMode.mid(xpos+1, ipos-xpos-1).toInt();
-        else
-            height = maxMode.mid(xpos+1).toInt();
+	else
+        {
+            int p_pos = maxMode.mid(xpos+1).indexOf('p', 0);
+            if (p_pos != -1)
+            {
+                height = maxMode.mid(xpos+1).left(p_pos).toInt();
+            }
+            else
+                height = maxMode.mid(xpos+1).toInt();
+        }
     }
     return QSize(width, height);
 }
