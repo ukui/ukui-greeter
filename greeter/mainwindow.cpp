@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent)
     setMouseTracking(true);
 
     //cof
-    m_cof.load(m_configuration->getValue("cof").toString());
+    //m_cof.load(m_configuration->getValue("cof").toString());
 
     //背景图片 优先级：用户桌面背景、背景图片、背景颜色
     m_defaultBackgroundPath = m_configuration->getDefaultBackgroundName();
@@ -119,13 +119,13 @@ void MainWindow::paintEvent(QPaintEvent *e)
         QPainter painter(this);
 
         //在没有登录窗口的屏幕上显示图标
-        if(screen != m_activeScreen)
-        {
-            QRect cofRect(rect.left() + (rect.width()-m_cof.width())/2,
-                          rect.top() + (rect.height()-m_cof.height())/2,
-                          m_cof.width(), m_cof.height());
-            painter.drawPixmap(cofRect, m_cof);
-        }
+//        if(screen != m_activeScreen)
+//        {
+//            QRect cofRect(rect.left() + (rect.width()-m_cof.width())/2,
+//                          rect.top() + (rect.height()-m_cof.height())/2,
+//                          m_cof.width(), m_cof.height());
+//            painter.drawPixmap(cofRect, m_cof);
+//        }
     }
     return QWidget::paintEvent(e);
 }
