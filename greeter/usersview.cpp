@@ -74,7 +74,7 @@ void UsersView::setModel(QAbstractListModel *model)
     setCurrentRow(0);   //默认选中第一位用户s
 }
 
-void UsersView::setCurrentUser(const QString &userName)
+void UsersView::setCurrentUser(const QString &userName, bool entered)
 {
     if(!usersModel || userName.isEmpty())
         return;
@@ -84,7 +84,8 @@ void UsersView::setCurrentUser(const QString &userName)
         if(name == userName)
         {
             setCurrentRow(i);
-            onUserClicked(i);
+            if (entered)
+                onUserClicked(i);
             return;
         }
     }
@@ -244,7 +245,7 @@ void UsersView::setCurrentRow(int row)
 
 void UsersView::pageUp()
 {
-    if(usersList->currentRow() >= 5)
+    if(usersList->currentRow() > 5)
         setCurrentRow(usersList->currentRow() - 5);
     else
         setCurrentRow(0);
@@ -252,7 +253,7 @@ void UsersView::pageUp()
 
 void UsersView::pageDown()
 {
-    if(usersList->count() - usersList->currentRow() >= 5)
+    if(usersList->count() - usersList->currentRow() > 5)
         setCurrentRow(usersList->currentRow() + 5);
     else
         setCurrentRow(usersList->count() - 1);

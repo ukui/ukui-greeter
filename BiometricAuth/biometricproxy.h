@@ -71,6 +71,15 @@ public Q_SLOTS:
      */
     int StopOps(int drvid, int waiting = 5);
     /**
+     * @brief 获取当前用户已连接设备对应特征数目
+     * @param uid              用户id
+     * @param indexStart       用于认证的特征索引范围
+     * @param indexEnd
+     * @return
+     */
+    int GetFeatureCount(int uid, int indexStart = 0, int indexEnd = -1);
+
+    /**
      * @brief 获取已连接的设备列表
      * @return
      */

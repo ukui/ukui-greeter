@@ -35,6 +35,7 @@ IconEdit::IconEdit(QWidget *parent)
     m_edit->setObjectName(QStringLiteral("passwdEdit"));
     m_edit->setAttribute(Qt::WA_InputMethodEnabled, false); //禁用输入法
     m_edit->setContextMenuPolicy(Qt::NoContextMenu);    //禁用右键菜单
+    m_edit->installEventFilter(this);
 
     m_capsIcon = new QLabel(this);
     m_capsIcon->setObjectName(QStringLiteral("capsIconLabel"));
@@ -68,6 +69,20 @@ IconEdit::IconEdit(QWidget *parent)
 
     setFocusProxy(m_edit);
     setCapsState(checkCapsState());
+}
+
+bool IconEdit::eventFilter(QObject *obj, QEvent *event)
+{
+    if(obj == m_edit){
+        if(event->type() == QEvent::KeyPress){
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+            if(keyEvent->key()==80 &&keyEvent->modifiers() ==(Qt::MetaModifier)){
+                event->ignore();
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void IconEdit::setType(QLineEdit::EchoMode type)

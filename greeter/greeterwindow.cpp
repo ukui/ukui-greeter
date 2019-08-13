@@ -140,28 +140,28 @@ void GreeterWindow::initUI()
 
     m_userWnd->setModel(m_usersModel);
 
-    //显示lightdm传过来的被选中的用户 -- SwitchToUser()
+    //显示lightdm传过来的被选中的用户且自动进入认证界面 -- SwitchToUser()
     QString selectedUser = m_greeter->selectUserHint();
     if(!selectedUser.isEmpty())
     {
         qDebug() << "SelectUserHint: " << selectedUser;
-        m_userWnd->setCurrentUser(selectedUser);
+        m_userWnd->setCurrentUser(selectedUser, true);
     }
-    // SwitchToGuest()
+    // SwitchToGuest()且自动进入认证界面
     else if(m_greeter->selectGuestHint())
     {
         qDebug() << "SelectGuest";
-        m_userWnd->setCurrentUser("*guest");
+        m_userWnd->setCurrentUser("*guest", true);
     }
     //如果只有一个用户，直接进入认证界面
     else if(m_usersModel->rowCount() == 1)
     {
         QString userName = m_usersModel->index(0, 0).data(QLightDM::UsersModel::NameRole).toString();
-        m_userWnd->setCurrentUser(userName);
+        m_userWnd->setCurrentUser(userName, true);
     }
     else
     {
-        //选中上一次登录的用户
+        //选中上一次登录的用户，但不进入认证界面
         QString lastLoginUser = Configuration::instance()->getLastLoginUser();
         m_userWnd->setCurrentUser(lastLoginUser);
     }
@@ -323,7 +323,7 @@ void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
 
 void GreeterWindow::onUserChangedByManual(const QString &userName)
 {
-    m_userWnd->setCurrentUser(userName);
+    m_userWnd->setCurrentUser(userName, true);
 }
 
 void GreeterWindow::onBacktoUsers()

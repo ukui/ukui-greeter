@@ -39,7 +39,7 @@ public:
     ~UsersView();
     void initUI();
     void setModel(QAbstractListModel *);
-    void setCurrentUser(const QString &userName);
+    void setCurrentUser(const QString &userName, bool entered = false);
     void pageUp();
     void pageDown();
 

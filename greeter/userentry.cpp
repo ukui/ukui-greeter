@@ -146,6 +146,11 @@ void UserEntry::setUserName(const QString &name)
     int pixelsWide = fm.width(m_name);
     if(pixelsWide < m_nameLabel->width())
         m_nameLabel->setAlignment(Qt::AlignCenter);
+    else{
+        QFontMetrics fontWidth(font);
+        QString str = fontWidth.elidedText(m_name,Qt::ElideRight,m_nameLabel->width());
+        this->m_nameLabel->setText(str);
+    }
 }
 
 void UserEntry::setLogin(bool isLogin)

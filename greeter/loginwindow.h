@@ -53,6 +53,7 @@ public:
     void setPrompt(const QString& text);
     QString getPassword();
     void reset();
+    bool isloginauth;
 
 protected:
     void showEvent(QShowEvent *);
@@ -73,7 +74,7 @@ public slots:
     void onShowPrompt(QString text, QLightDM::Greeter::PromptType type);
     void onAuthenticationComplete();
     void setUserNotInView(const QString &userName);
-
+        
 private slots:
     void onLogin(const QString &str);
     void onBackButtonClicked();
@@ -117,6 +118,7 @@ private:
     AuthMode authMode;
     // 生物识别认证
     int                     m_deviceCount;
+    int			    m_featureCount;
     QString                 m_deviceName;
     DeviceInfoPtr           m_deviceInfo;
     BiometricProxy          *m_biometricProxy;

@@ -41,6 +41,7 @@ LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
       isManual(false),
       authMode(UNKNOWN),
       m_deviceCount(-1),
+      m_featureCount(-1),
       m_biometricProxy(nullptr),
       m_biometricAuthWidget(nullptr),
       m_biometricDevicesWidget(nullptr),
@@ -106,6 +107,8 @@ void LoginWindow::initUI()
     m_messageLabel = new QLabel(m_passwdWidget);
     m_messageLabel->setObjectName(QStringLiteral("messageLabel"));
     m_messageLabel->setAlignment(Qt::AlignCenter);
+
+    isloginauth = false;
 }
 
 void LoginWindow::showEvent(QShowEvent *e)
@@ -170,9 +173,9 @@ void LoginWindow::setChildrenGeometry()
     // 密码框和提示信息显示位置
     m_passwdWidget->setGeometry(0, m_userWidget->geometry().bottom(), width(), 150);
     m_passwordEdit->setGeometry((m_passwdWidget->width() - 400)/2, 0, 400, 40);
-    m_messageLabel->setGeometry((m_passwdWidget->width() - 300)/2,
+    m_messageLabel->setGeometry((m_passwdWidget->width() - 400)/2,
                                 m_passwordEdit->geometry().bottom() + 25,
-                                300, 20);
+                                400, 20);
 
 
     setBiometricWidgetGeometry();
@@ -325,7 +328,10 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
 
     setChildrenGeometry();
 
-    startAuthentication();
+    if(!isloginauth)
+    	startAuthentication();
+
+    isloginauth = false;
 
     return true;
 }
@@ -336,6 +342,7 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
  */
 void LoginWindow::setUserNotInView(const QString &userName)
 {
+    isloginauth = false;
     m_name = userName;
     setUserName(userName);
 }
@@ -389,6 +396,7 @@ void LoginWindow::onLogin(const QString &str)
     }
     else if(m_name == "*login")
     {   //用户输入用户名
+	isloginauth = true;
         Q_EMIT userChangedByManual(str);
         m_greeter->respond(str);
     }
@@ -508,6 +516,17 @@ void LoginWindow::performBiometricAuth()
         return;
     }
 
+    //初始化用户对应特征数量    
+    m_featureCount = m_biometricProxy->GetFeatureCount(m_uid);
+	
+    qDebug()<<"m_featureCount = "<<m_featureCount;
+    //没有可用特征，不启用生物识别认证    
+    if(m_deviceCount < 1)
+    {
+        skipBiometricAuth();
+        return;
+    }
+
     //初始化生物识别认证UI
     initBiometricButtonWidget();
     initBiometricWidget();
@@ -568,9 +587,9 @@ void LoginWindow::skipBiometricAuth()
 //        m_biometricButton->setVisible(true);
 //        m_passwordButton->setVisible(false);
 //        m_otherDeviceButton->setVisible(false);
-//        m_retryButton->setVisible(false);
+//       m_retryButton->setVisible(false);
 //    }
-//    m_passwdWidget->show();
+    m_passwdWidget->show();
 }
 
 void LoginWindow::initBiometricWidget()
@@ -729,15 +748,30 @@ void LoginWindow::onBiometricButtonClicked()
     //当前没有设备，让用户选择设备
     if(!m_deviceInfo)
     {
-        m_otherDeviceButton->click();
-
+        if(m_deviceCount == 1)
+        {
+            DeviceList deviceList = m_biometricProxy->GetDevList();
+            m_deviceInfo = deviceList.at(0);
+            if(!m_deviceInfo)
+            {
+                m_otherDeviceButton->click();
+            }
+            else
+            {
+                authMode = BIOMETRIC;
+                startAuthentication();
+            }
+        }
+        else
+        {
+            m_otherDeviceButton->click();
+        }
     }
     else
     {
         authMode = BIOMETRIC;
         startAuthentication();
     }
-
 }
 
 void LoginWindow::onPasswordButtonClicked()
@@ -782,7 +816,7 @@ void LoginWindow::showPasswordAuthWidget()
 
     if(m_buttonsWidget)
     {
-        if(m_deviceCount > 0)
+        if(m_deviceCount > 0 && m_featureCount > 0)
         {
             m_buttonsWidget->setVisible(true);
             m_biometricButton->setVisible(true);
