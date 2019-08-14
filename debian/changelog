@@ -1,3 +1,17 @@
+ukui-greeter (1.1.9-1) unstable; urgency=medium
+
+  * Remove the logo on the inactive screen.
+  * Adjust the method of get screen resolution.
+  * Selecte the device by default when there is only one.
+  * Fix the incomplete prompt.
+  * Fix the error when manually enter the user name.
+  * Fix that right arrow doesn't work when multiple users loged in.
+  * Move the manpages from section 1 to section 8.
+  * debian/control:
+    - Bump standards-vertion to 4.4.0.
+
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Wed, 14 Aug 2019 09:39:50 +0800
+
 ukui-greeter (1.1.8-0ubuntu1) disco; urgency=medium
 
   * Bugfix only:
