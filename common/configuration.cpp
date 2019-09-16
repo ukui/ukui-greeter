@@ -160,5 +160,5 @@ QString Configuration::getDefaultBackgroundName()
     if(getSystemDistrib() == "Kylin")
         return "/usr/share/backgrounds/kylin-lightdm-default-background.png";
     else
-        return IMAGE_DIR + "background-ubuntu.jpg";
+        return "/usr/share/backgrounds/warty-final-ubuntukylin.jpg";
 }
