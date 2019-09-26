@@ -1,3 +1,12 @@
+ukui-greeter (1.1.10-1) unstable; urgency=medium
+
+  * New upstream bugfix release:
+    - Fix the wrong background. (LP: #1831718)
+    - Fix the error when get screen resolution in virtualbox.
+      (LP: #1842876)
+
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Thu, 26 Sep 2019 14:01:25 +0800
+
 ukui-greeter (1.1.9-1) unstable; urgency=medium
 
   * Remove the logo on the inactive screen.
