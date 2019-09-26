@@ -199,8 +199,8 @@ void MainWindow::moveToScreen(QScreen *screen)
     QRect activeScreenRect = m_activeScreen->geometry();
 
     qDebug() << "moveToScreen activeScreenRect " << activeScreenRect;
-    if(m_monitorWatcher->getMonitorCount() == 1)
-        activeScreenRect = QRect(QPoint(0, 0), m_monitorWatcher->getVirtualSize());
+   // if(m_monitorWatcher->getMonitorCount() == 1)
+     //   activeScreenRect = QRect(QPoint(0, 0), m_monitorWatcher->getVirtualSize());
 
     m_greeterWnd->setGeometry(activeScreenRect);
     Q_EMIT activeScreenChanged(activeScreenRect);
