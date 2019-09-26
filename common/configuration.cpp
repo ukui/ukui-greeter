@@ -159,6 +159,13 @@ QString Configuration::getDefaultBackgroundName()
 {
     if(getSystemDistrib() == "Kylin")
         return "/usr/share/backgrounds/kylin-lightdm-default-background.png";
-    else
-        return "/usr/share/backgrounds/warty-final-ubuntukylin.jpg";
+    else{
+       // return "/usr/share/backgrounds/warty-final-ubuntukylin.jpg";
+    	QString filepath = "/usr/share/backgrounds/warty-final-ubuntukylin.jpg";
+	QFileInfo file(filepath);
+	if(file.exists())
+            return "/usr/share/backgrounds/warty-final-ubuntukylin.jpg";
+	else
+	    return "/usr/share/ukui-greeter/images/background-ubuntu.jpg";
+    }
 }
