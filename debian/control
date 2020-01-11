@@ -12,7 +12,8 @@ Build-Depends: debhelper (>=12),
                libx11-dev,
                libxtst-dev,
                libxrandr-dev,
-               qttools5-dev-tools
+               qttools5-dev-tools,
+ 	       libimlib2-dev
 Standards-Version: 4.4.0
 Homepage: http://www.ukui.org
 Vcs-Git: https://github.com/ukui/ukui-greeter.git
