@@ -199,8 +199,8 @@ void MainWindow::moveToScreen(QScreen *screen)
     QRect activeScreenRect = m_activeScreen->geometry();
 
     qDebug() << "moveToScreen activeScreenRect " << activeScreenRect;
-    if(m_monitorWatcher->getMonitorCount() == 1)
-        activeScreenRect = QRect(QPoint(0, 0), m_monitorWatcher->getVirtualSize());
+    //if(m_monitorWatcher->getMonitorCount() == 1)
+    //    activeScreenRect = QRect(QPoint(0, 0), m_monitorWatcher->getVirtualSize());
 
     m_greeterWnd->setGeometry(activeScreenRect);
     Q_EMIT activeScreenChanged(activeScreenRect);
@@ -287,6 +287,17 @@ void MainWindow::drawBackground(QSharedPointer<Background> &background,
     case BACKGROUND_IMAGE:
     {
         QPixmap *pixmap = getBackground(background->image, rect);
+        if(pixmap->isNull())
+        {
+            QString color = m_configuration->getValue("background-color").toString();
+            QColor cor;
+            if(!color.isEmpty())
+                cor = color;
+            else
+                cor = "#035290";
+            painter.setBrush(cor);
+            painter.drawRect(rect);
+        }
         painter.drawPixmap(rect, *pixmap);
         break;
     }
