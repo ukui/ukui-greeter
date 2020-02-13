@@ -298,7 +298,9 @@ void MainWindow::drawBackground(QSharedPointer<Background> &background,
             painter.setBrush(cor);
             painter.drawRect(rect);
         }
-        painter.drawPixmap(rect, *pixmap);
+	else 
+            painter.drawPixmap(rect, *pixmap);
+
         break;
     }
     case BACKGROUND_COLOR:
