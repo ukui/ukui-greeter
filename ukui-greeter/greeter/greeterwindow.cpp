@@ -570,7 +570,7 @@ void GreeterWindow::onSessionChanged(const QString &session)
             .arg(sessionPrefix.toLower());
     QFile iconFile(sessionIcon);
     if(!iconFile.exists()){
-        sessionIcon = IMAGE_DIR + QString("badges/unknown_badge.png");
+        sessionIcon = IMAGE_DIR + QString("badges/ukui_badge.png");
     }
     qDebug() << sessionIcon;
     m_sessionLB->setIcon(QIcon(sessionIcon));
