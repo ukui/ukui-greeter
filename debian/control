@@ -3,7 +3,7 @@ Section: x11
 Priority: optional
 Maintainer: Kylin Team <team+kylin@tracker.debian.org>
 Uploaders: handsome_feng <jianfengli@ubuntukylin.com>,
-Build-Depends: debhelper (>=12),
+Build-Depends: debhelper-compat (=12),
                pkg-config,
                qtbase5-dev,
                libqt5x11extras5-dev,
@@ -13,8 +13,9 @@ Build-Depends: debhelper (>=12),
                libxtst-dev,
                libxrandr-dev,
                qttools5-dev-tools,
- 	       libimlib2-dev
-Standards-Version: 4.4.0
+               libimlib2-dev
+Standards-Version: 4.5.0
+Rules-Requires-Root: no
 Homepage: http://www.ukui.org
 Vcs-Git: https://github.com/ukui/ukui-greeter.git
 Vcs-Browser: https://github.com/ukui/ukui-greeter
