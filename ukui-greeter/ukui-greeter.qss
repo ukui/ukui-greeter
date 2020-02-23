@@ -164,6 +164,7 @@ QListWidget{
 /* 头像 */
 #faceLabel{
      border: 2px solid white;
+     border-radius: 64;
 }
 #login_nameLabel{
     font-size: 28px;
@@ -181,13 +182,14 @@ QLineEdit {
     font-size: 14px;
     lineedit-password-character:9679;
 }
+
 QLineEdit::hover {
     border: 1px solid #00FFFF;
 }
 QLineEdit::focus{
-    background: #CDDDEC;
-    border: #CDDDEC;
-
+    background: #FFFFFF;
+    border: #FFFFFF;
+    border-radius: 4px;
 }
 /* 大写提示 */
 #capsIconLabel{
@@ -214,7 +216,7 @@ QLineEdit::focus{
 /* 登录按钮 */
 #loginButton{
     background: #559BE2;
-/*    image: url(:/resource/login-button.png);*/
+ /*   image: url(:/resource/login-button.png);*/
     min-width: 26px;
     max-width: 26px;
     min-height: 26px;
