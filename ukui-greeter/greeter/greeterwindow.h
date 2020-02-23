@@ -66,6 +66,8 @@ private:
     void setVirkeyboardPos();
     void setWindowPos(QWidget *widget, Qt::Alignment align = Qt::AlignCenter);
     bool sessionIsValid(const QString &session);
+    void updateLanguage(QString userName);
+    void updateSession(QString userName);
 
     UsersView               *m_userWnd;
     LoginWindow             *m_loginWnd;

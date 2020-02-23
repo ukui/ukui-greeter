@@ -142,6 +142,7 @@ void GreeterWindow::initUI()
         m_sessionLB->setFocusPolicy(Qt::NoFocus);
         m_sessionLB->setFixedSize(39, 39);
         m_sessionLB->setCursor(Qt::PointingHandCursor);
+        m_sessionLB->setIcon(QIcon(IMAGE_DIR + QString("badges/unknown_badge.png")));
         connect(m_sessionLB, &QPushButton::clicked, this, &GreeterWindow::showSessionWnd);
     }
 
@@ -152,6 +153,10 @@ void GreeterWindow::initUI()
     m_languageLB->setFont(QFont("Ubuntu", 16));
     m_languageLB->setFixedHeight(39);
     m_languageLB->setCursor(Qt::PointingHandCursor);
+    LanguagesVector defaultLang = getLanguages();
+    m_languageLB->setText(defaultLang.at(0).name);
+    m_languageLB->adjustSize();
+
     connect(m_languageLB, &QPushButton::clicked, this, &GreeterWindow::showLanguageWnd);  
 
     //用户列表
@@ -243,6 +248,7 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     }
 
     //电源按钮位置
+
     int x = m_powerLB->geometry().width() + 20;
     int y = 20;
     m_powerLB->move(this->width() - x, y);
@@ -261,6 +267,7 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     //语言选择按钮位置
     x += (20 + m_languageLB->width());
     m_languageLB->move(this->width() - x, y);
+
 
     y = widgetTime->height()+20;
     widgetTime->move(0,this->height()-y);
@@ -325,6 +332,48 @@ void GreeterWindow::onUserSelected(const QModelIndex &index)
     switchWnd(1);
 }
 
+void GreeterWindow::updateLanguage(QString userName)
+{
+    QString language;
+    QDBusInterface iface("org.freedesktop.Accounts", "/org/freedesktop/Accounts",
+                         "org.freedesktop.Accounts",QDBusConnection::systemBus());
+    QDBusReply<QDBusObjectPath> userPath = iface.call("FindUserByName", userName);
+    if(!userPath.isValid())
+        qWarning() << "Get UserPath error:" << userPath.error();
+    else {
+        QDBusInterface userIface("org.freedesktop.Accounts", userPath.value().path(),
+                                 "org.freedesktop.DBus.Properties", QDBusConnection::systemBus());
+        QDBusReply<QDBusVariant> languageReply = userIface.call("Get", "org.freedesktop.Accounts.User", "Language");
+        if(!languageReply.isValid())
+            qWarning() << "Get User's language error" << languageReply.error();
+        else {
+            language = languageReply.value().variant().toString();
+            if(!language.isEmpty())
+                onLanguageChanged(getLanguage(language));
+        }
+    }
+}
+
+void GreeterWindow::updateSession(QString userName)
+{
+    QDBusInterface iface("org.freedesktop.Accounts", "/org/freedesktop/Accounts",
+                         "org.freedesktop.Accounts",QDBusConnection::systemBus());
+    QDBusReply<QDBusObjectPath> userPath = iface.call("FindUserByName", userName);
+    if(!userPath.isValid())
+        qWarning() << "Get UserPath error:" << userPath.error();
+    else {
+        QDBusInterface userIface("org.freedesktop.Accounts", userPath.value().path(),
+                                 "org.freedesktop.DBus.Properties", QDBusConnection::systemBus());
+        QDBusReply<QDBusVariant> sessionReply = userIface.call("Get", "org.freedesktop.Accounts.User", "XSession");
+        if(!sessionReply.isValid())
+            qWarning() << "Get User's session error" << sessionReply.error();
+        else {
+            QString session = sessionReply.value().variant().toString();
+             onSessionChanged(session);
+        }
+    }
+}
+
 void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
 {
     setBackground(index);
@@ -336,22 +385,7 @@ void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
         QString realName = index.data(QLightDM::UsersModel::NameRole).toString();
         if(realName == "*guest" || realName == "*login")
             return;
-        QDBusInterface iface("org.freedesktop.Accounts", "/org/freedesktop/Accounts",
-                             "org.freedesktop.Accounts",QDBusConnection::systemBus());
-        QDBusReply<QDBusObjectPath> userPath = iface.call("FindUserByName", realName);
-        if(!userPath.isValid())
-            qWarning() << "Get UserPath error:" << userPath.error();
-        else {
-            QDBusInterface userIface("org.freedesktop.Accounts", userPath.value().path(),
-                                     "org.freedesktop.DBus.Properties", QDBusConnection::systemBus());
-            QDBusReply<QDBusVariant> languageReply = userIface.call("Get", "org.freedesktop.Accounts.User", "Language");
-            if(!languageReply.isValid())
-                qWarning() << "Get User's language error" << languageReply.error();
-            else {
-                language = languageReply.value().variant().toString();
-                onLanguageChanged(getLanguage(language));
-            }
-        }
+        updateLanguage(realName);
     }
 
     if(!m_sessionHasChanged && m_sessionsModel->rowCount() > 1)
@@ -364,6 +398,9 @@ void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
 void GreeterWindow::onUserChangedByManual(const QString &userName)
 {
     m_userWnd->setCurrentUser(userName, true);
+
+    updateLanguage(userName);
+    updateSession(userName);
 }
 
 void GreeterWindow::onBacktoUsers()
