@@ -36,6 +36,21 @@
 
 bool MainWindow::m_first = true;
 
+QT_BEGIN_NAMESPACE
+extern void qt_blurImage(QPainter *p, QImage &blurImage, qreal radius, bool quality, bool alphaOnly, int transposed = 0);
+QT_END_NAMESPACE
+
+#define BLUR_RADIUS 300
+
+QPixmap blurPixmap(QPixmap pixmap)
+{
+    QPainter painter(&pixmap);
+    QImage srcImg = pixmap.toImage();
+    qt_blurImage(&painter, srcImg, BLUR_RADIUS, false, false);
+    painter.end();
+    return pixmap;
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent),
       m_screenModel(new ScreenModel(this)),

@@ -57,28 +57,6 @@ LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
             this, SLOT(onAuthenticationComplete()));
 }
 
-QPixmap LoginWindow::DrawRound(QPixmap &src, int radius)
-{
-
-    QPixmap pixmap(src);
-
-    QPainter painter(&pixmap);
-    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-    QRect drawRect = pixmap.rect();
-    QPoint point(radius,radius);
-    QRadialGradient rg(point,drawRect.width()/2,point);
-    rg.setColorAt(0,Qt::transparent);
-    rg.setColorAt(0.93,Qt::transparent);
-    rg.setColorAt(0.94,Qt::white);
-    rg.setColorAt(1,Qt::white);
-    painter.setBrush(rg);
-    QPen pen(Qt::white);//定义画笔
-    painter.setPen(pen);
-    painter.drawEllipse(drawRect);
-
-    return pixmap;
-}
-
 QPixmap LoginWindow::PixmapToRound(const QPixmap &src, int radius)
 {
     if (src.isNull()) {
@@ -105,11 +83,9 @@ void LoginWindow::initUI()
     m_userWidget->setObjectName(QStringLiteral("userWidget"));
 
     /* 头像 */
-    const QString SheetStyle = "min-width: 128px; min-height: 128px;max-width:128px; max-height: 128px;border-radius: 64px;  border:0px   solid white;";
     m_faceLabel = new QLabel(m_userWidget);
     m_faceLabel->setObjectName(QStringLiteral("faceLabel"));
     m_faceLabel->setFocusPolicy(Qt::NoFocus);
-    m_faceLabel->setStyleSheet(SheetStyle);
 
     /* 返回按钮 */
     m_backButton = new QPushButton(m_userWidget);
@@ -209,7 +185,7 @@ void LoginWindow::setChildrenGeometry()
     m_userWidget->setGeometry(0, (height() - 240 - 150) / 2,
                               width(), 240);
 
-    m_faceLabel->setGeometry((width() - 128) / 2, 0, 128, 128);
+    m_faceLabel->setGeometry((width() - 130) / 2, 0, 130, 130);
     m_backButton->setGeometry(m_faceLabel->geometry().left() - 30 - 32,
                               m_faceLabel->geometry().top() + (m_faceLabel->height() - 32) / 2,
                               32, 32);
@@ -219,11 +195,13 @@ void LoginWindow::setChildrenGeometry()
                                 width(), 15);
 
     // 密码框和提示信息显示位置
+
     m_passwdWidget->setGeometry(0, m_userWidget->geometry().bottom(), width(), 150);
-    m_passwordEdit->setGeometry((m_passwdWidget->width() - 400)/2, 0, 400, 40);
-    m_messageLabel->setGeometry((m_passwdWidget->width() - 400)/2,
+    m_passwordEdit->setGeometry((m_passwdWidget->width() - 300)/2, 0, 300, 34);
+    m_messageLabel->setGeometry((m_passwdWidget->width() - 600)/2,
                                 m_passwordEdit->geometry().bottom() + 25,
-                                400, 20);
+                                600, 20);
+
     m_messageButton->setGeometry((m_passwdWidget->width() - 200)/2, 0, 200, 40);
 
     setBiometricWidgetGeometry();
@@ -308,15 +286,15 @@ void LoginWindow::setFace(const QString& facePath)
 {
     QFile faceFile(facePath);
     QPixmap faceImage;
+    m_faceLabel->setFixedSize(128,128);
     //如果头像文件不存在，则使用默认头像
     if(faceFile.exists())
         faceImage = scaledPixmap(128, 128, facePath);
     else
         faceImage = scaledPixmap(128, 128, ":/resource/default_face.png");
 
-    faceImage =  PixmapToRound(faceImage, 64);
-    faceImage =  DrawRound(faceImage,64);
-
+    faceImage =  PixmapToRound(faceImage,62);
+    m_faceLabel->setAlignment(Qt::AlignCenter);
     m_faceLabel->setPixmap(faceImage);
 }
 

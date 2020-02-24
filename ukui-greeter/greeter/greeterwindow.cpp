@@ -21,6 +21,7 @@
 #include <QDebug>
 #include <QProcess>
 #include <QStandardPaths>
+#include <QPainter>
 #include <QResizeEvent>
 #include <QWindow>
 #include <QtDBus/QDBusInterface>
@@ -40,6 +41,7 @@
 
 float scale;
 int fontSize;
+
 GreeterWindow::GreeterWindow(QWidget *parent)
     : QWidget(parent),
       m_userWnd(nullptr),
@@ -85,7 +87,7 @@ void GreeterWindow::initUI()
 {
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [&]{
-            QString time = QDateTime::currentDateTime().toString("hh:mm:ss");
+            QString time = QDateTime::currentDateTime().toString("hh:mm");
             lblTime->setText(time);
             QString date = QDate::currentDate().toString("yyyy/MM/dd dddd");
             lblDate->setText(date);
@@ -98,16 +100,16 @@ void GreeterWindow::initUI()
     widgetlayout->addWidget(lblTime);
     widgetlayout->addWidget(lblDate);
 
-    QString time = QDateTime::currentDateTime().toString("hh:mm:ss");
+    QString time = QDateTime::currentDateTime().toString("hh:mm");
     lblTime->setText(time);
-    lblTime->setStyleSheet("QLabel{color:white; font-size: 55px;}");
+    lblTime->setStyleSheet("QLabel{color:white; font-size: 50px;}");
     lblTime->adjustSize();
     timer->start(1000);
 
     QString date = QDate::currentDate().toString("yyyy/MM/dd dddd");
     qDebug() << "current date: " << date;
     lblDate->setText(date);
-    lblDate->setStyleSheet("QLabel{color:white; font-size: 20px;}");
+    lblDate->setStyleSheet("QLabel{color:white; font-size: 16px;}");
     lblDate->adjustSize();
 
     widgetTime->adjustSize();
@@ -118,7 +120,7 @@ void GreeterWindow::initUI()
     m_powerLB->setIcon(QPixmap(":/resource/power.png"));
     m_powerLB->setIconSize(QSize(39, 39));
     m_powerLB->setFocusPolicy(Qt::NoFocus);
-    m_powerLB->setFixedSize(39, 39);
+    m_powerLB->setFixedSize(48, 48);
     m_powerLB->setCursor(Qt::PointingHandCursor);
     connect(m_powerLB, &QPushButton::clicked, this, &GreeterWindow::showPowerWnd);
 
@@ -126,9 +128,9 @@ void GreeterWindow::initUI()
     m_keyboardLB = new QPushButton(this);
     m_keyboardLB->setObjectName(QStringLiteral("keyboardButton"));
     m_keyboardLB->setIcon(QPixmap(":/resource/keyboard.png"));
-    m_keyboardLB->setIconSize(QSize(39, 39));
+    m_keyboardLB->setIconSize(QSize(30, 30));
     m_keyboardLB->setFocusPolicy(Qt::NoFocus);
-    m_keyboardLB->setFixedSize(39, 39);
+    m_keyboardLB->setFixedSize(48, 48);
     m_keyboardLB->setCursor(Qt::PointingHandCursor);
     connect(m_keyboardLB, &QPushButton::clicked,
             this, &GreeterWindow::showVirtualKeyboard);
@@ -140,7 +142,7 @@ void GreeterWindow::initUI()
         m_sessionLB->setObjectName((QStringLiteral("sessionButton")));
         m_sessionLB->setIconSize(QSize(39, 39));
         m_sessionLB->setFocusPolicy(Qt::NoFocus);
-        m_sessionLB->setFixedSize(39, 39);
+        m_sessionLB->setFixedSize(48, 48);
         m_sessionLB->setCursor(Qt::PointingHandCursor);
         m_sessionLB->setIcon(QIcon(IMAGE_DIR + QString("badges/unknown_badge.png")));
         connect(m_sessionLB, &QPushButton::clicked, this, &GreeterWindow::showSessionWnd);
@@ -151,7 +153,7 @@ void GreeterWindow::initUI()
     m_languageLB->setObjectName(QStringLiteral("languageButton"));
     m_languageLB->setFocusPolicy(Qt::NoFocus);
     m_languageLB->setFont(QFont("Ubuntu", 16));
-    m_languageLB->setFixedHeight(39);
+    m_languageLB->setFixedHeight(48);
     m_languageLB->setCursor(Qt::PointingHandCursor);
     LanguagesVector defaultLang = getLanguages();
     m_languageLB->setText(defaultLang.at(0).name);
@@ -249,29 +251,29 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
 
     //电源按钮位置
 
-    int x = m_powerLB->geometry().width() + 20;
-    int y = 20;
-    m_powerLB->move(this->width() - x, y);
+    int x = 39;
+    int y = 66;
+
+    x+=m_powerLB->width();
+    m_powerLB->move(this->width() - x,height() - y);
 
     //虚拟键盘按钮位置
-    x += (20 + m_keyboardLB->width());
-    m_keyboardLB->move(this->width() - x, y);
+    x += (m_keyboardLB->width() + 10);
+    m_keyboardLB->move(this->width() - x, height() - y);
 
     //桌面环境选择按钮位置
     if(m_sessionLB)
     {
-        x += (20 + m_sessionLB->width());
-        m_sessionLB->move(this->width() - x, y);
+        x += (m_sessionLB->width() + 10);
+        m_sessionLB->move(this->width() - x, height() - y);
     }
 
     //语言选择按钮位置
-    x += (20 + m_languageLB->width());
-    m_languageLB->move(this->width() - x, y);
+    x += (m_languageLB->width() + 10);
+    m_languageLB->move(this->width() - x, height() - y);
 
+    widgetTime->move((width()-widgetTime->geometry().width())/2, 59);
 
-    y = widgetTime->height()+20;
-    widgetTime->move(0,this->height()-y);
-    
     //虚拟键盘位置
     setVirkeyboardPos();
 }

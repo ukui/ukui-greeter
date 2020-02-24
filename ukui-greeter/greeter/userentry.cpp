@@ -48,14 +48,12 @@ UserEntry::UserEntry(QWidget *parent)
 
 void UserEntry::initUI()
 {
-    const QString SheetStyle = "border-radius: 999px;  border:0px   solid white;";
     if (objectName().isEmpty())
         setObjectName(QString::fromUtf8("Entry")+QString::number(id));
     m_faceLabel = new QLabel(this);
     m_faceLabel->setObjectName(QString::fromUtf8("faceLabel"));
     m_faceLabel->setScaledContents(true);
     m_faceLabel->installEventFilter(this);
-     m_faceLabel->setStyleSheet(SheetStyle.arg(IMG_WIDTH).arg(IMG_WIDTH));
 
     m_nameLabel = new QLabel(this);
     m_nameLabel->setObjectName(QString::fromUtf8("nameLabel"));
@@ -88,9 +86,7 @@ void UserEntry::resizeEvent(QResizeEvent *)
     m_faceLabel->setGeometry(faceRect);
 //    m_faceLabel->setPixmap(scaledPixmap(IMG_WIDTH, IMG_WIDTH, m_face));
     userface = scaledPixmap(IMG_WIDTH, IMG_WIDTH, m_face);
-
     userface =  PixmapToRound(userface, IMG_WIDTH);
-    userface =  DrawRound(userface,IMG_WIDTH);
     m_faceLabel->setPixmap(userface);
 
     QRect nameRect(SHADOW_WIDTH, faceRect.bottom() + SHADOW_WIDTH, FACE_WIDDTH, 20);
@@ -128,29 +124,6 @@ void UserEntry::onClicked()
     emit clicked(index.row());
 }
 
-
-QPixmap UserEntry::DrawRound(QPixmap &src, int radius)
-{
-
-    QPixmap pixmap(src);
-
-    QPainter painter(&pixmap);
-    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-    QRect drawRect = pixmap.rect();
-    QPoint point(radius,radius);
-    QRadialGradient rg(point,drawRect.width()/2,point);
-    rg.setColorAt(0,Qt::transparent);
-    rg.setColorAt(0.93,Qt::transparent);
-    rg.setColorAt(0.94,Qt::white);
-    rg.setColorAt(1,Qt::white);
-    painter.setBrush(rg);
-    QPen pen(Qt::white);//定义画笔
-    painter.setPen(pen);
-    painter.drawEllipse(drawRect);
-
-    return pixmap;
-}
-
 QPixmap UserEntry::PixmapToRound(const QPixmap &src, int radius)
 {
     if (src.isNull()) {
@@ -180,7 +153,6 @@ void UserEntry::setFace(const QString &facePath)
      userface = scaledPixmap(IMG_WIDTH, IMG_WIDTH, m_face);
      //50为圆形的半径
      userface =  PixmapToRound(userface, IMG_WIDTH);
-     userface =  DrawRound(userface,IMG_WIDTH);
      m_faceLabel->setAlignment(Qt::AlignCenter);
     m_faceLabel->setPixmap(userface);
 
