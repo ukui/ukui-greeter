@@ -120,13 +120,65 @@ void UsersView::keyReleaseEvent(QKeyEvent *event)
     switch(event->key()) {
     case Qt::Key_Down:
     case Qt::Key_Right:
-        if(usersList->currentRow() < usersList->count()-1)
-            setCurrentRow(usersList->currentRow() + 1);
+        {
+            int leftindex = 0;
+            UserEntry *leftentry = static_cast<UserEntry*>(usersList->itemWidget(usersList->item(leftindex)));
+            uid_t uid = leftentry->userIndex().data(QLightDM::UsersModel::UidRole).toUInt();
+            QListWidgetItem *left = usersList->takeItem(leftindex);
+            delete left;
+
+            int row = 0;
+            for(row = 0; row < usersModel->rowCount(); row++)
+            {
+                uid_t id= usersModel->index(row).data(QLightDM::UsersModel::UidRole).toUInt();
+                if(uid == id)
+                    break;
+            }
+
+            QModelIndex index = usersModel->index(row, 0);
+            QPersistentModelIndex persistentIndex(index);
+            UserEntry *entry = new UserEntry(this);
+            entry->setUserIndex(persistentIndex);
+
+            connect(entry, &UserEntry::pressed, this, &UsersView::onUserPressed);
+            connect(entry, &UserEntry::clicked, this, &UsersView::onUserClicked);
+            QListWidgetItem *item = new QListWidgetItem();
+            item->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
+            usersList->insertItem(usersList->count()-1, item);
+            usersList->setItemWidget(item, entry);
+            setCurrentRow(2);
+        }
         break;
     case Qt::Key_Up:
     case Qt::Key_Left:
-        if(usersList->currentRow() > 0)
-            setCurrentRow(usersList->currentRow() - 1);
+        {
+            int rightindex = usersList->count()-1;
+            UserEntry *rightentry = static_cast<UserEntry*>(usersList->itemWidget(usersList->item(rightindex)));
+            uid_t uid = rightentry->userIndex().data(QLightDM::UsersModel::UidRole).toUInt();
+            QListWidgetItem *last = usersList->takeItem(rightindex);
+            delete last;
+
+            int row = 0;
+            for(row = 0; row < usersModel->rowCount(); row++)
+            {
+                uid_t id= usersModel->index(row).data(QLightDM::UsersModel::UidRole).toUInt();
+                if(uid == id)
+                    break;
+            }
+
+            QModelIndex index = usersModel->index(row, 0);
+            QPersistentModelIndex persistentIndex(index);
+            UserEntry *entry = new UserEntry(this);
+            entry->setUserIndex(persistentIndex);
+
+            connect(entry, &UserEntry::pressed, this, &UsersView::onUserPressed);
+            connect(entry, &UserEntry::clicked, this, &UsersView::onUserClicked);
+            QListWidgetItem *item = new QListWidgetItem();
+            item->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
+            usersList->insertItem(0, item);
+            usersList->setItemWidget(item, entry);
+            setCurrentRow(2);
+        }
         break;
     case Qt::Key_PageDown:
         pageDown();
@@ -233,6 +285,7 @@ void UsersView::onUserChanged(const QModelIndex &topLeft, const QModelIndex &bot
 
 void UsersView::setCurrentRow(int row)
 {
+    qDebug()<<"ssssssetcurrentrow";
     if(row < 0 || row >= usersList->count())
         return;
     usersList->setCurrentRow(row);

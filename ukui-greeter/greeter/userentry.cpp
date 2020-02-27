@@ -201,7 +201,6 @@ bool UserEntry::selected()
     return id == selectedId;
 }
 
-
 void UserEntry::setUserIndex(const QPersistentModelIndex &index)
 {
     Q_ASSERT(index.isValid());
