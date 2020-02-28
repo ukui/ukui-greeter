@@ -82,18 +82,34 @@ void UserEntry::paintEvent(QPaintEvent *event)
 
 void UserEntry::resizeEvent(QResizeEvent *)
 {
-    QRect faceRect(SHADOW_WIDTH, SHADOW_WIDTH, FACE_WIDDTH, FACE_WIDDTH);
+    QRect faceRect,nameRect,loginRect;
+    if(id == selectedId)
+    {
+        const QString SheetStyle = "border-radius: 90px;  border:2px   solid white;";
+        m_faceLabel->setStyleSheet(SheetStyle);
+        faceRect.setRect(SHADOW_WIDTH, SHADOW_WIDTH, CENTER_FACE_WIDTH, CENTER_FACE_WIDTH);
+        userface = scaledPixmap(CENTER_IMG_WIDTH, CENTER_IMG_WIDTH, m_face);
+        userface =  PixmapToRound(userface, CENTER_IMG_WIDTH);
+        nameRect.setRect(SHADOW_WIDTH, faceRect.bottom() + SHADOW_WIDTH, CENTER_FACE_WIDTH, 20);
+        loginRect.setRect(SHADOW_WIDTH, nameRect.bottom()+5, CENTER_FACE_WIDTH, 20);
+    }
+    else
+    {
+        faceRect.setRect(SHADOW_WIDTH, SHADOW_WIDTH, FACE_WIDTH, FACE_WIDTH);
+        userface = scaledPixmap(IMG_WIDTH, IMG_WIDTH, m_face);
+        userface =  PixmapToRound(userface, IMG_WIDTH);
+        nameRect.setRect(SHADOW_WIDTH, faceRect.bottom() + SHADOW_WIDTH, FACE_WIDTH, 20);
+        loginRect.setRect(SHADOW_WIDTH, nameRect.bottom()+5, FACE_WIDTH, 20);
+    }
+
     m_faceLabel->setGeometry(faceRect);
-//    m_faceLabel->setPixmap(scaledPixmap(IMG_WIDTH, IMG_WIDTH, m_face));
     userface = scaledPixmap(IMG_WIDTH, IMG_WIDTH, m_face);
     userface =  PixmapToRound(userface, IMG_WIDTH);
     m_faceLabel->setPixmap(userface);
 
-    QRect nameRect(SHADOW_WIDTH, faceRect.bottom() + SHADOW_WIDTH, FACE_WIDDTH, 20);
     m_nameLabel->setGeometry(nameRect);
     m_nameLabel->setFont(QFont("Ubuntu", fontSize));
 
-    QRect loginRect(SHADOW_WIDTH, nameRect.bottom()+5, FACE_WIDDTH, 20);
     m_loginLabel->setGeometry(loginRect);
     m_loginLabel->setFont(QFont("Ubuntu", fontSize));
 }
@@ -150,10 +166,16 @@ void UserEntry::setFace(const QString &facePath)
     if(!faceFile.exists())
         this->m_face = ":/resource/default_face.png";
 
-     userface = scaledPixmap(IMG_WIDTH, IMG_WIDTH, m_face);
-     //50为圆形的半径
-     userface =  PixmapToRound(userface, IMG_WIDTH);
-     m_faceLabel->setAlignment(Qt::AlignCenter);
+    if(id == selectedId){
+        userface = scaledPixmap(CENTER_IMG_WIDTH, CENTER_IMG_WIDTH, m_face);
+        userface =  PixmapToRound(userface, CENTER_IMG_WIDTH);
+    }
+    else{
+        userface = scaledPixmap(IMG_WIDTH, IMG_WIDTH, m_face);
+        userface =  PixmapToRound(userface, IMG_WIDTH);
+    }
+
+    m_faceLabel->setAlignment(Qt::AlignCenter);
     m_faceLabel->setPixmap(userface);
 
 }

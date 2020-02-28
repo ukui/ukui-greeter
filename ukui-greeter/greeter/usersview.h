@@ -22,9 +22,9 @@
 #include <QWidget>
 #include "userentry.h"
 
-#define ITEM_WIDTH (ENTRY_WIDTH + 40 * scale)
-#define ITEM_HEIGHT ENTRY_HEIGHT
-#define USERSVIEW_WIDTH (ITEM_WIDTH * 5 + 40 + 64*scale*2 + 4)
+#define ITEM_WIDTH (CENTER_ENTRY_WIDTH + 40 * scale)
+#define ITEM_HEIGHT CENTER_ENTRY_HEIGHT
+#define USERSVIEW_WIDTH (ITEM_WIDTH * 5 + 2)
 #define USERSVIEW_HEIGHT ITEM_HEIGHT
 
 class QListWidget;
@@ -63,13 +63,13 @@ signals:
 
 private:
     void insertUserEntry(int row);
+    void moveUserEntry(int from,int to);
+    void moveCurrentToCenter(int row);
 
 private:
     QAbstractListModel *usersModel;
 
     QListWidget *usersList;
-    QPushButton *lastButton;
-    QPushButton *nextButton;
 
     QPushButton *addButton;
     QPushButton *remButton;

@@ -164,7 +164,7 @@ QListWidget{
 /* 头像 */
 #faceLabel{
      border: 2px solid white;
-     border-radius: 64;
+     border-radius: 75;
 }
 #login_nameLabel{
     font-size: 28px;
