@@ -93,8 +93,14 @@ void UsersView::resizeEvent(QResizeEvent *event)
         item->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
         item->setTextAlignment(Qt::AlignCenter);
         UserEntry *entry = static_cast<UserEntry*>(usersList->itemWidget(item));
-        entry->setFixedSize(ENTRY_WIDTH, ENTRY_HEIGHT);
+        if(usersList->currentRow()==i)
+            entry->setFixedSize(CENTER_ENTRY_WIDTH, CENTER_ENTRY_HEIGHT);
+        else
+            entry->setFixedSize(ENTRY_WIDTH, ENTRY_HEIGHT);
     }
+    if(usersList->count()==4||usersList->count()==2)
+        usersList->move((width()-usersList->width() + ITEM_WIDTH)/2 + 20, \
+                        (height()-usersList->height())/2);
 
     QWidget::resizeEvent(event);
 }
@@ -133,17 +139,17 @@ void UsersView::keyReleaseEvent(QKeyEvent *event)
     switch(event->key()) {
     case Qt::Key_Down:
     case Qt::Key_Right:
-        if(usersList->currentRow() < usersList->count()-1)
-            setCurrentRow(usersList->currentRow() + 1);
-        else if(usersList->currentRow() == 0 && usersList->count()==2)
-            setCurrentRow(0);
-        break;
-    case Qt::Key_Up:
-    case Qt::Key_Left:
         if(usersList->currentRow() > 0)
             setCurrentRow(usersList->currentRow() - 1);
         else if(usersList->currentRow() == 0 && usersList->count()==2)
             setCurrentRow(1);
+        break;
+    case Qt::Key_Up:
+    case Qt::Key_Left:
+        if(usersList->currentRow() < usersList->count()-1)
+            setCurrentRow(usersList->currentRow() + 1);
+        else if(usersList->currentRow() == 0 && usersList->count()==2)
+            setCurrentRow(0);
         break;
     case Qt::Key_Return:
         onUserClicked(usersList->currentRow());
@@ -245,7 +251,6 @@ void UsersView::onUserChanged(const QModelIndex &topLeft, const QModelIndex &bot
 
 void UsersView::moveCurrentToCenter(int row)
 {
-    qDebug()<<"11111111111111111111111";
 
     int center = usersList->indexAt(usersList->viewport()->contentsRect().center()).row();
 
@@ -266,7 +271,7 @@ void UsersView::moveCurrentToCenter(int row)
     }
     else if(row < center){
         while (row < center) {
-            row ++ ;
+            row += 1 ;
             moveUserEntry(usersList->count() - 1 , 0);
         }
     }
@@ -281,7 +286,21 @@ void UsersView::setCurrentRow(int row)
     moveCurrentToCenter(row);
 
     UserEntry *entry = static_cast<UserEntry*>(usersList->itemWidget(usersList->currentItem()));
+    entry->setFixedSize(CENTER_ENTRY_WIDTH, CENTER_ENTRY_HEIGHT);
     entry->setSelected();
+    for(int i=0;i<usersList->count();i++)
+    {
+         UserEntry *entry = static_cast<UserEntry*>(usersList->itemWidget(usersList->item(i)));
+         if(i==usersList->currentRow())
+         {
+             entry->setFixedSize(CENTER_ENTRY_WIDTH, CENTER_ENTRY_HEIGHT);
+             entry->setSelected();
+         }
+         else{
+             entry->setFixedSize(ENTRY_WIDTH,ENTRY_HEIGHT);
+         }
+    }
+
 
     int x = 0;
     uid_t uid =  entry->userIndex().data(QLightDM::UsersModel::UidRole).toUInt();

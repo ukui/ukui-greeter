@@ -108,11 +108,17 @@ void registerMetaType()
 
 QString GetDefaultDevice(const QString &userName)
 {
-    QProcess process;
-    QString cmd = "greeter-get-device "+userName;
-    process.start(cmd);
-    process.waitForFinished();
-    QString defaultDevice = process.readAllStandardOutput();
+    QString configPath = QString("/home/%1/" UKUI_BIOMETRIC_CONFIG_PATH).arg(userName);
+    QSettings settings(configPath, QSettings::IniFormat);
+//    qDebug() << "configure path: " << settings.fileName();
+
+    QString defaultDevice = settings.value("DefaultDevice").toString();
+    if(defaultDevice.isEmpty())
+    {
+        QSettings sysSettings(UKUI_BIOMETRIC_SYS_CONFIG_PATH, QSettings::IniFormat);
+        defaultDevice = sysSettings.value("DefaultDevice").toString();
+    }
+
     return defaultDevice;
 }
 

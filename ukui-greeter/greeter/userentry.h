@@ -54,7 +54,7 @@ public:
     void setLogin(bool isLogin);
     void setSelected(bool selected=true);
     bool selected();
-    QPixmap DrawRound(QPixmap &src, int radius);
+    void setResize();
     QPixmap PixmapToRound(const QPixmap &src, int radius);
 
 protected:
@@ -65,6 +65,7 @@ protected:
 private:
     void onClicked();
     void initUI();
+
 
 signals:
     void clicked(int row);
