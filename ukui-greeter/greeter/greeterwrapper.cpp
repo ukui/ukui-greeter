@@ -82,12 +82,10 @@ void GreeterWrapper::setrootWindow()
 
      QDesktopWidget desktop;
      setRootWindowBackground(desktop.width(),desktop.height(),path);
-
 }
 
 void GreeterWrapper::startSession()
 { 
-    exit(0);
     if(isAuthenticated())
         Q_EMIT authenticationSucess();
     //设置language

@@ -24,6 +24,8 @@
 #include <QStandardPaths>
 #include <QLightDM/UsersModel>
 
+#include "xeventmonitor.h"
+
 UsersView::UsersView(QWidget *parent) :
     QWidget(parent),
     usersModel(nullptr)
@@ -47,6 +49,10 @@ void UsersView::initUI()
     usersList->setSelectionMode(QListWidget::NoSelection);
     usersList->setFocusPolicy(Qt::NoFocus);
     usersList->setContentsMargins(10, 0, 10, 0);
+    usersList->installEventFilter(this);
+
+    connect(XEventMonitor::instance(), SIGNAL(keyRelease(const QString &)),
+            this, SLOT(onGlobalKeyRelease(const QString &)));
 
 }
 
@@ -134,31 +140,49 @@ void UsersView::moveUserEntry(int from,int to)
     usersList->setItemWidget(item, entry);
 }
 
-void UsersView::keyReleaseEvent(QKeyEvent *event)
+void UsersView::onGlobalKeyRelease(const QString &key)
 {
-    switch(event->key()) {
-    case Qt::Key_Down:
-    case Qt::Key_Right:
-        if(usersList->currentRow() > 0)
-            setCurrentRow(usersList->currentRow() - 1);
-        else if(usersList->currentRow() == 0 && usersList->count()==2)
-            setCurrentRow(1);
-        break;
-    case Qt::Key_Up:
-    case Qt::Key_Left:
+    qDebug()<<"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk key = "<<key;
+    if(key.compare("left",Qt::CaseInsensitive)==0)
+    {
         if(usersList->currentRow() < usersList->count()-1)
             setCurrentRow(usersList->currentRow() + 1);
         else if(usersList->currentRow() == 0 && usersList->count()==2)
             setCurrentRow(0);
-        break;
-    case Qt::Key_Return:
-        onUserClicked(usersList->currentRow());
-        break;
-    default:
-        QWidget::keyReleaseEvent(event);
     }
-
+    else if (key.compare("right",Qt::CaseInsensitive)==0) {
+        if(usersList->currentRow() > 0)
+            setCurrentRow(usersList->currentRow() - 1);
+        else if(usersList->currentRow() == 0 && usersList->count()==2)
+            setCurrentRow(1);
+    }
 }
+
+//void UsersView::keyReleaseEvent(QKeyEvent *event)
+//{
+//    switch(event->key()) {
+//    case Qt::Key_Down:
+//    case Qt::Key_Right:
+//        if(usersList->currentRow() > 0)
+//            setCurrentRow(usersList->currentRow() - 1);
+//        else if(usersList->currentRow() == 0 && usersList->count()==2)
+//            setCurrentRow(1);
+//        break;
+//    case Qt::Key_Up:
+//    case Qt::Key_Left:
+//        if(usersList->currentRow() < usersList->count()-1)
+//            setCurrentRow(usersList->currentRow() + 1);
+//        else if(usersList->currentRow() == 0 && usersList->count()==2)
+//            setCurrentRow(0);
+//        break;
+//    case Qt::Key_Return:
+//        onUserClicked(usersList->currentRow());
+//        break;
+//    default:
+//        QWidget::keyReleaseEvent(event);
+//    }
+
+//}
 
 void UsersView::showEvent(QShowEvent *event)
 {
@@ -313,5 +337,6 @@ void UsersView::setCurrentRow(int row)
 
     QModelIndex index = usersModel->index(x, 0);
     Q_EMIT currentUserChanged(index);
+    Q_EMIT userSelected(index);
 }
 

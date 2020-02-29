@@ -45,7 +45,7 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
+//    void keyReleaseEvent(QKeyEvent *event);
     void showEvent(QShowEvent *event);
 
 private slots:
@@ -55,6 +55,7 @@ private slots:
     void onUserRemoved(const QModelIndex&, int, int );
     void onUserChanged(const QModelIndex&, const QModelIndex&);
     void setCurrentRow(int row);
+    void onGlobalKeyRelease(const QString &key);
 
 signals:
     void userSelected(const QModelIndex&);

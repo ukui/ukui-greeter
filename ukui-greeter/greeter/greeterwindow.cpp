@@ -1,4 +1,4 @@
-/* greeterwindow.cpp
+﻿/* greeterwindow.cpp
  * Copyright (C) 2018 Tianjin KYLIN Information Technology Co., Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -168,8 +168,6 @@ void GreeterWindow::initUI()
 
     //登录窗口
     m_loginWnd = new LoginWindow(m_greeter, this);
-    m_loginWnd->hide();
-    connect(m_loginWnd, SIGNAL(back()), this, SLOT(onBacktoUsers()));
     connect(m_loginWnd, &LoginWindow::userChangedByManual,
             this, &GreeterWindow::onUserChangedByManual);
     connect(m_userWnd, &UsersView::userNotFound, m_loginWnd, &LoginWindow::setUserNotInView);
@@ -231,12 +229,12 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     if(m_userWnd){
         m_userWnd->resize(USERSVIEW_WIDTH, USERSVIEW_HEIGHT);
         QRect userRect((width()-m_userWnd->width())/2,
-                       (height()-m_userWnd->height())/2,
+                       304.9,
                        m_userWnd->width(), m_userWnd->height());
         m_userWnd->setGeometry(userRect);
     }
     if(m_loginWnd){
-        QRect loginRect((width()-m_loginWnd->width())/2, 0,
+        QRect loginRect((width()-m_loginWnd->width())/2, 585,
                         m_loginWnd->width(), height());
         m_loginWnd->setGeometry(loginRect);
     }
@@ -307,10 +305,6 @@ void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
     case Qt::Key_Escape:
         if(m_powerWnd && !m_powerWnd->isHidden())
             m_powerWnd->close();
-        else if(m_loginWnd && !m_loginWnd->isHidden()){
-            m_loginWnd->reset();
-            switchWnd(0);
-        }
     break;
     }
     QWidget::keyReleaseEvent(e);
@@ -331,7 +325,6 @@ void GreeterWindow::onUserSelected(const QModelIndex &index)
     qDebug() << index.data(QLightDM::UsersModel::NameRole).toString() << "selected";
     m_loginWnd->setUserIndex(index);
 
-    switchWnd(1);
 }
 
 void GreeterWindow::updateLanguage(QString userName)
@@ -403,40 +396,6 @@ void GreeterWindow::onUserChangedByManual(const QString &userName)
 
     updateLanguage(userName);
     updateSession(userName);
-}
-
-void GreeterWindow::onBacktoUsers()
-{
-    switchWnd(0);
-}
-
-void GreeterWindow::onBacktoLogin()
-{
-    switchWnd(1);
-}
-
-/**
- * @brief GreeterWindow::switchWnd
- * @param index （0：用户列表窗口；1：登录窗口；2：session选择窗口）
- * 切换窗口
- */
-void GreeterWindow::switchWnd(int index)
-{
-    if(m_userWnd)
-        m_userWnd->hide();
-    if(m_loginWnd)
-        m_loginWnd->hide();
-
-    switch (index) {
-    case 0:
-        m_userWnd->show();
-        break;
-    case 1:
-        m_loginWnd->show();
-        break;
-    default:
-        break;
-    }
 }
 
 /**

@@ -49,8 +49,6 @@ protected:
 private slots:
     void onUserSelected(const QModelIndex &);
     void onCurrentUserChanged(const QModelIndex&);
-    void onBacktoUsers();
-    void onBacktoLogin();
     void timedAutologin();
     void showPowerWnd();
     void showVirtualKeyboard();
