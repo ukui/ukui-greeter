@@ -21,15 +21,15 @@
 
 #include <QWidget>
 #include <QSharedPointer>
+#include <QMenu>
 #include <QAbstractItemModel>
-#include "fakedialog.h"
 
 class QLabel;
 class QPushButton;
 class IconLabel;
 class QListWidget;
 class QListWidgetItem;
-class SessionWindow : public FakeDialog
+class SessionWindow : public QMenu
 {
     Q_OBJECT
 public:
@@ -38,14 +38,12 @@ public:
     void setCurrentSession(const QString &session);
 
 protected:
-    void showEvent(QShowEvent *event);
-    void closeEvent(QCloseEvent *event);
 
 signals:
     void sessionChanged(const QString &session);
 
 private Q_SLOTS:
-    void onListCurrentItemDoubleClicked(QListWidgetItem *item);
+    void onSessionMenuTrigged(QAction *action);
 
 private:
     void initUI();

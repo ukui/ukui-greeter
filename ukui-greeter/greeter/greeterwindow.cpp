@@ -538,8 +538,8 @@ void GreeterWindow::showSessionWnd()
 
     m_sessionHasChanged = true;
 
-    m_sessionWnd->setCurrentSession(m_greeter->session());
     m_sessionWnd->show();
+    m_sessionWnd->move(m_languageLB->x(),m_languageLB->y()-m_sessionWnd->height());
 }
 
 void GreeterWindow::onSessionChanged(const QString &session)
