@@ -22,6 +22,8 @@
 #include <QPushButton>
 #include <QKeyEvent>
 #include <QStandardPaths>
+#include <QTime>
+#include <QCoreApplication>
 #include <QLightDM/UsersModel>
 
 #include "xeventmonitor.h"
@@ -182,7 +184,6 @@ void UsersView::onGlobalKeyRelease(const QString &key)
 
 void UsersView::showEvent(QShowEvent *event)
 {
-    this->setFocus();
 
     QWidget::showEvent(event);
 }
@@ -209,6 +210,13 @@ void UsersView::insertUserEntry(int row)
 
 void UsersView::onUserPressed()
 {
+    QTime time;
+    time.start();
+    while(time.elapsed() < 200)
+    {
+        QCoreApplication::processEvents();
+    }
+
     QString objName = sender()->objectName();
     for(int i = 0; i < usersList->count(); i++){
         QWidget *entry = usersList->itemWidget(usersList->item(i));
@@ -221,6 +229,14 @@ void UsersView::onUserPressed()
 
 void UsersView::onUserClicked(int row)
 {
+    QTime time;
+    time.start();
+    while(time.elapsed() < 200)
+    {
+        QCoreApplication::processEvents();
+    }
+
+
     UserEntry *entry = static_cast<UserEntry*>(usersList->itemWidget(usersList->currentItem()));
     int x = 0;
     uid_t uid =  entry->userIndex().data(QLightDM::UsersModel::UidRole).toUInt();
@@ -232,6 +248,7 @@ void UsersView::onUserClicked(int row)
     }
 
     Q_EMIT userSelected(usersModel->index(x, 0));
+
 }
 
 void UsersView::onUserAdded(const QModelIndex &parent, int left, int right)
@@ -335,5 +352,6 @@ void UsersView::setCurrentRow(int row)
     QModelIndex index = usersModel->index(x, 0);
     Q_EMIT currentUserChanged(index);
     Q_EMIT userSelected(index);
+
 }
 

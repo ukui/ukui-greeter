@@ -147,7 +147,7 @@ QListWidget{
 /********************** 弹出对话框 **********************/
 
 #fakeDialog{
-    background: rgba(12,66,120);
+    background: rgba(12,66,120,0);
     border: none;
     border-radius: 10px;
 }
@@ -157,9 +157,10 @@ QListWidget{
     background-repeat:no-repeat
 }
 #closeButton::hover{
-    border-radius: 11px;
+    border-radius: 4px;
     background: url(:/resource/dialog_close_highlight.png);
-    background-repeat:no-repeat
+    background-repeat:no-repeat;
+    font-size: 16px;
 }
 
 /********************** 认证界面 **********************/

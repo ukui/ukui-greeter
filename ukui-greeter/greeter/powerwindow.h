@@ -34,6 +34,12 @@ public:
 protected:
     bool eventFilter(QObject *, QEvent *);
     void mousePressEvent(QMouseEvent *event);
+    void showEvent(QShowEvent *event);
+    void closeEvent(QCloseEvent *event);
+
+Q_SIGNALS:
+    void windowVisibleChanged(bool visible);
+
 
 private:
     bool    m_hasOpenSessions;

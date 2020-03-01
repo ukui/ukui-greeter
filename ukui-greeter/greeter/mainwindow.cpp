@@ -40,7 +40,7 @@ QT_BEGIN_NAMESPACE
 extern void qt_blurImage(QPainter *p, QImage &blurImage, qreal radius, bool quality, bool alphaOnly, int transposed = 0);
 QT_END_NAMESPACE
 
-#define BLUR_RADIUS 300
+#define BLUR_RADIUS 100
 
 QPixmap blurPixmap(QPixmap pixmap)
 {

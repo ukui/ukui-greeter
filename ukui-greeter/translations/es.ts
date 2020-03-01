@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es">
+<TS version="2.1" language="es">
 <context>
     <name>BioAuthentication</name>
     <message>
@@ -81,6 +81,13 @@
     </message>
 </context>
 <context>
+    <name>FakeDialog</name>
+    <message>
+        <source>cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>GreeterWindow</name>
     <message>
         <source>CN</source>
@@ -109,13 +116,6 @@
     <name>KeyboardWidget</name>
     <message>
         <source>KeyboardWidget</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>LanguageWidget</name>
-    <message>
-        <source>Please select the language of session</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -174,7 +174,7 @@
     <name>MainWindow</name>
     <message>
         <source>MainWindow</source>
-        <translation type="obsolete">Ventana principal</translation>
+        <translation type="unfinished">Ventana principal</translation>
     </message>
 </context>
 <context>
@@ -216,18 +216,14 @@
     </message>
     <message>
         <source> (Default)</source>
-        <translation> (Defecto)</translation>
-    </message>
-    <message>
-        <source>Please select the desktop environment</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished"> (Defecto)</translation>
     </message>
 </context>
 <context>
     <name>UserEntry</name>
     <message>
         <source>logged in</source>
-        <translation>conectado</translation>
+        <translation type="vanished">conectado</translation>
     </message>
 </context>
 <context>

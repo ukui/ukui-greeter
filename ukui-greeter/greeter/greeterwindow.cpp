@@ -395,12 +395,19 @@ void GreeterWindow::onUserChangedByManual(const QString &userName)
     updateSession(userName);
 }
 
+void GreeterWindow::setWindowVisible(bool visible)
+{
+    m_loginWnd->setVisible(!visible);
+    m_userWnd->setVisible(!visible);
+}
 /**
  * @brief GreeterWindow::showPowerWnd
  * 显示电源对话框
  */
 void GreeterWindow::showPowerWnd()
 {
+    m_userWnd->hide();
+    m_loginWnd->hide();
     //如果已经打开了电源对话框则关闭
     if(m_powerWnd && !m_powerWnd->isHidden()){
         m_powerWnd->close();
@@ -414,6 +421,9 @@ void GreeterWindow::showPowerWnd()
             break;
     }
     m_powerWnd = new PowerWindow(hasOpenSessions, this);
+    connect(m_powerWnd, &PowerWindow::windowVisibleChanged,
+                this, &GreeterWindow::setWindowVisible);
+
     m_powerWnd->setObjectName(QStringLiteral("powerWnd"));
     m_powerWnd->show();
 }

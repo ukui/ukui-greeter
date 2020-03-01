@@ -48,7 +48,7 @@ void PowerWindow::initUI()
     if(m_power->canSuspend())
         cnt++;
 
-    setDialogSize(455 + 188 * cnt, 290);
+    setDialogSize(455 + 188 * cnt, 400);
     //根据提示内容的长度确定窗口的高度
     QFont font("ubuntu", 12);
     QString text = tr("Goodbye. Would you like to...");
@@ -61,7 +61,7 @@ void PowerWindow::initUI()
         int textWide = fm.width(text2);
         lineNum = qCeil(textWide * 1.0 / centerWidget()->width()) + 1 + lineNum;
     }
-    setDialogSize(455 + 188 * cnt, 280 + 20*lineNum);
+    setDialogSize(455 + 188 * cnt, 400 + 20*lineNum);
 
     QVBoxLayout *vbox = new QVBoxLayout(centerWidget());
     vbox->setContentsMargins(20, 10, 20, 2);
@@ -90,6 +90,7 @@ void PowerWindow::initUI()
         m_suspendLabel = new QLabel(centerWidget());
         m_suspendLabel->setAlignment(Qt::AlignCenter);
         m_suspendLabel->setFixedSize(168, 30);
+        m_suspendLabel->setText(tr("suspend"));
 
         vboxSuspend->addWidget(m_suspend);
         vboxSuspend->addWidget(m_suspendLabel);
@@ -107,6 +108,7 @@ void PowerWindow::initUI()
         m_hibernateLabel = new QLabel(centerWidget());
         m_hibernateLabel->setAlignment(Qt::AlignCenter);
         m_hibernateLabel->setFixedSize(168, 30);
+        m_hibernateLabel->setText(tr("hibernate"));
 
         vboxHibernate->addWidget(m_hibernate);
         vboxHibernate->addWidget(m_hibernateLabel);
@@ -124,6 +126,7 @@ void PowerWindow::initUI()
     m_restartLabel = new QLabel(centerWidget());
     m_restartLabel->setAlignment(Qt::AlignCenter);
     m_restartLabel->setFixedSize(168, 30);
+    m_restartLabel->setText(tr("restart"));
 
     vboxStart->addWidget(m_restart);
     vboxStart->addWidget(m_restartLabel);
@@ -138,6 +141,7 @@ void PowerWindow::initUI()
     m_shutdownLabel = new QLabel(centerWidget());
     m_shutdownLabel->setAlignment(Qt::AlignCenter);
     m_shutdownLabel->setFixedSize(168, 30);
+    m_shutdownLabel->setText(tr("shutdown"));
 
     vboxShutdown->addWidget(m_shutdown);
     vboxShutdown->addWidget(m_shutdownLabel);
@@ -152,11 +156,7 @@ void PowerWindow::initUI()
 bool PowerWindow::eventFilter(QObject *obj, QEvent *event)
 {
     if(obj == m_suspend) {
-        if(event->type() == QEvent::Enter) {
-            m_suspendLabel->setText(tr("suspend"));
-        } else if(event->type() == QEvent::Leave) {
-            m_suspendLabel->setText("");
-        } else if(event->type() == QEvent::MouseButtonRelease){
+        if(event->type() == QEvent::MouseButtonRelease){
             qDebug() << "suspend";
             try{
                 m_power->suspend();
@@ -166,11 +166,7 @@ bool PowerWindow::eventFilter(QObject *obj, QEvent *event)
             }
         }
     }else if(obj == m_hibernate) {
-        if(event->type() == QEvent::Enter) {
-            m_hibernateLabel->setText(tr("hibernate"));
-        } else if(event->type() == QEvent::Leave) {
-            m_hibernateLabel->setText("");
-        } else if(event->type() == QEvent::MouseButtonRelease){
+        if(event->type() == QEvent::MouseButtonRelease){
             qDebug() << "hibernate";
             try{
                 m_power->hibernate();
@@ -180,11 +176,7 @@ bool PowerWindow::eventFilter(QObject *obj, QEvent *event)
             }
         }
     } else if(obj == m_restart) {
-        if(event->type() == QEvent::Enter) {
-            m_restartLabel->setText(tr("restart"));
-        }else if(event->type() == QEvent::Leave) {
-            m_restartLabel->setText("");
-        }else if(event->type() == QEvent::MouseButtonRelease){
+        if(event->type() == QEvent::MouseButtonRelease){
             qDebug() << "restart";
             try{
                 m_power->restart();
@@ -194,11 +186,7 @@ bool PowerWindow::eventFilter(QObject *obj, QEvent *event)
             }
         }
     } else if(obj == m_shutdown) {
-        if(event->type() == QEvent::Enter) {
-            m_shutdownLabel->setText(tr("shutdown"));
-        }else if(event->type() == QEvent::Leave) {
-            m_shutdownLabel->setText("");
-        }else if(event->type() == QEvent::MouseButtonRelease){
+        if(event->type() == QEvent::MouseButtonRelease){
             try{
                 qDebug() << "shutdown";
                 m_power->shutdown();
@@ -215,4 +203,14 @@ void PowerWindow::mousePressEvent(QMouseEvent *event)
 {
     if(!dialog()->geometry().contains(event->pos()))
         close();
+}
+
+void PowerWindow::showEvent(QShowEvent *event)
+{
+    emit windowVisibleChanged(true);
+}
+
+void PowerWindow::closeEvent(QCloseEvent *event)
+{
+    emit windowVisibleChanged(false);
 }

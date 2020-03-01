@@ -33,7 +33,6 @@ public:
     QWidget *dialog();
 
 protected:
-    void paintEvent(QPaintEvent *e);
     void resizeEvent(QResizeEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 
