@@ -82,7 +82,6 @@ void GreeterWrapper::setrootWindow()
 
      QDesktopWidget desktop;
      setRootWindowBackground(desktop.width(),desktop.height(),path);
-
 }
 
 void GreeterWrapper::startSession()
@@ -93,7 +92,7 @@ void GreeterWrapper::startSession()
     if(!m_language.isEmpty()) {
         setLanguage(m_language);
     }
-    qDebug() << "start session: " << m_session;
+
     //启动session
     setrootWindow();
 

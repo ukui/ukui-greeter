@@ -20,13 +20,14 @@
 #define LANGUAGEWIDGET_H
 
 #include <QWidget>
+#include <QMenu>
 #include "language.h"
 #include "fakedialog.h"
 
 class QListWidget;
 class QListWidgetItem;
 class QLabel;
-class LanguageWidget : public FakeDialog
+class LanguageWidget : public QMenu
 {
     Q_OBJECT
 public:
@@ -34,22 +35,21 @@ public:
     void setCurrentLanguage(const QString &language);
 
 protected:
-    void showEvent(QShowEvent *event);
-    void closeEvent(QCloseEvent *event);
 
 private:
-    void initUI();
+    void initUserMenu();
 
 private Q_SLOTS:
-    void onListCurrentItemChanged(QListWidgetItem *item);
+    void onLanguageAdded(QString lang);
+    void onLanguageDeleted(QString lang);
+    void onLanguageMenuTrigged(QAction *action);
 
 Q_SIGNALS:
     void languageChanged(const Language &language);
 
 private:
     LanguagesVector &languagesVector;
-    QListWidget     *lwLanguages;
-    QLabel          *lblPrompt;
+    QMenu           *menu;
 };
 
 #endif // LANGUAGEWIDGET_H

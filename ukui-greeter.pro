@@ -1,4 +1,3 @@
 TEMPLATE = subdirs
 SUBDIRS += \
-        ukui-greeter \
-        GetDefaultDevice
+        ukui-greeter 

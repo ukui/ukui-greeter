@@ -79,33 +79,33 @@ void LoginWindow::initUI()
 {
     setFixedWidth(500);
 
-    m_userWidget = new QWidget(this);
-    m_userWidget->setObjectName(QStringLiteral("userWidget"));
+//    m_userWidget = new QWidget(this);
+//    m_userWidget->setObjectName(QStringLiteral("userWidget"));
 
     /* 头像 */
-    m_faceLabel = new QLabel(m_userWidget);
-    m_faceLabel->setObjectName(QStringLiteral("faceLabel"));
-    m_faceLabel->setFocusPolicy(Qt::NoFocus);
+//    m_faceLabel = new QLabel(m_userWidget);
+//    m_faceLabel->setObjectName(QStringLiteral("faceLabel"));
+//    m_faceLabel->setFocusPolicy(Qt::NoFocus);
 
     /* 返回按钮 */
-    m_backButton = new QPushButton(m_userWidget);
-    m_backButton->setObjectName(QStringLiteral("backButton"));
-    m_backButton->setFocusPolicy(Qt::NoFocus);
-    m_backButton->show();
-    connect(m_backButton, &QPushButton::clicked,
-            this, &LoginWindow::onBackButtonClicked);
+//    m_backButton = new QPushButton(m_userWidget);
+//    m_backButton->setObjectName(QStringLiteral("backButton"));
+//    m_backButton->setFocusPolicy(Qt::NoFocus);
+//    m_backButton->show();
+//    connect(m_backButton, &QPushButton::clicked,
+//            this, &LoginWindow::onBackButtonClicked);
 
-    /* 用户名 */
-    m_nameLabel = new QLabel(m_userWidget);
-    m_nameLabel->setObjectName(QStringLiteral("login_nameLabel"));
-    m_nameLabel->setFocusPolicy(Qt::NoFocus);
-    m_nameLabel->setAlignment(Qt::AlignCenter);
+//    /* 用户名 */
+//    m_nameLabel = new QLabel(m_userWidget);
+//    m_nameLabel->setObjectName(QStringLiteral("login_nameLabel"));
+//    m_nameLabel->setFocusPolicy(Qt::NoFocus);
+//    m_nameLabel->setAlignment(Qt::AlignCenter);
 
-    /* 是否已登录 */
-    m_isLoginLabel = new QLabel(m_userWidget);
-    m_isLoginLabel->setObjectName(QStringLiteral("isLoginLabel"));
-    m_isLoginLabel->setFocusPolicy(Qt::NoFocus);
-    m_isLoginLabel->setAlignment(Qt::AlignCenter);
+//    /* 是否已登录 */
+//    m_isLoginLabel = new QLabel(m_userWidget);
+//    m_isLoginLabel->setObjectName(QStringLiteral("isLoginLabel"));
+//    m_isLoginLabel->setFocusPolicy(Qt::NoFocus);
+//    m_isLoginLabel->setAlignment(Qt::AlignCenter);
 
     /* 密码框所在窗口 */
     m_passwdWidget = new QWidget(this);
@@ -182,21 +182,21 @@ void LoginWindow::keyReleaseEvent(QKeyEvent *event)
 void LoginWindow::setChildrenGeometry()
 {
     // 用户信息显示位置
-    m_userWidget->setGeometry(0, (height() - 240 - 150) / 2,
-                              width(), 240);
+//    m_userWidget->setGeometry(0, (height() - 240 - 150) / 2,
+//                              width(), 240);
 
-    m_faceLabel->setGeometry((width() - 130) / 2, 0, 130, 130);
-    m_backButton->setGeometry(m_faceLabel->geometry().left() - 30 - 32,
-                              m_faceLabel->geometry().top() + (m_faceLabel->height() - 32) / 2,
-                              32, 32);
-    m_nameLabel->setGeometry(0, m_faceLabel->geometry().bottom() + 25,
-                             width(), 30);
-    m_isLoginLabel->setGeometry(0, m_nameLabel->geometry().bottom() + 10,
-                                width(), 15);
+//    m_faceLabel->setGeometry((width() - 130) / 2, 0, 130, 130);
+//    m_backButton->setGeometry(m_faceLabel->geometry().left() - 30 - 32,
+//                              m_faceLabel->geometry().top() + (m_faceLabel->height() - 32) / 2,
+//                              32, 32);
+//    m_nameLabel->setGeometry(0, m_faceLabel->geometry().bottom() + 25,
+//                             width(), 30);
+//    m_isLoginLabel->setGeometry(0, m_nameLabel->geometry().bottom() + 10,
+//                                width(), 15);
 
     // 密码框和提示信息显示位置
 
-    m_passwdWidget->setGeometry(0, m_userWidget->geometry().bottom(), width(), 150);
+    m_passwdWidget->setGeometry(0, 0, width(), 150);
     m_passwordEdit->setGeometry((m_passwdWidget->width() - 300)/2, 0, 300, 34);
     m_messageLabel->setGeometry((m_passwdWidget->width() - 600)/2,
                                 m_passwordEdit->geometry().bottom() + 25,
@@ -214,8 +214,8 @@ void LoginWindow::setChildrenGeometry()
  */
 void LoginWindow::reset()
 {
-    m_nameLabel->clear();
-    m_isLoginLabel->clear();
+//    m_nameLabel->clear();
+//    m_isLoginLabel->clear();
     m_passwordEdit->clear();
     m_passwordEdit->setType(QLineEdit::Password);
     m_messageButton->hide();
@@ -334,6 +334,7 @@ QString LoginWindow::getPassword()
 
 bool LoginWindow::setUserIndex(const QModelIndex& index)
 {
+    qDebug()<<"11111111111111111111111111111111111111";
     if(!index.isValid()){
         return false;
     }
@@ -343,15 +344,15 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
     //设置用户名
     QString name = index.data(QLightDM::UsersModel::RealNameRole).toString();
     m_name = index.data(QLightDM::UsersModel::NameRole).toString();
-    setUserName(name.isEmpty() ? m_name : name);
+   // setUserName(name.isEmpty() ? m_name : name);
 
     //设置头像
-    QString facePath = index.data(QLightDM::UsersModel::ImagePathRole).toString();
-    setFace(facePath);
+//    QString facePath = index.data(QLightDM::UsersModel::ImagePathRole).toString();
+//    setFace(facePath);
 
     //显示是否已经登录
-    bool isLoggedIn = index.data(QLightDM::UsersModel::LoggedInRole).toBool();
-    setLoggedIn(isLoggedIn);
+//    bool isLoggedIn = index.data(QLightDM::UsersModel::LoggedInRole).toBool();
+//    setLoggedIn(isLoggedIn);
 
     //设置生物识别设备窗口的uid
     m_uid = index.data(QLightDM::UsersModel::UidRole).toInt();
@@ -407,21 +408,17 @@ void LoginWindow::startAuthentication()
 void LoginWindow::startWaiting()
 {
     m_passwordEdit->startWaiting();   //等待认证结果期间不能再输入密码
-    m_backButton->setEnabled(false);
 }
 
 void LoginWindow::stopWaiting()
 {
     m_passwordEdit->stopWaiting();
-    m_backButton->setEnabled(true);
 }
-
-
 
 void LoginWindow::onLogin(const QString &str)
 {
     clearMessage();
-
+    qDebug()<<m_name;
     if(m_name == "*guest")
     {
         m_greeter->authenticateAsGuest();
@@ -930,7 +927,7 @@ void LoginWindow::onRetryButtonClicked()
 
 void LoginWindow::showPasswordAuthWidget()
 { 
-    m_userWidget->setVisible(true);
+    //m_userWidget->setVisible(true);
     m_passwdWidget->setVisible(true);
 
     if(m_biometricAuthWidget)

@@ -13,6 +13,20 @@ QPushButton::pressed {
     background-color: rgba(0, 0, 0, 30%);
 }
 
+/***************** 弹出菜单 QMenu ****************/
+QMenu{
+    background-color: rgb(255,255,255,20%);
+    color: white;
+    font-size: 16px;
+    border-radius: 4px;
+}
+QMenu::item:selected {
+    background-color:rgb(235,110,36);
+}
+QMenu::item:pressed {
+    background-color: rgb(220,80,6);
+}
+
 /***************** 文本Label ********************/
 
 QLabel{
@@ -164,15 +178,14 @@ QListWidget{
 /* 头像 */
 #faceLabel{
      border: 2px solid white;
-     border-radius: 64;
+     border-radius: 75;
 }
 #login_nameLabel{
     font-size: 28px;
-/*    background: rgba(255, 255, 255, 30%);*/
+/*  background: rgba(255, 255, 255, 30%);*/
 }
 #isLoginLabel{
-    font-size: 12px;
-/*    background: rgba(255, 255, 0, 30%);*/
+
 }
 
 /* 密码输入框 */

@@ -33,42 +33,14 @@
 #define DISPLAY_ROWS 3  //只显示3行，可以通过上下键移动焦点
 #define LISTWIDGET_HEIGHT (DISPLAY_ROWS * (LISTWIDGET_SAPCE * 2 + ITEM_HEIGHT))
 
-class IconLabel : public QWidget
-{
-public:
-    IconLabel(int width, int height, QWidget* parent = 0)
-        : QWidget(parent),
-          m_iconLabel(new QLabel(this)),
-          m_textLabel(new QLabel(this))
-    {
-        m_textLabel->setObjectName(QStringLiteral("sessionLabel"));
-        m_iconLabel->setGeometry(25, (height-ICON_SIZE)/2, ICON_SIZE, ICON_SIZE);
-        m_textLabel->setGeometry(height+5, 0, width-height-5, height);
-    }
-
-    void setIcon(const QString& icon)
-    {
-        m_iconLabel->setPixmap(scaledPixmap(ICON_SIZE, ICON_SIZE, icon));
-    }
-
-    void setText(const QString& text)
-    {
-        m_textLabel->setText(text);
-    }
-
-private:
-    QLabel  *m_iconLabel;
-    QLabel  *m_textLabel;
-};
-
-
-
 SessionWindow::SessionWindow(QAbstractItemModel *model, QWidget *parent)
-    : FakeDialog(parent),
+    : QMenu(parent),
       m_sessionsModel(model)
 {
     initUI();
     setSessionModel(model);
+    connect(this, &QMenu::triggered,
+                this, &SessionWindow::onSessionMenuTrigged);
 }
 
 void SessionWindow::initUI()
@@ -76,27 +48,6 @@ void SessionWindow::initUI()
     if (objectName().isEmpty())
         setObjectName(QStringLiteral("SessionWnd"));
 
-    setDialogSize(600, 400);
-
-    m_prompt = new QLabel(centerWidget());
-    m_prompt->setObjectName(QStringLiteral("lblSessionPrompt"));
-    m_prompt->setGeometry(0, 10, centerWidget()->width(), 40);
-    m_prompt->setAlignment(Qt::AlignCenter);
-    m_prompt->setText(tr("Please select the desktop environment"));
-
-    m_sessionsList = new QListWidget(centerWidget());
-    m_sessionsList->setObjectName(QStringLiteral("sessionsList"));
-    m_sessionsList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_sessionsList->setSpacing(LISTWIDGET_SAPCE);
-    m_sessionsList->setGeometry(m_prompt->x() + 10, m_prompt->y() + m_prompt->height() + 20,
-                                centerWidget()->width() - 20, centerWidget()->height() - m_prompt->height() - 40);
-    connect(m_sessionsList, &QListWidget::itemDoubleClicked,
-            this, &SessionWindow::onListCurrentItemDoubleClicked);
-}
-
-void SessionWindow::onListCurrentItemDoubleClicked(QListWidgetItem */*item*/)
-{
-    close();
 }
 
 void SessionWindow::setSessionModel(QAbstractItemModel *model)
@@ -107,10 +58,6 @@ void SessionWindow::setSessionModel(QAbstractItemModel *model)
     m_sessionsModel = model;
 
     addSessionLabels();
-
-#ifdef TEST
-    testAddSessionLabels();
-#endif
 }
 
 void SessionWindow::addSessionLabels()
@@ -118,47 +65,19 @@ void SessionWindow::addSessionLabels()
     for(int i = 0; i < m_sessionsModel->rowCount(); i++) {
         QString sessionName = m_sessionsModel->index(i, 0).data().toString();
         QString sessionKey = m_sessionsModel->index(i, 0).data(Qt::UserRole).toString();
-        IconLabel *sessionLabel = new IconLabel(ITEM_WIDTH, ITEM_HEIGHT, this);
-        sessionLabel->setIcon(getSessionIcon(sessionKey));
-        if(sessionKey == m_defaultSession)
-            sessionLabel->setText(sessionName + tr(" (Default)"));
-        else
-            sessionLabel->setText(sessionName);
-
-        QListWidgetItem *newItem = new QListWidgetItem();
-        newItem->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
-        m_sessionsList->insertItem(i,newItem);
-        m_sessionsList->setItemWidget(newItem, sessionLabel);
+        QAction *action = new QAction(QIcon(getSessionIcon(sessionKey)), sessionName, this);
+        action->setData(sessionKey);
+        addAction(action);
+        adjustSize();
     }
 }
 
-
-void SessionWindow::showEvent(QShowEvent *event)
+void SessionWindow::onSessionMenuTrigged(QAction *action)
 {
-    FakeDialog::showEvent(event);
-    m_sessionsList->setFocus();
+    QString sessionkey  = action->data().toString();
+    emit sessionChanged(sessionkey);
 }
 
-void SessionWindow::closeEvent(QCloseEvent *event)
-{
-    int currentRow = m_sessionsList->currentRow();
-    //传递给loginWindow的是session的唯一标识
-    emit sessionChanged(m_sessionsModel->index(currentRow, 0).data(Qt::UserRole).toString());
-
-    FakeDialog::closeEvent(event);
-}
-
-
-void SessionWindow::setCurrentSession(const QString &session)
-{
-    for(int i = 0; i < m_sessionsModel->rowCount(); i++){
-        QString sessionKey = m_sessionsModel->index(i, 0).data(Qt::UserRole).toString();
-        if(sessionKey == session){
-            m_sessionsList->setCurrentRow(i);
-            return;
-        }
-    }
-}
 
 QString SessionWindow::getSessionIcon(const QString &session)
 {
@@ -171,21 +90,3 @@ QString SessionWindow::getSessionIcon(const QString &session)
     return sessionIcon;
 }
 
-/**
- * @brief SessionWindow::testAddSessionLabels
- * 测试有多个session的情况
- */
-void SessionWindow::testAddSessionLabels()
-{
-    QStringList sessionList{"MATE", "Ubuntu", "Xfce", "LUbuntu", "XUbuntu", "GNOME", "KDE", "Pantheon"};
-    for(int i = 0; i < sessionList.size(); i++) {
-        QString sessionName = sessionList[i];
-        IconLabel *sessionLabel = new IconLabel(ITEM_WIDTH, ITEM_HEIGHT, this);
-        sessionLabel->setIcon(getSessionIcon(sessionName));
-        sessionLabel->setText(sessionName);
-        QListWidgetItem *newItem = new QListWidgetItem();
-        newItem->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
-        m_sessionsList->insertItem(i,newItem);
-        m_sessionsList->setItemWidget(newItem, sessionLabel);
-    }
-}

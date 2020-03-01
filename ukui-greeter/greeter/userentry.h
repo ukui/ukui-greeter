@@ -23,12 +23,19 @@
 #include <QLabel>
 #include <QPersistentModelIndex>
 
-#define SHADOW_WIDTH (scale > 0.5 ? 10 : 5)
-#define FACE_WIDDTH (130 * scale)
-#define BORDER_WIDTH FACE_WIDDTH + SHADOW_WIDTH * 2
-#define IMG_WIDTH (128 * scale)
-#define ENTRY_HEIGHT (FACE_WIDDTH + SHADOW_WIDTH * 2 + 45)
-#define ENTRY_WIDTH (130 * scale + SHADOW_WIDTH * 2)
+#define SHADOW_WIDTH (10)
+#define FACE_WIDTH (152 * scale)
+#define BORDER_WIDTH FACE_WIDTH + SHADOW_WIDTH * 2
+#define IMG_WIDTH (150 * scale)
+#define ENTRY_HEIGHT (FACE_WIDTH + SHADOW_WIDTH * 2 + 45)
+#define ENTRY_WIDTH (152 * scale + SHADOW_WIDTH * 2)
+
+#define CENTER_IMG_WIDTH (180 * scale)
+#define CENTER_FACE_WIDTH (182 * scale)
+#define CENTER_ENTRY_WIDTH (182 * scale + SHADOW_WIDTH * 2)
+#define CENTER_ENTRY_HEIGHT (CENTER_FACE_WIDTH + SHADOW_WIDTH * 2 + 45)
+#define CENTER_BORDER_WIDTH CENTER_FACE_WIDTH + SHADOW_WIDTH * 2
+
 
 extern float scale;
 
@@ -47,17 +54,18 @@ public:
     void setLogin(bool isLogin);
     void setSelected(bool selected=true);
     bool selected();
-    QPixmap DrawRound(QPixmap &src, int radius);
+    void setResize();
     QPixmap PixmapToRound(const QPixmap &src, int radius);
 
 protected:
-    void paintEvent(QPaintEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);
     void resizeEvent(QResizeEvent *);
+    void paintEvent(QPaintEvent *event);
 
 private:
     void onClicked();
     void initUI();
+
 
 signals:
     void clicked(int row);
