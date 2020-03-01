@@ -23,7 +23,7 @@
 #include <QLabel>
 #include <QPersistentModelIndex>
 
-#define SHADOW_WIDTH (scale > 0.5 ? 10 : 5)
+#define SHADOW_WIDTH (10)
 #define FACE_WIDTH (152 * scale)
 #define BORDER_WIDTH FACE_WIDTH + SHADOW_WIDTH * 2
 #define IMG_WIDTH (150 * scale)
@@ -58,9 +58,9 @@ public:
     QPixmap PixmapToRound(const QPixmap &src, int radius);
 
 protected:
-    void paintEvent(QPaintEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);
     void resizeEvent(QResizeEvent *);
+    void paintEvent(QPaintEvent *event);
 
 private:
     void onClicked();

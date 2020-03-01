@@ -43,18 +43,18 @@ void LanguageWidget::setCurrentLanguage(const QString &language)
 
 void LanguageWidget::initUI()
 {
-    setDialogSize(600, 400);
+    setDialogSize(600, 200);
 
-    lblPrompt = new QLabel(centerWidget());
-    lblPrompt->setObjectName("lblLanguagePrompt");
-    lblPrompt->setText(tr("Please select the language of session"));
-    lblPrompt->setGeometry(0, 10, centerWidget()->width(), 40);
-    lblPrompt->setAlignment(Qt::AlignCenter);
+//    lblPrompt = new QLabel(centerWidget());
+//    lblPrompt->setObjectName("lblLanguagePrompt");
+//    lblPrompt->setText(tr("Please select the language of session"));
+//    lblPrompt->setGeometry(0, 10, centerWidget()->width(), 40);
+//    lblPrompt->setAlignment(Qt::AlignCenter);
 
     lwLanguages = new QListWidget(centerWidget());
     lwLanguages->setObjectName("languageList");
-    lwLanguages->setGeometry(lblPrompt->x() + 10, lblPrompt->y() + lblPrompt->height() + 20,
-                             centerWidget()->width() - 20, centerWidget()->height() - lblPrompt->height() - 40);
+    lwLanguages->setGeometry(10, 20,
+                             centerWidget()->width() - 20, centerWidget()->height()- 40);
     lwLanguages->setSpacing(3);
 
     int i = 0;

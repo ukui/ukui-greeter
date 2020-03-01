@@ -22,7 +22,7 @@
 #include <QWidget>
 #include "userentry.h"
 
-#define ITEM_WIDTH (CENTER_ENTRY_WIDTH + 40 * scale)
+#define ITEM_WIDTH (CENTER_ENTRY_WIDTH + 31 * scale)
 #define ITEM_HEIGHT CENTER_ENTRY_HEIGHT
 #define USERSVIEW_WIDTH (ITEM_WIDTH * 5 + 2)
 #define USERSVIEW_HEIGHT ITEM_HEIGHT

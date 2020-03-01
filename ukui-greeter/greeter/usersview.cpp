@@ -93,19 +93,16 @@ void UsersView::resizeEvent(QResizeEvent *event)
 
     int num = usersList->count() <= 5 ? usersList->count() : 5;
     usersList->resize(ITEM_WIDTH * num + 2, ITEM_HEIGHT);
-    usersList->move((width()-usersList->width())/2 + 20,(height()-usersList->height())/2);
+    usersList->move((width()-usersList->width())/2,(height()-usersList->height())/2);
     for(int i = 0; i < usersList->count(); i++) {
         QListWidgetItem *item = usersList->item(i);
         item->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
-        item->setTextAlignment(Qt::AlignCenter);
         UserEntry *entry = static_cast<UserEntry*>(usersList->itemWidget(item));
-        if(usersList->currentRow()==i)
-            entry->setFixedSize(CENTER_ENTRY_WIDTH, CENTER_ENTRY_HEIGHT);
-        else
-            entry->setFixedSize(ENTRY_WIDTH, ENTRY_HEIGHT);
+        entry->setFixedSize(item->sizeHint());
+
     }
     if(usersList->count()==4||usersList->count()==2)
-        usersList->move((width()-usersList->width() + ITEM_WIDTH)/2 + 20, \
+        usersList->move((width()-usersList->width() + ITEM_WIDTH)/2, \
                         (height()-usersList->height())/2);
 
     QWidget::resizeEvent(event);
@@ -142,7 +139,6 @@ void UsersView::moveUserEntry(int from,int to)
 
 void UsersView::onGlobalKeyRelease(const QString &key)
 {
-    qDebug()<<"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk key = "<<key;
     if(key.compare("left",Qt::CaseInsensitive)==0)
     {
         if(usersList->currentRow() < usersList->count()-1)
@@ -202,6 +198,7 @@ void UsersView::insertUserEntry(int row)
     connect(entry, &UserEntry::clicked, this, &UsersView::onUserClicked);
     QListWidgetItem *item = new QListWidgetItem();
     item->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
+    item->setTextAlignment(Qt::AlignHCenter);
     usersList->insertItem(row, item);
     usersList->setItemWidget(item, entry);
 
