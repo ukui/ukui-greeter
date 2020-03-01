@@ -13,6 +13,20 @@ QPushButton::pressed {
     background-color: rgba(0, 0, 0, 30%);
 }
 
+/***************** 弹出菜单 QMenu ****************/
+QMenu{
+    background-color: rgb(255,255,255,20%);
+    color: white;
+    font-size: 16px;
+    border-radius: 4px;
+}
+QMenu::item:selected {
+    background-color:rgb(235,110,36);
+}
+QMenu::item:pressed {
+    background-color: rgb(220,80,6);
+}
+
 /***************** 文本Label ********************/
 
 QLabel{

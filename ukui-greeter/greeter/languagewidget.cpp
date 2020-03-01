@@ -19,84 +19,65 @@
 #include "languagewidget.h"
 #include <QListWidget>
 #include <QLabel>
+#include <QAction>
 #include <QDebug>
 
 LanguageWidget::LanguageWidget(QWidget *parent)
-    : FakeDialog(parent),
+    : QMenu (parent),
       languagesVector(getLanguages())
 {
-    initUI();
+    initUserMenu();
 }
 
 void LanguageWidget::setCurrentLanguage(const QString &language)
 {
-    for(int i = 0; i < lwLanguages->count(); i++)
+    for(auto action : this->actions())
     {
-        QListWidgetItem *item = lwLanguages->item(i);
-        if(item->data(Qt::UserRole).toString() == language)
-        {
-            lwLanguages->setCurrentItem(item);
-        }
+        if(action->text() == language)
+            this->setActiveAction(action);
     }
 }
 
 
-void LanguageWidget::initUI()
+void LanguageWidget::initUserMenu()
 {
-    setDialogSize(600, 200);
 
-//    lblPrompt = new QLabel(centerWidget());
-//    lblPrompt->setObjectName("lblLanguagePrompt");
-//    lblPrompt->setText(tr("Please select the language of session"));
-//    lblPrompt->setGeometry(0, 10, centerWidget()->width(), 40);
-//    lblPrompt->setAlignment(Qt::AlignCenter);
+    connect(this, &QMenu::triggered,
+                this, &LanguageWidget::onLanguageMenuTrigged);
 
-    lwLanguages = new QListWidget(centerWidget());
-    lwLanguages->setObjectName("languageList");
-    lwLanguages->setGeometry(10, 20,
-                             centerWidget()->width() - 20, centerWidget()->height()- 40);
-    lwLanguages->setSpacing(3);
-
-    int i = 0;
     for(Language &lang : languagesVector)
     {
         QString text = lang.name + (lang.territory.isEmpty() ? "" : ("-" + lang.territory));
-        QLabel *label = new QLabel(text, this);
-        label->setObjectName(QStringLiteral("languageLabel"));
-        QListWidgetItem *item = new QListWidgetItem(lwLanguages);
-        item->setData(Qt::UserRole, lang.code);
-        lwLanguages->insertItem(i++, item);
-        lwLanguages->setItemWidget(item, label);
+        QAction *action = new QAction (this);
+        action->setText(text);
+        action->setData(lang.code);
+        addAction(action);
     }
 
-    connect(lwLanguages, &QListWidget::itemDoubleClicked,
-            this, &LanguageWidget::onListCurrentItemChanged);
-}
-void LanguageWidget::showEvent(QShowEvent *event)
-{
-    FakeDialog::showEvent(event);
-  //  lwLanguages->setFocus();
 }
 
-void LanguageWidget::closeEvent(QCloseEvent *event)
+void LanguageWidget::onLanguageAdded(QString lang)
 {
-    QListWidgetItem *item = lwLanguages->currentItem();
-    if(item)
+
+
+}
+
+void LanguageWidget::onLanguageDeleted(QString lang)
+{
+    for(auto action : this->actions())
     {
-        QString languageCode = item->data(Qt::UserRole).toString();
-
-        auto iter = std::find_if(languagesVector.begin(), languagesVector.end(),
-                                 [&](const Language &language) {
-            return language.code == languageCode;
-        });
-
-        Q_EMIT languageChanged(*iter);
+        if(action->text() == lang)
+            this->removeAction(action);
     }
-
-    FakeDialog::closeEvent(event);
 }
 
-void LanguageWidget::onListCurrentItemChanged(QListWidgetItem */*item*/)
+void LanguageWidget::onLanguageMenuTrigged(QAction *action)
 {
-    close();
+    QString languageCode = action->data().toString();
+    auto iter = std::find_if(languagesVector.begin(), languagesVector.end(),
+                             [&](const Language &language) {
+        return language.code == languageCode;
+    });
+
+    Q_EMIT languageChanged(*iter);
 }

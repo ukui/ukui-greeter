@@ -139,14 +139,14 @@ void UsersView::moveUserEntry(int from,int to)
 
 void UsersView::onGlobalKeyRelease(const QString &key)
 {
-    if(key.compare("left",Qt::CaseInsensitive)==0)
+    if(key.compare("right",Qt::CaseInsensitive)==0)
     {
         if(usersList->currentRow() < usersList->count()-1)
             setCurrentRow(usersList->currentRow() + 1);
         else if(usersList->currentRow() == 0 && usersList->count()==2)
             setCurrentRow(0);
     }
-    else if (key.compare("right",Qt::CaseInsensitive)==0) {
+    else if (key.compare("left",Qt::CaseInsensitive)==0) {
         if(usersList->currentRow() > 0)
             setCurrentRow(usersList->currentRow() - 1);
         else if(usersList->currentRow() == 0 && usersList->count()==2)

@@ -159,7 +159,7 @@ void GreeterWindow::initUI()
     m_languageLB->setText(defaultLang.at(0).name);
     m_languageLB->adjustSize();
 
-    connect(m_languageLB, &QPushButton::clicked, this, &GreeterWindow::showLanguageWnd);  
+    connect(m_languageLB, &QPushButton::clicked, this, &GreeterWindow::showLanguageWnd);
 
     //用户列表
     m_userWnd = new UsersView(this);
@@ -241,10 +241,7 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
 
     if(m_languageWnd)
     {
-        QRect languageWndRect((rect().width()-m_languageWnd->width())/2,
-                              (height()-m_languageWnd->height())/2,
-                              m_languageWnd->width(), m_languageWnd->height());
-        m_languageWnd->setGeometry(languageWndRect);
+        m_languageWnd->move(m_languageLB->x(),m_languageLB->y()+m_languageWnd->height());
     }
 
     //电源按钮位置
@@ -471,6 +468,7 @@ void GreeterWindow::showLanguageWnd()
 
     m_languageWnd->show();
     m_languageWnd->setCurrentLanguage(m_greeter->lang());
+    m_languageWnd->move(m_languageLB->x(),m_languageLB->y()-m_languageWnd->height());
 }
 
 void GreeterWindow::setWindowPos(QWidget *widget, Qt::Alignment align)
@@ -495,6 +493,9 @@ void GreeterWindow::setWindowPos(QWidget *widget, Qt::Alignment align)
 
 void GreeterWindow::onLanguageChanged(const Language &language)
 {
+    if(language.code.isEmpty())
+        return ;
+
     if(m_greeter->lang() == language.code)
     {
         return;
@@ -509,16 +510,19 @@ void GreeterWindow::onLanguageChanged(const Language &language)
     int pixelWidth = fm.width(language.name);
     m_languageLB->setFixedWidth(pixelWidth + 4);
 
-    int x;
+    int x,y;
     if(m_sessionLB)
     {
         x = m_sessionLB->geometry().left();
+        y = m_sessionLB->y();
     }
     else
     {
         x = m_keyboardLB->geometry().left();
+        y = m_keyboardLB->y();
     }
-    m_languageLB->move(x - 20 - m_languageLB->width(), 20);
+
+    m_languageLB->move(x - 10 - m_languageLB->width() , y);
 
     if(m_userWnd && !m_userWnd->isHidden())
     {

@@ -52,11 +52,11 @@ private slots:
     void timedAutologin();
     void showPowerWnd();
     void showVirtualKeyboard();
-    void showLanguageWnd();
     void onLanguageChanged(const Language &language);
     void showSessionWnd();
     void onSessionChanged(const QString &session);
     void onUserChangedByManual(const QString &userName);
+    void showLanguageWnd();
 
 private:
     void switchWnd(int);
