@@ -210,13 +210,6 @@ void UsersView::insertUserEntry(int row)
 
 void UsersView::onUserPressed()
 {
-    QTime time;
-    time.start();
-    while(time.elapsed() < 200)
-    {
-        QCoreApplication::processEvents();
-    }
-
     QString objName = sender()->objectName();
     for(int i = 0; i < usersList->count(); i++){
         QWidget *entry = usersList->itemWidget(usersList->item(i));
@@ -229,14 +222,6 @@ void UsersView::onUserPressed()
 
 void UsersView::onUserClicked(int row)
 {
-    QTime time;
-    time.start();
-    while(time.elapsed() < 200)
-    {
-        QCoreApplication::processEvents();
-    }
-
-
     UserEntry *entry = static_cast<UserEntry*>(usersList->itemWidget(usersList->currentItem()));
     int x = 0;
     uid_t uid =  entry->userIndex().data(QLightDM::UsersModel::UidRole).toUInt();
