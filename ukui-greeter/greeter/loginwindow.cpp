@@ -130,7 +130,7 @@ void LoginWindow::initUI()
     m_messageButton->setObjectName(QStringLiteral("messageButton"));
     m_messageButton->hide();
 
-
+    setFocusProxy(m_passwordEdit);
 
     isloginauth = false;
 }

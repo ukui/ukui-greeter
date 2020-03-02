@@ -173,6 +173,7 @@ void GreeterWindow::initUI()
     connect(m_userWnd, &UsersView::userNotFound, m_loginWnd, &LoginWindow::setUserNotInView);
 
     m_userWnd->setModel(m_usersModel);
+    setFocusProxy(m_loginWnd);
 
     //显示lightdm传过来的被选中的用户且自动进入认证界面 -- SwitchToUser()
     QString selectedUser = m_greeter->selectUserHint();
@@ -468,17 +469,24 @@ void GreeterWindow::timedAutologin()
  */
 void GreeterWindow::showLanguageWnd()
 {
-    m_languageWnd = new LanguageWidget(this);
-    m_languageWnd->setObjectName("languageWnd");
+    if(!m_languageWnd){
+        m_languageWnd = new LanguageWidget(this);
+        m_languageWnd->setObjectName("languageWnd");
 
-    connect(m_languageWnd, &LanguageWidget::languageChanged,
+        connect(m_languageWnd, &LanguageWidget::languageChanged,
             this, &GreeterWindow::onLanguageChanged);
-
+    }
     m_languageHasChanged = true;
-
-    m_languageWnd->show();
-    m_languageWnd->setCurrentLanguage(m_greeter->lang());
-    m_languageWnd->move(m_languageLB->x(),m_languageLB->y()-m_languageWnd->height());
+    if(m_languageWnd->isVisible()){
+        m_languageWnd->hide();
+        setFocus();
+    }
+    else{
+        m_languageWnd->show();
+        m_languageWnd->setFocus();
+        m_languageWnd->setCurrentLanguage(m_greeter->lang());
+        m_languageWnd->move(m_languageLB->x(),m_languageLB->y()-m_languageWnd->height());
+    }
 }
 
 void GreeterWindow::setWindowPos(QWidget *widget, Qt::Alignment align)
@@ -542,14 +550,24 @@ void GreeterWindow::onLanguageChanged(const Language &language)
 
 void GreeterWindow::showSessionWnd()
 {
-    m_sessionWnd = new SessionWindow(m_sessionsModel, this);
-    connect(m_sessionWnd, &SessionWindow::sessionChanged,
-            this, &GreeterWindow::onSessionChanged);
+    if(!m_sessionWnd){
+        m_sessionWnd = new SessionWindow(m_sessionsModel, this);
+        connect(m_sessionWnd, &SessionWindow::sessionChanged, \
+                this, &GreeterWindow::onSessionChanged);
+    }
 
     m_sessionHasChanged = true;
 
-    m_sessionWnd->show();
-    m_sessionWnd->move(m_languageLB->x(),m_languageLB->y()-m_sessionWnd->height());
+    if(m_sessionWnd->isVisible()){
+        m_sessionWnd->hide();
+        setFocus();
+    }
+    else{
+        m_sessionWnd->move(m_languageLB->x(),m_languageLB->y()-m_sessionWnd->height());
+        m_sessionWnd->show();
+        m_sessionWnd->setCurrentSession(m_greeter->session());
+        m_sessionWnd->setFocus();
+    }
 }
 
 void GreeterWindow::onSessionChanged(const QString &session)

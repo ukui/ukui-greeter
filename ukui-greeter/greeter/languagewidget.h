@@ -35,6 +35,7 @@ public:
     void setCurrentLanguage(const QString &language);
 
 protected:
+    bool eventFilter(QObject *obj, QEvent *event);
 
 private:
     void initUserMenu();

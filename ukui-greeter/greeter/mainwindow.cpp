@@ -134,7 +134,7 @@ void MainWindow::paintEvent(QPaintEvent *e)
         QPainter painter(this);
 
         //在没有登录窗口的屏幕上显示图标
-//        if(screen != m_activeScreen)
+//        if(screen != m_azctiveScreen)
 //        {
 //            QRect cofRect(rect.left() + (rect.width()-m_cof.width())/2,
 //                          rect.top() + (rect.height()-m_cof.height())/2,
