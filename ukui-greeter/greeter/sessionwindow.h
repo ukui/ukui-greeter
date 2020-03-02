@@ -38,7 +38,7 @@ public:
     void setCurrentSession(const QString &session);
 
 protected:
-
+    bool eventFilter(QObject *obj, QEvent *event);
 signals:
     void sessionChanged(const QString &session);
 

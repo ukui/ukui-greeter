@@ -75,18 +75,16 @@ void UsersView::setCurrentUser(const QString &userName, bool entered)
 {
     if(!usersModel || userName.isEmpty())
         return;
-    for(int i = 0; i < usersModel->rowCount(); i++)
+    for(int i = 0; i < usersList->count(); i++)
     {
-        QString name = usersModel->index(i).data(QLightDM::UsersModel::NameRole).toString();
-        if(name == userName)
+        QListWidgetItem *item = usersList->item(i);
+        UserEntry *entry = static_cast<UserEntry*>(usersList->itemWidget(item));
+        if(userName == entry->userIndex().data(QLightDM::UsersModel::NameRole).toString())
         {
             setCurrentRow(i);
-            if (entered)
-                onUserClicked(i);
             return;
         }
     }
-    Q_EMIT userNotFound(userName);
 }
 
 void UsersView::resizeEvent(QResizeEvent *event)
@@ -306,6 +304,7 @@ void UsersView::setCurrentRow(int row)
     if(row < 0 || row >= usersList->count())
         return;
     usersList->setCurrentRow(row);
+
     moveCurrentToCenter(row);
 
     UserEntry *entry = static_cast<UserEntry*>(usersList->itemWidget(usersList->currentItem()));

@@ -41,6 +41,10 @@ SessionWindow::SessionWindow(QAbstractItemModel *model, QWidget *parent)
     setSessionModel(model);
     connect(this, &QMenu::triggered,
                 this, &SessionWindow::onSessionMenuTrigged);
+
+    setWindowFlags(Qt::FramelessWindowHint);
+    setAttribute(Qt::WA_TranslucentBackground);
+    this->installEventFilter(this);
 }
 
 void SessionWindow::initUI()
@@ -72,6 +76,15 @@ void SessionWindow::addSessionLabels()
     }
 }
 
+void SessionWindow::setCurrentSession(const QString &session)
+{
+    for(auto action : this->actions())
+    {
+        if(action->data().toString()== session)
+            this->setActiveAction(action);
+    }
+}
+
 void SessionWindow::onSessionMenuTrigged(QAction *action)
 {
     QString sessionkey  = action->data().toString();
@@ -90,3 +103,12 @@ QString SessionWindow::getSessionIcon(const QString &session)
     return sessionIcon;
 }
 
+bool SessionWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    //失去焦点时隐藏窗口
+    if(event->type() == 23)
+    {
+        hide();
+    }
+    return false;
+}

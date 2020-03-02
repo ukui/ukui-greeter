@@ -130,7 +130,7 @@ void LoginWindow::initUI()
     m_messageButton->setObjectName(QStringLiteral("messageButton"));
     m_messageButton->hide();
 
-
+    setFocusProxy(m_passwordEdit);
 
     isloginauth = false;
 }
@@ -334,7 +334,6 @@ QString LoginWindow::getPassword()
 
 bool LoginWindow::setUserIndex(const QModelIndex& index)
 {
-    qDebug()<<"11111111111111111111111111111111111111";
     if(!index.isValid()){
         return false;
     }

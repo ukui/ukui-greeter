@@ -19,6 +19,7 @@
 #include "languagewidget.h"
 #include <QListWidget>
 #include <QLabel>
+#include <QEvent>
 #include <QAction>
 #include <QDebug>
 
@@ -26,6 +27,9 @@ LanguageWidget::LanguageWidget(QWidget *parent)
     : QMenu (parent),
       languagesVector(getLanguages())
 {
+    setWindowFlags(Qt::FramelessWindowHint);
+    setAttribute(Qt::WA_TranslucentBackground);
+    this->installEventFilter(this);
     initUserMenu();
 }
 
@@ -33,7 +37,7 @@ void LanguageWidget::setCurrentLanguage(const QString &language)
 {
     for(auto action : this->actions())
     {
-        if(action->text() == language)
+        if(action->data().toString()== language)
             this->setActiveAction(action);
     }
 }
@@ -41,7 +45,6 @@ void LanguageWidget::setCurrentLanguage(const QString &language)
 
 void LanguageWidget::initUserMenu()
 {
-
     connect(this, &QMenu::triggered,
                 this, &LanguageWidget::onLanguageMenuTrigged);
 
@@ -53,7 +56,6 @@ void LanguageWidget::initUserMenu()
         action->setData(lang.code);
         addAction(action);
     }
-
 }
 
 void LanguageWidget::onLanguageAdded(QString lang)
@@ -66,7 +68,7 @@ void LanguageWidget::onLanguageDeleted(QString lang)
 {
     for(auto action : this->actions())
     {
-        if(action->text() == lang)
+        if(action->data().toString() == lang)
             this->removeAction(action);
     }
 }
@@ -80,4 +82,15 @@ void LanguageWidget::onLanguageMenuTrigged(QAction *action)
     });
 
     Q_EMIT languageChanged(*iter);
+    close();
+}
+
+bool LanguageWidget::eventFilter(QObject *obj, QEvent *event)
+{
+    //失去焦点时隐藏窗口
+    if(event->type() == 23)
+    {
+        hide();
+    }
+    return false;
 }

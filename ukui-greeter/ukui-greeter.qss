@@ -17,16 +17,34 @@ QPushButton::pressed {
 QMenu{
     background-color: rgb(255,255,255,20%);
     color: white;
-    font-size: 16px;
     border-radius: 4px;
-}
-QMenu::item:selected {
-    background-color:rgb(235,110,36);
-}
-QMenu::item:pressed {
-    background-color: rgb(220,80,6);
+    width: 260px;
+    height: 350px;
 }
 
+QMenu::item
+{
+    border-radius: 4px;
+    height:36px;
+    width:260px;
+    padding-left:15px;
+}
+QMenu::item:selected {
+    background-color:rgb(255,255,255,15%);
+}
+QMenu::item:pressed {
+    background-color: rgb(255,255,255,15%);
+}
+
+QMenu#SessionWnd::item{
+    border-radius: 4px;
+    height:36px;
+    width:260px;
+    padding-left:40px;
+}
+QMenu#SessionWnd::icon{
+    padding-left:15px;
+}
 /***************** 文本Label ********************/
 
 QLabel{
@@ -193,6 +211,7 @@ QListWidget{
 QLineEdit {
     background: #FFFFFF;
     border: 1px solid #FFFFFF;
+    border-radius: 4px;
     font-size: 14px;
     lineedit-password-character:9679;
 }
