@@ -60,19 +60,11 @@ void FakeDialog::initUI()
     m_centerWidget->setObjectName(QStringLiteral("dialogCenterWidget"));
 
     m_closeButton = new QPushButton(m_dialog);
-    m_closeButton->setObjectName(QStringLiteral("closeButton"));
+    m_closeButton->setText(tr("cancel"));
+
     connect(m_closeButton, &QPushButton::clicked, this, &FakeDialog::close);
 }
 
-void FakeDialog::paintEvent(QPaintEvent *e)
-{
-    QPainter painter(this);
-    painter.setPen(Qt::transparent);
-    painter.setBrush(QColor(0, 0, 0, 100));
-    painter.drawRect(rect());
-
-    QWidget::paintEvent(e);
-}
 
 void FakeDialog::resizeEvent(QResizeEvent */*event*/)
 {
@@ -80,10 +72,11 @@ void FakeDialog::resizeEvent(QResizeEvent */*event*/)
                           (height() - dialogHeight) / 2,
                           dialogWidth, dialogHeight);
     m_centerWidget->setGeometry(BORDER_WIDTH, BORDER_WIDTH,
-                                m_dialog->width() - BORDER_WIDTH * 2,
+                                m_dialog->width() - BORDER_WIDTH * 2 ,
                                 m_dialog->height() - BORDER_WIDTH * 2);
-    m_closeButton->setGeometry(m_dialog->width() - BORDER_WIDTH, 0,
-                               BORDER_WIDTH, BORDER_WIDTH);
+    m_closeButton->setGeometry(m_centerWidget->width()*2/3, m_centerWidget->y() + m_centerWidget->height() - 80,
+                               80, 30);
+
 }
 
 void FakeDialog::keyReleaseEvent(QKeyEvent *event)

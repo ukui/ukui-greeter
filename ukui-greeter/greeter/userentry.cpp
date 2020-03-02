@@ -86,12 +86,6 @@ bool UserEntry::eventFilter(QObject *obj, QEvent *event)
                 Q_EMIT pressed();
                 return true;
             }
-        } else if(event->type() == QEvent::MouseButtonRelease){
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-            if(mouseEvent->button() == Qt::LeftButton){
-                onClicked();
-                return true;
-            }
         }
     }
     return QWidget::eventFilter(obj, event);

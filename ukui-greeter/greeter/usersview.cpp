@@ -22,6 +22,8 @@
 #include <QPushButton>
 #include <QKeyEvent>
 #include <QStandardPaths>
+#include <QTime>
+#include <QCoreApplication>
 #include <QLightDM/UsersModel>
 
 #include "xeventmonitor.h"
@@ -182,7 +184,6 @@ void UsersView::onGlobalKeyRelease(const QString &key)
 
 void UsersView::showEvent(QShowEvent *event)
 {
-    this->setFocus();
 
     QWidget::showEvent(event);
 }
@@ -232,6 +233,7 @@ void UsersView::onUserClicked(int row)
     }
 
     Q_EMIT userSelected(usersModel->index(x, 0));
+
 }
 
 void UsersView::onUserAdded(const QModelIndex &parent, int left, int right)
@@ -335,5 +337,6 @@ void UsersView::setCurrentRow(int row)
     QModelIndex index = usersModel->index(x, 0);
     Q_EMIT currentUserChanged(index);
     Q_EMIT userSelected(index);
+
 }
 

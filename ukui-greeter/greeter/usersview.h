@@ -20,6 +20,7 @@
 #define USERSVIEW_H
 
 #include <QWidget>
+#include <QTime>
 #include "userentry.h"
 
 #define ITEM_WIDTH (CENTER_ENTRY_WIDTH + 31 * scale)
@@ -77,6 +78,8 @@ private:
     QPushButton *insertButton;
     QPushButton *zomInButton;
     QPushButton *zomOutButton;
+    int lastClickTime;
+    QTime time;
 };
 
 #endif // USERSVIEW_H
