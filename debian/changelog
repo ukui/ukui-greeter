@@ -1,11 +1,18 @@
-ukui-greeter (1.2.0-1) unstable; urgency=medium
+ukui-greeter (1.2.1-1) unstable; urgency=medium
 
   * New upstream bugfix release:
     - Fix the wrong background.
     - Fix the error when get screen resolution in virtualbox.
     - Show solid color when background loading fails.
+    - Correct typos in loginwindow.cpp.
+    - Show unknown_badge.png for unknown session.
+    - Fix the error when double-click on user avatar.
+    - Fix that lost the info of last logged in user.
+    - Adjust the UI.
+  * debian/control:
+    - Bump standards-vertion to 4.5.0.
 
- -- handsome_feng <jianfengli@ubuntukylin.com>  Thu, 26 Sep 2019 14:01:25 +0800
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Mon, 02 Mar 2020 16:21:02 +0800
 
 ukui-greeter (1.1.9-1) unstable; urgency=medium
 
