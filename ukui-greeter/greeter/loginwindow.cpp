@@ -334,7 +334,6 @@ QString LoginWindow::getPassword()
 
 bool LoginWindow::setUserIndex(const QModelIndex& index)
 {
-    qDebug()<<"11111111111111111111111111111111111111";
     if(!index.isValid()){
         return false;
     }
