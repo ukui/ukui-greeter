@@ -124,12 +124,16 @@ void UserEntry::setFace(const QString &facePath)
         this->m_face = ":/resource/default_face.png";
 
     if(id == selectedId){
+        const QString SheetStyle = QString("border-radius: %1px;  border:2px   solid white;").arg(CENTER_IMG_WIDTH/2);
+        m_faceLabel->setStyleSheet(SheetStyle);
         userface = scaledPixmap(CENTER_IMG_WIDTH, CENTER_IMG_WIDTH, m_face);
-        userface =  PixmapToRound(userface, CENTER_IMG_WIDTH);
+        userface =  PixmapToRound(userface, CENTER_IMG_WIDTH/2);
     }
     else{
+        const QString SheetStyle = QString("border-radius: %1px;  border:2px   solid white;").arg(IMG_WIDTH/2);
+        m_faceLabel->setStyleSheet(SheetStyle);
         userface = scaledPixmap(IMG_WIDTH, IMG_WIDTH, m_face);
-        userface =  PixmapToRound(userface, IMG_WIDTH);
+        userface =  PixmapToRound(userface, IMG_WIDTH/2);
     }
 
     m_faceLabel->setAlignment(Qt::AlignCenter);
@@ -175,11 +179,11 @@ void UserEntry::setResize()
     QRect faceRect,nameRect,loginRect;
     if(id == selectedId)
     {
-        const QString SheetStyle = "border-radius: 90px;  border:2px   solid white;";
+        const QString SheetStyle = QString("border-radius: %1px;  border:2px   solid white;").arg(CENTER_IMG_WIDTH/2);
         m_faceLabel->setStyleSheet(SheetStyle);
         faceRect.setRect(SHADOW_WIDTH, SHADOW_WIDTH, CENTER_FACE_WIDTH, CENTER_FACE_WIDTH);
         userface = scaledPixmap(CENTER_IMG_WIDTH, CENTER_IMG_WIDTH, m_face);
-        userface =  PixmapToRound(userface, CENTER_IMG_WIDTH);
+        userface =  PixmapToRound(userface, CENTER_IMG_WIDTH/2);
         m_faceLabel->setGeometry(faceRect);
         m_faceLabel->move((width() - m_faceLabel->width())/2,m_faceLabel->y());
         m_nameLabel->setFont(QFont("Ubuntu", 24));
@@ -189,11 +193,11 @@ void UserEntry::setResize()
     }
     else
     {
-        const QString SheetStyle = "border-radius: 75px;  border:2px   solid white;";
+        const QString SheetStyle = QString("border-radius: %1px;  border:2px   solid white;").arg(IMG_WIDTH/2);
         m_faceLabel->setStyleSheet(SheetStyle);
         faceRect.setRect(SHADOW_WIDTH, SHADOW_WIDTH, FACE_WIDTH, FACE_WIDTH);
         userface = scaledPixmap(IMG_WIDTH, IMG_WIDTH, m_face);
-        userface =  PixmapToRound(userface, IMG_WIDTH);
+        userface =  PixmapToRound(userface, IMG_WIDTH/2);
         m_faceLabel->setGeometry(faceRect);
         m_faceLabel->move((width() - m_faceLabel->width())/2,m_faceLabel->y()+30);
         m_nameLabel->setFont(QFont("Ubuntu", 18));
