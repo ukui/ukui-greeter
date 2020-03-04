@@ -136,7 +136,7 @@ void GreeterWindow::initUI()
             this, &GreeterWindow::showVirtualKeyboard);
 
     //桌面环境选择按钮
-    if(m_sessionsModel->rowCount() > 1)
+    if(m_sessionsModel->rowCount() > 0)
     {
         m_sessionLB = new QPushButton(this);
         m_sessionLB->setObjectName((QStringLiteral("sessionButton")));
@@ -603,7 +603,10 @@ void GreeterWindow::onSessionChanged(const QString &session)
         sessionIcon = IMAGE_DIR + QString("badges/unknown_badge.png");
     }
     qDebug() << sessionIcon;
-    m_sessionLB->setIcon(QIcon(sessionIcon));
+    qDebug()<<"11111111111111111111111111";
+    if(m_sessionLB)
+        m_sessionLB->setIcon(QIcon(sessionIcon));
+    qDebug()<<"2222222222222222222222222222";
     m_greeter->setSession(sessionTmp);
 
     if(m_userWnd && !m_userWnd->isHidden())
