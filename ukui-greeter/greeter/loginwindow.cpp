@@ -476,9 +476,9 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
         if(text == "Password: ")
             text = tr("Password: ");
         if(text == "login:") {
-            text = tr("login:");
+            text = tr("Username");
             m_name = "*login";
-            m_nameLabel->setText(tr("login"));
+            //m_nameLabel->setText(tr("login"));
             m_name_is_login = true;
             qDebug()<<"m_name_is_login = true";
         }

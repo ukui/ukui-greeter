@@ -251,7 +251,7 @@
     </message>
     <message>
         <source>Username</source>
-        <translation type="obsolete">用户名</translation>
+        <translation>用户名</translation>
     </message>
     <message>
         <source>Failed to start session</source>
