@@ -511,7 +511,7 @@ void GreeterWindow::setWindowPos(QWidget *widget, Qt::Alignment align)
 
 void GreeterWindow::onLanguageChanged(const Language &language)
 {
-    if(language.code.isEmpty())
+    if(language.code.isEmpty() || language.name.isEmpty())
         return ;
 
     if(m_greeter->lang() == language.code)
