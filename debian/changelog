@@ -1,3 +1,12 @@
+ukui-greeter (1.2.2-1) unstable; urgency=medium
+
+  * New upstream bugfix release:
+    - Fix the error when system language not readed.
+    - Fix the error if hide users.
+    - Fix that avatar displayed incorrectly.
+
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Sun, 08 Mar 2020 23:44:44 +0800
+
 ukui-greeter (1.2.1-1) unstable; urgency=medium
 
   * New upstream bugfix release:
