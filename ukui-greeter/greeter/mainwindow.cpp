@@ -315,8 +315,7 @@ void MainWindow::drawBackground(QSharedPointer<Background> &background,
         }
         else
         {
-            QPixmap pix = blurPixmap(*pixmap);
-            painter.drawPixmap(rect, pix);
+            painter.drawPixmap(rect, *pixmap);
         }
         break;
     }
