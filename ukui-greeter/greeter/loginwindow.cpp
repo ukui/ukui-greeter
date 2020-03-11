@@ -556,7 +556,7 @@ void LoginWindow::onAuthenticationComplete()
     }
 }
 
-void LoginWindow::show_authenticated(bool sucessful)
+void LoginWindow::show_authenticated(bool successful)
 {
     m_passwordEdit->hide();
     m_messageButton->show();
@@ -565,7 +565,7 @@ void LoginWindow::show_authenticated(bool sucessful)
 
     connect(m_messageButton, &QPushButton::clicked,
             this, &LoginWindow::onMessageButtonClicked);
-    if(sucessful)
+    if(successful)
     {
 	isretry = false;
       //  m_greeter->startSession();
