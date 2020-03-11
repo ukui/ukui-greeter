@@ -20,6 +20,7 @@
 #include <QProcess>
 #include <langinfo.h>
 #include <libintl.h>
+#include <QDebug>
 
 QString getLocaleName(const QString &code)
 {
@@ -111,6 +112,9 @@ LanguagesVector& getLanguages()
     QString result = process.readAll();
     QStringList langs = result.split("\n");
 
+    if(result.isEmpty())
+        return languagesVector;
+
     for(auto lang : langs)
     {
         QString name = getName(lang);
@@ -121,7 +125,7 @@ LanguagesVector& getLanguages()
     return languagesVector;
 }
 
-Language &getLanguage(const QString &lang)
+Language getLanguage(const QString &lang)
 {
     LanguagesVector &languages = getLanguages();
     QString code = lang;
@@ -131,10 +135,17 @@ Language &getLanguage(const QString &lang)
         code = code.left(code.length() - 6);
     }
 
-    auto iter = std::find_if(languages.begin(), languages.end(),
-                             [&](const Language &language){
-        return language.code == code;
-    });
+    for(int i=0;i<languages.count();i++)
+    {
+        if(languages.at(i).code == code){
+            return languages.at(i);
+        }
+    }
 
-    return *iter;
+    Language nolanguage;
+    nolanguage.code = "";
+    nolanguage.territory = "";
+    nolanguage.name = "";
+
+    return nolanguage;
 }

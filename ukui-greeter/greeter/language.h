@@ -39,6 +39,6 @@ typedef QVector<Language> LanguagesVector;
 LanguagesVector &getLanguages();
 
 /// 根据LANG获取语言
-Language &getLanguage(const QString &lang);
+Language getLanguage(const QString &lang);
 
 #endif // LANGUAGE_H

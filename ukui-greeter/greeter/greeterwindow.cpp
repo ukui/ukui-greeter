@@ -145,6 +145,7 @@ void GreeterWindow::initUI()
         m_sessionLB->setFixedSize(48, 48);
         m_sessionLB->setCursor(Qt::PointingHandCursor);
         m_sessionLB->setIcon(QIcon(IMAGE_DIR + QString("badges/unknown_badge.png")));
+        onSessionChanged(m_greeter->defaultSessionHint());
         connect(m_sessionLB, &QPushButton::clicked, this, &GreeterWindow::showSessionWnd);
     }
 
@@ -156,8 +157,13 @@ void GreeterWindow::initUI()
     m_languageLB->setFixedHeight(48);
     m_languageLB->setCursor(Qt::PointingHandCursor);
     LanguagesVector defaultLang = getLanguages();
-    m_languageLB->setText(defaultLang.at(0).name);
-    m_languageLB->adjustSize();
+    if(defaultLang.count()>0){
+        m_languageLB->setText(defaultLang.at(0).name);
+        m_languageLB->adjustSize();
+    }
+    else{
+        m_languageLB->hide();
+    }
 
     connect(m_languageLB, &QPushButton::clicked, this, &GreeterWindow::showLanguageWnd);
 
@@ -341,8 +347,9 @@ void GreeterWindow::updateLanguage(QString userName)
             qWarning() << "Get User's language error" << languageReply.error();
         else {
             language = languageReply.value().variant().toString();
-            if(!language.isEmpty())
-                onLanguageChanged(getLanguage(language));
+            if(!language.isEmpty()){
+                    onLanguageChanged(getLanguage(language));
+             }
         }
     }
 }
@@ -511,7 +518,7 @@ void GreeterWindow::setWindowPos(QWidget *widget, Qt::Alignment align)
 
 void GreeterWindow::onLanguageChanged(const Language &language)
 {
-    if(language.code.isEmpty() || language.name.isEmpty())
+    if(language.code == "" || language.name == "")
         return ;
 
     if(m_greeter->lang() == language.code)
@@ -603,10 +610,10 @@ void GreeterWindow::onSessionChanged(const QString &session)
         sessionIcon = IMAGE_DIR + QString("badges/unknown_badge.png");
     }
     qDebug() << sessionIcon;
-    qDebug()<<"11111111111111111111111111";
+
     if(m_sessionLB)
         m_sessionLB->setIcon(QIcon(sessionIcon));
-    qDebug()<<"2222222222222222222222222222";
+
     m_greeter->setSession(sessionTmp);
 
     if(m_userWnd && !m_userWnd->isHidden())
