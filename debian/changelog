@@ -1,3 +1,11 @@
+ukui-greeter (1.2.3-1) unstable; urgency=medium
+
+  * New upsgream bugfix release.
+    - Fix that the default session is not selected.
+    - Change the path of background.
+
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Thu, 12 Mar 2020 16:23:30 +0800
+
 ukui-greeter (1.2.2-1) unstable; urgency=medium
 
   * New upstream bugfix release:
