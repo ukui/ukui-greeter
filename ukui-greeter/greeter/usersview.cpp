@@ -25,14 +25,16 @@
 #include <QTime>
 #include <QCoreApplication>
 #include <QLightDM/UsersModel>
+#include <QPropertyAnimation>
 
 #include "xeventmonitor.h"
 
 UsersView::UsersView(QWidget *parent) :
     QWidget(parent),
-    usersModel(nullptr)
+    usersModel(nullptr),
+    currentUser(0)
 {
-    resize(USERSVIEW_WIDTH, USERSVIEW_HEIGHT);
+    resize(CENTER_ENTRY_WIDTH*5, CENTER_ENTRY_HEIGHT);
     initUI();
 }
 
@@ -43,19 +45,31 @@ UsersView::~UsersView()
 
 void UsersView::initUI()
 {
-    usersList = new QListWidget(this);
-    usersList->setObjectName(QStringLiteral("usersListWidget"));
-    usersList->setFlow(QListWidget::LeftToRight);
-    usersList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    usersList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    usersList->setSelectionMode(QListWidget::NoSelection);
-    usersList->setFocusPolicy(Qt::NoFocus);
-    usersList->setContentsMargins(10, 0, 10, 0);
-    usersList->installEventFilter(this);
+//    usersList = new QListWidget(this);
+//    usersList->setObjectName(QStringLiteral("usersListWidget"));
+//    usersList->setFlow(QListWidget::LeftToRight);
+//    usersList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//    usersList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//    usersList->setSelectionMode(QListWidget::NoSelection);
+//    usersList->setFocusPolicy(Qt::NoFocus);
+//    usersList->setContentsMargins(10, 0, 10, 0);
+//    usersList->installEventFilter(this);
 
     connect(XEventMonitor::instance(), SIGNAL(keyRelease(const QString &)),
             this, SLOT(onGlobalKeyRelease(const QString &)));
 
+}
+
+bool UsersView::eventFilter(QObject *obj, QEvent *event)
+{
+    for(int i=0;i<userlist.count();i++){
+        if(obj == userlist.at(i)){
+            if(event->type() == QEvent::MouseButtonDblClick){
+                setCurrentRow(i);
+            }
+        }
+    }
+    return false;
 }
 
 void UsersView::setModel(QAbstractListModel *model)
@@ -73,112 +87,85 @@ void UsersView::setModel(QAbstractListModel *model)
 
 void UsersView::setCurrentUser(const QString &userName, bool entered)
 {
-    if(!usersModel || userName.isEmpty())
-        return;
-    for(int i = 0; i < usersList->count(); i++)
-    {
-        QListWidgetItem *item = usersList->item(i);
-        UserEntry *entry = static_cast<UserEntry*>(usersList->itemWidget(item));
-        if(userName == entry->userIndex().data(QLightDM::UsersModel::NameRole).toString())
-        {
-            setCurrentRow(i);
-            return;
-        }
-    }
-}
-
-void UsersView::resizeEvent(QResizeEvent *event)
-{
-    int buttonTop = scale > 0.5 ? 10 : 5;
-
-    int num = usersList->count() <= 5 ? usersList->count() : 5;
-    usersList->resize(ITEM_WIDTH * num + 2, ITEM_HEIGHT);
-    usersList->move((width()-usersList->width())/2,(height()-usersList->height())/2);
-    for(int i = 0; i < usersList->count(); i++) {
-        QListWidgetItem *item = usersList->item(i);
-        item->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
-        UserEntry *entry = static_cast<UserEntry*>(usersList->itemWidget(item));
-        entry->setFixedSize(item->sizeHint());
-
-    }
-    if(usersList->count()==4||usersList->count()==2)
-        usersList->move((width()-usersList->width() + ITEM_WIDTH)/2, \
-                        (height()-usersList->height())/2);
-
-    QWidget::resizeEvent(event);
-}
-
-void UsersView::moveUserEntry(int from,int to)
-{
-    UserEntry *fromentry = static_cast<UserEntry*>(usersList->itemWidget(usersList->item(from)));
-    uid_t uid = fromentry->userIndex().data(QLightDM::UsersModel::UidRole).toUInt();
-    QListWidgetItem *fromitem = usersList->takeItem(from);
-    delete fromitem;
-
-    int row = 0;
-    for(row = 0; row < usersModel->rowCount(); row++)
-    {
-        uid_t id= usersModel->index(row).data(QLightDM::UsersModel::UidRole).toUInt();
-        if(uid == id)
-            break;
-    }
-
-    QModelIndex index = usersModel->index(row, 0);
-    QPersistentModelIndex persistentIndex(index);
-    UserEntry *entry = new UserEntry(this);
-    entry->setUserIndex(persistentIndex);
-
-    connect(entry, &UserEntry::pressed, this, &UsersView::onUserPressed);
-    connect(entry, &UserEntry::clicked, this, &UsersView::onUserClicked);
-
-    QListWidgetItem *item = new QListWidgetItem();
-    item->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
-    usersList->insertItem(to, item);
-    usersList->setItemWidget(item, entry);
+//    if(!usersModel || userName.isEmpty())
+//        return;
+//    for(int i = 0; i < usersList->count(); i++)
+//    {
+//        QListWidgetItem *item = usersList->item(i);
+//        UserEntry *entry = static_cast<UserEntry*>(usersList->itemWidget(item));
+//        if(userName == entry->userIndex().data(QLightDM::UsersModel::NameRole).toString())
+//        {
+//            setCurrentRo#define ITEM_WIDTH (CENTER_ENTRY_WIDTH)
+//            return;
+//        }
+//    }
 }
 
 void UsersView::onGlobalKeyRelease(const QString &key)
 {
     if(key.compare("right",Qt::CaseInsensitive)==0)
     {
-        if(usersList->currentRow() < usersList->count()-1)
-            setCurrentRow(usersList->currentRow() + 1);
-        else if(usersList->currentRow() == 0 && usersList->count()==2)
-            setCurrentRow(0);
+        rightKeyPressed();
     }
     else if (key.compare("left",Qt::CaseInsensitive)==0) {
-        if(usersList->currentRow() > 0)
-            setCurrentRow(usersList->currentRow() - 1);
-        else if(usersList->currentRow() == 0 && usersList->count()==2)
-            setCurrentRow(1);
+        leftKeyPressed();
     }
 }
 
-//void UsersView::keyReleaseEvent(QKeyEvent *event)
-//{
-//    switch(event->key()) {
-//    case Qt::Key_Down:
-//    case Qt::Key_Right:
-//        if(usersList->currentRow() > 0)
-//            setCurrentRow(usersList->currentRow() - 1);
-//        else if(usersList->currentRow() == 0 && usersList->count()==2)
-//            setCurrentRow(1);
-//        break;
-//    case Qt::Key_Up:
-//    case Qt::Key_Left:
-//        if(usersList->currentRow() < usersList->count()-1)
-//            setCurrentRow(usersList->currentRow() + 1);
-//        else if(usersList->currentRow() == 0 && usersList->count()==2)
-//            setCurrentRow(0);
-//        break;
-//    case Qt::Key_Return:
-//        onUserClicked(usersList->currentRow());
-//        break;
-//    default:
-//        QWidget::keyReleaseEvent(event);
-//    }
+void UsersView::leftKeyPressed()
+{
+    if(currentUser <= 0)
+       return;
 
-//}
+    rightToRight();
+    centerToRight();
+    leftToRight();
+    currentUser-- ;
+
+    UserEntry *entry = userlist.at(currentUser);
+    uid_t uid =  entry->userIndex().data(QLightDM::UsersModel::UidRole).toUInt();
+
+
+    int x = 0;
+    for(x = 0; x < usersModel->rowCount(); x++)
+    {
+        uid_t id= usersModel->index(x).data(QLightDM::UsersModel::UidRole).toUInt();
+        if(uid == id)
+            break;
+    }
+
+    QModelIndex index = usersModel->index(x, 0);
+    Q_EMIT currentUserChanged(index);
+    Q_EMIT userSelected(index);
+
+}
+
+void UsersView::rightKeyPressed()
+{
+    if(currentUser >= userlist.count() - 1)
+        return ;
+
+   leftToLeft();
+   centerToleft();
+   rightToLeft();
+   currentUser++;
+
+   UserEntry *entry = userlist.at(currentUser);
+   uid_t uid =  entry->userIndex().data(QLightDM::UsersModel::UidRole).toUInt();
+
+   int x = 0;
+   for(x = 0; x < usersModel->rowCount(); x++)
+   {
+       uid_t id= usersModel->index(x).data(QLightDM::UsersModel::UidRole).toUInt();
+       if(uid == id)
+           break;
+   }
+
+   QModelIndex index = usersModel->index(x, 0);
+   Q_EMIT currentUserChanged(index);
+   Q_EMIT userSelected(index);
+
+}
 
 void UsersView::showEvent(QShowEvent *event)
 {
@@ -192,46 +179,30 @@ void UsersView::insertUserEntry(int row)
     QPersistentModelIndex persistentIndex(index);
     UserEntry *entry = new UserEntry(this);
     entry->setUserIndex(persistentIndex);
+    entry->installEventFilter(this);
 
     connect(entry, &UserEntry::pressed, this, &UsersView::onUserPressed);
     connect(entry, &UserEntry::clicked, this, &UsersView::onUserClicked);
-    QListWidgetItem *item = new QListWidgetItem();
-    item->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
-    item->setTextAlignment(Qt::AlignHCenter);
-    usersList->insertItem(row, item);
-    usersList->setItemWidget(item, entry);
 
-    if(usersList->count() <= 5) {
-        usersList->resize(ITEM_WIDTH * usersList->count() + 2, ITEM_HEIGHT);
-    }
+    entry->hide();
+    userlist.append(entry);
 }
 
 void UsersView::onUserPressed()
 {
-    QString objName = sender()->objectName();
-    for(int i = 0; i < usersList->count(); i++){
-        QWidget *entry = usersList->itemWidget(usersList->item(i));
-        if(entry->objectName() == objName){
-            setCurrentRow(i);
-        }
-    }
-    update();
+//    QString objName = sender()->objectName();
+//    for(int i = 0; i < usersList->count(); i++){
+//        QWidget *entry = usersList->itemWidget(usersList->item(i));
+//        if(entry->objectName() == objName){
+//            setCurrentRow(i);
+//        }
+//    }
+//    update();
 }
 
 void UsersView::onUserClicked(int row)
 {
-    UserEntry *entry = static_cast<UserEntry*>(usersList->itemWidget(usersList->currentItem()));
-    int x = 0;
-    uid_t uid =  entry->userIndex().data(QLightDM::UsersModel::UidRole).toUInt();
-    for(x = 0; x < usersModel->rowCount(); x++)
-    {
-        uid_t id= usersModel->index(x).data(QLightDM::UsersModel::UidRole).toUInt();
-        if(uid == id)
-            break;
-    }
-
-    Q_EMIT userSelected(usersModel->index(x, 0));
-
+    qDebug()<<"sssssssssssssssssssssssssss row = "<<row;
 }
 
 void UsersView::onUserAdded(const QModelIndex &parent, int left, int right)
@@ -247,85 +218,209 @@ void UsersView::onUserRemoved(const QModelIndex &parent, int left, int right)
 {
     Q_UNUSED(parent);
 
-    for(int i = left; i <= right; i++){
-        usersList->takeItem(i);
-        setCurrentRow(usersList->currentRow());
-        if(usersList->count() < 5) {
-            usersList->resize(ITEM_WIDTH * usersList->count() + 2, ITEM_HEIGHT);
-            usersList->move(usersList->geometry().left() + ITEM_WIDTH / 2, 0);
-        }
-    }
+//    for(int i = left; i <= right; i++){
+//        usersList->takeItem(i);
+//        setCurrentRow(usersList->currentRow());
+//        if(usersList->count() < 5) {
+//            usersList->resize(ITEM_WIDTH * usersList->count() + 2, ITEM_HEIGHT);
+//            usersList->move(usersList->geometry().left() + ITEM_WIDTH / 2, 0);
+//        }
+//    }
 }
 
 void UsersView::onUserChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
 {
-    int begin = topLeft.row();
-    int end = bottomRight.row();
-    for(int i = begin; i <= end; i++) {
-        UserEntry *entry = static_cast<UserEntry*>(usersList->itemWidget(usersList->item(i)));
-        QModelIndex index = usersModel->index(i, 0);
-        entry->setUserName(index.data(Qt::DisplayRole).toString());
-        entry->setFace(index.data(QLightDM::UsersModel::ImagePathRole).toString());
-        entry->setLogin(index.data(QLightDM::UsersModel::LoggedInRole).toBool());
-    }
+
 }
 
-void UsersView::moveCurrentToCenter(int row)
+void UsersView::centerToleft()
 {
-
-    int center = usersList->indexAt(usersList->viewport()->contentsRect().center()).row();
-
-    if(usersList->count() == 4 || usersList->count() == 3)
-        center = 1;
-    else if(usersList->count() == 1 || usersList->count() == 2)
-        center = 0;
-
-    if(center < 0)
+    if(currentUser >= userlist.count() - 1)
         return ;
-    if(row == center)
-        return ;
-    else if(row > center){
-        while (row > center) {
-            row -= 1;
-            moveUserEntry(0,usersList->count()-1);
-        }
-    }
-    else if(row < center){
-        while (row < center) {
-            row += 1 ;
-            moveUserEntry(usersList->count() - 1 , 0);
-        }
-    }
-    usersList->setCurrentRow(center);
+
+    UserEntry *entry = userlist.at(currentUser);
+    QRect rec1 = entry->geometry();
+    QRect rec2 = QRect(CENTER_ENTRY_WIDTH,
+                       CENTER_ENTRY_HEIGHT-ENTRY_HEIGHT,
+                       ENTRY_WIDTH,
+                       ENTRY_HEIGHT);
+
+    moveAnimation(entry,rec1,rec2);
 }
 
-void UsersView::setCurrentRow(int row)
+void UsersView::centerToRight()
 {
-    if(row < 0 || row >= usersList->count())
-        return;
-    usersList->setCurrentRow(row);
+    qDebug()<<"centerToRight currentuser = "<<currentUser;
+    if(currentUser <= 0)
+        return ;
 
-    moveCurrentToCenter(row);
+    UserEntry *entry = userlist.at(currentUser);
+    QRect rec1 = entry->geometry();
+    QRect rec2 = QRect(CENTER_ENTRY_WIDTH*4-ENTRY_WIDTH,
+                       CENTER_ENTRY_HEIGHT-ENTRY_HEIGHT,
+                       ENTRY_WIDTH,
+                       ENTRY_HEIGHT);
 
-    UserEntry *entry = static_cast<UserEntry*>(usersList->itemWidget(usersList->currentItem()));
-    entry->setFixedSize(CENTER_ENTRY_WIDTH, CENTER_ENTRY_HEIGHT);
+    moveAnimation(entry,rec1,rec2);
+}
+
+void UsersView::leftToLeft()
+{
+    int left = currentUser;
+
+    if(left <= 0){
+        return ;
+    }
+
+    UserEntry *entry = userlist.at(currentUser-1);
+    QRect rec1 = entry->geometry();
+    QRect rec2 = QRect(0,
+                       CENTER_ENTRY_HEIGHT-ENTRY_HEIGHT,
+                       ENTRY_WIDTH,
+                       ENTRY_HEIGHT);
+
+    moveAnimation(entry,rec1,rec2);
+
+    if(left >= 2){
+        UserEntry *entry2 = userlist.at(currentUser-2);
+        entry2->hide();
+    }
+
+}
+
+void UsersView::leftToRight()
+{
+    int left = currentUser;
+
+    if(left <= 0)
+        return ;
+
+    UserEntry *entry = userlist.at(currentUser-1);
+    QRect rec1 = entry->geometry();
+    QRect rec2 = QRect(CENTER_ENTRY_WIDTH*2,0,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
+    moveAnimation(entry,rec1,rec2);
     entry->setSelected();
-    for(int i=0;i<usersList->count();i++)
-    {
-         UserEntry *entry = static_cast<UserEntry*>(usersList->itemWidget(usersList->item(i)));
-         if(i==usersList->currentRow())
-         {
-             entry->setFixedSize(CENTER_ENTRY_WIDTH, CENTER_ENTRY_HEIGHT);
-             entry->setSelected();
-         }
-         else{
-             entry->setFixedSize(ENTRY_WIDTH,ENTRY_HEIGHT);
-         }
+
+    if(left >= 2){
+        UserEntry *entry2 = userlist.at(currentUser - 2);
+        rec1 = entry2->geometry();
+        rec2 = QRect(CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT-ENTRY_HEIGHT,ENTRY_WIDTH,ENTRY_HEIGHT);
+
+        moveAnimation(entry2,rec1,rec2);
     }
+
+    if(left >= 3){
+        UserEntry *entry3 = userlist.at(currentUser - 3);
+        entry3->setGeometry(0,CENTER_ENTRY_HEIGHT-ENTRY_HEIGHT,ENTRY_WIDTH,ENTRY_HEIGHT);
+        entry3->show();
+    }
+}
+
+void UsersView::rightToLeft()
+{
+    int right = userlist.count() - currentUser - 1;
+
+    if(right <= 0)
+        return ;
+
+    UserEntry *entry = userlist.at(currentUser + 1);
+    QRect rec1 = entry->geometry();
+    QRect rec2 = QRect(CENTER_ENTRY_WIDTH*2,0,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
+    moveAnimation(entry,rec1,rec2);
+    entry->setSelected();
+
+    if(right >= 2){
+        UserEntry *entry2 = userlist.at(currentUser + 2);
+        rec1 = entry2->geometry();
+        rec2 = QRect(CENTER_ENTRY_WIDTH*4-FACE_WIDTH,
+                     CENTER_ENTRY_HEIGHT-ENTRY_HEIGHT,
+                     ENTRY_WIDTH,
+                     ENTRY_HEIGHT);
+        moveAnimation(entry2,rec1,rec2);
+    }
+
+    if(right >= 3){
+        UserEntry *entry3 = userlist.at(currentUser + 3);
+        entry3->setGeometry(CENTER_ENTRY_WIDTH*5-ENTRY_WIDTH,
+                             CENTER_ENTRY_HEIGHT-ENTRY_HEIGHT,
+                             ENTRY_WIDTH,
+                             ENTRY_HEIGHT);
+        entry3->show();
+    }
+}
+
+void UsersView::rightToRight()
+{
+    int right = userlist.count() - currentUser - 1;
+    if(right <= 0)
+        return ;
+
+    UserEntry *entry = userlist.at(currentUser + 1);
+    QRect rec1 = entry->geometry();
+    QRect rec2 = QRect(CENTER_ENTRY_WIDTH*5-ENTRY_WIDTH,
+                       CENTER_ENTRY_HEIGHT-ENTRY_HEIGHT,
+                       ENTRY_WIDTH,
+                       ENTRY_HEIGHT);
+
+    moveAnimation(entry,rec1,rec2);
+
+    if(right >= 2){
+        UserEntry *entry2 = userlist.at(currentUser + 2);
+        entry2->hide();
+    }
+}
+
+void UsersView::moveAnimation(UserEntry *entry, QRect preRect, QRect nextRect)
+{
+    QPropertyAnimation *pScaleAnimation = new QPropertyAnimation(entry, "geometry");
+    pScaleAnimation->setDuration(300);
+    pScaleAnimation->setStartValue(preRect);
+    pScaleAnimation->setEndValue(nextRect);
+    pScaleAnimation->setEasingCurve(QEasingCurve::InOutQuad);
+    pScaleAnimation->start();
+}
+
+void UsersView::setCurrentRow(int user)
+{
+    if(userlist.count() == 0)
+        return ;
+
+    if(user < 0 || user >= userlist.count())
+        user = 0;
+
+    currentUser = user;
+
+    for(int i=0;i<userlist.count();i++)
+        userlist.at(i)->hide();
+
+    userlist.at(user) -> setGeometry(CENTER_ENTRY_WIDTH*2,0,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
+    userlist.at(user)->show();
+    userlist.at(user)->setSelected();
+
+    for(int i = user + 1; i < userlist.count() && i - user < 3; ++i)
+    {
+        userlist.at(i)->setGeometry(CENTER_ENTRY_WIDTH*(2+i-user)+CENTER_ENTRY_WIDTH-ENTRY_WIDTH,
+                                    CENTER_ENTRY_HEIGHT-ENTRY_HEIGHT,
+                                    ENTRY_WIDTH,
+                                    ENTRY_HEIGHT);
+
+        userlist.at(i)->show();
+    }
+
+    for(int i = user - 1;i >= 0 && user - i < 3; i--)
+    {
+        userlist.at(i)->setGeometry(CENTER_ENTRY_WIDTH*(2+i-user),
+                                    CENTER_ENTRY_HEIGHT-ENTRY_HEIGHT,
+                                    ENTRY_WIDTH,
+                                    ENTRY_HEIGHT);
+        userlist.at(i)->show();
+    }
+
+    UserEntry *entry = userlist.at(currentUser);
+    uid_t uid =  entry->userIndex().data(QLightDM::UsersModel::UidRole).toUInt();
 
 
     int x = 0;
-    uid_t uid =  entry->userIndex().data(QLightDM::UsersModel::UidRole).toUInt();
     for(x = 0; x < usersModel->rowCount(); x++)
     {
         uid_t id= usersModel->index(x).data(QLightDM::UsersModel::UidRole).toUInt();

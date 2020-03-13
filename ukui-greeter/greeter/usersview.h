@@ -23,11 +23,6 @@
 #include <QTime>
 #include "userentry.h"
 
-#define ITEM_WIDTH (CENTER_ENTRY_WIDTH + 31 * scale)
-#define ITEM_HEIGHT CENTER_ENTRY_HEIGHT
-#define USERSVIEW_WIDTH (ITEM_WIDTH * 5 + 2)
-#define USERSVIEW_HEIGHT ITEM_HEIGHT
-
 class QListWidget;
 class QPushButton;
 class QAbstractListModel;
@@ -45,9 +40,9 @@ public:
     void pageDown();
 
 protected:
-    void resizeEvent(QResizeEvent *event);
 //    void keyReleaseEvent(QKeyEvent *event);
     void showEvent(QShowEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:
     void onUserPressed();
@@ -67,19 +62,22 @@ private:
     void insertUserEntry(int row);
     void moveUserEntry(int from,int to);
     void moveCurrentToCenter(int row);
+    void leftToRight();
+    void leftToLeft();
+    void rightToRight();
+    void rightToLeft();
+    void centerToleft();
+    void centerToRight();
+    void moveAnimation(UserEntry *entry,QRect preRect,QRect nextRect);
+    void leftKeyPressed();
+    void rightKeyPressed();
 
 private:
     QAbstractListModel *usersModel;
+    int currentUser;
+    QList<UserEntry *>userlist;
 
-    QListWidget *usersList;
 
-    QPushButton *addButton;
-    QPushButton *remButton;
-    QPushButton *insertButton;
-    QPushButton *zomInButton;
-    QPushButton *zomOutButton;
-    int lastClickTime;
-    QTime time;
 };
 
 #endif // USERSVIEW_H

@@ -58,6 +58,8 @@ GreeterWindow::GreeterWindow(QWidget *parent)
       m_languageHasChanged(false),
       m_sessionHasChanged(false)
 {
+    scale = 1.0;
+
     if(m_greeter->hasGuestAccountHint()){    //允许游客登录
         qDebug() << "allow guest";
         m_usersModel->setShowGuest(true);
@@ -234,7 +236,7 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     qDebug() << "scale: " << scale;
 
     if(m_userWnd){
-        m_userWnd->resize(USERSVIEW_WIDTH, USERSVIEW_HEIGHT);
+        m_userWnd->resize(CENTER_ENTRY_WIDTH*5, CENTER_ENTRY_HEIGHT);
         QRect userRect((width()-m_userWnd->width())/2,
                        304.9,
                        m_userWnd->width(), m_userWnd->height());

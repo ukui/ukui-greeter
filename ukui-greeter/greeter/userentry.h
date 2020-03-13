@@ -23,7 +23,7 @@
 #include <QLabel>
 #include <QPersistentModelIndex>
 
-#define SHADOW_WIDTH (10)
+#define SHADOW_WIDTH (0)
 #define FACE_WIDTH (152 * scale)
 #define BORDER_WIDTH FACE_WIDTH + SHADOW_WIDTH * 2
 #define IMG_WIDTH (150 * scale)
