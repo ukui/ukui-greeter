@@ -70,6 +70,7 @@ GreeterWindow::GreeterWindow(QWidget *parent)
     }
 
     m_greeter->setSession(m_greeter->defaultSessionHint());
+    m_greeter->setrootWindowBackground(m_configuration->getDefaultBackgroundName());
 
     for(int i = 0; i < m_usersModel->rowCount(); i++)
         qDebug() << "load user " << m_usersModel->index(i).
@@ -244,7 +245,7 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     }
     if(m_loginWnd){
         QRect loginRect((width()-m_loginWnd->width())/2, 585,
-                        m_loginWnd->width(), height());
+                        m_loginWnd->width(), height() - 585);
         m_loginWnd->setGeometry(loginRect);
     }
 
@@ -378,7 +379,7 @@ void GreeterWindow::updateSession(QString userName)
 
 void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
 {
-    setBackground(index);
+    //setBackground(index);
 
     if(!m_languageHasChanged)
     {
