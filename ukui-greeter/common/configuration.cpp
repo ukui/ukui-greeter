@@ -158,19 +158,5 @@ QPixmap Configuration::getLogo()
 
 QString Configuration::getDefaultBackgroundName()
 {
-
-    if(getSystemDistrib().contains("Ubuntu",Qt::CaseInsensitive)){
-        return IMAGE_DIR + "background-ubuntu.png";
-    }
-    else if(getSystemDistrib().contains("Kylin",Qt::CaseInsensitive)){
-        QFileInfo fileInfo("/usr/share/backgrounds/kylin/kylin-background.png");
-        if(fileInfo.isFile())
-        {
-            return "/usr/share/backgrounds/kylin/kylin-background.png";
-        }
-        return "/usr/share/backgrounds/kylin-lightdm-default-background.png";
-    }
-    else{
-        return IMAGE_DIR + "background-ubuntu.png";
-    }
+    return IMAGE_DIR + "background-ubuntu.png";
 }
