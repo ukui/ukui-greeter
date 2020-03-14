@@ -23,19 +23,16 @@
 #include <QLabel>
 #include <QPersistentModelIndex>
 
-#define SHADOW_WIDTH (0)
-#define FACE_WIDTH (152 * scale)
-#define BORDER_WIDTH FACE_WIDTH + SHADOW_WIDTH * 2
+#define FACE_WIDTH (150 * scale)
+#define BORDER_WIDTH FACE_WIDTH
 #define IMG_WIDTH (150 * scale)
-#define ENTRY_HEIGHT (FACE_WIDTH + SHADOW_WIDTH * 2 + 45)
-#define ENTRY_WIDTH (152 * scale + SHADOW_WIDTH * 2)
+#define ENTRY_HEIGHT (FACE_WIDTH + 70)
+#define ENTRY_WIDTH (150 * scale)
 
 #define CENTER_IMG_WIDTH (180 * scale)
-#define CENTER_FACE_WIDTH (182 * scale)
-#define CENTER_ENTRY_WIDTH (182 * scale + SHADOW_WIDTH * 2)
-#define CENTER_ENTRY_HEIGHT (CENTER_FACE_WIDTH + SHADOW_WIDTH * 2 + 45)
-#define CENTER_BORDER_WIDTH CENTER_FACE_WIDTH + SHADOW_WIDTH * 2
-
+#define CENTER_FACE_WIDTH (180 * scale)
+#define CENTER_ENTRY_WIDTH (180 * scale )
+#define CENTER_ENTRY_HEIGHT (CENTER_FACE_WIDTH + 70)
 
 extern float scale;
 

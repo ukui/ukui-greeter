@@ -177,44 +177,42 @@ void UserEntry::setLogin(bool isLogin)
 void UserEntry::setResize()
 {
     QRect faceRect,nameRect,loginRect;
-    if(id == selectedId)
-    {
-        const QString SheetStyle = QString("border-radius: %1px;  border:2px   solid white;").arg(CENTER_IMG_WIDTH/2);
-        m_faceLabel->setStyleSheet(SheetStyle);
-        faceRect.setRect(SHADOW_WIDTH, SHADOW_WIDTH, CENTER_FACE_WIDTH, CENTER_FACE_WIDTH);
-        userface = scaledPixmap(CENTER_IMG_WIDTH, CENTER_IMG_WIDTH, m_face);
-        userface =  PixmapToRound(userface, CENTER_IMG_WIDTH/2);
-        m_faceLabel->setGeometry(faceRect);
-        m_faceLabel->move((width() - m_faceLabel->width())/2,m_faceLabel->y());
-        m_nameLabel->setFont(QFont("Ubuntu", 24));
-        QGraphicsOpacityEffect *opacityEffect=new QGraphicsOpacityEffect;
-        m_faceLabel->setGraphicsEffect(opacityEffect);
-        opacityEffect->setOpacity(1);
-    }
-    else
-    {
-        const QString SheetStyle = QString("border-radius: %1px;  border:2px   solid white;").arg(IMG_WIDTH/2);
-        m_faceLabel->setStyleSheet(SheetStyle);
-        faceRect.setRect(SHADOW_WIDTH, SHADOW_WIDTH, FACE_WIDTH, FACE_WIDTH);
-        userface = scaledPixmap(IMG_WIDTH, IMG_WIDTH, m_face);
-        userface =  PixmapToRound(userface, IMG_WIDTH/2);
-        m_faceLabel->setGeometry(faceRect);
-        m_faceLabel->move((width() - m_faceLabel->width())/2,m_faceLabel->y()+30);
-        m_nameLabel->setFont(QFont("Ubuntu", 18));
-        QGraphicsOpacityEffect *opacityEffect=new QGraphicsOpacityEffect;
-        m_faceLabel->setGraphicsEffect(opacityEffect);
-        opacityEffect->setOpacity(0.6);
-    }
 
+    const QString SheetStyle = QString("border-radius: %1px;  border:2px   solid white;").arg(width()/2);
+    m_faceLabel->setStyleSheet(SheetStyle);
+    faceRect.setRect(0, 0, width(), width());
+    userface = scaledPixmap(width(), width(), m_face);
+    userface =  PixmapToRound(userface, width()/2);
+    m_faceLabel->setGeometry(faceRect);
+    m_faceLabel->move((width() - m_faceLabel->width())/2,m_faceLabel->y());
 
     m_faceLabel->setPixmap(userface);
-
-    m_nameLabel->adjustSize();
-    m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height());
 
     m_loginLabel->setPixmap(QPixmap(":/resource/is_logined.png"));
     m_loginLabel->resize(24,24);
     m_loginLabel->setGeometry(m_faceLabel->x(),m_faceLabel->y(),24,24);
+
+    if(id == selectedId)
+    {
+        m_nameLabel->setFont(QFont("Ubuntu", 30));
+
+        QGraphicsOpacityEffect opacityEffect;
+        opacityEffect.setOpacity(1);
+        m_faceLabel->setGraphicsEffect(&opacityEffect);
+
+        m_nameLabel->adjustSize();
+        m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 25);
+    }
+    else
+    {
+        m_nameLabel->setFont(QFont("Ubuntu", 24));
+        QGraphicsOpacityEffect opacityEffect;
+        opacityEffect.setOpacity(0.6);
+        m_faceLabel->setGraphicsEffect(&opacityEffect);
+
+        m_nameLabel->adjustSize();
+        m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 32);
+    }
 
 
 }

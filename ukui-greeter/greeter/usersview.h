@@ -45,8 +45,6 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:
-    void onUserPressed();
-    void onUserClicked(int row);
     void onUserAdded(const QModelIndex&, int, int);
     void onUserRemoved(const QModelIndex&, int, int );
     void onUserChanged(const QModelIndex&, const QModelIndex&);
@@ -60,6 +58,7 @@ signals:
 
 private:
     void insertUserEntry(int row);
+    void removeUserEntry(int row);
     void moveUserEntry(int from,int to);
     void moveCurrentToCenter(int row);
     void leftToRight();
@@ -76,6 +75,7 @@ private:
     QAbstractListModel *usersModel;
     int currentUser;
     QList<UserEntry *>userlist;
+    QTime lasttime;
 
 
 };
