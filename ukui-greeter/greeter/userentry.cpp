@@ -155,11 +155,11 @@ void UserEntry::setUserName(const QString &name)
     QFont font("ubuntu", 24);
     QFontMetrics fm(font);
     int pixelsWide = fm.width(m_name);
-    if(pixelsWide < m_nameLabel->width())
+    if(pixelsWide < IMG_WIDTH)
         m_nameLabel->setAlignment(Qt::AlignCenter);
     else{
         QFontMetrics fontWidth(font);
-        QString str = fontWidth.elidedText(m_name,Qt::ElideRight,m_nameLabel->width());
+        QString str = fontWidth.elidedText(m_name,Qt::ElideRight,IMG_WIDTH);
         this->m_nameLabel->setText(str);
     }
 }
