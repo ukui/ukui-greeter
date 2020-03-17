@@ -313,8 +313,11 @@ void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
             m_powerLB->click();
     break;
     case Qt::Key_Escape:
-        if(m_powerWnd && !m_powerWnd->isHidden())
+        if(m_powerWnd && !m_powerWnd->isHidden()){
             m_powerWnd->close();
+            m_userWnd->show();
+            m_loginWnd->show();
+        }
     break;
     }
     QWidget::keyReleaseEvent(e);

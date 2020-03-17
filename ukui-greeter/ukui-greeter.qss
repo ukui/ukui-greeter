@@ -49,6 +49,7 @@ QMenu#SessionWnd::icon{
 
 QLabel{
     color: white;
+    font-size: 16px;
     font-family: "Ubuntu"
 }
 
