@@ -281,6 +281,7 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
 
     //虚拟键盘位置
     setVirkeyboardPos();
+
 }
 
 void GreeterWindow::setVirkeyboardPos()
@@ -406,10 +407,13 @@ void GreeterWindow::onUserChangedByManual(const QString &userName)
     updateSession(userName);
 }
 
-void GreeterWindow::setWindowVisible(bool visible)
+void GreeterWindow::setWindowVisible()
 {
-    m_loginWnd->setVisible(!visible);
-    m_userWnd->setVisible(!visible);
+    if(m_powerWnd && m_powerWnd->isVisible())
+        m_powerWnd->hide();
+
+    m_loginWnd->setVisible(true);
+    m_userWnd->setVisible(true);
 }
 /**
  * @brief GreeterWindow::showPowerWnd
@@ -417,24 +421,27 @@ void GreeterWindow::setWindowVisible(bool visible)
  */
 void GreeterWindow::showPowerWnd()
 {
-    m_userWnd->hide();
-    m_loginWnd->hide();
     //如果已经打开了电源对话框则关闭
     if(m_powerWnd && !m_powerWnd->isHidden()){
         m_powerWnd->close();
+        m_userWnd->show();
+        m_loginWnd->show();
         return;
     }
-    //判断是否已经有用户登录
-    bool hasOpenSessions = false;
-    for(int i = 0; i < m_usersModel->rowCount(); i++) {
-        hasOpenSessions = m_usersModel->index(i, 0).data(QLightDM::UsersModel::LoggedInRole).toBool();
-        if(hasOpenSessions)
-            break;
-    }
-    m_powerWnd = new PowerWindow(hasOpenSessions, this);
-    connect(m_powerWnd, &PowerWindow::windowVisibleChanged,
-                this, &GreeterWindow::setWindowVisible);
 
+    m_userWnd->hide();
+    m_loginWnd->hide();
+
+    m_powerWnd = new PowerManager(this);
+    m_powerWnd->adjustSize();
+//    m_powerWnd->setGeometry((width()-ITEM_WIDTH*5)/2,
+//                              (height()-ITEM_HEIGHT)/2,
+//                              ITEM_WIDTH*5,ITEM_HEIGHT);
+    m_powerWnd->setFixedSize(m_powerWnd->windowSize());
+    m_powerWnd->move((width()-m_powerWnd->width())/2,(height() - m_powerWnd->height())/2);
+
+    connect(m_powerWnd,SIGNAL(switchToUser())
+            ,this,SLOT(setWindowVisible()));
     m_powerWnd->setObjectName(QStringLiteral("powerWnd"));
     m_powerWnd->show();
 }

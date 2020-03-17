@@ -27,8 +27,8 @@
 #include "usersmodel.h"
 #include "greeterwrapper.h"
 
-class PowerWindow;
 class UsersView;
+class PowerManager;
 class QProcess;
 class QGraphicsOpacityEffect;
 class Configuration;
@@ -57,7 +57,7 @@ private slots:
     void onSessionChanged(const QString &session);
     void onUserChangedByManual(const QString &userName);
     void showLanguageWnd();
-    void setWindowVisible(bool);
+    void setWindowVisible();
 
 private:
     void switchWnd(int);
@@ -71,7 +71,7 @@ private:
     UsersView               *m_userWnd;
     LoginWindow             *m_loginWnd;
     SessionWindow           *m_sessionWnd;
-    PowerWindow             *m_powerWnd;
+    PowerManager             *m_powerWnd;
     QPushButton             *m_keyboardLB;
     QPushButton             *m_powerLB;
     QPushButton             *m_sessionLB;

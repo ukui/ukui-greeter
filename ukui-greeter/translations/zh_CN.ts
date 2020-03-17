@@ -141,7 +141,7 @@
 <context>
     <name>GreeterWrapper</name>
     <message>
-        <location filename="../greeter/greeterwrapper.cpp" line="102"/>
+        <location filename="../greeter/greeterwrapper.cpp" line="101"/>
         <source>failed to start session.</source>
         <translation>启动会话失败</translation>
     </message>
@@ -176,34 +176,33 @@
         <translation>已登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="390"/>
-        <location filename="../greeter/loginwindow.cpp" line="482"/>
+        <location filename="../greeter/loginwindow.cpp" line="389"/>
         <source>login</source>
         <translation>登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="537"/>
+        <location filename="../greeter/loginwindow.cpp" line="536"/>
         <source>Incorrect user name, please input again</source>
         <translation>用户名不正确，请重新输入</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="751"/>
+        <location filename="../greeter/loginwindow.cpp" line="750"/>
         <source>Biometric Authentication</source>
         <translation>生物识别认证</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="763"/>
+        <location filename="../greeter/loginwindow.cpp" line="762"/>
         <source>Password Authentication</source>
         <translation>密码认证</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="775"/>
+        <location filename="../greeter/loginwindow.cpp" line="774"/>
         <source>Other Devices</source>
         <translation>其他设备</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="578"/>
-        <location filename="../greeter/loginwindow.cpp" line="785"/>
+        <location filename="../greeter/loginwindow.cpp" line="577"/>
+        <location filename="../greeter/loginwindow.cpp" line="784"/>
         <source>Retry</source>
         <translation>重试</translation>
     </message>
@@ -224,32 +223,32 @@
         <translation type="obsolete">游客登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="478"/>
+        <location filename="../greeter/loginwindow.cpp" line="477"/>
         <source>Password: </source>
         <translation>密码：</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="480"/>
         <source>login:</source>
-        <translation>登录：</translation>
+        <translation type="vanished">登录：</translation>
     </message>
     <message>
         <source>Password:</source>
         <translation type="obsolete">密码：</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="542"/>
-        <location filename="../greeter/loginwindow.cpp" line="547"/>
+        <location filename="../greeter/loginwindow.cpp" line="541"/>
+        <location filename="../greeter/loginwindow.cpp" line="546"/>
         <source>Incorrect password, please input again</source>
         <translation type="unfinished">密码错误，请重新输入</translation>
     </message>
     <message>
         <location filename="../greeter/loginwindow.cpp" line="264"/>
-        <location filename="../greeter/loginwindow.cpp" line="573"/>
+        <location filename="../greeter/loginwindow.cpp" line="572"/>
         <source>Login</source>
         <translation>登录</translation>
     </message>
     <message>
+        <location filename="../greeter/loginwindow.cpp" line="479"/>
         <source>Username</source>
         <translation>用户名</translation>
     </message>
@@ -271,40 +270,69 @@
     </message>
 </context>
 <context>
+    <name>PowerManager</name>
+    <message>
+        <location filename="../greeter/powerwindow.cpp" line="131"/>
+        <source>SwitchUser</source>
+        <translation>切换用户</translation>
+    </message>
+    <message>
+        <location filename="../greeter/powerwindow.cpp" line="144"/>
+        <source>Suspend</source>
+        <translation>挂起</translation>
+    </message>
+    <message>
+        <location filename="../greeter/powerwindow.cpp" line="158"/>
+        <source>Restart</source>
+        <translation>重启</translation>
+    </message>
+    <message>
+        <location filename="../greeter/powerwindow.cpp" line="172"/>
+        <source>Shutdown</source>
+        <translation>关机</translation>
+    </message>
+    <message>
+        <source>suspend</source>
+        <translation type="vanished">挂起</translation>
+    </message>
+    <message>
+        <source>restart</source>
+        <translation type="vanished">重启</translation>
+    </message>
+    <message>
+        <source>shutdown</source>
+        <translation type="vanished">关机</translation>
+    </message>
+</context>
+<context>
     <name>PowerWindow</name>
     <message>
         <source>Goodbye. Would you like to…</source>
         <translation type="obsolete">再见，你是否想要...</translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="54"/>
         <source>Goodbye. Would you like to...</source>
-        <translation>再见，你是否想要...</translation>
+        <translation type="vanished">再见，你是否想要...</translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="57"/>
         <source>Other users are currently logged in to this computer, shutting down now will also close these other sessions.</source>
-        <translation>当前已有其他用户登录此电脑，现在关机，其他用户的会话也将被终止。</translation>
+        <translation type="vanished">当前已有其他用户登录此电脑，现在关机，其他用户的会话也将被终止。</translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="156"/>
         <source>suspend</source>
-        <translation>挂起</translation>
+        <translation type="vanished">挂起</translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="170"/>
         <source>hibernate</source>
-        <translation>休眠</translation>
+        <translation type="vanished">休眠</translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="184"/>
         <source>restart</source>
-        <translation>重启</translation>
+        <translation type="vanished">重启</translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="198"/>
         <source>shutdown</source>
-        <translation>关机</translation>
+        <translation type="vanished">关机</translation>
     </message>
 </context>
 <context>

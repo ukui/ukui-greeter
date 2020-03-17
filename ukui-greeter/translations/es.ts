@@ -139,7 +139,7 @@
     </message>
     <message>
         <source>login:</source>
-        <translation>iniciar sesión:</translation>
+        <translation type="vanished">iniciar sesión:</translation>
     </message>
     <message>
         <source>Incorrect password, please input again</source>
@@ -169,12 +169,47 @@
         <source>Other Devices</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
         <source>MainWindow</source>
         <translation type="unfinished">Ventana principal</translation>
+    </message>
+</context>
+<context>
+    <name>PowerManager</name>
+    <message>
+        <source>SwitchUser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>suspend</source>
+        <translation type="obsolete">suspender</translation>
+    </message>
+    <message>
+        <source>restart</source>
+        <translation type="obsolete">reiniciar</translation>
+    </message>
+    <message>
+        <source>shutdown</source>
+        <translation type="obsolete">apagar</translation>
+    </message>
+    <message>
+        <source>Suspend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shutdown</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -185,27 +220,23 @@
     </message>
     <message>
         <source>Other users are currently logged in to this computer, shutting down now will also close these other sessions.</source>
-        <translation>Otros usuarios están actualmente conectados a esta computadora, apagar ahora también cerrará estas otras sesiones.</translation>
+        <translation type="vanished">Otros usuarios están actualmente conectados a esta computadora, apagar ahora también cerrará estas otras sesiones.</translation>
     </message>
     <message>
         <source>suspend</source>
-        <translation>suspender</translation>
+        <translation type="vanished">suspender</translation>
     </message>
     <message>
         <source>hibernate</source>
-        <translation>hibernar</translation>
+        <translation type="vanished">hibernar</translation>
     </message>
     <message>
         <source>restart</source>
-        <translation>reiniciar</translation>
+        <translation type="vanished">reiniciar</translation>
     </message>
     <message>
         <source>shutdown</source>
-        <translation>apagar</translation>
-    </message>
-    <message>
-        <source>Goodbye. Would you like to...</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">apagar</translation>
     </message>
 </context>
 <context>

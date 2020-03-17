@@ -9,17 +9,12 @@
         <file>resource/dialog_close_highlight.png</file>
         <file>resource/dialog_close_press.png</file>
         <file>resource/dialog_close.png</file>
-        <file>resource/hibernate_highlight.png</file>
-        <file>resource/hibernate.png</file>
         <file>resource/keyboard.png</file>
         <file>resource/next.png</file>
         <file>resource/power.png</file>
         <file>resource/prev.png</file>
-        <file>resource/restart_highlight.png</file>
-        <file>resource/restart.png</file>
-        <file>resource/shutdown_highlight.png</file>
+	<file>resource/reboot.png</file>
         <file>resource/shutdown.png</file>
-        <file>resource/suspend_highlight.png</file>
         <file>resource/suspend.png</file>
         <file>resource/waiting.png</file>
         <file>resource/show-password.png</file>
@@ -29,6 +24,8 @@
         <file>resource/scrollbar_down_clicked.png</file>
         <file>resource/scrollbar_down_hover.png</file>
         <file>resource/scrollbar_up.png</file>
+        <file>resource/reboot.png</file>
+        <file>resource/avatar.png</file>
         <file>resource/scrollbar_up_clicked.png</file>
         <file>resource/scrollbar_up_hover.png</file>
         <file>resource/combobox_down.png</file>
