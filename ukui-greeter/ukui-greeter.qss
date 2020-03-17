@@ -248,21 +248,16 @@ QLineEdit::focus{
 }
 /* 登录按钮 */
 #loginButton{
-    background: #559BE2;
  /*   image: url(:/resource/login-button.png);*/
-    min-width: 26px;
-    max-width: 26px;
-    min-height: 26px;
-    max-height: 26px;
-    margin-right: 4px;
-    icon-size: 26px;
+     min-width: 26px;
+     max-width: 26px;
+     min-height: 26px;
+     max-height: 26px;
+     icon-size: 26px;
+     background:#3D6BE5;
+     border-radius:13px;
 }
-#loginButton::hover{
-    background: #1172D5;
-}
-#loginButton::pressed{
-    background: #0653A1;
-}
+
 /* PAM message提示*/
 #messageLabel {
     font-size: 16px;

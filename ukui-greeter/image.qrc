@@ -20,6 +20,8 @@
         <file>resource/show-password.png</file>
         <file>resource/hide-password.png</file>
         <file>resource/login-button.png</file>
+	<file>resource/login-button-hover.png</file>
+	<file>resource/login-button-pressed.png</file>
         <file>resource/scrollbar_down.png</file>
         <file>resource/scrollbar_down_clicked.png</file>
         <file>resource/scrollbar_down_hover.png</file>
