@@ -63,6 +63,7 @@ protected:
 
 signals:
     void back();
+    void bioDeviceIsChoosed(bool);
 
     /**
      * @brief 手动输入用户名

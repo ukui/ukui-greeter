@@ -747,6 +747,7 @@ void LoginWindow::initBiometricButtonWidget()
 
     m_biometricButton = new QPushButton(m_buttonsWidget);
     m_biometricButton->setObjectName(QStringLiteral("biometricButton"));
+    m_biometricButton->setIcon(QIcon(":/resource/bio-login.png"));
     m_biometricButton->setText(tr("Biometric Authentication"));
     m_biometricButton->setSizePolicy(sizePolicy);
     m_biometricButton->setVisible(false);
@@ -759,6 +760,7 @@ void LoginWindow::initBiometricButtonWidget()
 
     m_passwordButton = new QPushButton(m_buttonsWidget);
     m_passwordButton->setObjectName(QStringLiteral("passwordButton"));
+    m_passwordButton->setIcon(QIcon(":/resource/password-login.png"));
     m_passwordButton->setText(tr("Password Authentication"));
     fm = QFontMetrics(m_passwordButton->font(), m_passwordButton);
     width = fm.width(m_passwordButton->text());
@@ -871,24 +873,24 @@ void LoginWindow::onBiometricButtonClicked()
     //当前没有设备，让用户选择设备
     if(!m_deviceInfo)
     {
-        if(m_deviceCount == 1)
-        {
-            DeviceList deviceList = m_biometricProxy->GetDevList();
-            m_deviceInfo = deviceList.at(0);
-            if(!m_deviceInfo)
-            {
-                m_otherDeviceButton->click();
-            }
-            else
-            {
-                authMode = BIOMETRIC;
-                startAuthentication();
-            }
-        }
-        else
-        {
+//        if(m_deviceCount == 1)
+//        {
+//            DeviceList deviceList = m_biometricProxy->GetDevList();
+//            m_deviceInfo = deviceList.at(0);
+//            if(!m_deviceInfo)
+//            {
+//                m_otherDeviceButton->click();
+//            }
+//            else
+//            {
+//                authMode = BIOMETRIC;
+//                startAuthentication();
+//            }
+//        }
+//        else
+//        {
             m_otherDeviceButton->click();
-        }
+//        }
     }
     else
     {
@@ -957,7 +959,7 @@ void LoginWindow::showPasswordAuthWidget()
 
 void LoginWindow::showBiometricAuthWidget()
 {
-
+    emit bioDeviceIsChoosed(true);
     m_passwdWidget->setVisible(false);
     m_messageButton->hide();
     if(m_biometricAuthWidget)
@@ -982,6 +984,7 @@ void LoginWindow::showBiometricAuthWidget()
 
 void LoginWindow::showBiometricDeviceWidget()
 {
+    emit bioDeviceIsChoosed(false);
     m_passwdWidget->setVisible(false);
     m_messageButton->hide();
     if(m_biometricAuthWidget)

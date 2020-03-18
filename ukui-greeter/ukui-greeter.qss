@@ -134,10 +134,14 @@ QComboBox QListView{
     font-size: 18px;
     color: white;
 }
-QComboBox QListView::item:hover{
-/*    background: rgba(255, 255, 255, 20%);*/
-
+QComboBox QListView::item{
+    background: rgba(255, 255, 255, 0);
 }
+
+QComboBox QListView::item:hover{
+    background: rgba(255, 255, 255, 20%);
+}
+
 QComboBox QListView::item:selected{
     background-color: rgba(255, 255, 255, 30%);
 }
@@ -340,16 +344,14 @@ QListWidget::item#languageList{
 #otherDeviceButton::hover, #retryButton::hover,
 #OKButton::hover
 {
-    background: rgba(255, 255, 255, 35%);
-    border: 1px solid rgba(255, 255, 255, 50%);
+    background: rgba(255, 255, 255, 20%);
 }
 
 #biometricButton::pressed, #passwordButton::pressed,
 #otherDeviceButton::pressed, #retryButton::pressed,
 #OKButton::pressed
 {
-    background: rgba(0, 0, 0, 15%);
-    border: 1px solid rgba(255, 255, 255, 20%);
+    background: rgba(0, 0, 0, 20%);
 }
 
 

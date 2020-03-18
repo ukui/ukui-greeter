@@ -67,6 +67,7 @@ private:
     bool sessionIsValid(const QString &session);
     void updateLanguage(QString userName);
     void updateSession(QString userName);
+    void setUserWindowVisible(bool visible);
 
     UsersView               *m_userWnd;
     LoginWindow             *m_loginWnd;

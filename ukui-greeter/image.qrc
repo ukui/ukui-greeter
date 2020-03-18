@@ -33,5 +33,7 @@
         <file>resource/combobox_down.png</file>
         <file>resource/capslock.png</file>
     	<file>resource/is_logined.png</file>
+    	<file>resource/bio-login.png</file>
+	<file>resource/password-login.png</file>
     </qresource>
 </RCC>

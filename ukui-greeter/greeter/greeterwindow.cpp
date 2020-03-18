@@ -179,6 +179,9 @@ void GreeterWindow::initUI()
     m_loginWnd = new LoginWindow(m_greeter, this);
     connect(m_loginWnd, &LoginWindow::userChangedByManual,
             this, &GreeterWindow::onUserChangedByManual);
+    connect(m_loginWnd, &LoginWindow::bioDeviceIsChoosed,
+            this, &GreeterWindow::setUserWindowVisible);
+
     connect(m_userWnd, &UsersView::userNotFound, m_loginWnd, &LoginWindow::setUserNotInView);
 
     m_userWnd->setModel(m_usersModel);
@@ -218,6 +221,25 @@ void GreeterWindow::initUI()
     }
 }
 
+void GreeterWindow::setUserWindowVisible(bool visible)
+{
+    if(m_userWnd)
+        m_userWnd->setVisible(visible);
+    if(!visible){
+        QRect loginRect((width()-m_loginWnd->width())/2,
+                        widgetTime->y() + widgetTime->height() + 176*scale,
+                        m_loginWnd->width(),
+                        m_loginWnd->height());
+        m_loginWnd->setGeometry(loginRect);
+    }
+    else{
+        QRect loginRect((width()-m_loginWnd->width())/2,
+                        m_userWnd->y() + m_userWnd->height() + 46 *scale,
+                        m_loginWnd->width(),
+                        height() - (m_userWnd->y() + m_userWnd->height() + 46 *scale));
+        m_loginWnd->setGeometry(loginRect);
+    }
+}
 /**
  * @brief GreeterWindow::resizeEvent
  * @param event
