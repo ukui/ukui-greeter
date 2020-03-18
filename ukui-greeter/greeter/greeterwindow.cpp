@@ -179,6 +179,9 @@ void GreeterWindow::initUI()
     m_loginWnd = new LoginWindow(m_greeter, this);
     connect(m_loginWnd, &LoginWindow::userChangedByManual,
             this, &GreeterWindow::onUserChangedByManual);
+    connect(m_loginWnd, &LoginWindow::bioDeviceIsChoosed,
+            this, &GreeterWindow::setUserWindowVisible);
+
     connect(m_userWnd, &UsersView::userNotFound, m_loginWnd, &LoginWindow::setUserNotInView);
 
     m_userWnd->setModel(m_usersModel);
@@ -218,6 +221,25 @@ void GreeterWindow::initUI()
     }
 }
 
+void GreeterWindow::setUserWindowVisible(bool visible)
+{
+    if(m_userWnd)
+        m_userWnd->setVisible(visible);
+    if(!visible){
+        QRect loginRect((width()-m_loginWnd->width())/2,
+                        widgetTime->y() + widgetTime->height() + 176*scale,
+                        m_loginWnd->width(),
+                        m_loginWnd->height());
+        m_loginWnd->setGeometry(loginRect);
+    }
+    else{
+        QRect loginRect((width()-m_loginWnd->width())/2,
+                        m_userWnd->y() + m_userWnd->height() + 46 *scale,
+                        m_loginWnd->width(),
+                        height() - (m_userWnd->y() + m_userWnd->height() + 46 *scale));
+        m_loginWnd->setGeometry(loginRect);
+    }
+}
 /**
  * @brief GreeterWindow::resizeEvent
  * @param event
@@ -239,13 +261,16 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     if(m_userWnd){
         m_userWnd->resize(CENTER_ENTRY_WIDTH*9 - ENTRY_WIDTH*4, CENTER_ENTRY_HEIGHT);
         QRect userRect((width()-m_userWnd->width())/2,
-                       304.9,
+                       widgetTime->y() + widgetTime->height() + 176*scale,
                        m_userWnd->width(), m_userWnd->height());
         m_userWnd->setGeometry(userRect);
     }
     if(m_loginWnd){
-        QRect loginRect((width()-m_loginWnd->width())/2, 585,
-                        m_loginWnd->width(), height() - 585);
+
+    QRect loginRect((width()-m_loginWnd->width())/2,
+                        m_userWnd->y() + m_userWnd->height() + 46 *scale,
+                        m_loginWnd->width(),
+                        height() - (m_userWnd->y() + m_userWnd->height() + 46 *scale));
         m_loginWnd->setGeometry(loginRect);
     }
 
@@ -281,6 +306,7 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
 
     //虚拟键盘位置
     setVirkeyboardPos();
+
 }
 
 void GreeterWindow::setVirkeyboardPos()
@@ -310,8 +336,11 @@ void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
             m_powerLB->click();
     break;
     case Qt::Key_Escape:
-        if(m_powerWnd && !m_powerWnd->isHidden())
+        if(m_powerWnd && !m_powerWnd->isHidden()){
             m_powerWnd->close();
+            m_userWnd->show();
+            m_loginWnd->show();
+        }
     break;
     }
     QWidget::keyReleaseEvent(e);
@@ -406,10 +435,13 @@ void GreeterWindow::onUserChangedByManual(const QString &userName)
     updateSession(userName);
 }
 
-void GreeterWindow::setWindowVisible(bool visible)
+void GreeterWindow::setWindowVisible()
 {
-    m_loginWnd->setVisible(!visible);
-    m_userWnd->setVisible(!visible);
+    if(m_powerWnd && m_powerWnd->isVisible())
+        m_powerWnd->hide();
+
+    m_loginWnd->setVisible(true);
+    m_userWnd->setVisible(true);
 }
 /**
  * @brief GreeterWindow::showPowerWnd
@@ -417,24 +449,27 @@ void GreeterWindow::setWindowVisible(bool visible)
  */
 void GreeterWindow::showPowerWnd()
 {
-    m_userWnd->hide();
-    m_loginWnd->hide();
     //如果已经打开了电源对话框则关闭
     if(m_powerWnd && !m_powerWnd->isHidden()){
         m_powerWnd->close();
+        m_userWnd->show();
+        m_loginWnd->show();
         return;
     }
-    //判断是否已经有用户登录
-    bool hasOpenSessions = false;
-    for(int i = 0; i < m_usersModel->rowCount(); i++) {
-        hasOpenSessions = m_usersModel->index(i, 0).data(QLightDM::UsersModel::LoggedInRole).toBool();
-        if(hasOpenSessions)
-            break;
-    }
-    m_powerWnd = new PowerWindow(hasOpenSessions, this);
-    connect(m_powerWnd, &PowerWindow::windowVisibleChanged,
-                this, &GreeterWindow::setWindowVisible);
 
+    m_userWnd->hide();
+    m_loginWnd->hide();
+
+    m_powerWnd = new PowerManager(this);
+    m_powerWnd->adjustSize();
+//    m_powerWnd->setGeometry((width()-ITEM_WIDTH*5)/2,
+//                              (height()-ITEM_HEIGHT)/2,
+//                              ITEM_WIDTH*5,ITEM_HEIGHT);
+    m_powerWnd->setFixedSize(m_powerWnd->windowSize());
+    m_powerWnd->move((width()-m_powerWnd->width())/2,(height() - m_powerWnd->height())/2);
+
+    connect(m_powerWnd,SIGNAL(switchToUser())
+            ,this,SLOT(setWindowVisible()));
     m_powerWnd->setObjectName(QStringLiteral("powerWnd"));
     m_powerWnd->show();
 }

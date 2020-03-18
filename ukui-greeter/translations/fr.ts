@@ -139,7 +139,7 @@
     </message>
     <message>
         <source>login:</source>
-        <translation>s&apos;identifier:</translation>
+        <translation type="vanished">s&apos;identifier:</translation>
     </message>
     <message>
         <source>Incorrect password, please input again</source>
@@ -169,12 +169,47 @@
         <source>Other Devices</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
         <source>MainWindow</source>
         <translation type="unfinished">Fenêtre principale</translation>
+    </message>
+</context>
+<context>
+    <name>PowerManager</name>
+    <message>
+        <source>SwitchUser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>suspend</source>
+        <translation type="obsolete">suspendre</translation>
+    </message>
+    <message>
+        <source>restart</source>
+        <translation type="obsolete">redémarrer</translation>
+    </message>
+    <message>
+        <source>shutdown</source>
+        <translation type="obsolete">fermer</translation>
+    </message>
+    <message>
+        <source>Suspend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shutdown</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -185,27 +220,23 @@
     </message>
     <message>
         <source>Other users are currently logged in to this computer, shutting down now will also close these other sessions.</source>
-        <translation>D&apos;autres utilisateurs sont actuellement connectés à cet ordinateur, leur fermeture ferme également ces autres sessions.</translation>
+        <translation type="vanished">D&apos;autres utilisateurs sont actuellement connectés à cet ordinateur, leur fermeture ferme également ces autres sessions.</translation>
     </message>
     <message>
         <source>suspend</source>
-        <translation>suspendre</translation>
+        <translation type="vanished">suspendre</translation>
     </message>
     <message>
         <source>hibernate</source>
-        <translation>hiberner</translation>
+        <translation type="vanished">hiberner</translation>
     </message>
     <message>
         <source>restart</source>
-        <translation>redémarrer</translation>
+        <translation type="vanished">redémarrer</translation>
     </message>
     <message>
         <source>shutdown</source>
-        <translation>fermer</translation>
-    </message>
-    <message>
-        <source>Goodbye. Would you like to...</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">fermer</translation>
     </message>
 </context>
 <context>

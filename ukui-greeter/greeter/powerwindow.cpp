@@ -16,201 +16,188 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301, USA.
 **/
-#include "powerwindow.h"
+
 #include <QLabel>
-#include <QMouseEvent>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QDebug>
+#include <QPixmap>
+#include <QListWidgetItem>
+#include <QListWidget>
 #include <QException>
-#include <QFontMetrics>
-#include <qmath.h>
-#include "globalv.h"
+#include <QDebug>
+#include <QDBusInterface>
+#include "powerwindow.h"
 
-PowerWindow::PowerWindow(bool hasOpenSessions, QWidget *parent)
-    : FakeDialog(parent),
-      m_hasOpenSessions(hasOpenSessions),
-      m_power(new QLightDM::PowerInterface(this))
+PowerManager::PowerManager(QWidget *parent)
+ : QListWidget(parent),
+   m_power(new QLightDM::PowerInterface(this)),
+   lasttime(QTime::currentTime())
 {
-    initUI();
-}
-
-void PowerWindow::initUI()
-{
-    setWindowFlags(Qt::FramelessWindowHint);
-    setAttribute(Qt::WA_TranslucentBackground, true);
-    setGeometry(parentWidget()->rect());
-
-    //重启和关机一定存在，根据是否能挂起和休眠确定窗口宽度
-    int cnt = 0;
-    if(m_power->canHibernate())
-        cnt++;
     if(m_power->canSuspend())
-        cnt++;
+        resize(ITEM_WIDTH*4, ITEM_HEIGHT);
+    else
+        resize(ITEM_WIDTH*3, ITEM_HEIGHT);
 
-    setDialogSize(455 + 188 * cnt, 400);
-    //根据提示内容的长度确定窗口的高度
-    QFont font("ubuntu", 12);
-    QString text = tr("Goodbye. Would you like to...");
-    int lineNum = 1;
-    if(m_hasOpenSessions) {
-        QString text2 = tr("Other users are currently logged in to this computer, "
-                   "shutting down now will also close these other sessions.");
-        text = QString("%1\n\n%2").arg(text2).arg(text);
-        QFontMetrics fm(font);
-        int textWide = fm.width(text2);
-        lineNum = qCeil(textWide * 1.0 / centerWidget()->width()) + 1 + lineNum;
-    }
-    setDialogSize(455 + 188 * cnt, 400 + 20*lineNum);
+    setFlow(QListWidget::LeftToRight);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setSelectionMode(QListWidget::NoSelection);
 
-    QVBoxLayout *vbox = new QVBoxLayout(centerWidget());
-    vbox->setContentsMargins(20, 10, 20, 2);
-    vbox->setSpacing(20);
+    QObject::connect(this,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(powerClicked(QListWidgetItem*)));
+    initUI();
 
-    m_prompt = new QLabel(centerWidget());
-    m_prompt->adjustSize();
-    m_prompt->setText(text);
-    m_prompt->setWordWrap(true);
-    m_prompt->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    m_prompt->setFont(font);
-
-    vbox->addWidget(m_prompt);
-
-    QHBoxLayout *hbox = new QHBoxLayout();
-    hbox->setSpacing(20);
-
-    /* 挂起 */
-    if(m_power->canSuspend()){
-        QVBoxLayout *vboxSuspend = new QVBoxLayout();
-        m_suspend = new QLabel(centerWidget());
-        m_suspend->setFixedSize(168, 168);
-        m_suspend->setObjectName(QStringLiteral("suspend"));
-        m_suspend->installEventFilter(this);
-
-        m_suspendLabel = new QLabel(centerWidget());
-        m_suspendLabel->setAlignment(Qt::AlignCenter);
-        m_suspendLabel->setFixedSize(168, 30);
-        m_suspendLabel->setText(tr("suspend"));
-
-        vboxSuspend->addWidget(m_suspend);
-        vboxSuspend->addWidget(m_suspendLabel);
-
-        hbox->addLayout(vboxSuspend);
-    }
-    /* 休眠 */
-    if(m_power->canHibernate()) {
-        QVBoxLayout *vboxHibernate = new QVBoxLayout();
-        m_hibernate = new QLabel(centerWidget());
-        m_hibernate->setFixedSize(168, 168);
-        m_hibernate->setObjectName(QStringLiteral("hibernate"));
-        m_hibernate->installEventFilter(this);
-
-        m_hibernateLabel = new QLabel(centerWidget());
-        m_hibernateLabel->setAlignment(Qt::AlignCenter);
-        m_hibernateLabel->setFixedSize(168, 30);
-        m_hibernateLabel->setText(tr("hibernate"));
-
-        vboxHibernate->addWidget(m_hibernate);
-        vboxHibernate->addWidget(m_hibernateLabel);
-
-        hbox->addLayout(vboxHibernate);
-    }
-
-    /* 重启 */
-    QVBoxLayout *vboxStart = new QVBoxLayout();
-    m_restart = new QLabel(centerWidget());
-    m_restart->setFixedSize(168, 168);
-    m_restart->setObjectName(QStringLiteral("restart"));
-    m_restart->installEventFilter(this);
-
-    m_restartLabel = new QLabel(centerWidget());
-    m_restartLabel->setAlignment(Qt::AlignCenter);
-    m_restartLabel->setFixedSize(168, 30);
-    m_restartLabel->setText(tr("restart"));
-
-    vboxStart->addWidget(m_restart);
-    vboxStart->addWidget(m_restartLabel);
-
-    /* 关机 */
-    QVBoxLayout *vboxShutdown = new QVBoxLayout();
-    m_shutdown = new QLabel(centerWidget());
-    m_shutdown->setFixedSize(168, 168);
-    m_shutdown->setObjectName(QStringLiteral("shutdown"));
-    m_shutdown->installEventFilter(this);
-
-    m_shutdownLabel = new QLabel(centerWidget());
-    m_shutdownLabel->setAlignment(Qt::AlignCenter);
-    m_shutdownLabel->setFixedSize(168, 30);
-    m_shutdownLabel->setText(tr("shutdown"));
-
-    vboxShutdown->addWidget(m_shutdown);
-    vboxShutdown->addWidget(m_shutdownLabel);
-
-    hbox->addLayout(vboxStart);
-    hbox->addLayout(vboxShutdown);
-
-    vbox->addLayout(hbox);
-    vbox->addStretch();
 }
 
-bool PowerWindow::eventFilter(QObject *obj, QEvent *event)
+QSize PowerManager::windowSize()
 {
-    if(obj == m_suspend) {
-        if(event->type() == QEvent::MouseButtonRelease){
-            qDebug() << "suspend";
-            try{
-                m_power->suspend();
-                close();
-            }catch(QException &e) {
-                qWarning() << e.what();
-            }
-        }
-    }else if(obj == m_hibernate) {
-        if(event->type() == QEvent::MouseButtonRelease){
-            qDebug() << "hibernate";
-            try{
-                m_power->hibernate();
-                close();
-            }catch(QException &e) {
-                qWarning() << e.what();
-            }
-        }
-    } else if(obj == m_restart) {
-        if(event->type() == QEvent::MouseButtonRelease){
-            qDebug() << "restart";
-            try{
-                m_power->restart();
-                close();
-            }catch(QException &e) {
-                qWarning() << e.what();
-            }
-        }
-    } else if(obj == m_shutdown) {
-        if(event->type() == QEvent::MouseButtonRelease){
-            try{
-                qDebug() << "shutdown";
-                m_power->shutdown();
-                close();
-            }catch(QException &e) {
-                qWarning() << e.what();
-            }
-        }
-    }
-    return QWidget::eventFilter(obj, event);
+    if(m_power->canSuspend())
+        return QSize(ITEM_WIDTH*4, ITEM_HEIGHT);
+    else
+        return QSize(ITEM_WIDTH*3, ITEM_HEIGHT);
 }
 
-void PowerWindow::mousePressEvent(QMouseEvent *event)
+void PowerManager::powerClicked(QListWidgetItem *item)
 {
-    if(!dialog()->geometry().contains(event->pos()))
+    int interval = lasttime.msecsTo(QTime::currentTime());
+    if(interval < 200 && interval > -200)
+        return ;
+    lasttime = QTime::currentTime();
+
+    int x = row(item);
+
+    switch (x) {
+    case 0:
+        switchWidgetClicked();
+        break;
+    case 1:
+        rebootWidgetClicked();
+        break;
+    case 2:
+        shutdownWidgetClicked();
+        break;
+    case 3:
+        suspendWidgetCliced();
+        break;
+    default:
+        break;
+    }
+}
+
+void PowerManager::switchWidgetClicked()
+{
+    emit switchToUser();
+}
+
+void PowerManager::shutdownWidgetClicked()
+{
+    try{
+        qDebug() << "shutdown";
+        m_power->shutdown();
         close();
+    }catch(QException &e) {
+        qWarning() << e.what();
+    }
 }
 
-void PowerWindow::showEvent(QShowEvent *event)
+void PowerManager::rebootWidgetClicked()
 {
-    emit windowVisibleChanged(true);
+    try{
+        m_power->restart();
+        close();
+    }catch(QException &e) {
+        qWarning() << e.what();
+    }
 }
 
-void PowerWindow::closeEvent(QCloseEvent *event)
+void PowerManager::suspendWidgetCliced()
 {
-    emit windowVisibleChanged(false);
+    try{
+        m_power->suspend();
+        close();
+    }catch(QException &e) {
+        qWarning() << e.what();
+    }
+}
+
+void PowerManager::initUI()
+{
+
+    switchWidget = new QWidget(this);
+    switchWidget->setObjectName("switchWidget");
+    QLabel *switchFace = new QLabel(this);
+    QLabel *switchLabel =  new QLabel(this);
+    switchFace->setAlignment(Qt::AlignCenter);
+    switchLabel->setAlignment(Qt::AlignCenter);
+    switchFace->setPixmap(QPixmap(":/resource/avatar.png").scaled(58,58));
+    switchLabel->setText(tr("SwitchUser"));
+    switchWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
+    QVBoxLayout *switchlayout = new QVBoxLayout(switchWidget);
+    switchlayout->addWidget(switchFace);
+    switchlayout->addWidget(switchLabel);
+
+    suspendWidget = new QWidget(this);
+    suspendWidget->setObjectName("suspendWidget");
+    QLabel *suspendFace = new QLabel(this);
+    QLabel *suspendLabel = new QLabel(this);
+    suspendFace->setAlignment(Qt::AlignCenter);
+    suspendLabel->setAlignment(Qt::AlignCenter);
+    suspendFace->setPixmap(QPixmap(":/resource/suspend.png").scaled(58,58));
+    suspendLabel->setText(tr("Suspend"));
+    suspendWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
+    QVBoxLayout *suspendlayout = new QVBoxLayout(suspendWidget);
+    suspendlayout->addWidget(suspendFace);
+    suspendlayout->addWidget(suspendLabel);
+
+
+    rebootWidget = new QWidget(this);
+    rebootWidget->setObjectName("rebootWidget");
+    QLabel *rebootFace = new QLabel(this);
+    QLabel *rebootLabel = new QLabel(this);
+    rebootFace->setAlignment(Qt::AlignCenter);
+    rebootLabel->setAlignment(Qt::AlignCenter);
+    rebootFace->setPixmap(QPixmap(":/resource/reboot.png").scaled(58,58));
+    rebootLabel->setText(tr("Restart"));
+    rebootWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
+    QVBoxLayout *rebootlayout = new QVBoxLayout(rebootWidget);
+    rebootlayout->addWidget(rebootFace);
+    rebootlayout->addWidget(rebootLabel);
+
+    if(m_power->canSuspend()){
+        shutdownWidget = new QWidget(this);
+        shutdownWidget->setObjectName("shutdownWidget");
+        QLabel *shutdownFace  = new QLabel(this);
+        QLabel *shutdownLabel = new QLabel(this);
+        shutdownLabel->setAlignment(Qt::AlignCenter);
+        shutdownFace->setAlignment(Qt::AlignCenter);
+        shutdownFace->setPixmap(QPixmap(":/resource/shutdown.png").scaled(58,58));
+        shutdownLabel->setText(tr("Shutdown"));
+        shutdownWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
+        QVBoxLayout *shutdownlayout = new QVBoxLayout(shutdownWidget);
+        shutdownlayout->addWidget(shutdownFace);
+        shutdownlayout->addWidget(shutdownLabel);
+    }
+
+    QListWidgetItem *item0 = new QListWidgetItem();
+    item0->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
+    insertItem(0, item0);
+    setItemWidget(item0, switchWidget);
+
+    QListWidgetItem *item1 = new QListWidgetItem();
+    item1->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
+    insertItem(1, item1);
+    setItemWidget(item1, rebootWidget);
+
+    QListWidgetItem *item2 = new QListWidgetItem();
+    item2->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
+    insertItem(2, item2);
+    setItemWidget(item2, shutdownWidget);
+
+    if(m_power->canSuspend()){
+        QListWidgetItem *item3 = new QListWidgetItem();
+        item3->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
+        insertItem(3, item3);
+        setItemWidget(item3, suspendWidget);
+    }
+
+    adjustSize();
+
 }

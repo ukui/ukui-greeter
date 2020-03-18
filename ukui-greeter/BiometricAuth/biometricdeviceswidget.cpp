@@ -43,6 +43,8 @@ BiometricDevicesWidget::BiometricDevicesWidget(BiometricProxy *proxy, QWidget *p
 
 void BiometricDevicesWidget::initUI()
 {
+
+
     lblPrompt = new QLabel(this);
     lblPrompt->setObjectName(QStringLiteral("lblBioetricDevicesPrompt"));
     lblPrompt->setText(tr("Please select the biometric device"));
@@ -59,6 +61,9 @@ void BiometricDevicesWidget::initUI()
     cmbDeviceType->setObjectName(QStringLiteral("cmbDeviceType"));
     cmbDeviceType->setMaxVisibleItems(5);
     cmbDeviceType->setItemDelegate(itemDelegate);
+    cmbDeviceType->view()->parentWidget()->setWindowFlags(Qt::Popup|Qt::FramelessWindowHint);
+    cmbDeviceType->view()->parentWidget()->setAttribute(Qt::WA_TranslucentBackground);
+
     connect(cmbDeviceType, SIGNAL(currentIndexChanged(int)),
             this, SLOT(onCmbDeviceTypeCurrentIndexChanged(int)));
 
@@ -71,6 +76,8 @@ void BiometricDevicesWidget::initUI()
     cmbDeviceName->setObjectName(QStringLiteral("cmbDeviceName"));
     cmbDeviceName->setMaxVisibleItems(5);
     cmbDeviceName->setItemDelegate(itemDelegate);
+    cmbDeviceName->view()->parentWidget()->setWindowFlags(Qt::Popup|Qt::FramelessWindowHint);
+    cmbDeviceName->view()->parentWidget()->setAttribute(Qt::WA_TranslucentBackground);
 
     btnOK = new QPushButton(tr("OK"), this);
     btnOK->setObjectName(QStringLiteral("OKButton"));

@@ -44,6 +44,7 @@ IconEdit::IconEdit(QWidget *parent)
     m_iconButton->setObjectName(QStringLiteral("loginButton"));
     m_iconButton->setFocusPolicy(Qt::NoFocus);
     m_iconButton->setCursor(QCursor(Qt::PointingHandCursor));
+    m_iconButton->installEventFilter(this);
 
     m_modeButton = new QPushButton(this);
     m_modeButton->setObjectName(QStringLiteral("echoModeButton"));
@@ -80,6 +81,18 @@ bool IconEdit::eventFilter(QObject *obj, QEvent *event)
                 event->ignore();
                 return true;
             }
+        }
+    }
+    if(obj == m_iconButton){
+        if(m_timer && m_timer->isActive())
+        {
+            return false;
+        }
+        if(event->type() == QEvent::HoverEnter){
+            setIcon(QIcon(":/resource/login-button-hover.png"));
+        }
+        else if(event->type() == QEvent::HoverLeave){
+            setIcon(QIcon(":/resource/login-button.png"));
         }
     }
     return false;
@@ -163,13 +176,13 @@ void IconEdit::startWaiting()
     m_edit->setReadOnly(true);
     m_iconButton->setEnabled(false);
 
-
     if(!m_timer)
     {
         m_timer = new QTimer(this);
         m_timer->setInterval(120);
         connect(m_timer, &QTimer::timeout, this, &IconEdit::updatePixmap);
     }
+
     m_waitingPixmap.load(":/resource/waiting.png");
     m_iconButton->setIconSize(m_iconButton->size());
     m_iconButton->setIcon(QIcon(m_waitingPixmap));

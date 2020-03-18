@@ -19,6 +19,9 @@
 #include "usersview.h"
 #include <QListWidget>
 #include <QDebug>
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QScreen>
 #include <QPushButton>
 #include <QKeyEvent>
 #include <QStandardPaths>
@@ -42,6 +45,10 @@ UsersView::UsersView(QWidget *parent) :
     currentUser(0),
     lasttime(QTime::currentTime())
 {
+    QSize size = QApplication::desktop()->size();
+    scale = QString::number(size.width() / 1920.0, 'f', 1).toFloat();
+    scale = scale > 0.5 ? scale : (width() >= 800 ? 0.5 : scale);
+
     resize(CENTER_ENTRY_WIDTH*9 - ENTRY_WIDTH*4 , CENTER_ENTRY_HEIGHT);
     initUI();
 }
