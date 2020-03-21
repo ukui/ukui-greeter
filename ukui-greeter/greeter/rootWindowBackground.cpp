@@ -23,7 +23,22 @@
 
 #include "rootWindowBackground.h"
 
-void setRootWindowBackground(int width,int height,char *filename)
+
+static void x11_get_screen_size(Display *display,int *width,int *height)
+{
+    if (display == NULL) {
+        fprintf(stderr, "Cannot connect to X server %s/n", "simey:0");
+    	return;
+    }
+    int screen_num;
+
+    screen_num = DefaultScreen(display);
+
+    *width = DisplayWidth(display, screen_num);
+    *height = DisplayHeight(display, screen_num);
+}
+
+void setRootWindowBackground(char *filename)
 {
     Imlib_Image img;
     Display *dpy;
@@ -41,6 +56,9 @@ void setRootWindowBackground(int width,int height,char *filename)
     dpy = XOpenDisplay(NULL);
     if (!dpy)
         return ;
+    int width = 0,height = 0;
+    x11_get_screen_size(dpy,&width,&height);
+    
     scn = DefaultScreenOfDisplay(dpy);
     root = DefaultRootWindow(dpy);
 

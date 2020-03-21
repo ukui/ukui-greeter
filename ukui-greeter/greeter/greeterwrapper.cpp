@@ -81,7 +81,7 @@ void GreeterWrapper::setrootWindow()
      path=ba.data();
 
      QDesktopWidget desktop;
-     setRootWindowBackground(desktop.width(),desktop.height(),path);
+     setRootWindowBackground(path);
 }
 
 void GreeterWrapper::startSession()
@@ -95,7 +95,6 @@ void GreeterWrapper::startSession()
 
     //启动session
     setrootWindow();
-
     if(!startSessionSync(m_session)) {
         Q_EMIT startSessionFailed();
         Q_EMIT showMessage(tr("failed to start session."), QLightDM::Greeter::MessageTypeError);
