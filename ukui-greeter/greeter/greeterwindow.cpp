@@ -70,7 +70,6 @@ GreeterWindow::GreeterWindow(QWidget *parent)
     }
 
     m_greeter->setSession(m_greeter->defaultSessionHint());
-    m_greeter->setrootWindowBackground(m_configuration->getDefaultBackgroundName());
 
     for(int i = 0; i < m_usersModel->rowCount(); i++)
         qDebug() << "load user " << m_usersModel->index(i).
@@ -345,14 +344,41 @@ void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
     QWidget::keyReleaseEvent(e);
 }
 
+QString GreeterWindow::getAccountBackground(uid_t uid)
+{
+
+    QDBusInterface iface("org.freedesktop.Accounts", "/org/freedesktop/Accounts",
+                         "org.freedesktop.Accounts",QDBusConnection::systemBus());
+
+    QDBusReply<QDBusObjectPath> userPath = iface.call("FindUserById", (qint64)uid);
+    if(!userPath.isValid())
+        qWarning() << "Get UserPath error:" << userPath.error();
+    else {
+        QDBusInterface userIface("org.freedesktop.Accounts", userPath.value().path(),
+                                 "org.freedesktop.DBus.Properties", QDBusConnection::systemBus());
+        QDBusReply<QDBusVariant> backgroundReply = userIface.call("Get", "org.freedesktop.Accounts.User", "BackgroundFile");
+        if(backgroundReply.isValid())
+            return  backgroundReply.value().variant().toString();
+    }
+    return "";
+}
+
 void GreeterWindow::setBackground(const QModelIndex &index)
 {
     QString backgroundPath = index.data(QLightDM::UsersModel::BackgroundPathRole).toString();
+    if(backgroundPath.isEmpty())
+    {
+        uid_t uid = index.data(QLightDM::UsersModel::UidRole).toUInt();
+        backgroundPath = getAccountBackground(uid);
+        if(backgroundPath.isEmpty())
+            backgroundPath = "/usr/share/backgrounds/warty-final-ubuntukylin.jpg";
+    }
     QSharedPointer<Background> background(new Background);
     background->type = BACKGROUND_IMAGE;
     background->image = backgroundPath;
     static_cast<MainWindow*>(parentWidget())->setBackground(background);
     m_greeter->setrootWindowBackground(background->image);
+
 }
 
 void GreeterWindow::onUserSelected(const QModelIndex &index)
@@ -407,7 +433,7 @@ void GreeterWindow::updateSession(QString userName)
 
 void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
 {
-    //setBackground(index);
+    setBackground(index);
 
     if(!m_languageHasChanged)
     {

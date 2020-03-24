@@ -40,7 +40,7 @@ QT_BEGIN_NAMESPACE
 extern void qt_blurImage(QPainter *p, QImage &blurImage, qreal radius, bool quality, bool alphaOnly, int transposed = 0);
 QT_END_NAMESPACE
 
-#define BLUR_RADIUS 100
+#define BLUR_RADIUS 300
 
 QPixmap blurPixmap(QPixmap pixmap)
 {
@@ -302,6 +302,7 @@ void MainWindow::drawBackground(QSharedPointer<Background> &background,
     case BACKGROUND_IMAGE:
     {
         QPixmap *pixmap = getBackground(background->image, rect);
+        QPixmap pix = blurPixmap(*pixmap);
         if(pixmap->isNull())
         {
             QString color = m_configuration->getValue("background-color").toString();
@@ -315,7 +316,7 @@ void MainWindow::drawBackground(QSharedPointer<Background> &background,
         }
         else
         {
-            painter.drawPixmap(rect, *pixmap);
+            painter.drawPixmap(rect, pix);
         }
         break;
     }
