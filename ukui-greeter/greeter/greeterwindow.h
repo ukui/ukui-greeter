@@ -68,6 +68,7 @@ private:
     void updateLanguage(QString userName);
     void updateSession(QString userName);
     void setUserWindowVisible(bool visible);
+    QString getAccountBackground(uid_t uid);
 
     UsersView               *m_userWnd;
     LoginWindow             *m_loginWnd;
