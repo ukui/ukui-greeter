@@ -111,8 +111,8 @@ void PowerManager::rebootWidgetClicked()
 void PowerManager::suspendWidgetCliced()
 {
     try{
-        m_power->suspend();
-        close();
+        emit switchToUser();
+	m_power->suspend();
     }catch(QException &e) {
         qWarning() << e.what();
     }
