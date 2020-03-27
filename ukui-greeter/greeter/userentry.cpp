@@ -124,13 +124,13 @@ void UserEntry::setFace(const QString &facePath)
         this->m_face = ":/resource/default_face.png";
 
     if(id == selectedId){
-        const QString SheetStyle = QString("border-radius: %1px;  border:2px   solid white;").arg(CENTER_IMG_WIDTH/2);
+        const QString SheetStyle = QString("border-radius: %1px;  border:0px   solid white;").arg(CENTER_IMG_WIDTH/2);
         m_faceLabel->setStyleSheet(SheetStyle);
         userface = scaledPixmap(CENTER_IMG_WIDTH, CENTER_IMG_WIDTH, m_face);
         userface =  PixmapToRound(userface, CENTER_IMG_WIDTH/2);
     }
     else{
-        const QString SheetStyle = QString("border-radius: %1px;  border:2px   solid white;").arg(IMG_WIDTH/2);
+        const QString SheetStyle = QString("border-radius: %1px;  border:0px   solid white;").arg(IMG_WIDTH/2);
         m_faceLabel->setStyleSheet(SheetStyle);
         userface = scaledPixmap(IMG_WIDTH, IMG_WIDTH, m_face);
         userface =  PixmapToRound(userface, IMG_WIDTH/2);
@@ -178,7 +178,7 @@ void UserEntry::setResize()
 {
     QRect faceRect,nameRect,loginRect;
 
-    const QString SheetStyle = QString("border-radius: %1px;  border:2px   solid white;").arg(width()/2);
+    const QString SheetStyle = QString("border-radius: %1px;  border:0px   solid white;").arg(width()/2);
     m_faceLabel->setStyleSheet(SheetStyle);
     faceRect.setRect(0, 0, width(), width());
     userface = scaledPixmap(width(), width(), m_face);
@@ -190,11 +190,11 @@ void UserEntry::setResize()
 
     m_loginLabel->setPixmap(QPixmap(":/resource/is_logined.png"));
     m_loginLabel->resize(24,24);
-    m_loginLabel->setGeometry(m_faceLabel->x(),m_faceLabel->y(),24,24);
+    m_loginLabel->setGeometry(m_faceLabel->x() + m_faceLabel->width() - 24,m_faceLabel->y(),24,24);
 
     if(id == selectedId)
     {
-        m_nameLabel->setFont(QFont("Ubuntu", 30));
+        m_nameLabel->setFont(QFont("Ubuntu", 16));
 
         QGraphicsOpacityEffect opacityEffect;
         opacityEffect.setOpacity(1);
@@ -205,7 +205,7 @@ void UserEntry::setResize()
     }
     else
     {
-        m_nameLabel->setFont(QFont("Ubuntu", 24));
+        m_nameLabel->setFont(QFont("Ubuntu", 14));
         QGraphicsOpacityEffect opacityEffect;
         opacityEffect.setOpacity(0.6);
         m_faceLabel->setGraphicsEffect(&opacityEffect);

@@ -250,7 +250,9 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     //重新计算缩放比例
     scale = QString::number(size.width() / 1920.0, 'f', 1).toFloat();
     scale = scale > 0.5 ? scale : (width() >= 800 ? 0.5 : scale);
-
+    
+    if(scale > 1)
+	    scale = 1;
     //字体大小
     fontSize = scale > 0.5 ? 10 : 8;
 
@@ -556,7 +558,7 @@ void GreeterWindow::showLanguageWnd()
         m_languageWnd->show();
         m_languageWnd->setFocus();
         m_languageWnd->setCurrentLanguage(m_greeter->lang());
-        m_languageWnd->move(m_languageLB->x(),m_languageLB->y()-m_languageWnd->height());
+        m_languageWnd->move(m_languageLB->x(),m_languageLB->y()-m_languageWnd->height() - 5);
     }
 }
 
