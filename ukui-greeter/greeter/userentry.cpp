@@ -190,7 +190,7 @@ void UserEntry::setResize()
 
     m_loginLabel->setPixmap(QPixmap(":/resource/is_logined.png"));
     m_loginLabel->resize(24,24);
-    m_loginLabel->setGeometry(m_faceLabel->x(),m_faceLabel->y(),24,24);
+    m_loginLabel->setGeometry(m_faceLabel->x() + m_faceLabel->width() - 24,m_faceLabel->y(),24,24);
 
     if(id == selectedId)
     {
