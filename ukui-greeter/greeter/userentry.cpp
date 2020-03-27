@@ -152,7 +152,7 @@ void UserEntry::setUserName(const QString &name)
         m_name = name;
     this->m_nameLabel->setText(m_name);
     /* 当用户名短的时候居中， 否则是居左显示前半部分 */
-    QFont font("ubuntu", 24);
+    QFont font("ubuntu", 16);
     QFontMetrics fm(font);
     int pixelsWide = fm.width(m_name);
     if(pixelsWide < IMG_WIDTH)
