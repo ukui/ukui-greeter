@@ -3,6 +3,7 @@ QPushButton{
     text-align:center;
     color: rgb(255, 255, 255, 200);
     border: none;
+    border-radius: 4px;
     outline: none;
     font-family: 'Ubuntu';
 }
@@ -160,7 +161,8 @@ QListWidget{
 #powerButton, #keyboardButton,
 #sessionButton, #languageButton
 {
-/*    border-radius: 6px;*/
+    border-radius: 4px;
+
 }
 
 #languageButton{
@@ -222,7 +224,7 @@ QLineEdit {
 }
 
 QLineEdit::hover {
-    border: 1px solid #00FFFF;
+    border: 1px solid #FFFFFF;
 }
 QLineEdit::focus{
     background: #FFFFFF;
@@ -283,11 +285,13 @@ QListWidget{
 }
 QListWidget::item:hover{
     background:rgb(255, 255, 255, 20%);
+    border-radius: 4px;
     border: none;
 }
 
 QListWidget::item:selected
     background:rgb(255, 255, 255, 20%);
+    border-radius: 4px;
     border: none;
 }
 

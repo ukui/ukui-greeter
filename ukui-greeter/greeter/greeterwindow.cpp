@@ -555,7 +555,7 @@ void GreeterWindow::showLanguageWnd()
         m_languageWnd->show();
         m_languageWnd->setFocus();
         m_languageWnd->setCurrentLanguage(m_greeter->lang());
-        m_languageWnd->move(m_languageLB->x(),m_languageLB->y()-m_languageWnd->height());
+        m_languageWnd->move(m_languageLB->x(),m_languageLB->y()-m_languageWnd->height() - 5);
     }
 }
 
