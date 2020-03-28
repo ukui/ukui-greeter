@@ -76,6 +76,7 @@ private:
     int currentUser;
     QList<UserEntry *>userlist;
     QTime lasttime;
+    QTime mouseClickLast;
 
 
 };

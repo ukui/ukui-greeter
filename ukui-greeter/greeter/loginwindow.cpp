@@ -985,6 +985,7 @@ void LoginWindow::showBiometricAuthWidget()
 void LoginWindow::showBiometricDeviceWidget()
 {
     emit bioDeviceIsChoosed(false);
+
     m_passwdWidget->setVisible(false);
     m_messageButton->hide();
     if(m_biometricAuthWidget)

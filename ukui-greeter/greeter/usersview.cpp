@@ -43,7 +43,8 @@ UsersView::UsersView(QWidget *parent) :
     QWidget(parent),
     usersModel(nullptr),
     currentUser(0),
-    lasttime(QTime::currentTime())
+    lasttime(QTime::currentTime()),
+    mouseClickLast(QTime::currentTime())
 {
     QSize size = QApplication::primaryScreen()->size();
     scale = QString::number(size.width() / 1920.0, 'f', 1).toFloat();
@@ -71,9 +72,14 @@ void UsersView::initUI()
 
 bool UsersView::eventFilter(QObject *obj, QEvent *event)
 {
+    int interval = mouseClickLast.msecsTo(QTime::currentTime());
+    if(interval < 300 && interval > -300)
+        return false;
+    mouseClickLast = QTime::currentTime();
+
     for(int i=0;i<userlist.count();i++){
         if(obj == userlist.at(i)){
-            if(event->type() == QEvent::MouseButtonDblClick){
+            if(event->type() == QEvent::MouseButtonRelease){
                 setCurrentRow(i);
             }
         }
