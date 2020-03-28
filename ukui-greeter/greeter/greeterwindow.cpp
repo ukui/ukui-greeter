@@ -257,8 +257,7 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     scale = scale > 0.5 ? scale : (width() >= 800 ? 0.5 : scale);
     
     if(scale > 1)
-	    scale = 1;
-    //字体大小
+        scale = 1;
     fontSize = scale > 0.5 ? 10 : 8;
 
     qDebug() << "GreeterWindow resize to " << size;
