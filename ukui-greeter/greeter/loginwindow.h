@@ -63,6 +63,7 @@ protected:
 
 signals:
     void back();
+    void bioDeviceIsChoosed(bool);
 
     /**
      * @brief 手动输入用户名
@@ -137,7 +138,6 @@ private:
 
     // UI
     QPushButton     *m_backButton;         //返回用户列表
-    QWidget         *m_userWidget;          //放置用户信息Label
     QLabel          *m_faceLabel;         //头像
     QLabel          *m_nameLabel;         //用户名
     QLabel          *m_isLoginLabel;      //提示是否已登录

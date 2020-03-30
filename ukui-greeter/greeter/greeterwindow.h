@@ -27,7 +27,6 @@
 #include "usersmodel.h"
 #include "greeterwrapper.h"
 
-class PowerWindow;
 class UsersView;
 class QProcess;
 class QGraphicsOpacityEffect;
@@ -35,6 +34,8 @@ class Configuration;
 class VirtualKeyboard;
 class LanguageWidget;
 class Language;
+class PowerWindow;
+
 class GreeterWindow : public QWidget
 {
     Q_OBJECT
@@ -45,6 +46,7 @@ public:
 protected:
     void resizeEvent(QResizeEvent *);
     void keyReleaseEvent(QKeyEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:
     void onUserSelected(const QModelIndex &);
@@ -57,7 +59,7 @@ private slots:
     void onSessionChanged(const QString &session);
     void onUserChangedByManual(const QString &userName);
     void showLanguageWnd();
-    void setWindowVisible(bool);
+    void setWindowVisible(bool visible);
 
 private:
     void switchWnd(int);
@@ -67,6 +69,8 @@ private:
     bool sessionIsValid(const QString &session);
     void updateLanguage(QString userName);
     void updateSession(QString userName);
+    void setUserWindowVisible(bool visible);
+    QString getAccountBackground(uid_t uid);
 
     UsersView               *m_userWnd;
     LoginWindow             *m_loginWnd;

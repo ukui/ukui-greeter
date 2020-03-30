@@ -747,6 +747,7 @@ void LoginWindow::initBiometricButtonWidget()
 
     m_biometricButton = new QPushButton(m_buttonsWidget);
     m_biometricButton->setObjectName(QStringLiteral("biometricButton"));
+    m_biometricButton->setIcon(QIcon(":/resource/bio-login.png"));
     m_biometricButton->setText(tr("Biometric Authentication"));
     m_biometricButton->setSizePolicy(sizePolicy);
     m_biometricButton->setVisible(false);
@@ -759,6 +760,7 @@ void LoginWindow::initBiometricButtonWidget()
 
     m_passwordButton = new QPushButton(m_buttonsWidget);
     m_passwordButton->setObjectName(QStringLiteral("passwordButton"));
+    m_passwordButton->setIcon(QIcon(":/resource/password-login.png"));
     m_passwordButton->setText(tr("Password Authentication"));
     fm = QFontMetrics(m_passwordButton->font(), m_passwordButton);
     width = fm.width(m_passwordButton->text());
@@ -807,7 +809,7 @@ void LoginWindow::setBiometricWidgetGeometry()
     //生物识别
     if(m_biometricAuthWidget)
     {
-        m_biometricAuthWidget->setGeometry(0, m_userWidget->geometry().bottom(),
+        m_biometricAuthWidget->setGeometry(0, 0,
                                            width(), m_biometricAuthWidget->height());
     }
     if(m_biometricDevicesWidget)
@@ -823,7 +825,7 @@ void LoginWindow::setBiometricButtonWidgetGeometry()
 {
     if(m_buttonsWidget)
     {
-        m_buttonsWidget->setGeometry(0, height() - m_buttonsWidget->height() - 100,
+        m_buttonsWidget->setGeometry(0, height() - 100,
                                      width(), m_buttonsWidget->height());
     }
 }
@@ -957,7 +959,7 @@ void LoginWindow::showPasswordAuthWidget()
 
 void LoginWindow::showBiometricAuthWidget()
 {
-    m_userWidget->setVisible(true);
+    emit bioDeviceIsChoosed(true);
     m_passwdWidget->setVisible(false);
     m_messageButton->hide();
     if(m_biometricAuthWidget)
@@ -982,7 +984,8 @@ void LoginWindow::showBiometricAuthWidget()
 
 void LoginWindow::showBiometricDeviceWidget()
 {
-    m_userWidget->setVisible(false);
+    emit bioDeviceIsChoosed(false);
+
     m_passwdWidget->setVisible(false);
     m_messageButton->hide();
     if(m_biometricAuthWidget)
