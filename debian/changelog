@@ -1,3 +1,13 @@
+ukui-greeter (1.2.4-1) unstable; urgency=medium
+
+  * New upstream bugfix release:
+    - Fixed that the user avatar needs to be clicked twice to select it.
+    - Fixed that the popup menu will not be hidden when lose focus.
+    * Fix incomplete display when user name is long.
+    * Fix that the user avatar list is displayed incorrectly.
+
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Mon, 30 Mar 2020 19:39:17 +0800
+
 ukui-greeter (1.2.3-1) unstable; urgency=medium
 
   * New upsgream bugfix release.
