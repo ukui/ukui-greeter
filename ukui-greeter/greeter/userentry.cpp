@@ -62,13 +62,13 @@ void UserEntry::initUI()
     m_loginLabel = new QLabel(this);
     m_loginLabel->setObjectName(QString::fromUtf8("isloginLabel"));
     m_loginLabel->setAlignment(Qt::AlignCenter);
+    m_loginLabel->setPixmap(QPixmap(":/resource/is_logined.png"));
+    m_loginLabel->resize(24,24);
 
 }
 
 void UserEntry::paintEvent(QPaintEvent *event)
 {
-    //绘制阴影边框
-
     return QWidget::paintEvent(event);
 }
 
@@ -115,13 +115,12 @@ QPixmap UserEntry::PixmapToRound(const QPixmap &src, int radius)
     return pixmap;
 }
 
-
 void UserEntry::setFace(const QString &facePath)
 {
     this->m_face = facePath;
     QFile faceFile(facePath);
     if(!faceFile.exists())
-        this->m_face = ":/resource/default_face.png";
+        this->m_face = ":/resource/default_face.svg";
 
     if(id == selectedId){
         const QString SheetStyle = QString("border-radius: %1px;  border:0px   solid white;").arg(CENTER_IMG_WIDTH/2);
@@ -152,7 +151,7 @@ void UserEntry::setUserName(const QString &name)
         m_name = name;
     this->m_nameLabel->setText(m_name);
     /* 当用户名短的时候居中， 否则是居左显示前半部分 */
-    QFont font("ubuntu", 16);
+    QFont font = m_nameLabel->font();
     QFontMetrics fm(font);
     int pixelsWide = fm.width(m_name);
     if(pixelsWide < IMG_WIDTH)
@@ -174,6 +173,45 @@ void UserEntry::setLogin(bool isLogin)
         m_loginLabel->hide();
 }
 
+void UserEntry::setEnterEvent(bool isEnter)
+{
+    if(id == selectedId)
+        return;
+
+    QRect faceRect,nameRect,loginRect;
+
+    const QString SheetStyle = QString("border-radius: %1px;  border:0px   solid white;").arg(width()/2);
+    m_faceLabel->setStyleSheet(SheetStyle);
+    faceRect.setRect(0, 0, width(), width());
+    userface = scaledPixmap(width(), width(), m_face);
+    userface =  PixmapToRound(userface, width()/2);
+    m_faceLabel->setGeometry(faceRect);
+    m_faceLabel->move((width() - m_faceLabel->width())/2,m_faceLabel->y());
+
+    m_faceLabel->setPixmap(userface);
+
+    m_loginLabel->setGeometry(m_faceLabel->x() + m_faceLabel->width() - 24,m_faceLabel->y(),24,24);
+
+    if(isEnter)
+    {
+        QFont font = m_nameLabel->font();
+        font.setPixelSize(16);
+        m_nameLabel->setFont(font);
+
+        m_nameLabel->adjustSize();
+        m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 25);
+    }
+    else
+    {
+        QFont font = m_nameLabel->font();
+        font.setPixelSize(14);
+        m_nameLabel->setFont(font);
+
+        m_nameLabel->adjustSize();
+        m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 32);
+    }
+}
+
 void UserEntry::setResize()
 {
     QRect faceRect,nameRect,loginRect;
@@ -188,33 +226,26 @@ void UserEntry::setResize()
 
     m_faceLabel->setPixmap(userface);
 
-    m_loginLabel->setPixmap(QPixmap(":/resource/is_logined.png"));
-    m_loginLabel->resize(24,24);
     m_loginLabel->setGeometry(m_faceLabel->x() + m_faceLabel->width() - 24,m_faceLabel->y(),24,24);
 
     if(id == selectedId)
     {
-        m_nameLabel->setFont(QFont("Ubuntu", 16));
-
-        QGraphicsOpacityEffect opacityEffect;
-        opacityEffect.setOpacity(1);
-        m_faceLabel->setGraphicsEffect(&opacityEffect);
+        QFont font = m_nameLabel->font();
+        font.setPixelSize(16);
+        m_nameLabel->setFont(font);
 
         m_nameLabel->adjustSize();
         m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 25);
     }
     else
     {
-        m_nameLabel->setFont(QFont("Ubuntu", 14));
-        QGraphicsOpacityEffect opacityEffect;
-        opacityEffect.setOpacity(0.6);
-        m_faceLabel->setGraphicsEffect(&opacityEffect);
+        QFont font = m_nameLabel->font();
+        font.setPixelSize(14);
+        m_nameLabel->setFont(font);
 
         m_nameLabel->adjustSize();
         m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 32);
     }
-
-
 }
 
 void UserEntry::setSelected(bool selected)

@@ -77,6 +77,8 @@ private:
     QList<UserEntry *>userlist;
     QTime lasttime;
     QTime mouseClickLast;
+    QPushButton *prevArrow;
+    QPushButton *nextArrow;
 
 
 };

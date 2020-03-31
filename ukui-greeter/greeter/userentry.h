@@ -52,6 +52,8 @@ public:
     void setSelected(bool selected=true);
     bool selected();
     void setResize();
+    void setEnterEvent(bool isEnter);
+    void setMoveSize();
     QPixmap PixmapToRound(const QPixmap &src, int radius);
 
 protected:
