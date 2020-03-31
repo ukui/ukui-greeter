@@ -87,6 +87,8 @@ GreeterWindow::GreeterWindow(QWidget *parent)
 
 void GreeterWindow::initUI()
 {
+    installEventFilter(this);
+
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [&]{
             QString time = QDateTime::currentDateTime().toString("hh:mm");
@@ -124,6 +126,7 @@ void GreeterWindow::initUI()
     m_powerLB->setFocusPolicy(Qt::NoFocus);
     m_powerLB->setFixedSize(48, 48);
     m_powerLB->setCursor(Qt::PointingHandCursor);
+    m_powerLB->installEventFilter(this);
     connect(m_powerLB, &QPushButton::clicked, this, &GreeterWindow::showPowerWnd);
 
     //虚拟键盘启动按钮
@@ -134,6 +137,7 @@ void GreeterWindow::initUI()
     m_keyboardLB->setFocusPolicy(Qt::NoFocus);
     m_keyboardLB->setFixedSize(48, 48);
     m_keyboardLB->setCursor(Qt::PointingHandCursor);
+    m_keyboardLB->installEventFilter(this);
     connect(m_keyboardLB, &QPushButton::clicked,
             this, &GreeterWindow::showVirtualKeyboard);
 
@@ -146,6 +150,7 @@ void GreeterWindow::initUI()
         m_sessionLB->setFocusPolicy(Qt::NoFocus);
         m_sessionLB->setFixedSize(48, 48);
         m_sessionLB->setCursor(Qt::PointingHandCursor);
+        m_sessionLB->installEventFilter(this);
         m_sessionLB->setIcon(QIcon(IMAGE_DIR + QString("badges/unknown_badge.png")));
         onSessionChanged(m_greeter->defaultSessionHint());
         connect(m_sessionLB, &QPushButton::clicked, this, &GreeterWindow::showSessionWnd);
@@ -252,8 +257,7 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     scale = scale > 0.5 ? scale : (width() >= 800 ? 0.5 : scale);
     
     if(scale > 1)
-	    scale = 1;
-    //字体大小
+        scale = 1;
     fontSize = scale > 0.5 ? 10 : 8;
 
     qDebug() << "GreeterWindow resize to " << size;
@@ -318,6 +322,17 @@ void GreeterWindow::setVirkeyboardPos()
                                        height() - height()/3,
                                        width(), height()/3);
     }
+}
+
+bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if(event->type() == QEvent::MouseButtonPress){
+        if(m_sessionWnd && m_sessionWnd->isVisible())
+            m_sessionWnd->hide();
+        if(m_languageWnd && m_languageWnd->isVisible())
+            m_languageWnd->hide();
+    }
+    return false;
 }
 
 void GreeterWindow::keyReleaseEvent(QKeyEvent *e)

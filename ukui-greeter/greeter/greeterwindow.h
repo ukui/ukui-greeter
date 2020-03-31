@@ -45,6 +45,7 @@ public:
 protected:
     void resizeEvent(QResizeEvent *);
     void keyReleaseEvent(QKeyEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:
     void onUserSelected(const QModelIndex &);

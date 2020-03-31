@@ -46,9 +46,12 @@ UsersView::UsersView(QWidget *parent) :
     lasttime(QTime::currentTime()),
     mouseClickLast(QTime::currentTime())
 {
-    QSize size = QApplication::desktop()->size();
+    QSize size = QApplication::primaryScreen()->size();
     scale = QString::number(size.width() / 1920.0, 'f', 1).toFloat();
     scale = scale > 0.5 ? scale : (width() >= 800 ? 0.5 : scale);
+	
+    if(scale > 1)
+	    scale = 1;
 
     resize(CENTER_ENTRY_WIDTH*9 - ENTRY_WIDTH*4 , CENTER_ENTRY_HEIGHT);
     initUI();
