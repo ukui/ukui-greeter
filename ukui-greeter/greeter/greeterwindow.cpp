@@ -264,7 +264,7 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     qDebug() << "scale: " << scale;
 
     if(m_userWnd){
-        m_userWnd->resize(CENTER_ENTRY_WIDTH*9 - ENTRY_WIDTH*4, CENTER_ENTRY_HEIGHT);
+        m_userWnd->resize(CENTER_ENTRY_WIDTH*10 - ENTRY_WIDTH*4, CENTER_ENTRY_HEIGHT);
         QRect userRect((width()-m_userWnd->width())/2,
                        widgetTime->y() + widgetTime->height() + 176*scale,
                        m_userWnd->width(), m_userWnd->height());
