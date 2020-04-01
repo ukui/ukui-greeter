@@ -20,7 +20,7 @@ QMenu{
     color: white;
     border-radius: 4px;
     width: 260px;
-    height: 350px;
+    padding: 5px 5px 5px 5px;
 }
 
 QMenu::item
@@ -28,7 +28,8 @@ QMenu::item
     border-radius: 4px;
     height:36px;
     width:260px;
-    padding-left:15px;
+    font-size:16px;
+    padding: 2px 10px 2px 10px;
 }
 QMenu::item:selected {
     background-color:rgb(255,255,255,15%);
@@ -162,7 +163,6 @@ QListWidget{
 #sessionButton, #languageButton
 {
     border-radius: 4px;
-
 }
 
 #languageButton{

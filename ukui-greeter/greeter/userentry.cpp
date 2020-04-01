@@ -197,7 +197,6 @@ void UserEntry::setEnterEvent(bool isEnter)
         QFont font = m_nameLabel->font();
         font.setPixelSize(16);
         m_nameLabel->setFont(font);
-
         m_nameLabel->adjustSize();
         m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 25);
     }
@@ -206,7 +205,6 @@ void UserEntry::setEnterEvent(bool isEnter)
         QFont font = m_nameLabel->font();
         font.setPixelSize(14);
         m_nameLabel->setFont(font);
-
         m_nameLabel->adjustSize();
         m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 32);
     }
@@ -233,7 +231,6 @@ void UserEntry::setResize()
         QFont font = m_nameLabel->font();
         font.setPixelSize(16);
         m_nameLabel->setFont(font);
-
         m_nameLabel->adjustSize();
         m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 25);
     }
@@ -242,7 +239,6 @@ void UserEntry::setResize()
         QFont font = m_nameLabel->font();
         font.setPixelSize(14);
         m_nameLabel->setFont(font);
-
         m_nameLabel->adjustSize();
         m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 32);
     }

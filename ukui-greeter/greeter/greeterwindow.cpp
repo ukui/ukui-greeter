@@ -166,7 +166,7 @@ void GreeterWindow::initUI()
     LanguagesVector defaultLang = getLanguages();
     if(defaultLang.count()>0){
         m_languageLB->setText(defaultLang.at(0).name);
-        m_languageLB->adjustSize();
+        adjustSize();
     }
     else{
         m_languageLB->hide();
@@ -573,7 +573,7 @@ void GreeterWindow::showLanguageWnd()
         m_languageWnd->show();
         m_languageWnd->setFocus();
         m_languageWnd->setCurrentLanguage(m_greeter->lang());
-        m_languageWnd->move(m_languageLB->x(),m_languageLB->y()-m_languageWnd->height() - 5);
+        m_languageWnd->move(m_languageLB->x(),m_languageLB->y()-m_languageWnd->height() - 3);
     }
 }
 
@@ -614,7 +614,7 @@ void GreeterWindow::onLanguageChanged(const Language &language)
     const QFont &font = m_languageLB->font();
     QFontMetrics fm(font);
     int pixelWidth = fm.width(language.name);
-    m_languageLB->setFixedWidth(pixelWidth + 4);
+    m_languageLB->setFixedWidth(pixelWidth + 14);
 
     int x,y;
     if(m_sessionLB)
@@ -651,7 +651,7 @@ void GreeterWindow::showSessionWnd()
         setFocus();
     }
     else{
-        m_sessionWnd->move(m_languageLB->x(),m_languageLB->y()-m_sessionWnd->height());
+        m_sessionWnd->move(m_languageLB->x(),m_languageLB->y()-m_sessionWnd->height() - 3);
         m_sessionWnd->show();
         m_sessionWnd->setCurrentSession(m_greeter->session());
         m_sessionWnd->setFocus();
