@@ -27,7 +27,7 @@ QMenu::item
 {
     border-radius: 4px;
     height:36px;
-    width:260px;
+    width:230;
     font-size:16px;
     padding: 2px 10px 2px 10px;
 }
@@ -42,7 +42,7 @@ QMenu#SessionWnd::item{
     border-radius: 4px;
     height:36px;
     width:260px;
-    padding-left:40px;
+    padding-left:10px;
 }
 QMenu#SessionWnd::icon{
     padding-left:15px;
