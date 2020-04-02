@@ -166,7 +166,7 @@ void GreeterWindow::initUI()
     LanguagesVector defaultLang = getLanguages();
     if(defaultLang.count()>0){
         m_languageLB->setText(defaultLang.at(0).name);
-        adjustSize();
+        m_languageLB->adjustSize();
     }
     else{
         m_languageLB->hide();
