@@ -120,7 +120,7 @@ void UserEntry::setFace(const QString &facePath)
     this->m_face = facePath;
     QFile faceFile(facePath);
     if(!faceFile.exists())
-        this->m_face = ":/resource/default_face.svg";
+        this->m_face = ":/resource/default_face.png";
 
     if(id == selectedId){
         const QString SheetStyle = QString("border-radius: %1px;  border:0px   solid white;").arg(CENTER_IMG_WIDTH/2);
