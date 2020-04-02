@@ -56,7 +56,9 @@ UsersView::UsersView(QWidget *parent) :
 	
     if(scale > 1)
 	    scale = 1;
-
+// CENTER_ENTRY_WIDTH*5 +4* (CENTER_ENTRY_WIDTH - ENTRY_WIDTH*) +CENTER_ENTRY_WIDTH 
+// 计算头像列表的宽度，宽度计算公式为5个大头像的宽加上四个间距，再加上两边左右箭头的
+// 宽度
     resize(CENTER_ENTRY_WIDTH*10 - ENTRY_WIDTH*4 , CENTER_ENTRY_HEIGHT);
     initUI();
 }

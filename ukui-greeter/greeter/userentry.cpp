@@ -120,7 +120,7 @@ void UserEntry::setFace(const QString &facePath)
     this->m_face = facePath;
     QFile faceFile(facePath);
     if(!faceFile.exists())
-        this->m_face = ":/resource/default_face.svg";
+        this->m_face = ":/resource/default_face.png";
 
     if(id == selectedId){
         const QString SheetStyle = QString("border-radius: %1px;  border:0px   solid white;").arg(CENTER_IMG_WIDTH/2);
@@ -197,8 +197,8 @@ void UserEntry::setEnterEvent(bool isEnter)
         QFont font = m_nameLabel->font();
         font.setPixelSize(16);
         m_nameLabel->setFont(font);
-
         m_nameLabel->adjustSize();
+	//距离头像保持25距离
         m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 25);
     }
     else
@@ -206,7 +206,6 @@ void UserEntry::setEnterEvent(bool isEnter)
         QFont font = m_nameLabel->font();
         font.setPixelSize(14);
         m_nameLabel->setFont(font);
-
         m_nameLabel->adjustSize();
         m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 32);
     }
@@ -233,8 +232,8 @@ void UserEntry::setResize()
         QFont font = m_nameLabel->font();
         font.setPixelSize(16);
         m_nameLabel->setFont(font);
-
         m_nameLabel->adjustSize();
+	//距离头像保持25距离
         m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 25);
     }
     else
@@ -242,8 +241,8 @@ void UserEntry::setResize()
         QFont font = m_nameLabel->font();
         font.setPixelSize(14);
         m_nameLabel->setFont(font);
-
         m_nameLabel->adjustSize();
+	//当前头像，用户名距离头像保持32距离
         m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 32);
     }
 }

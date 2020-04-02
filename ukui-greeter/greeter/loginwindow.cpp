@@ -291,7 +291,7 @@ void LoginWindow::setFace(const QString& facePath)
     if(faceFile.exists())
         faceImage = scaledPixmap(128, 128, facePath);
     else
-        faceImage = scaledPixmap(128, 128, ":/resource/default_face.svg");
+        faceImage = scaledPixmap(128, 128, ":/resource/default_face.png");
 
     faceImage =  PixmapToRound(faceImage,62);
     m_faceLabel->setAlignment(Qt::AlignCenter);
