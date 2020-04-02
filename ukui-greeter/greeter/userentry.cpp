@@ -198,6 +198,7 @@ void UserEntry::setEnterEvent(bool isEnter)
         font.setPixelSize(16);
         m_nameLabel->setFont(font);
         m_nameLabel->adjustSize();
+	//距离头像保持25距离
         m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 25);
     }
     else
@@ -232,6 +233,7 @@ void UserEntry::setResize()
         font.setPixelSize(16);
         m_nameLabel->setFont(font);
         m_nameLabel->adjustSize();
+	//距离头像保持25距离
         m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 25);
     }
     else
@@ -240,6 +242,7 @@ void UserEntry::setResize()
         font.setPixelSize(14);
         m_nameLabel->setFont(font);
         m_nameLabel->adjustSize();
+	//当前头像，用户名距离头像保持32距离
         m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 32);
     }
 }

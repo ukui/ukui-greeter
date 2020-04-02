@@ -227,6 +227,7 @@ void GreeterWindow::initUI()
 
 void GreeterWindow::setUserWindowVisible(bool visible)
 {
+	//对距离进行缩放
     if(m_userWnd)
         m_userWnd->setVisible(visible);
     if(!visible){
@@ -262,7 +263,7 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
 
     qDebug() << "GreeterWindow resize to " << size;
     qDebug() << "scale: " << scale;
-
+//对距离进行缩放
     if(m_userWnd){
         m_userWnd->resize(CENTER_ENTRY_WIDTH*10 - ENTRY_WIDTH*4, CENTER_ENTRY_HEIGHT);
         QRect userRect((width()-m_userWnd->width())/2,
@@ -284,7 +285,7 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
         m_languageWnd->move(m_languageLB->x(),m_languageLB->y()+m_languageWnd->height());
     }
 
-    //电源按钮位置
+    //电源按钮位置,根据x，y的值进行计算，初始值为到右下角的距离
 
     int x = 39;
     int y = 66;
@@ -293,21 +294,21 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     m_powerLB->move(this->width() - x,height() - y);
 
     //虚拟键盘按钮位置
-    x += (m_keyboardLB->width() + 10);
+    x += (m_keyboardLB->width() + 10); //10为间隔
     m_keyboardLB->move(this->width() - x, height() - y);
 
     //桌面环境选择按钮位置
     if(m_sessionLB)
     {
-        x += (m_sessionLB->width() + 10);
+        x += (m_sessionLB->width() + 10); //10为间隔
         m_sessionLB->move(this->width() - x, height() - y);
     }
 
     //语言选择按钮位置
-    x += (m_languageLB->width() + 10);
+    x += (m_languageLB->width() + 10); //10为间隔
     m_languageLB->move(this->width() - x, height() - y);
 
-    widgetTime->move((width()-widgetTime->geometry().width())/2, 59);
+    widgetTime->move((width()-widgetTime->geometry().width())/2, 59); 
 
     //虚拟键盘位置
     setVirkeyboardPos();
@@ -318,6 +319,7 @@ void GreeterWindow::setVirkeyboardPos()
 {
     if(m_virtualKeyboard)
     {
+	    //设置屏幕键盘的高度为窗口高度的三分之一
        m_virtualKeyboard->setGeometry(0,
                                        height() - height()/3,
                                        width(), height()/3);
@@ -614,6 +616,7 @@ void GreeterWindow::onLanguageChanged(const Language &language)
     const QFont &font = m_languageLB->font();
     QFontMetrics fm(font);
     int pixelWidth = fm.width(language.name);
+//根据语言文字的长度计算按钮的宽度，并加上文字距离按钮两边的间距
     m_languageLB->setFixedWidth(pixelWidth + 14);
 
     int x,y;
@@ -627,7 +630,7 @@ void GreeterWindow::onLanguageChanged(const Language &language)
         x = m_keyboardLB->geometry().left();
         y = m_keyboardLB->y();
     }
-
+//10为距离左边按钮的距离
     m_languageLB->move(x - 10 - m_languageLB->width() , y);
 
     if(m_userWnd && !m_userWnd->isHidden())
