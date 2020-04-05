@@ -31,6 +31,8 @@
 #include <QProcess>
 #include <QScreen>
 #include <X11/Xlib.h>
+#include <X11/XKBlib.h>
+#include <X11/keysym.h>
 #include <X11/cursorfont.h>
 #include <X11/extensions/Xrandr.h>
 #include "globalv.h"
@@ -129,6 +131,9 @@ int main(int argc, char *argv[])
     //设置鼠标指针样式
     XDefineCursor(QX11Info::display(), QX11Info::appRootWindow(), XCreateFontCursor(QX11Info::display(), XC_arrow));
 
+    //默认打开numlock
+    unsigned int num_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Num_Lock);
+    XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, num_mask);
 
     //等待显示器准备完毕
     /*waitMonitorsReady();

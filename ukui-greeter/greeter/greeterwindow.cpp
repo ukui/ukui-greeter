@@ -163,6 +163,7 @@ void GreeterWindow::initUI()
     m_languageLB->setFont(QFont("Ubuntu", 16));
     m_languageLB->setFixedHeight(48);
     m_languageLB->setCursor(Qt::PointingHandCursor);
+    m_languageLB->installEventFilter(this);
     LanguagesVector defaultLang = getLanguages();
     if(defaultLang.count()>0){
         m_languageLB->setText(defaultLang.at(0).name);
@@ -223,6 +224,8 @@ void GreeterWindow::initUI()
         QString lastLoginUser = Configuration::instance()->getLastLoginUser();
         m_userWnd->setCurrentUser(lastLoginUser);
     }
+
+    setWindowOpacity(0.5);
 }
 
 void GreeterWindow::setUserWindowVisible(bool visible)
@@ -330,9 +333,15 @@ bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
 {
     if(event->type() == QEvent::MouseButtonPress){
         if(m_sessionWnd && m_sessionWnd->isVisible())
-            m_sessionWnd->hide();
+        {
+            m_sessionWnd->close();
+            m_sessionWnd = nullptr;
+        }
         if(m_languageWnd && m_languageWnd->isVisible())
-            m_languageWnd->hide();
+        {
+            m_languageWnd->close();
+            m_languageWnd = nullptr;
+        }
     }
     return false;
 }
@@ -568,13 +577,13 @@ void GreeterWindow::showLanguageWnd()
     }
     m_languageHasChanged = true;
     if(m_languageWnd->isVisible()){
-        m_languageWnd->hide();
+        m_languageWnd->close();
+        m_languageWnd = nullptr;
         setFocus();
     }
     else{
         m_languageWnd->show();
         m_languageWnd->setFocus();
-        m_languageWnd->setCurrentLanguage(m_greeter->lang());
         m_languageWnd->move(m_languageLB->x(),m_languageLB->y()-m_languageWnd->height() - 3);
     }
 }
@@ -637,6 +646,10 @@ void GreeterWindow::onLanguageChanged(const Language &language)
     {
         m_userWnd->setFocus();
     }
+    if(m_languageWnd){
+        m_languageWnd->close();
+        m_languageWnd = nullptr;
+    }
 }
 
 void GreeterWindow::showSessionWnd()
@@ -650,13 +663,13 @@ void GreeterWindow::showSessionWnd()
     m_sessionHasChanged = true;
 
     if(m_sessionWnd->isVisible()){
-        m_sessionWnd->hide();
+        m_sessionWnd->close();
+        m_sessionWnd = nullptr;
         setFocus();
     }
     else{
         m_sessionWnd->move(m_languageLB->x(),m_languageLB->y()-m_sessionWnd->height() - 3);
         m_sessionWnd->show();
-        m_sessionWnd->setCurrentSession(m_greeter->session());
         m_sessionWnd->setFocus();
     }
 }
@@ -703,6 +716,11 @@ void GreeterWindow::onSessionChanged(const QString &session)
     if(m_userWnd && !m_userWnd->isHidden())
     {
         m_userWnd->setFocus();
+    }
+
+    if(m_sessionWnd){
+        m_sessionWnd->close();
+        m_sessionWnd = nullptr;
     }
 }
 

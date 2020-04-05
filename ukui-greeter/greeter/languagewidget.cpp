@@ -90,7 +90,7 @@ bool LanguageWidget::eventFilter(QObject *obj, QEvent *event)
     //失去焦点时隐藏窗口
     if(event->type() == 23)
     {
-        hide();
+        close();
     }
     return false;
 }
