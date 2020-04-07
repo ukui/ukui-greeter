@@ -131,9 +131,14 @@ int main(int argc, char *argv[])
     //设置鼠标指针样式
     XDefineCursor(QX11Info::display(), QX11Info::appRootWindow(), XCreateFontCursor(QX11Info::display(), XC_arrow));
 
-    //默认打开numlock
+    //默认打开numlock,以及关闭caps lock,需要设置两次，否则灯和效果可能不一致，原因不知
     unsigned int num_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Num_Lock);
+    XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, 0);
     XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, num_mask);
+  
+    unsigned int caps_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Caps_Lock); 
+    XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, caps_mask);
+    XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, 0);
 
     //等待显示器准备完毕
     /*waitMonitorsReady();
