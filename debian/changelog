@@ -1,3 +1,11 @@
+ukui-greeter (1.2.5-1) unstable; urgency=medium
+
+  * New upstream bugfix release:
+    - Fix the problem on highdpi screen.
+  * debian/watch: update to monitor the upstream orig.tar.gz.
+
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Tue, 07 Apr 2020 14:43:43 +0800
+
 ukui-greeter (1.2.4-1) unstable; urgency=medium
 
   * New upstream bugfix release:
