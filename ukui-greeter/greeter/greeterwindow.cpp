@@ -258,7 +258,6 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     QSize size = event->size();
     //重新计算缩放比例
     scale = QString::number(size.width() / 1920.0, 'f', 1).toFloat();
-    scale = scale > 0.5 ? scale : (width() >= 800 ? 0.5 : scale);
     
     if(scale > 1)
         scale = 1;

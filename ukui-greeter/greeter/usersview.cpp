@@ -52,8 +52,7 @@ UsersView::UsersView(QWidget *parent) :
 {
     QSize size = QApplication::primaryScreen()->size();
     scale = QString::number(size.width() / 1920.0, 'f', 1).toFloat();
-    scale = scale > 0.5 ? scale : (width() >= 800 ? 0.5 : scale);
-	
+
     if(scale > 1)
 	    scale = 1;
 // CENTER_ENTRY_WIDTH*5 +4* (CENTER_ENTRY_WIDTH - ENTRY_WIDTH*) +CENTER_ENTRY_WIDTH 
@@ -77,7 +76,7 @@ void UsersView::initUI()
     prevArrow = new QPushButton(this);
     prevArrow->setObjectName("prevArrow");
     prevArrow->setIcon(QIcon(":/resource/prev.png"));
-    prevArrow->setIconSize(QSize(64,64));
+    prevArrow->setIconSize(QSize(64*scale,64*scale));
     prevArrow->setGeometry(LEFT_ARROW_X,0,CENTER_ENTRY_WIDTH/2,CENTER_ENTRY_HEIGHT);
     prevArrow->hide();
     connect(prevArrow,&QPushButton::clicked,this,[this](){
@@ -87,7 +86,7 @@ void UsersView::initUI()
     nextArrow = new QPushButton(this);
     nextArrow->setObjectName("nextArrow");
     nextArrow->setIcon(QIcon(":/resource/next.png"));
-    nextArrow->setIconSize(QSize(64,64));
+    nextArrow->setIconSize(QSize(64*scale,64*scale));
     nextArrow->setGeometry(RIGHT_ARROW_X,0,CENTER_ENTRY_WIDTH/2,CENTER_ENTRY_HEIGHT);
     nextArrow->hide();
     connect(nextArrow,&QPushButton::clicked,this,[this](){
