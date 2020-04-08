@@ -196,6 +196,9 @@ void LoginWindow::setChildrenGeometry()
 
     // 密码框和提示信息显示位置
 
+    if(scale < 0.5)
+        setFixedWidth(300);
+
     m_passwdWidget->setGeometry(0, 0, width(), 150);
     m_passwordEdit->setGeometry((m_passwdWidget->width() - 300)/2, 0, 300, 34);
     m_messageLabel->setGeometry((m_passwdWidget->width() - 600)/2,

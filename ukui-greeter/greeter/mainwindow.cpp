@@ -42,10 +42,10 @@ QT_END_NAMESPACE
 
 #define BLUR_RADIUS 300
 
-QPixmap blurPixmap(QPixmap pixmap)
+QPixmap * blurPixmap(QPixmap *pixmap)
 {
-    QPainter painter(&pixmap);
-    QImage srcImg = pixmap.toImage();
+    QPainter painter(pixmap);
+    QImage srcImg = pixmap->toImage();
     qt_blurImage(&painter, srcImg, BLUR_RADIUS, false, false);
     painter.end();
     return pixmap;
@@ -245,6 +245,7 @@ void MainWindow::setBackground(QSharedPointer<Background> &background)
     }
 
     //如果是第一次绘制背景，则不需要渐变
+    //现在由于绘制模糊背景，不需要渐变了
     if(!m_background.isNull())
         startTransition(m_background, background);
 
@@ -274,7 +275,7 @@ void MainWindow::stopTransition()
 
 void MainWindow::onTransition()
 {
-    m_transition.stage += 0.05;//= (1 - cos(M_PI * m_transition.stage)) / 2;
+    m_transition.stage += 0.2;//= (1 - cos(M_PI * m_transition.stage)) / 2;
 
     if(m_transition.stage >= 1.0)
         stopTransition();
@@ -296,13 +297,14 @@ void MainWindow::drawBackground(QSharedPointer<Background> &background,
         return;
 
     QPainter painter(this);
-    painter.setOpacity(alpha);
+   painter.setOpacity(alpha);
 
     switch(background->type) {
     case BACKGROUND_IMAGE:
     {
+
         QPixmap *pixmap = getBackground(background->image, rect);
-        QPixmap pix = blurPixmap(*pixmap);
+
         if(pixmap->isNull())
         {
             QString color = m_configuration->getValue("background-color").toString();
@@ -316,7 +318,7 @@ void MainWindow::drawBackground(QSharedPointer<Background> &background,
         }
         else
         {
-            painter.drawPixmap(rect, pix);
+            painter.drawPixmap(rect, *pixmap);
         }
         break;
     }
@@ -334,8 +336,9 @@ QPixmap * MainWindow::getBackground(const QString &path, const QRect &rect)
     QString resolution = QString("%1x%2").arg(rect.width()).arg(rect.height());
     QPair<QString, QString> key(path, resolution);
 
-    if(!m_backgrounds.contains(key))
-        m_backgrounds[key] = new QPixmap(scaledPixmap(width(), height(), path));
-
+    if(!m_backgrounds.contains(key)){
+        QPixmap *pixmap =  new QPixmap(scaledPixmap(width(), height(), path));
+        m_backgrounds[key] = blurPixmap(pixmap);
+    }
     return m_backgrounds[key];
 }

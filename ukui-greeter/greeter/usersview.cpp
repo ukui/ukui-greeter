@@ -52,8 +52,7 @@ UsersView::UsersView(QWidget *parent) :
 {
     QSize size = QApplication::primaryScreen()->size();
     scale = QString::number(size.width() / 1920.0, 'f', 1).toFloat();
-    scale = scale > 0.5 ? scale : (width() >= 800 ? 0.5 : scale);
-	
+
     if(scale > 1)
 	    scale = 1;
 // CENTER_ENTRY_WIDTH*5 +4* (CENTER_ENTRY_WIDTH - ENTRY_WIDTH*) +CENTER_ENTRY_WIDTH 
@@ -77,21 +76,21 @@ void UsersView::initUI()
     prevArrow = new QPushButton(this);
     prevArrow->setObjectName("prevArrow");
     prevArrow->setIcon(QIcon(":/resource/prev.png"));
-    prevArrow->setIconSize(QSize(64,64));
+    prevArrow->setIconSize(QSize(64*scale,64*scale));
     prevArrow->setGeometry(LEFT_ARROW_X,0,CENTER_ENTRY_WIDTH/2,CENTER_ENTRY_HEIGHT);
     prevArrow->hide();
     connect(prevArrow,&QPushButton::clicked,this,[this](){
-        leftKeyPressed();
+        leftKeyPressed(true);
     });
 
     nextArrow = new QPushButton(this);
     nextArrow->setObjectName("nextArrow");
     nextArrow->setIcon(QIcon(":/resource/next.png"));
-    nextArrow->setIconSize(QSize(64,64));
+    nextArrow->setIconSize(QSize(64*scale,64*scale));
     nextArrow->setGeometry(RIGHT_ARROW_X,0,CENTER_ENTRY_WIDTH/2,CENTER_ENTRY_HEIGHT);
     nextArrow->hide();
     connect(nextArrow,&QPushButton::clicked,this,[this](){
-        rightKeyPressed();
+        rightKeyPressed(true);
     });
 
 }
@@ -103,24 +102,24 @@ bool UsersView::eventFilter(QObject *obj, QEvent *event)
         for(int i=0;i<userlist.count();i++){
             if(obj == userlist.at(i)){
                     //添加定时器，防止点击过快。
-                    int interval = mouseClickLast.msecsTo(QTime::currentTime());
-                    if(interval < 300 && interval > -300)
-                        return false;
+//                    int interval = mouseClickLast.msecsTo(QTime::currentTime());
+//                    if(interval < 100 && interval > -100)
+//                        return false;
                     mouseClickLast = QTime::currentTime();
 
                     if(i == currentUser - 1){
-                        leftKeyPressed();
+                        leftKeyPressed(true);
                     }
                     else if(i == currentUser -2){
-                        leftKeyPressed();
-                        leftKeyPressed();
+                        leftKeyPressed(false);
+                        leftKeyPressed(true);
                     }
                     else if(i == currentUser + 1){
-                        rightKeyPressed();
+                        rightKeyPressed(true);
                     }
                     else if(i == currentUser + 2){
-                        rightKeyPressed();
-                        rightKeyPressed();
+                        rightKeyPressed(false);
+                        rightKeyPressed(true);
                     }
             }
         }
@@ -129,15 +128,14 @@ bool UsersView::eventFilter(QObject *obj, QEvent *event)
     if(event->type() == QEvent::Enter){
         for(int i=0;i<userlist.count();i++){
             if(obj == userlist.at(i)){
-                if(i == currentUser - 2)
-                    userlist.at(i)->setGeometry(ITEM1_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
-                else if(i == currentUser - 1)
-                    userlist.at(i)->setGeometry(ITEM2_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
-                else if(i == currentUser + 1)
-                    userlist.at(i)->setGeometry(ITEM4_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
-                else if(i == currentUser + 2)
-                    userlist.at(i)->setGeometry(ITEM5_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
-
+//                if(i == currentUser - 2)
+//                    userlist.at(i)->setGeometry(ITEM1_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
+//                else if(i == currentUser - 1)
+//                    userlist.at(i)->setGeometry(ITEM2_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
+//                else if(i == currentUser + 1)
+//                    userlist.at(i)->setGeometry(ITEM4_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
+//                else if(i == currentUser + 2)
+//                    userlist.at(i)->setGeometry(ITEM5_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
                 userlist.at(i)->setEnterEvent(true);
             }
         }
@@ -146,15 +144,14 @@ bool UsersView::eventFilter(QObject *obj, QEvent *event)
     if(event->type() == QEvent::Leave){
         for(int i=0;i<userlist.count();i++){
             if(obj == userlist.at(i)){
-                if(i == currentUser - 2)
-                    userlist.at(i)->setGeometry(ITEM1_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
-                else if(i == currentUser - 1)
-                    userlist.at(i)->setGeometry(ITEM2_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
-                else if(i == currentUser + 1)
-                    userlist.at(i)->setGeometry(ITEM4_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
-                else if(i == currentUser + 2)
-                    userlist.at(i)->setGeometry(ITEM5_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
-
+//                if(i == currentUser - 2)
+//                    userlist.at(i)->setGeometry(ITEM1_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
+//                else if(i == currentUser - 1)
+//                    userlist.at(i)->setGeometry(ITEM2_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
+//                else if(i == currentUser + 1)
+//                    userlist.at(i)->setGeometry(ITEM4_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
+//                else if(i == currentUser + 2)
+//                    userlist.at(i)->setGeometry(ITEM5_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
                 userlist.at(i)->setEnterEvent(false);
             }
         }
@@ -198,14 +195,14 @@ void UsersView::onGlobalKeyRelease(const QString &key)
     lasttime = QTime::currentTime();
     if(key.compare("right",Qt::CaseInsensitive)==0)
     {
-        rightKeyPressed();
+        rightKeyPressed(true);
     }
     else if (key.compare("left",Qt::CaseInsensitive)==0) {
-        leftKeyPressed();
+        leftKeyPressed(true);
     }
 }
 
-void UsersView::leftKeyPressed()
+void UsersView::leftKeyPressed(bool isChoosed)
 {
     if(currentUser <= 0)
        return;
@@ -227,9 +224,11 @@ void UsersView::leftKeyPressed()
             break;
     }
 
-    QModelIndex index = usersModel->index(x, 0);
-    Q_EMIT currentUserChanged(index);
-    Q_EMIT userSelected(index);
+    if(isChoosed){
+        QModelIndex index = usersModel->index(x, 0);
+        Q_EMIT currentUserChanged(index);
+        Q_EMIT userSelected(index);
+    }
 
     if(currentUser >= 3)
         prevArrow->show();
@@ -243,7 +242,7 @@ void UsersView::leftKeyPressed()
 
 }
 
-void UsersView::rightKeyPressed()
+void UsersView::rightKeyPressed(bool isChoosed)
 {
     if(currentUser >= userlist.count() - 1)
         return ;
@@ -264,9 +263,11 @@ void UsersView::rightKeyPressed()
            break;
    }
 
-   QModelIndex index = usersModel->index(x, 0);
-   Q_EMIT currentUserChanged(index);
-   Q_EMIT userSelected(index);
+   if(isChoosed){
+       QModelIndex index = usersModel->index(x, 0);
+       Q_EMIT currentUserChanged(index);
+       Q_EMIT userSelected(index);
+   }
 
    if(currentUser >= 3)
        prevArrow->show();
@@ -505,7 +506,7 @@ void UsersView::rightToRight()
 void UsersView::moveAnimation(UserEntry *entry, QRect preRect, QRect nextRect)
 {
     QPropertyAnimation *pScaleAnimation = new QPropertyAnimation(entry, "geometry");
-    pScaleAnimation->setDuration(300);
+    pScaleAnimation->setDuration(200);
     pScaleAnimation->setStartValue(preRect);
     pScaleAnimation->setEndValue(nextRect);
     pScaleAnimation->setEasingCurve(QEasingCurve::InOutQuad);

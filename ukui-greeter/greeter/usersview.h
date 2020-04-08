@@ -68,8 +68,11 @@ private:
     void centerToleft();
     void centerToRight();
     void moveAnimation(UserEntry *entry,QRect preRect,QRect nextRect);
-    void leftKeyPressed();
-    void rightKeyPressed();
+    /*左方向建按下，isChoosed代表下个用户是否为选中用户，如果不是，则不触发用户改变
+        信号，只进行头像的动画效果。
+    */
+    void leftKeyPressed(bool isChoosed);
+    void rightKeyPressed(bool isChoosed);
 
 private:
     QAbstractListModel *usersModel;

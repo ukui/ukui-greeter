@@ -54,7 +54,6 @@ public:
     void setResize();
     void setEnterEvent(bool isEnter);
     void setMoveSize();
-    QPixmap PixmapToRound(const QPixmap &src, int radius);
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
@@ -64,6 +63,8 @@ protected:
 private:
     void onClicked();
     void initUI();
+    QPixmap PixmapToRound(const QPixmap &src, int radius);
+    QPixmap PixmapToOpacity(const QPixmap src , double val);
 
 
 signals:
