@@ -266,10 +266,12 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     qDebug() << "GreeterWindow resize to " << size;
     qDebug() << "scale: " << scale;
 //对距离进行缩放
+    widgetTime->move((width()-widgetTime->geometry().width())/2, 59*scale); //距离顶部59*scale的距离
+
     if(m_userWnd){
         m_userWnd->resize(CENTER_ENTRY_WIDTH*10 - ENTRY_WIDTH*4, CENTER_ENTRY_HEIGHT);
         QRect userRect((width()-m_userWnd->width())/2,
-                       widgetTime->y() + widgetTime->height() + 176*scale,
+                       widgetTime->geometry().bottom() + 176*scale,
                        m_userWnd->width(), m_userWnd->height());
         m_userWnd->setGeometry(userRect);
     }
@@ -309,8 +311,6 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     //语言选择按钮位置
     x += (m_languageLB->width() + 10); //10为间隔
     m_languageLB->move(this->width() - x, height() - y);
-
-    widgetTime->move((width()-widgetTime->geometry().width())/2, 59); 
 
     //虚拟键盘位置
     setVirkeyboardPos();
