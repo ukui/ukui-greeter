@@ -184,10 +184,6 @@
 <context>
     <name>PowerManager</name>
     <message>
-        <source>SwitchUser</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>suspend</source>
         <translation type="obsolete">suspender</translation>
     </message>
@@ -208,7 +204,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Shutdown</source>
+        <source>Switch User</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Power Off</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
