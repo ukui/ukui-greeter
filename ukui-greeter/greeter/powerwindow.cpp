@@ -128,7 +128,7 @@ void PowerManager::initUI()
     switchFace->setAlignment(Qt::AlignCenter);
     switchLabel->setAlignment(Qt::AlignCenter);
     switchFace->setPixmap(QPixmap(":/resource/avatar.png").scaled(58,58));
-    switchLabel->setText(tr("SwitchUser"));
+    switchLabel->setText(tr("Switch User"));
     switchWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
     QVBoxLayout *switchlayout = new QVBoxLayout(switchWidget);
     switchlayout->addWidget(switchFace);
@@ -169,7 +169,7 @@ void PowerManager::initUI()
         shutdownLabel->setAlignment(Qt::AlignCenter);
         shutdownFace->setAlignment(Qt::AlignCenter);
         shutdownFace->setPixmap(QPixmap(":/resource/shutdown.png").scaled(58,58));
-        shutdownLabel->setText(tr("Shutdown"));
+        shutdownLabel->setText(tr("Power Off"));
         shutdownWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
         QVBoxLayout *shutdownlayout = new QVBoxLayout(shutdownWidget);
         shutdownlayout->addWidget(shutdownFace);
