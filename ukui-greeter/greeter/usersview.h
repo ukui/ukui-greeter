@@ -21,6 +21,7 @@
 
 #include <QWidget>
 #include <QTime>
+#include <QPair>
 #include "userentry.h"
 
 class QListWidget;
@@ -40,7 +41,7 @@ public:
     void pageDown();
 
 protected:
-//    void keyReleaseEvent(QKeyEvent *event);
+  //  void keyReleaseEvent(QKeyEvent *event);
     void showEvent(QShowEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);
 
@@ -77,12 +78,14 @@ private:
 private:
     QAbstractListModel *usersModel;
     int currentUser;
-    QList<UserEntry *>userlist;
+    /*qpair记录用户的上一个用户和下一用户的在list的位置*/
+    QList<QPair<UserEntry *, QPair<int ,int>>> userlist;
     QTime lasttime;
     QTime mouseClickLast;
     QPushButton *prevArrow;
     QPushButton *nextArrow;
-
+    int leftCount;
+    int rightCount;
 
 };
 

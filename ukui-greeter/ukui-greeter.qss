@@ -1,11 +1,10 @@
 /******************* 按钮 *********************/
 QPushButton{
     text-align:center;
-    color: rgb(255, 255, 255, 200);
+    color: rgb(255, 255, 255, 255);
     border: none;
     border-radius: 4px;
     outline: none;
-    font-family: 'Ubuntu';
 }
 QPushButton::hover{
     background-color: rgb(255, 255, 255, 20%);
@@ -52,7 +51,6 @@ QMenu#SessionWnd::icon{
 QLabel{
     color: white;
     font-size: 16px;
-    font-family: "Ubuntu"
 }
 
 /***************** 垂直滚动条 ********************/

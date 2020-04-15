@@ -33,6 +33,7 @@
 #include <QGraphicsOpacityEffect>
 #include "xeventmonitor.h"
 
+/*记录五个节点的坐标*/
 #define LEFT_ARROW_X 0
 #define ITEM1_X (CENTER_ENTRY_WIDTH/2)
 #define ITEM2_X (ITEM1_X + CENTER_ENTRY_WIDTH * 2 - ENTRY_WIDTH)
@@ -97,62 +98,53 @@ void UsersView::initUI()
 
 bool UsersView::eventFilter(QObject *obj, QEvent *event)
 {
+    if(userlist.count() <= 1)
+        return false;
 
     if(event->type() == QEvent::MouseButtonRelease){
+	/*为防止双击时点中当前头像和下一个头像，添加延时，确保只点中当前头像*/
+        int interval = mouseClickLast.msecsTo(QTime::currentTime());
+        if(interval < 300 && interval > -300)
+            return false;
+        mouseClickLast = QTime::currentTime();
         for(int i=0;i<userlist.count();i++){
-            if(obj == userlist.at(i)){
-                    //添加定时器，防止点击过快。
-//                    int interval = mouseClickLast.msecsTo(QTime::currentTime());
-//                    if(interval < 100 && interval > -100)
-//                        return false;
-                    mouseClickLast = QTime::currentTime();
+            int next = userlist.at(currentUser).second.second; //当前用户的下一个用户下标
+            int prev = userlist.at(currentUser).second.first; //当前用户的上一个用户下标
+            int nnext = userlist.at(next).second.second;//当前用户的下下个用户下标
+            int pprev = userlist.at(prev).second.first;//当前用户的上上个用户下标
 
-                    if(i == currentUser - 1){
+            if(obj == userlist.at(i).first){
+                    if(i == prev){
                         leftKeyPressed(true);
                     }
-                    else if(i == currentUser -2){
-                        leftKeyPressed(false);
-                        leftKeyPressed(true);
-                    }
-                    else if(i == currentUser + 1){
+                    else if(i == next){
                         rightKeyPressed(true);
                     }
-                    else if(i == currentUser + 2){
+                    else if(i == nnext && i != currentUser){
+			    /*这里要放在下一条语句之前，否则当只有四个用户时，左移变右移*/
                         rightKeyPressed(false);
                         rightKeyPressed(true);
                     }
+		    else if(i == pprev && i != currentUser){
+                        leftKeyPressed(false);
+                        leftKeyPressed(true);
+                    }
             }
         }
     }
-
+    /*鼠标移动到头像上事件*/
     if(event->type() == QEvent::Enter){
         for(int i=0;i<userlist.count();i++){
-            if(obj == userlist.at(i)){
-//                if(i == currentUser - 2)
-//                    userlist.at(i)->setGeometry(ITEM1_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
-//                else if(i == currentUser - 1)
-//                    userlist.at(i)->setGeometry(ITEM2_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
-//                else if(i == currentUser + 1)
-//                    userlist.at(i)->setGeometry(ITEM4_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
-//                else if(i == currentUser + 2)
-//                    userlist.at(i)->setGeometry(ITEM5_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
-                userlist.at(i)->setEnterEvent(true);
+            if(obj == userlist.at(i).first){
+                userlist.at(i).first->setEnterEvent(true);
             }
         }
     }
-
+    /*鼠标移出头像事件*/
     if(event->type() == QEvent::Leave){
         for(int i=0;i<userlist.count();i++){
-            if(obj == userlist.at(i)){
-//                if(i == currentUser - 2)
-//                    userlist.at(i)->setGeometry(ITEM1_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
-//                else if(i == currentUser - 1)
-//                    userlist.at(i)->setGeometry(ITEM2_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
-//                else if(i == currentUser + 1)
-//                    userlist.at(i)->setGeometry(ITEM4_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
-//                else if(i == currentUser + 2)
-//                    userlist.at(i)->setGeometry(ITEM5_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
-                userlist.at(i)->setEnterEvent(false);
+            if(obj == userlist.at(i).first){
+                userlist.at(i).first->setEnterEvent(false);
             }
         }
     }
@@ -178,7 +170,7 @@ void UsersView::setCurrentUser(const QString &userName, bool entered)
         return ;
     for(int i = 0;i<userlist.count();i++)
     {
-        UserEntry *entry = userlist.at(i);
+        UserEntry *entry = userlist.at(i).first;
         if(entry->userIndex().data(QLightDM::UsersModel::NameRole).toString() == userName)
         {
             setCurrentRow(i);
@@ -189,6 +181,7 @@ void UsersView::setCurrentUser(const QString &userName, bool entered)
 
 void UsersView::onGlobalKeyRelease(const QString &key)
 {
+    /*添加一定延时，避免按键太快*/	
     int interval = lasttime.msecsTo(QTime::currentTime());
     if(interval < 200 && interval > -200)
         return ;
@@ -204,15 +197,16 @@ void UsersView::onGlobalKeyRelease(const QString &key)
 
 void UsersView::leftKeyPressed(bool isChoosed)
 {
-    if(currentUser <= 0)
+    if(userlist.count() <= 1)
        return;
 
     rightToRight();
     centerToRight();
     leftToRight();
-    currentUser-- ;
 
-    UserEntry *entry = userlist.at(currentUser);
+    currentUser = userlist.at(currentUser).second.first;
+
+    UserEntry *entry = userlist.at(currentUser).first;
     uid_t uid =  entry->userIndex().data(QLightDM::UsersModel::UidRole).toUInt();
 
 
@@ -223,36 +217,27 @@ void UsersView::leftKeyPressed(bool isChoosed)
         if(uid == id)
             break;
     }
-
+    
+    /*只有isChoosed为true时，才会触发切换用户信号，否则只是在界面上右显示，
+     * 用于处理点击距离当前用户一个位置以上时，多次移动用户的问题*/
     if(isChoosed){
         QModelIndex index = usersModel->index(x, 0);
         Q_EMIT currentUserChanged(index);
         Q_EMIT userSelected(index);
     }
 
-    if(currentUser >= 3)
-        prevArrow->show();
-    else
-        prevArrow->hide();
-
-    if(currentUser + 2 < userlist.count()-1)
-        nextArrow->show();
-    else
-        nextArrow->hide();
-
 }
 
 void UsersView::rightKeyPressed(bool isChoosed)
 {
-    if(currentUser >= userlist.count() - 1)
+    if(userlist.count() <= 1)
         return ;
 
    leftToLeft();
    centerToleft();
    rightToLeft();
-   currentUser++;
-
-   UserEntry *entry = userlist.at(currentUser);
+   currentUser = userlist.at(currentUser).second.second;
+   UserEntry *entry = userlist.at(currentUser).first;
    uid_t uid =  entry->userIndex().data(QLightDM::UsersModel::UidRole).toUInt();
 
    int x = 0;
@@ -269,15 +254,6 @@ void UsersView::rightKeyPressed(bool isChoosed)
        Q_EMIT userSelected(index);
    }
 
-   if(currentUser >= 3)
-       prevArrow->show();
-   else
-       prevArrow->hide();
-
-   if(currentUser + 2 < userlist.count()-1)
-       nextArrow->show();
-   else
-       nextArrow->hide();
 
 }
 
@@ -296,23 +272,78 @@ void UsersView::insertUserEntry(int row)
     entry->installEventFilter(this);
 
     entry->hide();
-    userlist.append(entry);
+    
+    int prev = 0,next = 0;
+    if(userlist.count() >= 1)
+    {
+        //第一个用户的上一个用户指向即将添加的下一个用户。
+        userlist.last().second.second = userlist.count();
+        //原来最后一个用户的下一个用户指向即将添加的下一个用户。
+        userlist.first().second.first = userlist.count();
+        //新添加的用户放在最后，所以上一个用户是原来的最后一个用户。
+        prev = userlist.count() - 1;
+    }
+
+    QPair<int,int> pairindex(prev,next);
+    QPair<UserEntry*,QPair<int,int>> pair(entry,pairindex);
+    userlist.append(pair);
+
+    /*记录当前用户两边可显示的用户数量*/
+    int usersCount = userlist.count();
+       switch (usersCount) {
+       case 0:
+           return;
+           break;
+       case 1:
+           leftCount = rightCount = 0;
+           break;
+       case 2:
+           leftCount = 0;
+           rightCount = 1;
+           break;
+       case 3:
+           leftCount = rightCount = 1;
+           break;
+       case 4:
+           leftCount = 1;
+           rightCount = 2;
+           break;
+       default:
+            leftCount = rightCount = 2;
+           break;
+       }
+
+    if(userlist.count() > 5){
+        prevArrow->show();
+        nextArrow->show();
+    }
 }
 
 void UsersView::removeUserEntry(int row)
 {
-    QModelIndex index = usersModel->index(row,0);
-    uid_t uid = index.data(QLightDM::UsersModel::UidRole).toUInt();
+//    QModelIndex index = usersModel->index(row,0);
+//    uid_t uid = index.data(QLightDM::UsersModel::UidRole).toUInt();
 
-    for(int i=0;i<userlist.count();i++)
-    {
-        UserEntry *entry = userlist.at(i);
-        uid_t id = entry->userIndex().data(QLightDM::UsersModel::UidRole).toUInt();
-        if(id == uid){
-            userlist.takeAt(i);
-            currentUser = 0;
-        }
-    }
+//    for(int i=0;i<userlist.count();i++)
+//    {
+//        UserEntry *entry = userlist.at(i).first;
+//        uid_t id = entry->userIndex().data(QLightDM::UsersModel::UidRole).toUInt();
+//        if(id == uid){
+//            int prev = userlist.at(i).second.first;
+//            int next = userlist.at(i).second.second;
+
+//            QPair<int,int> swap(userlist.at(prev).second.first,next);
+//            QPair<UserEntry*,QPair<int,int>> tmp(userlist.at(prev).first,swap);
+//            userlist.at(prev) = tmp;
+//            userlist.takeAt(i);
+//            currentUser = 0;
+//        }
+//    }
+
+//    if(userlist.count() <= 5){
+//        prevArrow->hide();
+//        nextArrow->hide();
+//    }
 }
 
 void UsersView::onUserAdded(const QModelIndex &parent, int left, int right)
@@ -344,7 +375,7 @@ void UsersView::onUserChanged(const QModelIndex &topLeft, const QModelIndex &bot
         uid_t uid =  index.data(QLightDM::UsersModel::UidRole).toUInt();
         for(int j = 0;j<userlist.count();j++)
         {
-            UserEntry *entry = userlist.at(j);
+            UserEntry *entry = userlist.at(j).first;
             uid_t id = entry->userIndex().data(QLightDM::UsersModel::UidRole).toUInt();
             if(id == uid)
             {
@@ -357,152 +388,177 @@ void UsersView::onUserChanged(const QModelIndex &topLeft, const QModelIndex &bot
     }
 }
 
+/*
+ * 当前用户往左移，走到这里，说明至少存在两个用户，
+ *当只有两个用户时，头像不能左移，而是隐藏,这里必须写明坐标，
+ * 否则当切换头像过快时，会出现坐标不对的问题。
+*/
 void UsersView::centerToleft()
 {
-    if(currentUser >= userlist.count() - 1)
-        return ;
+    UserEntry *entry = userlist.at(currentUser).first;
+    if(userlist.count() >= 1){
+        QRect rec1 = QRect(ITEM3_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
+        QRect rec2 = QRect(ITEM2_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
 
-    UserEntry *entry = userlist.at(currentUser);
-    QRect rec1 = entry->geometry();
-    QRect rec2 = QRect(ITEM2_X,
-                       ITEM_Y,
-                       ENTRY_WIDTH,
-                       ENTRY_HEIGHT);
-
-    moveAnimation(entry,rec1,rec2);
+        moveAnimation(entry,rec1,rec2);
+    }
+    else{
+        QRect rec1 = QRect(ITEM3_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
+        QRect rec2 = QRect(ITEM3_X+CENTER_ENTRY_WIDTH/2,
+                           ITEM_CENTER_Y+CENTER_ENTRY_HEIGHT/2,
+                           0,0);
+        moveAnimation(entry,rec1,rec2);
+    }
 }
 
+/*当前用户头像右移，当只有两个用户时，不往右移，而是隐藏*/
 void UsersView::centerToRight()
 {
-    qDebug()<<"centerToRight currentuser = "<<currentUser;
-    if(currentUser <= 0)
-        return ;
 
-    UserEntry *entry = userlist.at(currentUser);
-    QRect rec1 = entry->geometry();
-    QRect rec2 = QRect(ITEM4_X,
-                       ITEM_Y,
-                       ENTRY_WIDTH,
-                       ENTRY_HEIGHT);
+    UserEntry *entry = userlist.at(currentUser).first;
+    if(userlist.count() >= 1){
+        QRect rec1 =  QRect(ITEM3_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
+        QRect rec2 = QRect(ITEM4_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
 
-    moveAnimation(entry,rec1,rec2);
+        moveAnimation(entry,rec1,rec2);
+    }
+    else{
+        QRect rec1 = QRect(ITEM3_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
+        QRect rec2 = QRect(ITEM3_X+CENTER_ENTRY_WIDTH/2,
+                           ITEM_CENTER_Y+CENTER_ENTRY_HEIGHT/2,
+                           0,0);
+        moveAnimation(entry,rec1,rec2);
+    }
 }
-
+/*
+ *左边的两个头像左移，需要考虑三种情况
+ *leftCount == 0 : 返回
+ *leftCount == 1 : 左边只有一个头像，隐藏
+ *leftCount == 2: 最左边头像隐藏，左边第二个移动到最左边
+*/
 void UsersView::leftToLeft()
 {
-    int left = currentUser;
-
-    if(left <= 0){
+    if(leftCount == 0)
+        return ;
+    else if(leftCount == 1){
+        int index = userlist.at(currentUser).second.first;
+        UserEntry *entry = userlist.at(index).first;
+        QRect rec1 = QRect(ITEM2_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
+        QRect rec2 = QRect(ITEM2_X+ENTRY_WIDTH/2,ITEM_Y+ENTRY_HEIGHT/2,0,0);
+        moveAnimation(entry,rec1,rec2);
         return ;
     }
 
-    UserEntry *entry = userlist.at(currentUser-1);
-    QRect rec1 = entry->geometry();
-    QRect rec2 = QRect(ITEM1_X,
-                       ITEM_Y,
-                       ENTRY_WIDTH,
-                       ENTRY_HEIGHT);
-
+    /*leftCount == 2*/
+    int swap = currentUser;
+    swap = userlist.at(swap).second.first;
+    UserEntry *entry = userlist.at(swap).first;
+    QRect rec1 =QRect(ITEM2_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
+    QRect rec2 = QRect(ITEM1_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
     moveAnimation(entry,rec1,rec2);
 
-    if(left >= 2){
-        UserEntry *entry2 = userlist.at(currentUser-2);
-        rec1 = entry2->geometry();
-        rec2 = QRect(ITEM1_X+ENTRY_WIDTH/2,ITEM_Y/2,0,0);
-        moveAnimation(entry2,rec1,rec2);
-    }
+    swap = userlist.at(swap).second.first;
+    QRect rec3 = QRect(ITEM1_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
+    QRect rec4 = QRect(ITEM1_X+ENTRY_WIDTH/2,ITEM_Y+ENTRY_HEIGHT/2,0,0);
+    moveAnimation(userlist.at(swap).first,rec3,rec4);
 
 }
 
+/*
+* 当前头像左边的头像右移
+*/
 void UsersView::leftToRight()
 {
-    int left = currentUser;
+    int swap = currentUser;
+    for(int i = 0;i<=leftCount;i++){
+         swap = userlist.at(swap).second.first;
+         UserEntry *entry = userlist.at(swap).first;
+         entry->show();
+         QRect rec1,rec2;
+         if(i == 0){
+             if(leftCount == 0){
+                 rec1 = QRect(ITEM3_X+CENTER_ENTRY_WIDTH/2,
+                              ITEM_CENTER_Y+CENTER_ENTRY_HEIGHT/2,
+                              0,0);
+             }else{
+                 rec1 = QRect(ITEM2_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
+             }
+             entry->setSelected();
+             rec2 = QRect(ITEM3_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
+         }else if(i == 1){
+             if(leftCount == 1){
+                 rec1 = QRect(ITEM2_X + ENTRY_WIDTH/2,ITEM_Y+ENTRY_HEIGHT/2,0,0);
+             }else if(leftCount == 2){
+                 rec1 = QRect(ITEM1_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
+             }
+             rec2 = QRect(ITEM2_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
+         }else{
+             rec1 = QRect(ITEM1_X+ENTRY_WIDTH/2,ITEM_Y+ENTRY_HEIGHT/2,0,0);
+             rec2 = QRect(ITEM1_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
+         }
 
-    if(left <= 0)
-        return ;
-
-    UserEntry *entry = userlist.at(currentUser-1);
-    QRect rec1 = entry->geometry();
-    QRect rec2 = QRect(ITEM3_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
-    moveAnimation(entry,rec1,rec2);
-    entry->setSelected();
-
-    if(left >= 2){
-        UserEntry *entry2 = userlist.at(currentUser - 2);
-        rec1 = entry2->geometry();
-        rec2 = QRect(ITEM2_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
-
-        moveAnimation(entry2,rec1,rec2);
+         moveAnimation(entry,rec1,rec2);
     }
-
-    if(left >= 3){
-        UserEntry *entry3 = userlist.at(currentUser - 3);
-      //  entry3->setGeometry(ITEM1_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
-        rec1 = QRect(ITEM1_X+ENTRY_WIDTH/2,ITEM_Y/2,0,0);
-        rec2 = QRect(ITEM1_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
-        entry3->show();
-        moveAnimation(entry3,rec1,rec2);
-
-    }
-
 }
 
-
+/*右边部分头像左移*/
 void UsersView::rightToLeft()
 {
-    int right = userlist.count() - currentUser - 1;
+    int swap = currentUser;
+    for(int i = 0;i<=rightCount;i++){
+         swap = userlist.at(swap).second.second;
+         UserEntry *entry = userlist.at(swap).first;
+         entry->show();
+         QRect rec1,rec2;
+         if(i == 0){
+                 rec1 = QRect(ITEM4_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
+                 rec2 = QRect(ITEM3_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
+                 entry->setSelected();
+         }else if(i == 1){
+             if(rightCount == 1){
+                 rec1 = QRect(ITEM4_X + ENTRY_WIDTH/2,ITEM_Y+ENTRY_HEIGHT/2,0,0);
+             }else if(rightCount == 2){
+                 rec1 = QRect(ITEM5_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
+             }
+             rec2 = QRect(ITEM4_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
+         }else{
+             rec1 = QRect(ITEM5_X+ENTRY_WIDTH/2,ITEM_Y+ENTRY_HEIGHT/2,0,0);
+             rec2 = QRect(ITEM5_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
+         }
 
-    if(right <= 0)
-        return ;
-
-    UserEntry *entry = userlist.at(currentUser + 1);
-    QRect rec1 = entry->geometry();
-    QRect rec2 = QRect(ITEM3_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
-    moveAnimation(entry,rec1,rec2);
-    entry->setSelected();
-
-    if(right >= 2){
-        UserEntry *entry2 = userlist.at(currentUser + 2);
-        rec1 = entry2->geometry();
-        rec2 = QRect(ITEM4_X,
-                     ITEM_Y,
-                     ENTRY_WIDTH,
-                     ENTRY_HEIGHT);
-        moveAnimation(entry2,rec1,rec2);
-    }
-
-    if(right >= 3){
-        UserEntry *entry3 = userlist.at(currentUser + 3);
-        rec1 = QRect(ITEM5_X+ENTRY_WIDTH/2,ITEM_Y/2,0,0);
-        rec2 = QRect(ITEM5_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
-        entry3->show();
-        moveAnimation(entry3,rec1,rec2);
+         moveAnimation(entry,rec1,rec2);
     }
 }
 
+/*右边部分头像右移*/
 void UsersView::rightToRight()
 {
-    int right = userlist.count() - currentUser - 1;
-    if(right <= 0)
+    if(rightCount == 0)
         return ;
+    else if(rightCount == 1){
+        int index = userlist.at(currentUser).second.second;
+        UserEntry *entry = userlist.at(index).first;
+        QRect rec1 = QRect(ITEM4_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
+        QRect rec2 = QRect(ITEM4_X+ENTRY_WIDTH/2,ITEM_Y+ENTRY_HEIGHT/2,0,0);
+        moveAnimation(entry,rec1,rec2);
+        return ;
+    }
 
-    UserEntry *entry = userlist.at(currentUser + 1);
-    QRect rec1 = entry->geometry();
-    QRect rec2 = QRect(ITEM5_X,
-                       ITEM_Y,
-                       ENTRY_WIDTH,
-                       ENTRY_HEIGHT);
-
+    /*leftCount == 2*/
+    int swap = currentUser;
+    swap = userlist.at(swap).second.second;
+    UserEntry *entry = userlist.at(swap).first;
+    QRect rec1 =QRect(ITEM4_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
+    QRect rec2 = QRect(ITEM5_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
     moveAnimation(entry,rec1,rec2);
 
-    if(right >= 2){
-        UserEntry *entry2 = userlist.at(currentUser + 2);
-        rec1 = entry2->geometry();
-        rec2 = QRect(ITEM5_X+ENTRY_WIDTH/2,ITEM_Y/2,0,0);
-        moveAnimation(entry2,rec1,rec2);
-    }
+    swap = userlist.at(swap).second.second;
+    QRect rec3 = QRect(ITEM5_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT);
+    QRect rec4 = QRect(ITEM5_X+ENTRY_WIDTH/2,ITEM_Y+ENTRY_HEIGHT/2,0,0);
+    moveAnimation(userlist.at(swap).first,rec3,rec4);
 }
 
+/*移动的动画效果*/
 void UsersView::moveAnimation(UserEntry *entry, QRect preRect, QRect nextRect)
 {
     QPropertyAnimation *pScaleAnimation = new QPropertyAnimation(entry, "geometry");
@@ -524,47 +580,48 @@ void UsersView::setCurrentRow(int user)
     currentUser = user;
 
     for(int i=0;i<userlist.count();i++)
-        userlist.at(i)->hide();
+        userlist.at(i).first->hide();
 
-    userlist.at(user) -> setGeometry(ITEM3_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
-    userlist.at(user)->show();
-    userlist.at(user)->setSelected();
+    //当前用户保持居中
+    userlist.at(user).first -> setGeometry(ITEM3_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
+    userlist.at(user).first->show();
+    userlist.at(user).first->setSelected();
 
-    for(int i = user + 1; i < userlist.count() && i - user < 3; ++i)
-    {
-        int val = i - user;
-        if(val == 1)
-            userlist.at(i)->setGeometry(ITEM4_X,
-                                        ITEM_Y,
-                                        ENTRY_WIDTH,
-                                        ENTRY_HEIGHT);
-        if(val == 2)
-            userlist.at(i)->setGeometry(ITEM5_X,
-                                        ITEM_Y,
-                                        ENTRY_WIDTH,
-                                        ENTRY_HEIGHT);
+    int swap = currentUser;
 
-        userlist.at(i)->show();
+    //设置当前用户左边的用户显示
+    for(int i = 0;i<leftCount;i++){
+        swap = userlist.at(swap).second.first;
+        
+        QRect rec1 = QRect(ITEM2_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT); //左边第二个用户的大小
+        QRect rec2 = QRect(ITEM1_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT); //左边第一个用户的大小
+        
+        if(i == 0)
+            userlist.at(swap).first->setGeometry(rec1);
+        else if(i == 1)
+            userlist.at(swap).first->setGeometry(rec2);
+                           
+        userlist.at(swap).first->show();
     }
 
-    for(int i = user - 1;i >= 0 && user - i < 3; i--)
-    {
-        int val = user - i;
-        if(val == 1)
-            userlist.at(i)->setGeometry(ITEM2_X,
-                                        ITEM_Y,
-                                        ENTRY_WIDTH,
-                                        ENTRY_HEIGHT);
-        if(val == 2)
-            userlist.at(i)->setGeometry(ITEM1_X,
-                                        ITEM_Y,
-                                        ENTRY_WIDTH,
-                                        ENTRY_HEIGHT);
+    //设置当前用户右边的用户显示
+    swap = currentUser;
+    for(int i = 0;i<rightCount;i++){
+        swap = userlist.at(swap).second.second;
 
-        userlist.at(i)->show();
+        QRect  rec1 = QRect(ITEM4_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT); //从右往左第二个用户
+        QRect rec2 = QRect(ITEM5_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT); //从右往左第一个用户
+
+        if(i == 0)
+            userlist.at(swap).first->setGeometry(rec1);
+        else if(i == 1)
+            userlist.at(swap).first->setGeometry(rec2);
+
+        userlist.at(swap).first->show();
     }
 
-    UserEntry *entry = userlist.at(currentUser);
+    //获取当前用户对应的model下标
+    UserEntry *entry = userlist.at(currentUser).first;
     uid_t uid =  entry->userIndex().data(QLightDM::UsersModel::UidRole).toUInt();
 
 
@@ -575,16 +632,6 @@ void UsersView::setCurrentRow(int user)
         if(uid == id)
             break;
     }
-
-    if(currentUser >= 3)
-        prevArrow->show();
-    else
-        prevArrow->hide();
-
-    if(currentUser + 2 < userlist.count()-1)
-        nextArrow->show();
-    else
-        nextArrow->hide();
 
     QModelIndex index = usersModel->index(x, 0);
     Q_EMIT currentUserChanged(index);
