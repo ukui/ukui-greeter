@@ -67,14 +67,8 @@ void UserEntry::initUI()
 
 }
 
-void UserEntry::paintEvent(QPaintEvent *event)
-{
-    return QWidget::paintEvent(event);
-}
-
 void UserEntry::resizeEvent(QResizeEvent *)
 {
-
     setResize();
 }
 
