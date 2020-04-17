@@ -262,7 +262,7 @@ void MainWindow::startTransition(QSharedPointer<Background> &from,
     m_transition.stage = 0.0;
     m_transition.started = true;
 
-    m_timer->start(50);
+    m_timer->start(20);
 }
 
 void MainWindow::stopTransition()
@@ -275,12 +275,13 @@ void MainWindow::stopTransition()
 
 void MainWindow::onTransition()
 {
-    m_transition.stage += 0.2;//= (1 - cos(M_PI * m_transition.stage)) / 2;
+    m_transition.stage += 0.1;//= (1 - cos(M_PI * m_transition.stage)) / 2;
 
     if(m_transition.stage >= 1.0)
         stopTransition();
 
-    repaint();
+    //repaint();
+    update();
 }
 
 void MainWindow::drawTransitionAlpha(const QRect &rect)

@@ -58,7 +58,6 @@ public:
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
     void resizeEvent(QResizeEvent *);
-    void paintEvent(QPaintEvent *event);
 
 private:
     void onClicked();
