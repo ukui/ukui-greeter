@@ -269,7 +269,7 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     widgetTime->move((width()-widgetTime->geometry().width())/2, 59*scale); //距离顶部59*scale的距离
 
     if(m_userWnd){
-        m_userWnd->resize(CENTER_ENTRY_WIDTH*10 - ENTRY_WIDTH*4, CENTER_ENTRY_HEIGHT);
+        m_userWnd->resize(CENTER_ENTRY_WIDTH*9 - ENTRY_WIDTH*4 + 240*scale, CENTER_ENTRY_HEIGHT);
         QRect userRect((width()-m_userWnd->width())/2,
                        widgetTime->geometry().bottom() + 176*scale,
                        m_userWnd->width(), m_userWnd->height());

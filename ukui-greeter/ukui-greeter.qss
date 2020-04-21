@@ -147,6 +147,22 @@ QComboBox QListView::item:selected{
 }
 
 
+/************Arrow******************/
+#prevArrow{
+    background:transparent;
+    image:url(:/resource/prev-40.png);	
+}
+#prevArrow::hover{
+    image:url(:/resource/prev.png);      
+}
+
+#nextArrow{
+    background:transparent;
+    image:url(:/resource/next-40.png);      
+}
+#nextArrow::hover{
+    image:url(:/resource/next.png);     
+}
 
 /*********************** 列表 **************************/
 

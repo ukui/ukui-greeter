@@ -11,8 +11,10 @@
         <file>resource/dialog_close.png</file>
         <file>resource/keyboard.png</file>
         <file>resource/next.png</file>
+	<file>resource/next-40.png</file>
         <file>resource/power.png</file>
         <file>resource/prev.png</file>
+	<file>resource/prev-40.png</file>
 	<file>resource/reboot.png</file>
         <file>resource/shutdown.png</file>
         <file>resource/suspend.png</file>

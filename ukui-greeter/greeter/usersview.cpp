@@ -34,13 +34,14 @@
 #include "xeventmonitor.h"
 
 /*记录五个节点的坐标*/
+#define ARROW_WIDTH 120*scale
 #define LEFT_ARROW_X 0
-#define ITEM1_X (CENTER_ENTRY_WIDTH/2)
+#define ITEM1_X (ARROW_WIDTH)
 #define ITEM2_X (ITEM1_X + CENTER_ENTRY_WIDTH * 2 - ENTRY_WIDTH)
 #define ITEM3_X (ITEM2_X + CENTER_ENTRY_WIDTH * 2 - ENTRY_WIDTH )
 #define ITEM4_X (ITEM3_X + CENTER_ENTRY_WIDTH*3 - ENTRY_WIDTH*2)
 #define ITEM5_X (ITEM4_X + CENTER_ENTRY_WIDTH * 2 - ENTRY_WIDTH)
-#define RIGHT_ARROW_X (CENTER_ENTRY_WIDTH*9.5 - ENTRY_WIDTH*4)
+#define RIGHT_ARROW_X (CENTER_ENTRY_WIDTH*9 - ENTRY_WIDTH*4 + 220*scale)
 #define ITEM_Y CENTER_ENTRY_HEIGHT-ENTRY_HEIGHT
 #define ITEM_CENTER_Y  0
 
@@ -59,7 +60,7 @@ UsersView::UsersView(QWidget *parent) :
 // CENTER_ENTRY_WIDTH*5 +4* (CENTER_ENTRY_WIDTH - ENTRY_WIDTH*) +CENTER_ENTRY_WIDTH 
 // 计算头像列表的宽度，宽度计算公式为5个大头像的宽加上四个间距，再加上两边左右箭头的
 // 宽度
-    resize(CENTER_ENTRY_WIDTH*10 - ENTRY_WIDTH*4 , CENTER_ENTRY_HEIGHT);
+    resize(CENTER_ENTRY_WIDTH*9 - ENTRY_WIDTH*4 + 240*scale , CENTER_ENTRY_HEIGHT);
     initUI();
 }
 
@@ -76,9 +77,8 @@ void UsersView::initUI()
 
     prevArrow = new QPushButton(this);
     prevArrow->setObjectName("prevArrow");
-    prevArrow->setIcon(QIcon(":/resource/prev.png"));
-    prevArrow->setIconSize(QSize(64*scale,64*scale));
-    prevArrow->setGeometry(LEFT_ARROW_X,0,CENTER_ENTRY_WIDTH/2,CENTER_ENTRY_HEIGHT);
+    prevArrow->setIconSize(QSize(19*scale,52*scale));
+    prevArrow->setGeometry(LEFT_ARROW_X,CENTER_ENTRY_WIDTH - ENTRY_WIDTH + (ENTRY_WIDTH - 52*scale)/2,19*scale,52*scale);
     prevArrow->hide();
     connect(prevArrow,&QPushButton::clicked,this,[this](){
         leftKeyPressed(true);
@@ -86,14 +86,20 @@ void UsersView::initUI()
 
     nextArrow = new QPushButton(this);
     nextArrow->setObjectName("nextArrow");
-    nextArrow->setIcon(QIcon(":/resource/next.png"));
-    nextArrow->setIconSize(QSize(64*scale,64*scale));
-    nextArrow->setGeometry(RIGHT_ARROW_X,0,CENTER_ENTRY_WIDTH/2,CENTER_ENTRY_HEIGHT);
+    nextArrow->setIconSize(QSize(19*scale,52*scale));
+    nextArrow->setGeometry(RIGHT_ARROW_X,CENTER_ENTRY_WIDTH - ENTRY_WIDTH + (ENTRY_WIDTH - 52*scale)/2,19*scale,52*scale);
     nextArrow->hide();
     connect(nextArrow,&QPushButton::clicked,this,[this](){
         rightKeyPressed(true);
     });
 
+}
+
+void UsersView::resizeEvent(QResizeEvent *)
+{
+    prevArrow->setGeometry(LEFT_ARROW_X,CENTER_ENTRY_WIDTH - ENTRY_WIDTH + (ENTRY_WIDTH - 52*scale)/2,19*scale,52*scale);
+    nextArrow->setGeometry(RIGHT_ARROW_X,CENTER_ENTRY_WIDTH - ENTRY_WIDTH + (ENTRY_WIDTH - 52*scale)/2,19*scale,52*scale);
+    setCurrentRow(currentUser);
 }
 
 bool UsersView::eventFilter(QObject *obj, QEvent *event)

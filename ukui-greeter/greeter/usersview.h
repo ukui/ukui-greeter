@@ -44,6 +44,7 @@ protected:
   //  void keyReleaseEvent(QKeyEvent *event);
     void showEvent(QShowEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);
+    void resizeEvent(QResizeEvent *);
 
 private slots:
     void onUserAdded(const QModelIndex&, int, int);
