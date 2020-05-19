@@ -137,8 +137,8 @@ int main(int argc, char *argv[])
     XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, num_mask);
   
     unsigned int caps_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Caps_Lock); 
-    XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, caps_mask);
-    XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, 0);
+    XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, caps_mask, caps_mask);
+    XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, caps_mask, 0);
 
     //等待显示器准备完毕
     /*waitMonitorsReady();
