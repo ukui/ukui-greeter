@@ -398,8 +398,8 @@ void GreeterWindow::setBackground(const QModelIndex &index)
     bool useUserBackground = false;
 
     QString userConfigurePath = m_greeter->getEnsureShareDir(index.data(QLightDM::UsersModel::NameRole).toString()) + "/ukui-greeter.conf";
-    QFile faceFile(userConfigurePath);
-    if(faceFile.exists()){
+    QFile backgroundFile(userConfigurePath);
+    if(backgroundFile.exists()){
         QSettings settings(userConfigurePath,QSettings::IniFormat);
         settings.beginGroup("greeter");
         if(settings.contains("backgroundPath")){
@@ -413,7 +413,7 @@ void GreeterWindow::setBackground(const QModelIndex &index)
     }
 
     if(!useUserBackground){
-        QString backgroundPath = index.data(QLightDM::UsersModel::BackgroundPathRole).toString();
+        backgroundPath = index.data(QLightDM::UsersModel::BackgroundPathRole).toString();
         if(backgroundPath.isEmpty())
         {
             uid_t uid = index.data(QLightDM::UsersModel::UidRole).toUInt();
