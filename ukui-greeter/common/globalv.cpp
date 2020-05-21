@@ -22,6 +22,7 @@
 #include <QPixmap>
 #include <QProcess>
 #include <QPainter>
+#include <QMimeDatabase>
 #include <QtSvg/QSvgRenderer>
 
 /**
@@ -64,4 +65,12 @@ QPixmap scaledPixmap(int width, int height, QString url)
     }
 
     return pixmap.scaled(width, height, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+}
+
+bool isPicture(QString filepath)
+{
+    QMimeDatabase db;
+    QMimeType mime = db.mimeTypeForFile(filepath);
+    qDebug() << "mime: " << filepath << mime.name();
+    return mime.name().startsWith("image/");
 }

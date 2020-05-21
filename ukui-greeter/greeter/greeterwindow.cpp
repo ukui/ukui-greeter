@@ -393,13 +393,36 @@ QString GreeterWindow::getAccountBackground(uid_t uid)
 
 void GreeterWindow::setBackground(const QModelIndex &index)
 {
-    QString backgroundPath = index.data(QLightDM::UsersModel::BackgroundPathRole).toString();
-    if(backgroundPath.isEmpty())
-    {
-        uid_t uid = index.data(QLightDM::UsersModel::UidRole).toUInt();
-        backgroundPath = getAccountBackground(uid);
+    QString backgroundPath;
+
+    bool useUserBackground = false;
+	
+    //读取/var/lib/lightdm-date/用户名/ukui-greeter.conf,
+    //判断是否设置了该用户的登陆界面的背景图片.
+    QString userConfigurePath = m_greeter->getEnsureShareDir(index.data(QLightDM::UsersModel::NameRole).toString()) + "/ukui-greeter.conf";
+    QFile backgroundFile(userConfigurePath);
+    if(backgroundFile.exists()){
+        QSettings settings(userConfigurePath,QSettings::IniFormat);
+        settings.beginGroup("greeter");
+        if(settings.contains("backgroundPath")){
+            QString filepath = settings.value("backgroundPath").toString();
+            if(!filepath.isEmpty() && isPicture(filepath)){
+                backgroundPath = filepath;
+                useUserBackground = true;
+            }
+        }
+        settings.endGroup();
+    }
+
+    if(!useUserBackground){
+        backgroundPath = index.data(QLightDM::UsersModel::BackgroundPathRole).toString();
         if(backgroundPath.isEmpty())
-            backgroundPath = "/usr/share/backgrounds/warty-final-ubuntukylin.jpg";
+        {
+            uid_t uid = index.data(QLightDM::UsersModel::UidRole).toUInt();
+            backgroundPath = getAccountBackground(uid);
+            if(backgroundPath.isEmpty())
+                backgroundPath = "/usr/share/backgrounds/warty-final-ubuntukylin.jpg";
+        }
     }
     QSharedPointer<Background> background(new Background);
     background->type = BACKGROUND_IMAGE;

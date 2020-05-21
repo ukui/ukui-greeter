@@ -35,6 +35,7 @@ public:
     void setUserName(const QString &);
     void setrootWindow();
     void setrootWindowBackground(QString);
+    QString getEnsureShareDir(QString username);
 
 private:
     QString m_language;

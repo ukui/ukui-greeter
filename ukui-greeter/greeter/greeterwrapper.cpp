@@ -84,6 +84,11 @@ void GreeterWrapper::setrootWindow()
      setRootWindowBackground(path);
 }
 
+QString GreeterWrapper::getEnsureShareDir(QString username)
+{
+    return ensureSharedDataDirSync(username);
+}
+
 void GreeterWrapper::startSession()
 {
     if(isAuthenticated())

@@ -40,5 +40,6 @@ extern float scale;     //缩放比例
 extern int fontSize;    //字体大小
 
 QPixmap scaledPixmap(int width, int height, QString url);
+bool isPicture(QString filepath);
 #endif // GLOBALV_H
 
