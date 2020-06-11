@@ -17,7 +17,7 @@
 	<file>resource/prev-40.png</file>
 	<file>resource/reboot.png</file>
         <file>resource/shutdown.png</file>
-        <file>resource/suspend.png</file>
+        <file>resource/sleep.png</file>
         <file>resource/waiting.png</file>
         <file>resource/show-password.png</file>
         <file>resource/hide-password.png</file>

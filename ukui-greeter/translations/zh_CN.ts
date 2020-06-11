@@ -141,7 +141,7 @@
 <context>
     <name>GreeterWrapper</name>
     <message>
-        <location filename="../greeter/greeterwrapper.cpp" line="100"/>
+        <location filename="../greeter/greeterwrapper.cpp" line="105"/>
         <source>failed to start session.</source>
         <translation>启动会话失败</translation>
     </message>
@@ -281,9 +281,13 @@
         <translation>切换用户</translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="144"/>
         <source>Suspend</source>
-        <translation>挂起</translation>
+        <translation type="vanished">挂起</translation>
+    </message>
+    <message>
+        <location filename="../greeter/powerwindow.cpp" line="144"/>
+        <source>Sleep</source>
+        <translation>睡眠</translation>
     </message>
     <message>
         <location filename="../greeter/powerwindow.cpp" line="158"/>

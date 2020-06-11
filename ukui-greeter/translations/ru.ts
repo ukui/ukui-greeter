@@ -102,7 +102,7 @@
 <context>
     <name>GreeterWrapper</name>
     <message>
-        <location filename="../greeter/greeterwrapper.cpp" line="100"/>
+        <location filename="../greeter/greeterwrapper.cpp" line="105"/>
         <source>failed to start session.</source>
         <translation>не начала сессии.</translation>
     </message>
@@ -208,7 +208,7 @@
     </message>
     <message>
         <location filename="../greeter/powerwindow.cpp" line="144"/>
-        <source>Suspend</source>
+        <source>Sleep</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -140,8 +140,8 @@ void PowerManager::initUI()
     QLabel *suspendLabel = new QLabel(this);
     suspendFace->setAlignment(Qt::AlignCenter);
     suspendLabel->setAlignment(Qt::AlignCenter);
-    suspendFace->setPixmap(QPixmap(":/resource/suspend.png").scaled(58,58));
-    suspendLabel->setText(tr("Suspend"));
+    suspendFace->setPixmap(QPixmap(":/resource/sleep.png").scaled(58,58));
+    suspendLabel->setText(tr("Sleep"));
     suspendWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
     QVBoxLayout *suspendlayout = new QVBoxLayout(suspendWidget);
     suspendlayout->addWidget(suspendFace);
