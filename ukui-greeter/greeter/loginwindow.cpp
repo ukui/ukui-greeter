@@ -25,6 +25,7 @@
 #include <QGridLayout>
 #include <QAbstractItemModel>
 #include <QPainter>
+#include <QPainterPath>
 
 #include "greeterwrapper.h"
 #include "iconedit.h"
