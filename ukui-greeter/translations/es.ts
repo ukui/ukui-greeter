@@ -196,10 +196,6 @@
         <translation type="obsolete">apagar</translation>
     </message>
     <message>
-        <source>Suspend</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Restart</source>
         <translation type="unfinished"></translation>
     </message>
@@ -209,6 +205,10 @@
     </message>
     <message>
         <source>Power Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sleep</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
