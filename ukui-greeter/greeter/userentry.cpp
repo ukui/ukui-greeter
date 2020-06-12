@@ -18,6 +18,7 @@
 **/
 #include "userentry.h"
 #include <QPainter>
+#include <QPainterPath>
 #include <QBrush>
 #include <QFile>
 #include <QMouseEvent>
