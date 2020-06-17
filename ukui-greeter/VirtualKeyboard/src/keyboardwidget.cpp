@@ -194,7 +194,8 @@ void KeyboardWidget::setDefaultIcon()
     ui->btn_shift_l->setIcon(QIcon(":/images/images/capslock.svg"));
     ui->btn_shift_r->setIcon(QIcon(":/images/images/capslock.svg"));
     ui->btn_close->setIcon(QIcon(":/images/images/close.svg"));
-    ui->btn_super->setIcon(QIcon(":/images/images/super.svg"));
+    //ui->btn_super->setIcon(QIcon(":/images/images/super.svg"));
+    ui->btn_super->setText("Super");
     ui->btn_up->setIcon(QIcon(":/images/images/up.svg"));
     ui->btn_down->setIcon(QIcon(":/images/images/down.svg"));
     ui->btn_left->setIcon(QIcon(":/images/images/left.svg"));
