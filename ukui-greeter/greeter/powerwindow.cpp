@@ -134,20 +134,6 @@ void PowerManager::initUI()
     switchlayout->addWidget(switchFace);
     switchlayout->addWidget(switchLabel);
 
-    suspendWidget = new QWidget(this);
-    suspendWidget->setObjectName("suspendWidget");
-    QLabel *suspendFace = new QLabel(this);
-    QLabel *suspendLabel = new QLabel(this);
-    suspendFace->setAlignment(Qt::AlignCenter);
-    suspendLabel->setAlignment(Qt::AlignCenter);
-    suspendFace->setPixmap(QPixmap(":/resource/sleep.png").scaled(58,58));
-    suspendLabel->setText(tr("Sleep"));
-    suspendWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
-    QVBoxLayout *suspendlayout = new QVBoxLayout(suspendWidget);
-    suspendlayout->addWidget(suspendFace);
-    suspendlayout->addWidget(suspendLabel);
-
-
     rebootWidget = new QWidget(this);
     rebootWidget->setObjectName("rebootWidget");
     QLabel *rebootFace = new QLabel(this);
@@ -160,20 +146,33 @@ void PowerManager::initUI()
     QVBoxLayout *rebootlayout = new QVBoxLayout(rebootWidget);
     rebootlayout->addWidget(rebootFace);
     rebootlayout->addWidget(rebootLabel);
+    
+    shutdownWidget = new QWidget(this);
+    shutdownWidget->setObjectName("shutdownWidget");
+    QLabel *shutdownFace  = new QLabel(this);
+    QLabel *shutdownLabel = new QLabel(this);
+    shutdownLabel->setAlignment(Qt::AlignCenter);
+    shutdownFace->setAlignment(Qt::AlignCenter);
+    shutdownFace->setPixmap(QPixmap(":/resource/shutdown.png").scaled(58,58));
+    shutdownLabel->setText(tr("Power Off"));
+    shutdownWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
+    QVBoxLayout *shutdownlayout = new QVBoxLayout(shutdownWidget);
+    shutdownlayout->addWidget(shutdownFace);
+    shutdownlayout->addWidget(shutdownLabel);
 
     if(m_power->canSuspend()){
-        shutdownWidget = new QWidget(this);
-        shutdownWidget->setObjectName("shutdownWidget");
-        QLabel *shutdownFace  = new QLabel(this);
-        QLabel *shutdownLabel = new QLabel(this);
-        shutdownLabel->setAlignment(Qt::AlignCenter);
-        shutdownFace->setAlignment(Qt::AlignCenter);
-        shutdownFace->setPixmap(QPixmap(":/resource/shutdown.png").scaled(58,58));
-        shutdownLabel->setText(tr("Power Off"));
-        shutdownWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
-        QVBoxLayout *shutdownlayout = new QVBoxLayout(shutdownWidget);
-        shutdownlayout->addWidget(shutdownFace);
-        shutdownlayout->addWidget(shutdownLabel);
+        suspendWidget = new QWidget(this);
+        suspendWidget->setObjectName("suspendWidget");
+    	QLabel *suspendFace = new QLabel(this);
+    	QLabel *suspendLabel = new QLabel(this);
+    	suspendFace->setAlignment(Qt::AlignCenter);
+    	suspendLabel->setAlignment(Qt::AlignCenter);
+    	suspendFace->setPixmap(QPixmap(":/resource/sleep.png").scaled(58,58));
+    	suspendLabel->setText(tr("Sleep"));
+    	suspendWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
+    	QVBoxLayout *suspendlayout = new QVBoxLayout(suspendWidget);
+    	suspendlayout->addWidget(suspendFace);
+    	suspendlayout->addWidget(suspendLabel);
     }
 
     QListWidgetItem *item0 = new QListWidgetItem();
