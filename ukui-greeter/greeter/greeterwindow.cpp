@@ -146,12 +146,12 @@ void GreeterWindow::initUI()
     {
         m_sessionLB = new QPushButton(this);
         m_sessionLB->setObjectName((QStringLiteral("sessionButton")));
-        m_sessionLB->setIconSize(QSize(39, 39));
+        m_sessionLB->setIconSize(QSize(24, 24));
         m_sessionLB->setFocusPolicy(Qt::NoFocus);
         m_sessionLB->setFixedSize(48, 48);
         m_sessionLB->setCursor(Qt::PointingHandCursor);
         m_sessionLB->installEventFilter(this);
-        m_sessionLB->setIcon(QIcon(IMAGE_DIR + QString("badges/unknown_badge.png")));
+        m_sessionLB->setIcon(QIcon(IMAGE_DIR + QString("badges/unknown_badge.svg")));
         onSessionChanged(m_greeter->defaultSessionHint());
         connect(m_sessionLB, &QPushButton::clicked, this, &GreeterWindow::showSessionWnd);
     }
@@ -737,11 +737,11 @@ void GreeterWindow::onSessionChanged(const QString &session)
     }
 
     QString sessionPrefix = sessionTmp.left(sessionTmp.indexOf('-'));
-    QString sessionIcon = IMAGE_DIR + QString("badges/%1_badge.png")
+    QString sessionIcon = IMAGE_DIR + QString("badges/%1_badge.svg")
             .arg(sessionPrefix.toLower());
     QFile iconFile(sessionIcon);
     if(!iconFile.exists()){
-        sessionIcon = IMAGE_DIR + QString("badges/unknown_badge.png");
+        sessionIcon = IMAGE_DIR + QString("badges/unknown_badge.svg");
     }
     qDebug() << sessionIcon;
 

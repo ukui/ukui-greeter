@@ -86,7 +86,7 @@ qm_file.path = $${PREFIX}/translations/
 resourcefiles.files = resource/*
 resourcefiles.path = $${PREFIX}/images/
 
-badgefiles.files = resource/badges/*.png
+badgefiles.files = resource/badges/*.svg
 badgefiles.path = $${PREFIX}/images/badges/
 
 configfile.files = 95-ukui-greeter.conf
