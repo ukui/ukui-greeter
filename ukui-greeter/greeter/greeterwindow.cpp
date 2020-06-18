@@ -146,12 +146,12 @@ void GreeterWindow::initUI()
     {
         m_sessionLB = new QPushButton(this);
         m_sessionLB->setObjectName((QStringLiteral("sessionButton")));
-        m_sessionLB->setIconSize(QSize(39, 39));
+        m_sessionLB->setIconSize(QSize(24, 24));
         m_sessionLB->setFocusPolicy(Qt::NoFocus);
         m_sessionLB->setFixedSize(48, 48);
         m_sessionLB->setCursor(Qt::PointingHandCursor);
         m_sessionLB->installEventFilter(this);
-        m_sessionLB->setIcon(QIcon(IMAGE_DIR + QString("badges/unknown_badge.png")));
+        m_sessionLB->setIcon(QIcon(IMAGE_DIR + QString("badges/unknown_badge.svg")));
         onSessionChanged(m_greeter->defaultSessionHint());
         connect(m_sessionLB, &QPushButton::clicked, this, &GreeterWindow::showSessionWnd);
     }
@@ -331,6 +331,9 @@ void GreeterWindow::setVirkeyboardPos()
 bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
 {
     if(event->type() == QEvent::MouseButtonPress){
+        if(obj == m_sessionLB || obj == m_languageLB || obj == m_powerLB)
+            return false;
+
         if(m_sessionWnd && m_sessionWnd->isVisible())
         {
             m_sessionWnd->close();
@@ -340,6 +343,11 @@ bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
         {
             m_languageWnd->close();
             m_languageWnd = nullptr;
+        }
+        if(m_powerWnd && !m_powerWnd->isHidden()){
+            m_powerWnd->close();
+            m_userWnd->show();
+            m_loginWnd->show();
         }
     }
     return false;
@@ -678,6 +686,13 @@ void GreeterWindow::showSessionWnd()
 {
     if(!m_sessionWnd){
         m_sessionWnd = new SessionWindow(m_sessionsModel, this);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
+        m_sessionWnd->setStyleSheet("QMenu::item{padding: 2px 10px 2px 10px;}");
+#else
+        m_sessionWnd->setStyleSheet("QMenu::item{padding: 2px 10px 2px 30px;}");
+#endif
+
         connect(m_sessionWnd, &SessionWindow::sessionChanged, \
                 this, &GreeterWindow::onSessionChanged);
     }
@@ -722,11 +737,11 @@ void GreeterWindow::onSessionChanged(const QString &session)
     }
 
     QString sessionPrefix = sessionTmp.left(sessionTmp.indexOf('-'));
-    QString sessionIcon = IMAGE_DIR + QString("badges/%1_badge.png")
+    QString sessionIcon = IMAGE_DIR + QString("badges/%1_badge.svg")
             .arg(sessionPrefix.toLower());
     QFile iconFile(sessionIcon);
     if(!iconFile.exists()){
-        sessionIcon = IMAGE_DIR + QString("badges/unknown_badge.png");
+        sessionIcon = IMAGE_DIR + QString("badges/unknown_badge.svg");
     }
     qDebug() << sessionIcon;
 

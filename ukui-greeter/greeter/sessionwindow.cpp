@@ -95,10 +95,10 @@ void SessionWindow::onSessionMenuTrigged(QAction *action)
 QString SessionWindow::getSessionIcon(const QString &session)
 {
     QString sessionPrefix = session.left(session.indexOf('-'));
-    QString sessionIcon = IMAGE_DIR + QString("badges/%1_badge.png").arg(sessionPrefix.toLower());
+    QString sessionIcon = IMAGE_DIR + QString("badges/%1_badge.svg").arg(sessionPrefix.toLower());
     QFile iconFile(sessionIcon);
     if(!iconFile.exists()){
-        sessionIcon = IMAGE_DIR + QString("badges/unknown_badge.png");
+        sessionIcon = IMAGE_DIR + QString("badges/unknown_badge.svg");
     }
     return sessionIcon;
 }
