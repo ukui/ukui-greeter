@@ -429,7 +429,7 @@ void GreeterWindow::setBackground(const QModelIndex &index)
             uid_t uid = index.data(QLightDM::UsersModel::UidRole).toUInt();
             backgroundPath = getAccountBackground(uid);
             if(backgroundPath.isEmpty())
-                backgroundPath = "/usr/share/backgrounds/warty-final-ubuntukylin.jpg";
+                backgroundPath = m_configuration->getDefaultBackgroundName();
         }
     }
     QSharedPointer<Background> background(new Background);

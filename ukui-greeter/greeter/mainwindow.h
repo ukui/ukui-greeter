@@ -75,6 +75,7 @@ private slots:
     void onScreenResized();
     void onScreenCountChanged(int newCount);
     void onTransition();
+    void screenCountEvent();
 
 private:
     void moveToScreen(QScreen *screen = nullptr);
