@@ -198,11 +198,25 @@ void MainWindow::onScreenCountChanged(int newCount)
 //        activateWindow();
 //    }
 
-    move(0, 0);
-    setFixedSize(m_monitorWatcher->getVirtualSize());
+    //在调用xrandr打开显示器以后，不能马上设置窗口大小，会设置不正确的
+    //分辨率，延时500ms正常。
+    QTimer::singleShot(500,this,SLOT(screenCountEvent()));
+
+}
+
+void MainWindow::screenCountEvent()
+{
+    int totalWidth = 0;
+    int totalHeight = 0;
+    for(auto screen : QGuiApplication::screens())
+    {
+        totalWidth += screen->geometry().width();
+        totalHeight += screen->geometry().height();
+    }
+    setGeometry(0, 0, totalWidth, totalHeight);
     moveToScreen(QApplication::primaryScreen());
+    //需要重新绘制，否则背景图片大小会不正确
     repaint();
-    qDebug() << "total screen resize to " << geometry();
 }
 
 /**
@@ -214,8 +228,8 @@ void MainWindow::moveToScreen(QScreen *screen)
     QRect activeScreenRect = m_activeScreen->geometry();
 
     qDebug() << "moveToScreen activeScreenRect " << activeScreenRect;
-    //if(m_monitorWatcher->getMonitorCount() == 1)
-    //    activeScreenRect = QRect(QPoint(0, 0), m_monitorWatcher->getVirtualSize());
+    if(m_monitorWatcher->getMonitorCount() == 1)
+        m_greeterWnd->setGeometry(QApplication::primaryScreen()->geometry());
 
     m_greeterWnd->setGeometry(activeScreenRect);
     Q_EMIT activeScreenChanged(activeScreenRect);

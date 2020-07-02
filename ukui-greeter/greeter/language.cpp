@@ -92,6 +92,11 @@ QString getTerritory(const QString &code)
         if(country && strlen(country) > 0 && strcmp(country, "ISO") != 0)
         {
             territory = QString(dgettext("iso_3166", country));
+            QString str = QString(QLatin1String(country));
+            if(str.contains("taiwan",Qt::CaseInsensitive))
+            {
+                territory = "台湾";
+            }
         }
         setlocale(LC_ALL, currentLocale);
     }
