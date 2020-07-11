@@ -1,6 +1,6 @@
 # ukui-greeter
 
-![Check build](https://github.com/brsvh/ukui-greeter/workflows/Check%20build/badge.svg?branch=master)
+![Check build](https://github.com/ukui/ukui-greeter/workflows/Check%20build/badge.svg?branch=master)
 
 Lightdm greeter for UKUI
 
