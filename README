@@ -1,3 +1,0 @@
-git clone https://github.com/ukui/ukui-greeter.git
-git submodule init
-git submodule update
