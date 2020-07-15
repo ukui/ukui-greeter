@@ -74,3 +74,14 @@ bool isPicture(QString filepath)
     qDebug() << "mime: " << filepath << mime.name();
     return mime.name().startsWith("image/");
 }
+
+QString ElideText(QFont font,int width,QString strInfo)
+{
+    QFontMetrics fontMetrics(font);
+    //如果当前字体下，字符串长度大于指定宽度
+    if(fontMetrics.width(strInfo) > width)
+    {
+        strInfo= QFontMetrics(font).elidedText(strInfo, Qt::ElideRight, width);
+    }
+    return strInfo;
+}

@@ -147,18 +147,10 @@ void UserEntry::setUserName(const QString &name)
 {
     if(m_name != name)
         m_name = name;
-    this->m_nameLabel->setText(m_name);
-    /* 当用户名短的时候居中， 否则是居左显示前半部分 */
-    QFont font = m_nameLabel->font();
-    QFontMetrics fm(font);
-    int pixelsWide = fm.width(m_name);
-    if(pixelsWide < IMG_WIDTH)
-        m_nameLabel->setAlignment(Qt::AlignCenter);
-    else{
-        QFontMetrics fontWidth(font);
-        QString str = fontWidth.elidedText(m_name,Qt::ElideRight,IMG_WIDTH);
-        this->m_nameLabel->setText(str);
-    }
+
+     QString str = ElideText(m_nameLabel->font(),IMG_WIDTH,name);
+     m_nameLabel->setText(str);
+     m_nameLabel->setAlignment(Qt::AlignCenter);
 }
 
 void UserEntry::setLogin(bool isLogin)
@@ -248,6 +240,7 @@ void UserEntry::setResize()
         QFont font = m_nameLabel->font();
         font.setPixelSize(16);
         m_nameLabel->setFont(font);
+        setUserName(m_name);
         m_nameLabel->adjustSize();
 	//距离头像保持25距离
         m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 25);
@@ -259,8 +252,9 @@ void UserEntry::setResize()
         QFont font = m_nameLabel->font();
         font.setPixelSize(14);
         m_nameLabel->setFont(font);
-        m_nameLabel->adjustSize();
 	//当前头像，用户名距离头像保持32距离
+        setUserName(m_name);
+        m_nameLabel->adjustSize();
         m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 32);
         m_faceLabel->setPixmap(PixmapToOpacity(userface,0.8));
 

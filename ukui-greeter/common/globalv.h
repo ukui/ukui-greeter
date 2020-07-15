@@ -41,5 +41,6 @@ extern int fontSize;    //字体大小
 
 QPixmap scaledPixmap(int width, int height, QString url);
 bool isPicture(QString filepath);
+QString ElideText(QFont font,int width,QString strInfo);
 #endif // GLOBALV_H
 
