@@ -30,6 +30,7 @@
 #include <QX11Info>
 #include <QProcess>
 #include <QScreen>
+#include <QDesktopWidget>
 #include <X11/Xlib.h>
 #include <X11/XKBlib.h>
 #include <X11/keysym.h>
@@ -92,10 +93,12 @@ int main(int argc, char *argv[])
 {
     qInstallMessageHandler(outputMessage);
 
+if(QApplication::desktop()->width()>=2560){
 #if(QT_VERSION>=QT_VERSION_CHECK(5,6,0))
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
+}
 
     QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(true);
