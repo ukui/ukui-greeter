@@ -89,11 +89,33 @@ void waitMonitorsReady()
     }
 }
 
+void x11_get_screen_size(int *width,int *height)
+{
+    Display* display;
+
+    display = XOpenDisplay(NULL);
+    if (display == NULL) {
+        fprintf(stderr, "Cannot connect to X server %s/n", "simey:0");
+        exit (-1);
+    }
+    int screen_num;
+
+    screen_num = DefaultScreen(display);
+
+    *width = DisplayWidth(display, screen_num);
+    *height = DisplayHeight(display, screen_num);
+    XCloseDisplay(display);
+
+}
+
 int main(int argc, char *argv[])
 {
     qInstallMessageHandler(outputMessage);
 
-if(QApplication::desktop()->width()>=2560){
+    int width = 0, height = 0;
+    x11_get_screen_size(&width,&height);
+    qDebug()<<"width = "<<width<<"height = "<<height;
+if(width>=2560){
 #if(QT_VERSION>=QT_VERSION_CHECK(5,6,0))
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
