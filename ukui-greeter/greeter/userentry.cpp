@@ -63,7 +63,7 @@ void UserEntry::initUI()
     m_loginLabel = new QLabel(this);
     m_loginLabel->setObjectName(QString::fromUtf8("isloginLabel"));
     m_loginLabel->setAlignment(Qt::AlignCenter);
-    m_loginLabel->setPixmap(QPixmap(":/resource/is_logined.png"));
+    m_loginLabel->setPixmap(QPixmap(":/images/is_logined.png"));
     m_loginLabel->resize(24,24);
 
 }
@@ -116,7 +116,7 @@ void UserEntry::setFace(const QString &facePath)
     this->m_face = facePath;
     QFile faceFile(facePath);
     if(!faceFile.exists())
-        this->m_face = ":/resource/default_face.png";
+        this->m_face = ":/images/default_face.png";
 
     if(id == selectedId){
         const QString SheetStyle = QString("border-radius: %1px;  border:0px   solid white;").arg(CENTER_IMG_WIDTH/2);

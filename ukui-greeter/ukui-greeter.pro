@@ -84,11 +84,8 @@ system("lrelease translations/*.ts")
 qm_file.files = translations/*.qm
 qm_file.path = $${PREFIX}/translations/
 
-resourcefiles.files = resource/*
-resourcefiles.path = $${PREFIX}/images/
-
-badgefiles.files = resource/badges/*.svg
-badgefiles.path = $${PREFIX}/images/badges/
+resourcefiles.files = images
+resourcefiles.path = $${PREFIX}/
 
 configfile.files = 95-ukui-greeter.conf
 configfile.path = /usr/share/lightdm/lightdm.conf.d/
@@ -104,4 +101,4 @@ manfile.path = /usr/share/man/man1/
 
 target.path = /usr/sbin/
 
-INSTALLS += target configfile etcfile desktopfile resourcefiles qm_file manfile badgefiles
+INSTALLS += target configfile etcfile desktopfile resourcefiles qm_file manfile

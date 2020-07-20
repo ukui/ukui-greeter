@@ -115,7 +115,7 @@ void LoginWindow::initUI()
     /* 密码框 */
     m_passwordEdit = new IconEdit(m_passwdWidget);
     m_passwordEdit->setObjectName(QStringLiteral("passwordEdit"));   
-    m_passwordEdit->setIcon(QIcon(":/resource/login-button.png"));
+    m_passwordEdit->setIcon(QIcon(":/images/login-button.png"));
     m_passwordEdit->setFocusPolicy(Qt::StrongFocus);
     m_passwordEdit->installEventFilter(this);
     m_passwordEdit->hide(); //收到请求密码的prompt才显示出来
@@ -295,7 +295,7 @@ void LoginWindow::setFace(const QString& facePath)
     if(faceFile.exists())
         faceImage = scaledPixmap(128, 128, facePath);
     else
-        faceImage = scaledPixmap(128, 128, ":/resource/default_face.png");
+        faceImage = scaledPixmap(128, 128, ":/images/default_face.png");
 
     faceImage =  PixmapToRound(faceImage,62);
     m_faceLabel->setAlignment(Qt::AlignCenter);
@@ -751,7 +751,7 @@ void LoginWindow::initBiometricButtonWidget()
 
     m_biometricButton = new QPushButton(m_buttonsWidget);
     m_biometricButton->setObjectName(QStringLiteral("biometricButton"));
-    m_biometricButton->setIcon(QIcon(":/resource/bio-login.png"));
+    m_biometricButton->setIcon(QIcon(":/images/bio-login.png"));
     m_biometricButton->setText(tr("Biometric Authentication"));
     m_biometricButton->setSizePolicy(sizePolicy);
     m_biometricButton->setVisible(false);
@@ -764,7 +764,7 @@ void LoginWindow::initBiometricButtonWidget()
 
     m_passwordButton = new QPushButton(m_buttonsWidget);
     m_passwordButton->setObjectName(QStringLiteral("passwordButton"));
-    m_passwordButton->setIcon(QIcon(":/resource/password-login.png"));
+    m_passwordButton->setIcon(QIcon(":/images/password-login.png"));
     m_passwordButton->setText(tr("Password Authentication"));
     fm = QFontMetrics(m_passwordButton->font(), m_passwordButton);
     width = fm.width(m_passwordButton->text());

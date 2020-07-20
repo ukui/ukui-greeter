@@ -121,7 +121,7 @@ void GreeterWindow::initUI()
     //电源对话框打开按钮
     m_powerLB = new QPushButton(this);
     m_powerLB->setObjectName(QStringLiteral("powerButton"));
-    m_powerLB->setIcon(QPixmap(":/resource/power.png"));
+    m_powerLB->setIcon(QPixmap(":/images/power.png"));
     m_powerLB->setIconSize(QSize(39, 39));
     m_powerLB->setFocusPolicy(Qt::NoFocus);
     m_powerLB->setFixedSize(48, 48);
@@ -132,7 +132,7 @@ void GreeterWindow::initUI()
     //虚拟键盘启动按钮
     m_keyboardLB = new QPushButton(this);
     m_keyboardLB->setObjectName(QStringLiteral("keyboardButton"));
-    m_keyboardLB->setIcon(QPixmap(":/resource/keyboard.png"));
+    m_keyboardLB->setIcon(QPixmap(":/images/keyboard.png"));
     m_keyboardLB->setIconSize(QSize(30, 30));
     m_keyboardLB->setFocusPolicy(Qt::NoFocus);
     m_keyboardLB->setFixedSize(48, 48);

@@ -89,10 +89,10 @@ bool IconEdit::eventFilter(QObject *obj, QEvent *event)
             return false;
         }
         if(event->type() == QEvent::HoverEnter){
-            setIcon(QIcon(":/resource/login-button-hover.png"));
+            setIcon(QIcon(":/images/login-button-hover.png"));
         }
         else if(event->type() == QEvent::HoverLeave){
-            setIcon(QIcon(":/resource/login-button.png"));
+            setIcon(QIcon(":/images/login-button.png"));
         }
     }
     return false;
@@ -183,7 +183,7 @@ void IconEdit::startWaiting()
         connect(m_timer, &QTimer::timeout, this, &IconEdit::updatePixmap);
     }
 
-    m_waitingPixmap.load(":/resource/waiting.png");
+    m_waitingPixmap.load(":/images/waiting.png");
     m_iconButton->setIconSize(m_iconButton->size());
     m_iconButton->setIcon(QIcon(m_waitingPixmap));
     m_timer->start();
