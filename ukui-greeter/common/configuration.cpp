@@ -109,7 +109,7 @@ QString getSystemDistrib()
 QPixmap logoGenerator(const QString &text)
 {
 //    if(getSystemDistrib() == "Kylin")
-//        return QPixmap(":/resource/kylin-logo.png");
+//        return QPixmap(":/images/kylin-logo.png");
 
 //    QString logoFile(IMAGE_DIR + "logo.png");
 //    if(QFile(logoFile).exists())
@@ -118,7 +118,7 @@ QPixmap logoGenerator(const QString &text)
 //        return logo;
 //    }
     QPixmap logoBare;
-    logoBare.load(":/resource/uk-logo.png");
+    logoBare.load(":/images/uk-logo.png");
 
     QFont font("ubuntu", 18);
     QFontMetrics fm(font);

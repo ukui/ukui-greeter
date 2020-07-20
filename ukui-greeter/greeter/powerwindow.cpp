@@ -127,7 +127,7 @@ void PowerManager::initUI()
     QLabel *switchLabel =  new QLabel(this);
     switchFace->setAlignment(Qt::AlignCenter);
     switchLabel->setAlignment(Qt::AlignCenter);
-    switchFace->setPixmap(QPixmap(":/resource/avatar.png").scaled(58,58));
+    switchFace->setPixmap(QPixmap(":/images/avatar.png").scaled(58,58));
     switchLabel->setText(tr("Switch User"));
     switchWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
     QVBoxLayout *switchlayout = new QVBoxLayout(switchWidget);
@@ -140,7 +140,7 @@ void PowerManager::initUI()
     QLabel *rebootLabel = new QLabel(this);
     rebootFace->setAlignment(Qt::AlignCenter);
     rebootLabel->setAlignment(Qt::AlignCenter);
-    rebootFace->setPixmap(QPixmap(":/resource/reboot.png").scaled(58,58));
+    rebootFace->setPixmap(QPixmap(":/images/reboot.png").scaled(58,58));
     rebootLabel->setText(tr("Restart"));
     rebootWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
     QVBoxLayout *rebootlayout = new QVBoxLayout(rebootWidget);
@@ -153,7 +153,7 @@ void PowerManager::initUI()
     QLabel *shutdownLabel = new QLabel(this);
     shutdownLabel->setAlignment(Qt::AlignCenter);
     shutdownFace->setAlignment(Qt::AlignCenter);
-    shutdownFace->setPixmap(QPixmap(":/resource/shutdown.png").scaled(58,58));
+    shutdownFace->setPixmap(QPixmap(":/images/shutdown.png").scaled(58,58));
     shutdownLabel->setText(tr("Power Off"));
     shutdownWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
     QVBoxLayout *shutdownlayout = new QVBoxLayout(shutdownWidget);
@@ -167,7 +167,7 @@ void PowerManager::initUI()
     	QLabel *suspendLabel = new QLabel(this);
     	suspendFace->setAlignment(Qt::AlignCenter);
     	suspendLabel->setAlignment(Qt::AlignCenter);
-    	suspendFace->setPixmap(QPixmap(":/resource/sleep.png").scaled(58,58));
+    	suspendFace->setPixmap(QPixmap(":/images/sleep.png").scaled(58,58));
     	suspendLabel->setText(tr("Sleep"));
     	suspendWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
     	QVBoxLayout *suspendlayout = new QVBoxLayout(suspendWidget);

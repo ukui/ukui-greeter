@@ -76,17 +76,17 @@ QScrollBar::add-line:vertical
 {
     width:15px;
     height:15px;
-    border-image:url(:/resource/scrollbar_down.png);
+    border-image:url(:/images/scrollbar_down.png);
     subcontrol-position:bottom;
 }
 QScrollBar::add-line:vertical:hover
 {
-    border-image:url(:/resource/scrollbar_down_hover.png);
+    border-image:url(:/images/scrollbar_down_hover.png);
     subcontrol-position:bottom;
 }
 QScrollBar::add-line:vertical:pressed
 {
-    border-image:url(:/resource/scrollbar_down_clicked.png);
+    border-image:url(:/images/scrollbar_down_clicked.png);
     subcontrol-position:bottom;
 }
 /* 向上的箭头 */
@@ -94,17 +94,17 @@ QScrollBar::sub-line:vertical
 {
     width:15px;
     height:15px;
-    border-image:url(:/resource/scrollbar_up.png);
+    border-image:url(:/images/scrollbar_up.png);
     subcontrol-position:top;
 }
 QScrollBar::sub-line:vertical:hover
 {
-    border-image:url(:/resource/scrollbar_up_hover.png);
+    border-image:url(:/images/scrollbar_up_hover.png);
     subcontrol-position:top;
 }
 QScrollBar::sub-line:vertical:pressed
 {
-    border-image:url(:/resource/scrollbar_up_clicked.png);
+    border-image:url(:/images/scrollbar_up_clicked.png);
     subcontrol-position:top;
 }
 
@@ -120,7 +120,7 @@ QComboBox{
 }
 
 QComboBox::down-arrow{
-    image:url(:/resource/combobox_down.png);
+    image:url(:/images/combobox_down.png);
 }
 QComboBox::drop-down{
     width: 30px;
@@ -150,18 +150,18 @@ QComboBox QListView::item:selected{
 /************Arrow******************/
 #prevArrow{
     background:transparent;
-    image:url(:/resource/prev-40.png);	
+    image:url(:/images/prev-40.png);	
 }
 #prevArrow::hover{
-    image:url(:/resource/prev.png);      
+    image:url(:/images/prev.png);      
 }
 
 #nextArrow{
     background:transparent;
-    image:url(:/resource/next-40.png);      
+    image:url(:/images/next-40.png);      
 }
 #nextArrow::hover{
-    image:url(:/resource/next.png);     
+    image:url(:/images/next.png);     
 }
 
 /*********************** 列表 **************************/
@@ -192,12 +192,12 @@ QListWidget{
 }
 
 #closeButton{
-    background: url(:/resource/dialog_close.png);
+    background: url(:/images/dialog_close.png);
     background-repeat:no-repeat
 }
 #closeButton::hover{
     border-radius: 4px;
-    background: url(:/resource/dialog_close_highlight.png);
+    background: url(:/images/dialog_close_highlight.png);
     background-repeat:no-repeat;
     font-size: 16px;
 }
@@ -206,10 +206,10 @@ QListWidget{
 
 /* 返回按钮 */
 #backButton{
-    background: url(:/resource/arrow_left.png);
+    background: url(:/images/arrow_left.png);
 }
 #backButton::hover{
-    background: url(:/resource/arrow_left_prelight.png);
+    background: url(:/images/arrow_left_prelight.png);
 }
 
 #userWidget{
@@ -247,7 +247,7 @@ QLineEdit::focus{
 }
 /* 大写提示 */
 #capsIconLabel{
-    background: url(:/resource/capslock.png);
+    background: url(:/images/capslock.png);
     background-repeat: no-repeat;
     background-position: center;
     max-width: 22px;
@@ -259,17 +259,17 @@ QLineEdit::focus{
 /* echo mode */
 #echoModeButton {
     background: transparent;
-    image: url(:/resource/hide-password.png);
+    image: url(:/images/hide-password.png);
     max-width: 22px;
     max-height: 22px;
     margin-right: 5px;
 }
 #echoModeButton::checked {
-    image: url(:/resource/show-password.png);
+    image: url(:/images/show-password.png);
 }
 /* 登录按钮 */
 #loginButton{
- /*   image: url(:/resource/login-button.png);*/
+ /*   image: url(:/images/login-button.png);*/
      min-width: 26px;
      max-width: 26px;
      min-height: 26px;
