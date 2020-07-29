@@ -1,3 +1,10 @@
+ukui-greeter (3.0.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * debian: update watch file.
+
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Wed, 29 Jul 2020 07:58:12 +0000
+
 ukui-greeter (1.2.6-1) unstable; urgency=medium
 
   * New upstream release. (Closes: #964642)
