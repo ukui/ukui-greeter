@@ -25,6 +25,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QScreen>
+#include <QX11Info>
 #include <QProcess>
 #include <QtMath>
 #include <QTimer>
@@ -33,6 +34,10 @@
 #include "common/configuration.h"
 #include "common/monitorwatcher.h"
 #include "display-switch/displayservice.h"
+#include <X11/XKBlib.h>
+#include <X11/Xlib.h>
+#include <X11/keysymdef.h>
+#include <X11/keysym.h>
 
 bool MainWindow::m_first = true;
 
@@ -123,6 +128,21 @@ MainWindow::MainWindow(QWidget *parent)
     m_monitorWatcher->start();
 
     connect(m_timer, &QTimer::timeout, this, &MainWindow::onTransition);
+
+    bool numlockState = true;
+    numlockState = m_configuration->getLastNumLock();
+
+    if(numlockState){
+        //默认打开numlock需要设置两次，否则灯和效果可能不一致，原因不知
+        unsigned int num_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Num_Lock);
+        XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, 0);
+        XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, num_mask);
+    }else{
+        unsigned int num_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Num_Lock);
+        XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, num_mask);
+        XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, 0);
+    }
+
 }
 
 void MainWindow::paintEvent(QPaintEvent *e)

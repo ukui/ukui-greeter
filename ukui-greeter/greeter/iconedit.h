@@ -23,9 +23,10 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QSettings>
 #include <QPixmap>
 
-
+class Configuration;
 class IconEdit : public QWidget
 {
     Q_OBJECT
@@ -65,6 +66,7 @@ private:
     QPixmap         m_waitingPixmap;
     QString         m_iconText;     //文字作为图标
     QIcon           m_icon;
+    Configuration   *m_configuration;
 };
 
 #endif // ICONEDIT_H

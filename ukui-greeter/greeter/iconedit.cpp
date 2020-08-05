@@ -22,13 +22,17 @@
 #include <QPainter>
 #include <QFile>
 #include <QKeyEvent>
+#include <QSettings>
+#include <QDir>
 #include <QDebug>
 #include <QTimer>
+#include "common/configuration.h"
 #include "xeventmonitor.h"
 
 
 IconEdit::IconEdit(QWidget *parent)
     : QWidget(parent),
+	  m_configuration(Configuration::instance()),
       m_timer(nullptr)
 {
     m_edit = new QLineEdit(this);
@@ -129,6 +133,11 @@ void IconEdit::onGlobalKeyRelease(const QString &key)
     if(key == "Caps_Lock")
     {
         setCapsState(!m_capsIcon->isVisible());
+    }
+	else if(key == "Num_Lock")
+    {
+        bool numlockState = m_configuration->getLastNumLock();
+        m_configuration->saveLastNumLock(!numlockState);
     }
 }
 

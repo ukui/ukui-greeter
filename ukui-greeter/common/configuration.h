@@ -37,6 +37,8 @@ public:
 
     QString getLastLoginUser();
     void saveLastLoginUser(const QString &);
+    bool getLastNumLock();
+    void saveLastNumLock(bool value);
     QPixmap getLogo();
     QString getDefaultBackgroundName();
 

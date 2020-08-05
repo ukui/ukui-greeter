@@ -23,6 +23,7 @@
 #include <iostream>
 #include <QVector>
 #include <QSet>
+#include <QX11Info>
 #include <X11/Xlibint.h>
 #include <X11/XKBlib.h>
 #include <X11/Xlib.h>
@@ -256,12 +257,16 @@ void XEventMonitor::run()
 bool checkCapsState()
 {
     //判断大写键状态
-    Display *display = XOpenDisplay(NULL);
     bool capsState = false;
-    if(display) {
-        unsigned int n;
-        XkbGetIndicatorState(display, XkbUseCoreKbd, &n);
-        capsState = (n & 0x01) == 1;
-    }
-    return capsState;
+    unsigned int n;
+    XkbGetIndicatorState(QX11Info::display(), XkbUseCoreKbd, &n);
+    capsState = (n & 0x01) == 1;
+	return capsState;
+}
+
+bool checkNumLockState()
+{
+    XKeyboardState x;
+    XGetKeyboardControl(QX11Info::display(), &x);
+    return x.led_mask & 2;
 }
