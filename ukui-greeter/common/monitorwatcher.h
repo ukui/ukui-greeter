@@ -22,6 +22,7 @@
 #include <QThread>
 #include <QMap>
 #include <QSize>
+#include <QVector>
 
 /*!
  * \brief The MonitorWatcher class
@@ -46,6 +47,11 @@ protected:
 
 private:
     QSize getMonitorMaxSize(const QString &drm);
+
+    void getMonitors();
+
+    QMap<QString, QVector<QString>> monitors;
+    QStringList monitorNames;
 
     QMap<QString, QString>  drmStatus;
     QSize                   virtualSize;

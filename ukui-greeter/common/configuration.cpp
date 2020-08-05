@@ -79,6 +79,27 @@ void Configuration::saveLastLoginUser(const QString &userRealName)
     recordSettings->sync();
 }
 
+bool Configuration::getLastNumLock()
+{
+    recordSettings->beginGroup("Greeter");
+    if(recordSettings->contains("numlock") == false){
+    	recordSettings->setValue("numlock", true);
+	recordSettings->sync();
+	recordSettings->endGroup();
+	return true;
+    }
+    bool lastNumLock = recordSettings->value("numlock").toBool();
+    recordSettings->endGroup();
+    return lastNumLock;
+}
+
+void Configuration::saveLastNumLock(bool value)
+{
+    recordSettings->beginGroup("Greeter");
+    recordSettings->setValue("numlock", value);
+    recordSettings->endGroup();
+    recordSettings->sync();
+}
 
 /**
  * 获取系统版本号

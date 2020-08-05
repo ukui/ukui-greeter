@@ -338,16 +338,19 @@ bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
         {
             m_sessionWnd->close();
             m_sessionWnd = nullptr;
+            update();
         }
         if(m_languageWnd && m_languageWnd->isVisible())
         {
             m_languageWnd->close();
             m_languageWnd = nullptr;
+            update();
         }
         if(m_powerWnd && !m_powerWnd->isHidden()){
             m_powerWnd->close();
             m_userWnd->show();
             m_loginWnd->show();
+            update();
         }
     }
     return false;
@@ -374,6 +377,7 @@ void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
             m_powerWnd->close();
             m_userWnd->show();
             m_loginWnd->show();
+            update();
         }
     break;
     }
@@ -526,6 +530,7 @@ void GreeterWindow::setWindowVisible()
 
     m_loginWnd->setVisible(true);
     m_userWnd->setVisible(true);
+    update();
 }
 /**
  * @brief GreeterWindow::showPowerWnd
@@ -538,6 +543,7 @@ void GreeterWindow::showPowerWnd()
         m_powerWnd->close();
         m_userWnd->show();
         m_loginWnd->show();
+        update();
         return;
     }
 
@@ -556,6 +562,7 @@ void GreeterWindow::showPowerWnd()
             ,this,SLOT(setWindowVisible()));
     m_powerWnd->setObjectName(QStringLiteral("powerWnd"));
     m_powerWnd->show();
+    update();
 }
 
 /**
@@ -616,6 +623,7 @@ void GreeterWindow::showLanguageWnd()
         m_languageWnd->setFocus();
         m_languageWnd->move(m_languageLB->x(),m_languageLB->y()-m_languageWnd->height() - 3);
     }
+    update();
 }
 
 void GreeterWindow::setWindowPos(QWidget *widget, Qt::Alignment align)
@@ -709,6 +717,7 @@ void GreeterWindow::showSessionWnd()
         m_sessionWnd->show();
         m_sessionWnd->setFocus();
     }
+    update();
 }
 
 void GreeterWindow::onSessionChanged(const QString &session)

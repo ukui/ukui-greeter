@@ -25,6 +25,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QScreen>
+#include <QX11Info>
 #include <QProcess>
 #include <QtMath>
 #include <QTimer>
@@ -33,6 +34,10 @@
 #include "common/configuration.h"
 #include "common/monitorwatcher.h"
 #include "display-switch/displayservice.h"
+#include <X11/XKBlib.h>
+#include <X11/Xlib.h>
+#include <X11/keysymdef.h>
+#include <X11/keysym.h>
 
 bool MainWindow::m_first = true;
 
@@ -64,9 +69,16 @@ MainWindow::MainWindow(QWidget *parent)
     connect(_desktop, &QDesktopWidget::resized, this, &MainWindow::onScreenResized);
     /* QDesktopWidget对显示器的插拔的支持不好 */
     connect(m_monitorWatcher, &MonitorWatcher::monitorCountChanged, this, &MainWindow::onScreenCountChanged);
-
+    connect(_desktop, &QDesktopWidget::screenCountChanged, this, &MainWindow::onScreenCountChanged);
     //设置窗口大小
-    setFixedSize(QApplication::primaryScreen()->virtualSize());
+    int totalWidth = 0;
+    int totalHeight = 0;
+    for(auto screen : QGuiApplication::screens())
+    {
+        totalWidth += screen->geometry().width();
+        totalHeight += screen->geometry().height();
+    }
+    setGeometry(0, 0, totalWidth, totalHeight);
     //设置监控鼠标移动
     setMouseTracking(true);
 
@@ -116,6 +128,21 @@ MainWindow::MainWindow(QWidget *parent)
     m_monitorWatcher->start();
 
     connect(m_timer, &QTimer::timeout, this, &MainWindow::onTransition);
+
+    bool numlockState = true;
+    numlockState = m_configuration->getLastNumLock();
+
+    if(numlockState){
+        //默认打开numlock需要设置两次，否则灯和效果可能不一致，原因不知
+        unsigned int num_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Num_Lock);
+        XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, 0);
+        XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, num_mask);
+    }else{
+        unsigned int num_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Num_Lock);
+        XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, num_mask);
+        XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, 0);
+    }
+
 }
 
 void MainWindow::paintEvent(QPaintEvent *e)
@@ -132,16 +159,8 @@ void MainWindow::paintEvent(QPaintEvent *e)
         }
 
         QPainter painter(this);
-
-        //在没有登录窗口的屏幕上显示图标
-//        if(screen != m_azctiveScreen)
-//        {
-//            QRect cofRect(rect.left() + (rect.width()-m_cof.width())/2,
-//                          rect.top() + (rect.height()-m_cof.height())/2,
-//                          m_cof.width(), m_cof.height());
-//            painter.drawPixmap(cofRect, m_cof);
-//        }
     }
+
     return QWidget::paintEvent(e);
 }
 
@@ -174,34 +193,17 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
  */
 void MainWindow::onScreenResized()
 {
-    setGeometry(QApplication::desktop()->geometry());
+    int totalWidth = 0;
+    int totalHeight = 0;
+    for(auto screen : QGuiApplication::screens())
+    {
+        totalWidth += screen->geometry().width();
+        totalHeight += screen->geometry().height();
+    }
+    setGeometry(0, 0, totalWidth, totalHeight);
     qDebug() << "screen resize to " << geometry();
 
     moveToScreen(QApplication::primaryScreen());
-}
-
-/**
- * 有屏幕插拔,移动GreeterWindow到主屏幕
- */
-void MainWindow::onScreenCountChanged(int newCount)
-{
-    if(newCount < 2) {
-        QProcess enableMonitors;
-        enableMonitors.start("xrandr --auto");
-        enableMonitors.waitForFinished(-1);
-    } else {
-        DisplayService displayService;
-        displayService.switchDisplayMode(DISPLAY_MODE_EXTEND);
-    }
-//    if(m_first){
-//        show();
-//        activateWindow();
-//    }
-
-    //在调用xrandr打开显示器以后，不能马上设置窗口大小，会设置不正确的
-    //分辨率，延时500ms正常。
-    QTimer::singleShot(500,this,SLOT(screenCountEvent()));
-
 }
 
 void MainWindow::screenCountEvent()
@@ -217,6 +219,30 @@ void MainWindow::screenCountEvent()
     moveToScreen(QApplication::primaryScreen());
     //需要重新绘制，否则背景图片大小会不正确
     repaint();
+}
+
+/**
+ * 有屏幕插拔,移动GreeterWindow到主屏幕
+ */
+void MainWindow::onScreenCountChanged(int newCount)
+{
+    if(newCount < 2) {
+        QProcess enableMonitors;
+        enableMonitors.start("xrandr --auto");
+        enableMonitors.waitForFinished(-1);
+    } else {
+        DisplayService displayService;
+        int mode = m_configuration->getValue("display-mode").toInt();
+        displayService.switchDisplayMode((DisplayMode)mode);
+    }
+//    if(m_first){
+//        show();
+//        activateWindow();
+//    }
+
+    //在调用xrandr打开显示器以后，不能马上设置窗口大小，会设置不正确的
+    //分辨率，延时500ms正常。
+    QTimer::singleShot(500,this,SLOT(screenCountEvent()));
 }
 
 /**

@@ -86,5 +86,5 @@ private:
  * @return 开(true)，关(false)
  */
 bool checkCapsState();
-
+bool checkNumLockState();
 #endif
