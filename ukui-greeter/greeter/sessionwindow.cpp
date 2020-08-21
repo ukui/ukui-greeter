@@ -108,6 +108,8 @@ bool SessionWindow::eventFilter(QObject *obj, QEvent *event)
     //失去焦点时隐藏窗口
     if(event->type() == 23)
     {
+        QWidget *par = (QWidget*)this->parent();
+        par->update();
         close();
     }
     return false;

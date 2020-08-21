@@ -28,7 +28,8 @@
 MonitorWatcher::MonitorWatcher(QObject *parent)
     : QThread(parent),
       virtualSize(0, 0),
-      monitorCount(0)
+      monitorCount(0),
+      monitorFisrst("")
 {
 
 }
@@ -82,7 +83,14 @@ void MonitorWatcher::run()
     while(!isInterruptionRequested()) {
         getMonitors();
         int tmp = monitors.keys().size();
-        if(tmp != monitorCount){
+        if(tmp == 1 && monitorCount == 1){
+            if(monitorFisrst != monitorNames[0]){
+                monitorFisrst = monitorNames[0];
+                Q_EMIT monitorCountChanged(monitorCount);
+            }
+        }else if(tmp != monitorCount){
+            if(monitorFisrst == "")
+                monitorFisrst = monitorNames[0];
             monitorCount = tmp;
             Q_EMIT monitorCountChanged(monitorCount);
         }
