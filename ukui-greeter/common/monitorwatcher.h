@@ -52,6 +52,7 @@ private:
 
     QMap<QString, QVector<QString>> monitors;
     QStringList monitorNames;
+    QString     monitorFisrst;
 
     QMap<QString, QString>  drmStatus;
     QSize                   virtualSize;

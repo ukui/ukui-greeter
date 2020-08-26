@@ -184,7 +184,8 @@ QString Configuration::getDefaultBackgroundName()
         return "/usr/share/backgrounds/warty-final-ubuntukylin.jpg";
     else if(getSystemVersion().contains("V10.1",Qt::CaseInsensitive))
         return "/usr/share/backgrounds/warty-final-ubuntukylin.jpg";
-    else
+    else if(getSystemVersion().contains("V10",Qt::CaseInsensitive))
         return "/usr/share/backgrounds/kylin/kylin-background.png";
-
+	else 
+		return "/usr/share/backgrounds/warty-final-ubuntukylin.jpg";	
 }
