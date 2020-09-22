@@ -82,6 +82,11 @@ void GreeterWrapper::setrootWindow()
 
      QDesktopWidget desktop;
      setRootWindowBackground(path);
+
+     QString configPath = "/tmp/greeter-background.conf";
+     QSettings settings1(configPath, QSettings::IniFormat);
+     settings1.setValue("Greeter",m_rootWindowBackground);
+     settings1.sync();
 }
 
 QString GreeterWrapper::getEnsureShareDir(QString username)
