@@ -97,6 +97,22 @@
         <source>EN</source>
         <translation type="obsolete">EN</translation>
     </message>
+    <message>
+        <source>Power dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On-screen keyboard, providing virtual keyboard function</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the desktop environment for the selected user to log in. 	If the user is logged in, it will take effect after logging in again</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the language of the selected user after logging in. If the user is logged in, it will take effect after logging in again.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GreeterWrapper</name>
