@@ -1,3 +1,9 @@
+ukui-greeter (3.0.1-1) unstable; urgency=medium
+
+  * New upstream bugfix release.
+
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Sun, 27 Sep 2020 14:50:15 +0800
+
 ukui-greeter (3.0.0-1) unstable; urgency=medium
 
   * New upstream release.
