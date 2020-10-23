@@ -149,6 +149,8 @@ void UserEntry::setUserName(const QString &name)
         m_name = name;
 
      QString str = ElideText(m_nameLabel->font(),IMG_WIDTH,name);
+     if(name != str)
+         m_nameLabel->setToolTip(name);
      m_nameLabel->setText(str);
      m_nameLabel->setAlignment(Qt::AlignCenter);
 }
