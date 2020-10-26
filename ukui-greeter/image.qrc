@@ -17,8 +17,9 @@
 	<file>images/prev-40.png</file>
 	<file>images/reboot.png</file>
         <file>images/shutdown.png</file>
-        <file>images/sleep.png</file>
         <file>images/waiting.png</file>
+        <file>images/suspend.png</file>
+        <file>images/hibernate.png</file>
         <file>images/show-password.png</file>
         <file>images/hide-password.png</file>
         <file>images/login-button.png</file>

@@ -32,7 +32,9 @@ PowerManager::PowerManager(QWidget *parent)
    m_power(new QLightDM::PowerInterface(this)),
    lasttime(QTime::currentTime())
 {
-    if(m_power->canSuspend())
+    if(m_power->canSuspend() && m_power->canHibernate())
+        resize(ITEM_WIDTH*5, ITEM_HEIGHT);
+    else if(m_power->canSuspend() || m_power->canHibernate())
         resize(ITEM_WIDTH*4, ITEM_HEIGHT);
     else
         resize(ITEM_WIDTH*3, ITEM_HEIGHT);
@@ -49,7 +51,9 @@ PowerManager::PowerManager(QWidget *parent)
 
 QSize PowerManager::windowSize()
 {
-    if(m_power->canSuspend())
+    if(m_power->canSuspend() && m_power->canHibernate())
+        return QSize(ITEM_WIDTH*5, ITEM_HEIGHT);
+    else if(m_power->canSuspend() || m_power->canHibernate())
         return QSize(ITEM_WIDTH*4, ITEM_HEIGHT);
     else
         return QSize(ITEM_WIDTH*3, ITEM_HEIGHT);
@@ -75,8 +79,14 @@ void PowerManager::powerClicked(QListWidgetItem *item)
         shutdownWidgetClicked();
         break;
     case 3:
-        suspendWidgetCliced();
+        if(m_power->canSuspend())
+            suspendWidgetCliced();
+        else if(m_power->canHibernate())
+            hibernateWidgetClicked();
         break;
+    case 4:
+        if(m_power->canHibernate())
+            hibernateWidgetClicked();
     default:
         break;
     }
@@ -113,6 +123,16 @@ void PowerManager::suspendWidgetCliced()
     try{
         emit switchToUser();
 	m_power->suspend();
+    }catch(QException &e) {
+        qWarning() << e.what();
+    }
+}
+
+void PowerManager::hibernateWidgetClicked()
+{
+    try{
+        emit switchToUser();
+    m_power->hibernate();
     }catch(QException &e) {
         qWarning() << e.what();
     }
@@ -167,12 +187,27 @@ void PowerManager::initUI()
     	QLabel *suspendLabel = new QLabel(this);
     	suspendFace->setAlignment(Qt::AlignCenter);
     	suspendLabel->setAlignment(Qt::AlignCenter);
-    	suspendFace->setPixmap(QPixmap(":/images/sleep.png").scaled(58,58));
-    	suspendLabel->setText(tr("Sleep"));
+        suspendFace->setPixmap(QPixmap(":/images/suspend.png").scaled(48,48));
+        suspendLabel->setText(tr("Suspend"));
     	suspendWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
     	QVBoxLayout *suspendlayout = new QVBoxLayout(suspendWidget);
     	suspendlayout->addWidget(suspendFace);
     	suspendlayout->addWidget(suspendLabel);
+    }
+
+    if(m_power->canHibernate()) {
+        hibernateWidget = new QWidget(this);
+        hibernateWidget->setObjectName("suspendWidget");
+        QLabel *hibernateFace = new QLabel(this);
+        QLabel *hibernateLabel = new QLabel(this);
+        hibernateFace->setAlignment(Qt::AlignCenter);
+        hibernateLabel->setAlignment(Qt::AlignCenter);
+        hibernateFace->setPixmap(QPixmap(":/images/hibernate.png").scaled(48,48));
+        hibernateLabel->setText(tr("Sleep"));
+        hibernateWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
+        QVBoxLayout *hibernatelayout = new QVBoxLayout(hibernateWidget);
+        hibernatelayout->addWidget(hibernateFace);
+        hibernatelayout->addWidget(hibernateLabel);
     }
 
     QListWidgetItem *item0 = new QListWidgetItem();
@@ -196,7 +231,16 @@ void PowerManager::initUI()
         insertItem(3, item3);
         setItemWidget(item3, suspendWidget);
     }
-
+	
+    if(m_power->canHibernate()){
+        QListWidgetItem *item = new QListWidgetItem();
+        item->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
+        if(m_power->canSuspend())
+            insertItem(4, item);
+        else
+            insertItem(3, item);
+        setItemWidget(item,hibernateWidget);
+    }
     adjustSize();
 
 }

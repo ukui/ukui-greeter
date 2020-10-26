@@ -296,26 +296,27 @@
         <translation type="vanished">切换用户</translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="131"/>
+        <location filename="../greeter/powerwindow.cpp" line="151"/>
         <source>Switch User</source>
         <translation>切换用户</translation>
     </message>
     <message>
+        <location filename="../greeter/powerwindow.cpp" line="191"/>
         <source>Suspend</source>
-        <translation type="vanished">挂起</translation>
+        <translation>挂起</translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="171"/>
+        <location filename="../greeter/powerwindow.cpp" line="206"/>
         <source>Sleep</source>
         <translation>睡眠</translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="144"/>
+        <location filename="../greeter/powerwindow.cpp" line="164"/>
         <source>Restart</source>
         <translation>重启</translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="157"/>
+        <location filename="../greeter/powerwindow.cpp" line="177"/>
         <source>Power Off</source>
         <translation>关机</translation>
     </message>

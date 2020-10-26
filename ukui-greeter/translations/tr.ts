@@ -284,26 +284,27 @@
         <translation type="vanished">Kullanıcı Değiştir</translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="131"/>
+        <location filename="../greeter/powerwindow.cpp" line="151"/>
         <source>Switch User</source>
         <translation>Kullanıcı Değiştir</translation>
     </message>
     <message>
+        <location filename="../greeter/powerwindow.cpp" line="191"/>
         <source>Suspend</source>
-        <translation type="vanished">Askıya Al</translation>
+        <translation>Askıya Al</translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="171"/>
+        <location filename="../greeter/powerwindow.cpp" line="206"/>
         <source>Sleep</source>
         <translation>Uyku Modu</translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="144"/>
+        <location filename="../greeter/powerwindow.cpp" line="164"/>
         <source>Restart</source>
         <translation>Yeniden Başlat</translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="157"/>
+        <location filename="../greeter/powerwindow.cpp" line="177"/>
         <source>Power Off</source>
         <translation>Bilgisayarı Kapat</translation>
     </message>
