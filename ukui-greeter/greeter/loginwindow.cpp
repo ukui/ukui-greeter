@@ -542,12 +542,14 @@ void LoginWindow::onAuthenticationComplete()
                         m_name = "*login";
                     }
                     else{
-                        onShowMessage(tr("Incorrect password, please input again"), QLightDM::Greeter::MessageTypeError);
+                        if(!unacknowledged_messages)
+                            onShowMessage(tr("Incorrect password, please input again"), QLightDM::Greeter::MessageTypeError);
                     }
                        // m_name = "*login";
             }       
             else{
-                onShowMessage(tr("Incorrect password, please input again"), QLightDM::Greeter::MessageTypeError);
+                if(!unacknowledged_messages)
+                    onShowMessage(tr("Incorrect password, please input again"), QLightDM::Greeter::MessageTypeError);
                 authMode = PASSWORD;
             }
             isManual = false;
