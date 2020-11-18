@@ -49,6 +49,7 @@ GreeterWindow::GreeterWindow(QWidget *parent)
       m_sessionWnd(nullptr),
       m_powerWnd(nullptr),
       m_sessionLB(nullptr),
+      m_languageLB(nullptr),
       m_virtualKeyboard(nullptr),
       m_languageWnd(nullptr),
       m_greeter(new GreeterWrapper()),
@@ -161,24 +162,21 @@ void GreeterWindow::initUI()
     }
 
     //语言选择按钮
-    m_languageLB = new QPushButton(this);
-    m_languageLB->setObjectName(QStringLiteral("languageButton"));
-    m_languageLB->setFocusPolicy(Qt::NoFocus);
-    m_languageLB->setFont(QFont("Ubuntu", 16));
-    m_languageLB->setFixedHeight(48);
-    m_languageLB->setCursor(Qt::PointingHandCursor);
-    m_languageLB->installEventFilter(this);
-    m_languageLB->setToolTip(tr("Set the language of the selected user after logging in. If the user is logged in, it will take effect after logging in again."));
     LanguagesVector defaultLang = getLanguages();
     if(defaultLang.count()>0){
+        m_languageLB = new QPushButton(this);
+        m_languageLB->setObjectName(QStringLiteral("languageButton"));
+        m_languageLB->setFocusPolicy(Qt::NoFocus);
+        m_languageLB->setFont(QFont("Ubuntu", 16));
+        m_languageLB->setFixedHeight(48);
+        m_languageLB->setCursor(Qt::PointingHandCursor);
+        m_languageLB->installEventFilter(this);
+        m_languageLB->setToolTip(tr("Set the language of the selected user after logging in. If the user is logged in, it will take effect after logging in again."));
+
         m_languageLB->setText(defaultLang.at(0).name);
         m_languageLB->adjustSize();
+        connect(m_languageLB, &QPushButton::clicked, this, &GreeterWindow::showLanguageWnd);
     }
-    else{
-        m_languageLB->hide();
-    }
-
-    connect(m_languageLB, &QPushButton::clicked, this, &GreeterWindow::showLanguageWnd);
 
     //用户列表
     m_userWnd = new UsersView(this);
@@ -314,8 +312,10 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     }
 
     //语言选择按钮位置
-    x += (m_languageLB->width() + 10); //10为间隔
-    m_languageLB->move(this->width() - x, height() - y);
+    if(m_languageLB){
+        x += (m_languageLB->width() + 10); //10为间隔
+        m_languageLB->move(this->width() - x, height() - y);
+    }
 
     //虚拟键盘位置
     setVirkeyboardPos();
@@ -366,7 +366,7 @@ void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
     switch(e->key())
     {
     case Qt::Key_L:
-        if(e->modifiers() & Qt::ControlModifier)
+        if((e->modifiers() & Qt::ControlModifier) && m_languageLB)
             m_languageLB->click();
     break;
     case Qt::Key_K:
@@ -518,6 +518,23 @@ void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
         QString session = index.data(QLightDM::UsersModel::SessionRole).toString();
         onSessionChanged(session);
     }
+
+    bool islogin = index.data(QLightDM::UsersModel::LoggedInRole).toBool();
+    if(islogin){
+        if(m_sessionLB){
+            m_sessionLB->hide();
+        }
+        if(m_languageLB){
+            m_languageLB->hide();
+        }
+    }else{
+        if(m_sessionLB){
+            m_sessionLB->show();
+        }
+        if(m_languageLB){
+            m_languageLB->show();
+        }
+    }
 }
 
 void GreeterWindow::onUserChangedByManual(const QString &userName)
@@ -653,6 +670,9 @@ void GreeterWindow::setWindowPos(QWidget *widget, Qt::Alignment align)
 
 void GreeterWindow::onLanguageChanged(const Language &language)
 {
+    if(!m_languageLB)
+        return ;
+
     if(language.code == "" || language.name == "")
         return ;
 
@@ -683,7 +703,7 @@ void GreeterWindow::onLanguageChanged(const Language &language)
         y = m_keyboardLB->y();
     }
 //10为距离左边按钮的距离
-    m_languageLB->move(x - 10 - m_languageLB->width() , y);
+     m_languageLB->move(x - 10 - m_languageLB->width() , y);
 
     if(m_userWnd && !m_userWnd->isHidden())
     {
@@ -718,7 +738,10 @@ void GreeterWindow::showSessionWnd()
         setFocus();
     }
     else{
-        m_sessionWnd->move(m_languageLB->x(),m_languageLB->y()-m_sessionWnd->height() - 3);
+        if(m_languageLB)
+            m_sessionWnd->move(m_languageLB->x(),m_languageLB->y()-m_sessionWnd->height() - 3);
+        else
+            m_sessionWnd->move(m_sessionLB->x(),m_sessionLB->y()-m_sessionWnd->height() - 3);
         m_sessionWnd->show();
         m_sessionWnd->setFocus();
     }
