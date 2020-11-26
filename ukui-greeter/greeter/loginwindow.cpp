@@ -438,6 +438,7 @@ void LoginWindow::onLogin(const QString &str)
     {  //发送密码
         m_greeter->respond(str);
         startWaiting();
+        m_passwordEdit->setEnabled(false);
     }
 }
 
@@ -460,9 +461,10 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
         m_name_is_login = false;
         qDebug()<<"m_name_is_login = false";
         stopWaiting();
-        if(!text.isEmpty())
+        if(!text.isEmpty()){
+            m_passwordEdit->setEnabled(true);
             m_passwordEdit->show();
-
+        }
         m_passwordEdit->setFocus();
         if(type != QLightDM::Greeter::PromptTypeSecret){
             isauto_switch = true;
