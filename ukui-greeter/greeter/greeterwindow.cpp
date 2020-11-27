@@ -412,8 +412,18 @@ void GreeterWindow::setBackground(const QModelIndex &index)
 {
     QString backgroundPath;
 
-    bool useUserBackground = false;
-	
+    backgroundPath = index.data(QLightDM::UsersModel::BackgroundPathRole).toString();
+    if(backgroundPath.isEmpty())
+    {
+        uid_t uid = index.data(QLightDM::UsersModel::UidRole).toUInt();
+        backgroundPath = getAccountBackground(uid);
+        if(backgroundPath.isEmpty())
+            backgroundPath = m_configuration->getDefaultBackgroundName();
+    }
+ 
+    //登录后绘制桌面背景而不是登录背景
+    m_greeter->setrootWindowBackground(backgroundPath);
+
     //读取/var/lib/lightdm-date/用户名/ukui-greeter.conf,
     //判断是否设置了该用户的登陆界面的背景图片.
     QString userConfigurePath = m_greeter->getEnsureShareDir(index.data(QLightDM::UsersModel::NameRole).toString()) + "/ukui-greeter.conf";
@@ -425,27 +435,15 @@ void GreeterWindow::setBackground(const QModelIndex &index)
             QString filepath = settings.value("backgroundPath").toString();
             if(!filepath.isEmpty() && isPicture(filepath)){
                 backgroundPath = filepath;
-                useUserBackground = true;
             }
         }
         settings.endGroup();
     }
 
-    if(!useUserBackground){
-        backgroundPath = index.data(QLightDM::UsersModel::BackgroundPathRole).toString();
-        if(backgroundPath.isEmpty())
-        {
-            uid_t uid = index.data(QLightDM::UsersModel::UidRole).toUInt();
-            backgroundPath = getAccountBackground(uid);
-            if(backgroundPath.isEmpty())
-                backgroundPath = m_configuration->getDefaultBackgroundName();
-        }
-    }
     QSharedPointer<Background> background(new Background);
     background->type = BACKGROUND_IMAGE;
     background->image = backgroundPath;
     static_cast<MainWindow*>(parentWidget())->setBackground(background);
-    m_greeter->setrootWindowBackground(background->image);
 
 }
 
