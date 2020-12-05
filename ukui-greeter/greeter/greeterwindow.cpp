@@ -39,6 +39,7 @@
 #include "languagewidget.h"
 #include "language.h"
 
+
 float scale;
 int fontSize;
 
@@ -518,14 +519,16 @@ void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
     }
 
     bool islogin = index.data(QLightDM::UsersModel::LoggedInRole).toBool();
-    if(islogin){
+    QString name = index.data(QLightDM::UsersModel::NameRole).toString();
+    if(islogin || name == "*login" || name == "*guest"){
         if(m_sessionLB){
             m_sessionLB->hide();
         }
         if(m_languageLB){
             m_languageLB->hide();
         }
-    }else{
+    }
+    else{
         if(m_sessionLB){
             m_sessionLB->show();
         }

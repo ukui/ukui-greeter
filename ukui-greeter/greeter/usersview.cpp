@@ -32,6 +32,7 @@
 #include <unistd.h>
 #include <QGraphicsOpacityEffect>
 #include "xeventmonitor.h"
+#include "securityuser.h"
 
 /*记录五个节点的坐标*/
 #define ARROW_WIDTH 120*scale
@@ -49,6 +50,7 @@ UsersView::UsersView(QWidget *parent) :
     QWidget(parent),
     usersModel(nullptr),
     currentUser(0),
+    secUser(SecurityUser::instance()),
     lasttime(QTime::currentTime()),
     mouseClickLast(QTime::currentTime())
 {
@@ -62,6 +64,7 @@ UsersView::UsersView(QWidget *parent) :
 // 宽度
     resize(CENTER_ENTRY_WIDTH*9 - ENTRY_WIDTH*4 + 240*scale , CENTER_ENTRY_HEIGHT);
     initUI();
+
 }
 
 UsersView::~UsersView()
@@ -163,9 +166,13 @@ void UsersView::setModel(QAbstractListModel *model)
     connect(usersModel, &QAbstractListModel::rowsInserted, this, &UsersView::onUserAdded);
     connect(usersModel, &QAbstractListModel::rowsRemoved, this, &UsersView::onUserRemoved);
     connect(usersModel, &QAbstractListModel::dataChanged, this, &UsersView::onUserChanged);
-
-    for(int i = 0; i < usersModel->rowCount(); i++)
-        insertUserEntry(i);
+    
+    
+    for(int i = 0; i < usersModel->rowCount(); i++){
+        QString name = usersModel->index(i).data(QLightDM::UsersModel::NameRole).toString();
+        if(secUser->isSecrityUser(name))
+            insertUserEntry(i);
+    }
 
     setCurrentRow(0);
 }
@@ -259,8 +266,6 @@ void UsersView::rightKeyPressed(bool isChoosed)
        Q_EMIT currentUserChanged(index);
        Q_EMIT userSelected(index);
    }
-
-
 }
 
 void UsersView::showEvent(QShowEvent *event)
@@ -357,7 +362,9 @@ void UsersView::onUserAdded(const QModelIndex &parent, int left, int right)
     Q_UNUSED(parent);
 
     for(int i = left; i <= right; i++){
-        insertUserEntry(i);
+        QString name = usersModel->index(i).data(QLightDM::UsersModel::NameRole).toString();
+        if(secUser->isSecrityUser(name))
+            insertUserEntry(i);
     }
 }
 

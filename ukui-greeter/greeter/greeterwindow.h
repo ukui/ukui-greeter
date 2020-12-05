@@ -35,6 +35,7 @@ class Configuration;
 class VirtualKeyboard;
 class LanguageWidget;
 class Language;
+
 class GreeterWindow : public QWidget
 {
     Q_OBJECT

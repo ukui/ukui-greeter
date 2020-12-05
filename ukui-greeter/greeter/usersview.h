@@ -27,6 +27,7 @@
 class QListWidget;
 class QPushButton;
 class QAbstractListModel;
+class SecurityUser;
 class UsersView : public QWidget
 {
     Q_OBJECT
@@ -81,6 +82,7 @@ private:
     int currentUser;
     /*qpair记录用户的上一个用户和下一用户的在list的位置*/
     QList<QPair<UserEntry *, QPair<int ,int>>> userlist;
+    SecurityUser *secUser;
     QTime lasttime;
     QTime mouseClickLast;
     QPushButton *prevArrow;
