@@ -19,13 +19,19 @@
 #include "usersmodel.h"
 #include <QLightDM/UsersModel>
 #include <QDebug>
+#include "securityuser.h"
 
 UsersModel::UsersModel(bool hideUsers, QObject *parent) :
     ProxyModel(parent),
+    secUser(SecurityUser::instance()),
     m_showGuest(false)
 {
-    if(!hideUsers)
+    if(!hideUsers){
         setSourceModel(new QLightDM::UsersModel(this));
+        if(getSecUserCount() == 0){
+            setShowManualLogin(true);
+        }
+    }
     else {
         qDebug() << "hide users, show manual";
         setShowManualLogin(true);
@@ -81,6 +87,17 @@ void UsersModel::setShowManualLogin(bool isShowManualLogin)
             }
         }
     }
+}
+
+int UsersModel::getSecUserCount()
+{
+    int count = 0;
+    for(int i = 0; i < this->rowCount(); i++){
+        QString name = this->index(i).data(QLightDM::UsersModel::NameRole).toString();
+        if(secUser->isSecrityUser(name))
+            count++;
+    }
+    return count;
 }
 
 bool UsersModel::showManualLogin() const

@@ -227,6 +227,10 @@
         <source>Sleep</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Suspend</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PowerWindow</name>

@@ -21,6 +21,8 @@
 
 #include "proxymodel.h"
 
+class SecurityUser;
+
 class UsersModel : public ProxyModel
 {
     Q_OBJECT
@@ -33,8 +35,10 @@ public:
     void setShowManualLogin(bool);
     bool showManualLogin() const;
 private:
+    int getSecUserCount();
     bool m_showGuest;
     bool m_showManualLogin;
+    SecurityUser *secUser;
 };
 
 #endif // USERSMODEL_H

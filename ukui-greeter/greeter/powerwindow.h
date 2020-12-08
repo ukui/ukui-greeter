@@ -47,6 +47,7 @@ private:
     QWidget *suspendWidget;
     QWidget *rebootWidget;
     QWidget *shutdownWidget;
+    QWidget *hibernateWidget;
     QLightDM::PowerInterface *m_power;
     QTime lasttime;
 
@@ -56,6 +57,7 @@ private:
     void suspendWidgetCliced();
     void rebootWidgetClicked();
     void shutdownWidgetClicked();
+    void hibernateWidgetClicked();
 
 private Q_SLOTS:
     void powerClicked(QListWidgetItem *item);

@@ -225,22 +225,27 @@
 <context>
     <name>PowerManager</name>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="131"/>
+        <location filename="../greeter/powerwindow.cpp" line="151"/>
         <source>Switch User</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="171"/>
+        <location filename="../greeter/powerwindow.cpp" line="191"/>
+        <source>Suspend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../greeter/powerwindow.cpp" line="206"/>
         <source>Sleep</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="144"/>
+        <location filename="../greeter/powerwindow.cpp" line="164"/>
         <source>Restart</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../greeter/powerwindow.cpp" line="157"/>
+        <location filename="../greeter/powerwindow.cpp" line="177"/>
         <source>Power Off</source>
         <translation type="unfinished"></translation>
     </message>

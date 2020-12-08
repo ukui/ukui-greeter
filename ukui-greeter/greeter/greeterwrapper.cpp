@@ -21,6 +21,7 @@
 #include <QDesktopWidget>
 #include <QDebug>
 #include <QBitArray>
+#include <QTextCodec>
 #include "globalv.h"
 #include "common/configuration.h"
 
@@ -85,6 +86,7 @@ void GreeterWrapper::setrootWindow()
 
      QString configPath = "/tmp/greeter-background.conf";
      QSettings settings1(configPath, QSettings::IniFormat);
+     settings1.setIniCodec(QTextCodec::codecForName("UTF-8"));
      settings1.setValue("Greeter",m_rootWindowBackground);
      settings1.sync();
 }
