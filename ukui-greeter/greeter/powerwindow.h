@@ -23,6 +23,7 @@
 #include <QListWidget>
 #include <QLightDM/Power>
 #include <QSize>
+#include <QLabel>
 #include <QTime>
 
 #define ITEM_WIDTH 168
@@ -48,6 +49,9 @@ private:
     QWidget *rebootWidget;
     QWidget *shutdownWidget;
     QWidget *hibernateWidget;
+    QLabel *switchLabel;
+    QLabel *rebootLabel;
+    QLabel *shutdownLabel;
     QLightDM::PowerInterface *m_power;
     QTime lasttime;
 
@@ -58,9 +62,11 @@ private:
     void rebootWidgetClicked();
     void shutdownWidgetClicked();
     void hibernateWidgetClicked();
+    void refreshTranslate();
 
 private Q_SLOTS:
     void powerClicked(QListWidgetItem *item);
+    void changeEvent(QEvent *event);
 
 Q_SIGNALS:
     void switchToUser();

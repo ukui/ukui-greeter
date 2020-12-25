@@ -31,7 +31,8 @@
 Configuration* Configuration::instance_ = nullptr;
 
 Configuration::Configuration(QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      m_trans(nullptr)
 {
     QString recodfile = QDir::homePath() + "/.cache/ukui-greeter.conf";
     qDebug() << recodfile;

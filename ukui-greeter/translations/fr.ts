@@ -2,32 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr">
 <context>
-    <name>BioAuthentication</name>
-    <message>
-        <source>authentication failed, restart after 2 seconds</source>
-        <translation type="obsolete">L&apos;authentification a échoué, redémarrez après 2 secondes</translation>
-    </message>
-</context>
-<context>
-    <name>BioDeviceView</name>
-    <message>
-        <source>password login</source>
-        <translation type="obsolete">mot de passe</translation>
-    </message>
-    <message>
-        <source>fingerprint</source>
-        <translation type="obsolete">les empreintes digitales</translation>
-    </message>
-    <message>
-        <source>fingerevin</source>
-        <translation type="obsolete">doigt evin</translation>
-    </message>
-    <message>
-        <source>iris</source>
-        <translation type="obsolete">iris</translation>
-    </message>
-</context>
-<context>
     <name>BiometricAuthWidget</name>
     <message>
         <source>Current device: </source>
@@ -90,14 +64,6 @@
 <context>
     <name>GreeterWindow</name>
     <message>
-        <source>CN</source>
-        <translation type="obsolete">CN</translation>
-    </message>
-    <message>
-        <source>EN</source>
-        <translation type="obsolete">EN</translation>
-    </message>
-    <message>
         <source>Power dialog</source>
         <translation type="unfinished"></translation>
     </message>
@@ -106,11 +72,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Set the desktop environment for the selected user to log in. 	If the user is logged in, it will take effect after logging in again</source>
+        <source>Set the language of the selected user after logging in. If the user is logged in, it will take effect after logging in again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Set the language of the selected user after logging in. If the user is logged in, it will take effect after logging in again.</source>
+        <source>Set the desktop environment for the selected user to log in.If the user is logged in, it will take effect after logging in again</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -124,8 +90,12 @@
 <context>
     <name>IconEdit</name>
     <message>
-        <source>Login</source>
-        <translation type="obsolete">S&apos;identifier</translation>
+        <source>Password: </source>
+        <translation type="unfinished">Mot de passe: </translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -154,16 +124,8 @@
         <translation>Mot de passe: </translation>
     </message>
     <message>
-        <source>login:</source>
-        <translation type="vanished">s&apos;identifier:</translation>
-    </message>
-    <message>
         <source>Incorrect password, please input again</source>
         <translation type="unfinished">Mot de passe incorrect, veuillez saisir à nouveau</translation>
-    </message>
-    <message>
-        <source>please select the type of authentication</source>
-        <translation type="obsolete">veuillez sélectionner le type d&apos;authentification</translation>
     </message>
     <message>
         <source>Incorrect user name, please input again</source>
@@ -200,18 +162,6 @@
 <context>
     <name>PowerManager</name>
     <message>
-        <source>suspend</source>
-        <translation type="obsolete">suspendre</translation>
-    </message>
-    <message>
-        <source>restart</source>
-        <translation type="obsolete">redémarrer</translation>
-    </message>
-    <message>
-        <source>shutdown</source>
-        <translation type="obsolete">fermer</translation>
-    </message>
-    <message>
         <source>Restart</source>
         <translation type="unfinished"></translation>
     </message>
@@ -230,51 +180,6 @@
     <message>
         <source>Suspend</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>PowerWindow</name>
-    <message>
-        <source>Goodbye. Would you like to…</source>
-        <translation type="obsolete">Au revoir. Voudriez-vous…</translation>
-    </message>
-    <message>
-        <source>Other users are currently logged in to this computer, shutting down now will also close these other sessions.</source>
-        <translation type="vanished">D&apos;autres utilisateurs sont actuellement connectés à cet ordinateur, leur fermeture ferme également ces autres sessions.</translation>
-    </message>
-    <message>
-        <source>suspend</source>
-        <translation type="vanished">suspendre</translation>
-    </message>
-    <message>
-        <source>hibernate</source>
-        <translation type="vanished">hiberner</translation>
-    </message>
-    <message>
-        <source>restart</source>
-        <translation type="vanished">redémarrer</translation>
-    </message>
-    <message>
-        <source>shutdown</source>
-        <translation type="vanished">fermer</translation>
-    </message>
-</context>
-<context>
-    <name>SessionWindow</name>
-    <message>
-        <source>select the desktop environment</source>
-        <translation type="obsolete">sélectionner l&apos;environnement de bureau</translation>
-    </message>
-    <message>
-        <source> (Default)</source>
-        <translation type="vanished"> (Défaut)</translation>
-    </message>
-</context>
-<context>
-    <name>UserEntry</name>
-    <message>
-        <source>logged in</source>
-        <translation type="vanished">connecté</translation>
     </message>
 </context>
 <context>

@@ -40,6 +40,7 @@
 #include "mainwindow.h"
 #include "display-switch/displayswitch.h"
 #include "xeventmonitor.h"
+#include "configuration.h"
 
 void outputMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -129,13 +130,14 @@ int main(int argc, char *argv[])
     language = QLocale::system().language();
     qDebug() << "current locale language: " << QLocale::languageToString(language);
 
+    Configuration *m_configuration = Configuration::instance();
     //加载翻译文件
-    QTranslator translator;
+    m_configuration->m_trans =  new QTranslator();
     QString qmFile = QM_DIR + QString("%1.qm").arg(QLocale::system().name());
-    translator.load(qmFile);
+     m_configuration->m_trans->load(qmFile);
     qDebug() << "load translation file " << qmFile;
 
-    a.installTranslator(&translator);
+    qApp->installTranslator( m_configuration->m_trans);
 
     //加载qss文件
     QFile qss(":/ukui-greeter.qss");

@@ -76,6 +76,7 @@ public slots:
     void onShowPrompt(QString text, QLightDM::Greeter::PromptType type);
     void onAuthenticationComplete();
     void setUserNotInView(const QString &userName);
+    void changeEvent(QEvent *event);
         
 private slots:
     void onLogin(const QString &str);
@@ -107,6 +108,7 @@ private:
     QPixmap DrawRound(QPixmap &src, int radius);
     QPixmap PixmapToRound(const QPixmap &src, int radius);
     void show_authenticated (bool successful = true);
+    void refreshTranslate();
 
 private:
     GreeterWrapper      *m_greeter;

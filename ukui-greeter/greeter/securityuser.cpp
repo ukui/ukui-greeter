@@ -22,7 +22,6 @@
 #include <QJsonValue>
 #include <QJsonArray>
 #include <QJsonDocument>
-#include <QStringLiteral>
 #include <QFile>
 
 #include "securityuser.h"

@@ -19,7 +19,9 @@
 #include "greeterwindow.h"
 #include <QMenu>
 #include <QDebug>
+#include <QApplication>
 #include <QProcess>
+#include <QTranslator>
 #include <QStandardPaths>
 #include <QPainter>
 #include <QResizeEvent>
@@ -61,7 +63,6 @@ GreeterWindow::GreeterWindow(QWidget *parent)
       m_sessionHasChanged(false)
 {
     scale = 1.0;
-
     if(m_greeter->hasGuestAccountHint()){    //允许游客登录
         qDebug() << "allow guest";
         m_usersModel->setShowGuest(true);
@@ -91,11 +92,16 @@ void GreeterWindow::initUI()
 {
     installEventFilter(this);
 
+    local = QLocale::system().language();
+    QDateTime dateTime = QDateTime::currentDateTime();
+    QString strFormat = "dd.MM.yyyy, ddd MMMM d yy, hh:mm:ss.zzz, h:m:s ap";
+    QString strDateTime = local.toString(dateTime, strFormat);
+
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [&]{
-            QString time = QDateTime::currentDateTime().toString("hh:mm");
+            QString time = local.toString(QDateTime::currentDateTime(),"hh:mm");
             lblTime->setText(time);
-            QString date = QDate::currentDate().toString("yyyy/MM/dd dddd");
+            QString date = local.toString(QDate::currentDate(),"yyyy/MM/dd ddd");
             lblDate->setText(date);
     });
 
@@ -106,13 +112,13 @@ void GreeterWindow::initUI()
     widgetlayout->addWidget(lblTime);
     widgetlayout->addWidget(lblDate);
 
-    QString time = QDateTime::currentDateTime().toString("hh:mm");
+    QString time = local.toString(QDateTime::currentDateTime(),"hh:mm");
     lblTime->setText(time);
     lblTime->setStyleSheet("QLabel{color:white; font-size: 50px;}");
     lblTime->adjustSize();
     timer->start(1000);
 
-    QString date = QDate::currentDate().toString("yyyy/MM/dd dddd");
+    QString date = local.toString(QDate::currentDate(),"yyyy/MM/dd ddd");
     qDebug() << "current date: " << date;
     lblDate->setText(date);
     lblDate->setStyleSheet("QLabel{color:white; font-size: 16px;}");
@@ -155,8 +161,7 @@ void GreeterWindow::initUI()
         m_sessionLB->setFixedSize(48, 48);
         m_sessionLB->setCursor(Qt::PointingHandCursor);
         m_sessionLB->installEventFilter(this);
-	m_sessionLB->setToolTip(tr("Set the desktop environment for the selected user to log in. \
-	If the user is logged in, it will take effect after logging in again"));
+        m_sessionLB->setToolTip(tr("Set the desktop environment for the selected user to log in.If the user is logged in, it will take effect after logging in again"));
         m_sessionLB->setIcon(QIcon(IMAGE_DIR + QString("badges/unknown_badge.svg")));
         onSessionChanged(m_greeter->defaultSessionHint());
         connect(m_sessionLB, &QPushButton::clicked, this, &GreeterWindow::showSessionWnd);
@@ -321,6 +326,21 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     //虚拟键盘位置
     setVirkeyboardPos();
 
+}
+
+void GreeterWindow::changeEvent(QEvent *event)
+{
+    if(event->type() == QEvent::LanguageChange){
+        refreshTranslate();
+    }
+}
+
+void GreeterWindow::refreshTranslate()
+{
+    m_powerLB->setToolTip(tr("Power dialog"));
+    m_keyboardLB->setToolTip(tr("On-screen keyboard, providing virtual keyboard function"));
+    m_sessionLB->setToolTip(tr("Set the desktop environment for the selected user to log in.If the user is logged in, it will take effect after logging in again"));
+    m_languageLB->setToolTip(tr("Set the language of the selected user after logging in. If the user is logged in, it will take effect after logging in again."));
 }
 
 void GreeterWindow::setVirkeyboardPos()
@@ -681,6 +701,22 @@ void GreeterWindow::onLanguageChanged(const Language &language)
     {
         return;
     }
+	
+
+    qApp->removeTranslator(m_configuration->m_trans);
+    delete m_configuration->m_trans;
+    m_configuration->m_trans = new QTranslator();
+    QString qmFile;
+    if(language.code.startsWith("zh")){
+        local = QLocale::Chinese;
+        qmFile = QM_DIR + QString("%1.qm").arg("zh_CN");
+    }
+    else{
+        local = QLocale::English;
+        qmFile = QM_DIR + QString("%1.qm").arg("en_US");
+    }
+    m_configuration->m_trans->load(qmFile);
+    qApp->installTranslator(m_configuration->m_trans);
 
     m_greeter->setLang(language.code);
 

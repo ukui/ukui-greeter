@@ -46,7 +46,12 @@ LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
       m_biometricProxy(nullptr),
       m_biometricAuthWidget(nullptr),
       m_biometricDevicesWidget(nullptr),
-      m_buttonsWidget(nullptr)
+      m_buttonsWidget(nullptr),
+      m_biometricButton(nullptr),
+      m_passwordButton(nullptr),
+      m_otherDeviceButton(nullptr),
+      m_retryButton(nullptr),
+      m_nameLabel(nullptr)
 {    
     initUI();
 
@@ -178,6 +183,33 @@ void LoginWindow::keyReleaseEvent(QKeyEvent *event)
         }
     }
     QWidget::keyReleaseEvent(event);
+}
+
+void LoginWindow::changeEvent(QEvent *event)
+{
+    if(event->type() == QEvent::LanguageChange){
+        refreshTranslate();
+    }
+}
+
+void LoginWindow::refreshTranslate()
+{
+    if(m_biometricButton){
+        m_biometricButton->setText(tr("Biometric Authentication"));
+    }
+    if(m_passwordButton){
+        m_passwordButton->setText(tr("Password Authentication"));
+    }
+    if(m_otherDeviceButton){
+        m_otherDeviceButton->setText(tr("Other Devices"));
+    }
+    if(m_retryButton){
+        m_retryButton->setText(tr("Retry"));
+    }
+    if(m_nameLabel){
+        if(m_nameLabel->text() == "Login" || m_nameLabel->text() == "登录")
+            m_nameLabel->text() == tr("Login");
+    }
 }
 
 void LoginWindow::setChildrenGeometry()
@@ -389,7 +421,7 @@ void LoginWindow::startAuthentication()
     if(m_name == "*guest")
     {                       //游客登录
         qDebug() << "guest login";
-	m_passwordEdit->show();
+        m_passwordEdit->show();
         setPrompt(tr("login"));
     }
     else if(m_name == "*login")
@@ -575,7 +607,7 @@ void LoginWindow::show_authenticated(bool successful)
             this, &LoginWindow::onMessageButtonClicked);
     if(successful)
     {
-	isretry = false;
+        isretry = false;
       //  m_greeter->startSession();
         m_messageButton->setText(tr("Login"));
     }

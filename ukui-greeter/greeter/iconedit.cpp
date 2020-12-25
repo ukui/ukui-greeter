@@ -172,7 +172,13 @@ void IconEdit::clear()
 
 void IconEdit::setPrompt(const QString &prompt)
 {
-    m_edit->setPlaceholderText(prompt);
+   // m_edit->setPlaceholderText(prompt);
+    if(prompt == "Password: " || prompt == "密码：")
+        m_edit->setPlaceholderText(tr("Password: "));
+    else if(prompt == "Username" || prompt == "用户名")
+        m_edit->setPlaceholderText(tr("Username"));
+    else
+        m_edit->setPlaceholderText(prompt);
 }
 
 const QString IconEdit::text()
@@ -198,6 +204,20 @@ void IconEdit::startWaiting()
     m_timer->start();
 }
 
+void IconEdit::changeEvent(QEvent *event)
+{
+    if(event->type() == QEvent::LanguageChange){
+        refreshTranslate();
+    }
+}
+
+void IconEdit::refreshTranslate()
+{
+     if(m_edit->placeholderText() == "Password: " || m_edit->placeholderText() == "密码：")
+         m_edit->setPlaceholderText(tr("Password: "));
+     if(m_edit->placeholderText() == "Username" || m_edit->placeholderText() == "用户名")
+         m_edit->setPlaceholderText(tr("Username"));
+}
 
 void IconEdit::stopWaiting()
 {

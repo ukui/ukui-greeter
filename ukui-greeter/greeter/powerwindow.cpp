@@ -22,6 +22,7 @@
 #include <QPixmap>
 #include <QListWidgetItem>
 #include <QListWidget>
+#include <QEvent>
 #include <QException>
 #include <QDebug>
 #include <QDBusInterface>
@@ -138,13 +139,27 @@ void PowerManager::hibernateWidgetClicked()
     }
 }
 
+void PowerManager::changeEvent(QEvent *event)
+{
+    if(event->type() == QEvent::LanguageChange){
+        refreshTranslate();
+    }
+}
+
+void PowerManager::refreshTranslate()
+{
+      switchLabel->setText(tr("Switch User"));
+      rebootLabel->setText(tr("Restart"));
+      shutdownLabel->setText(tr("Power Off"));
+}
+
 void PowerManager::initUI()
 {
 
     switchWidget = new QWidget(this);
     switchWidget->setObjectName("switchWidget");
     QLabel *switchFace = new QLabel(this);
-    QLabel *switchLabel =  new QLabel(this);
+    switchLabel =  new QLabel(this);
     switchFace->setAlignment(Qt::AlignCenter);
     switchLabel->setAlignment(Qt::AlignCenter);
     switchFace->setPixmap(QPixmap(":/images/avatar.png").scaled(58,58));
@@ -157,7 +172,7 @@ void PowerManager::initUI()
     rebootWidget = new QWidget(this);
     rebootWidget->setObjectName("rebootWidget");
     QLabel *rebootFace = new QLabel(this);
-    QLabel *rebootLabel = new QLabel(this);
+    rebootLabel = new QLabel(this);
     rebootFace->setAlignment(Qt::AlignCenter);
     rebootLabel->setAlignment(Qt::AlignCenter);
     rebootFace->setPixmap(QPixmap(":/images/reboot.png").scaled(58,58));
@@ -170,7 +185,7 @@ void PowerManager::initUI()
     shutdownWidget = new QWidget(this);
     shutdownWidget->setObjectName("shutdownWidget");
     QLabel *shutdownFace  = new QLabel(this);
-    QLabel *shutdownLabel = new QLabel(this);
+    shutdownLabel = new QLabel(this);
     shutdownLabel->setAlignment(Qt::AlignCenter);
     shutdownFace->setAlignment(Qt::AlignCenter);
     shutdownFace->setPixmap(QPixmap(":/images/shutdown.png").scaled(58,58));
