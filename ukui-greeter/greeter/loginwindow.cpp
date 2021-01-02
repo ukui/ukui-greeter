@@ -854,9 +854,9 @@ void LoginWindow::setBiometricWidgetGeometry()
     }
     if(m_biometricDevicesWidget)
     {
-        m_biometricDevicesWidget->setGeometry((width() - m_biometricDevicesWidget->width()) / 2,
-                                              (height() - m_biometricDevicesWidget->height()) / 2,
-                                              m_biometricDevicesWidget->width(),
+        m_biometricDevicesWidget->setGeometry(0,
+                                              0,
+                                              width(),
                                               m_biometricDevicesWidget->height());
     }
 }
@@ -913,24 +913,24 @@ void LoginWindow::onBiometricButtonClicked()
     //当前没有设备，让用户选择设备
     if(!m_deviceInfo)
     {
-//        if(m_deviceCount == 1)
-//        {
-//            DeviceList deviceList = m_biometricProxy->GetDevList();
-//            m_deviceInfo = deviceList.at(0);
-//            if(!m_deviceInfo)
-//            {
-//                m_otherDeviceButton->click();
-//            }
-//            else
-//            {
-//                authMode = BIOMETRIC;
-//                startAuthentication();
-//            }
-//        }
-//        else
-//        {
+        if(m_deviceCount == 1)
+        {
+            DeviceList deviceList = m_biometricProxy->GetDevList();
+            m_deviceInfo = deviceList.at(0);
+            if(!m_deviceInfo)
+            {
+                m_otherDeviceButton->click();
+            }
+            else
+            {
+                authMode = BIOMETRIC;
+                startAuthentication();
+            }
+        }
+        else
+        {
             m_otherDeviceButton->click();
-//        }
+        }
     }
     else
     {
