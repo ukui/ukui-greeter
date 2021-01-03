@@ -56,7 +56,7 @@ int BiometricProxy::GetFeatureCount(int uid, int indexStart, int indexEnd)
 
         auto arg = variantList.at(i).value<QDBusArgument>();
         arg >> *pDeviceInfo;
-	StopOps(pDeviceInfo->id);
+
         QDBusMessage FeatureResult = call(QStringLiteral("GetFeatureList"),pDeviceInfo->id,uid,indexStart,indexEnd);
         if(FeatureResult.type() == QDBusMessage::ErrorMessage)
         {

@@ -49,7 +49,7 @@
 UsersView::UsersView(QWidget *parent) :
     QWidget(parent),
     usersModel(nullptr),
-    currentUser(0),
+    currentUser(-1),
     secUser(SecurityUser::instance()),
     lasttime(QTime::currentTime()),
     mouseClickLast(QTime::currentTime())
@@ -186,7 +186,8 @@ void UsersView::setCurrentUser(const QString &userName, bool entered)
         UserEntry *entry = userlist.at(i).first;
         if(entry->userIndex().data(QLightDM::UsersModel::NameRole).toString() == userName)
         {
-            setCurrentRow(i);
+            if(i != currentUser)
+                setCurrentRow(i);
             return ;
         }
     }
@@ -196,7 +197,7 @@ void UsersView::onGlobalKeyRelease(const QString &key)
 {
     /*添加一定延时，避免按键太快*/	
     int interval = lasttime.msecsTo(QTime::currentTime());
-    if(interval < 200 && interval > -200)
+    if(interval < 300 && interval > -300)
         return ;
     lasttime = QTime::currentTime();
     if(key.compare("right",Qt::CaseInsensitive)==0)
@@ -575,7 +576,7 @@ void UsersView::rightToRight()
 void UsersView::moveAnimation(UserEntry *entry, QRect preRect, QRect nextRect)
 {
     QPropertyAnimation *pScaleAnimation = new QPropertyAnimation(entry, "geometry");
-    pScaleAnimation->setDuration(200);
+    pScaleAnimation->setDuration(300);
     pScaleAnimation->setStartValue(preRect);
     pScaleAnimation->setEndValue(nextRect);
     pScaleAnimation->setEasingCurve(QEasingCurve::InOutQuad);
@@ -589,6 +590,9 @@ void UsersView::setCurrentRow(int user)
 
     if(user < 0 || user >= userlist.count())
         user = 0;
+
+    if(currentUser == user)
+	return ;
 
     currentUser = user;
 

@@ -62,7 +62,7 @@ void BiometricAuthWidget::initUI()
 
 void BiometricAuthWidget::resizeEvent(QResizeEvent */*event*/)
 {
-    lblNotify->setGeometry(0, 0, width(), 40);
+    lblNotify->setGeometry(0, 0, width(), 45);
     lblDevice->setGeometry(0, lblNotify->geometry().bottom()+5, width(), 30);
     lblImage->setGeometry((width() - lblImage->width()) / 2,
                            lblDevice->geometry().bottom() + 10,

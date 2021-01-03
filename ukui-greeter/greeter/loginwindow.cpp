@@ -255,6 +255,7 @@ void LoginWindow::reset()
     m_passwordEdit->clear();
     m_passwordEdit->setType(QLineEdit::Password);
     m_messageButton->hide();
+    m_featureCount = 0;
     clearMessage();
     showPasswordAuthWidget();
     m_deviceCount = -1;
