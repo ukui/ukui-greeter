@@ -55,6 +55,7 @@ public:
     void reset();
     bool isloginauth;
     void setDirLogin();
+    bool getIsChooseDev();
 
 protected:
     void showEvent(QShowEvent *);
@@ -154,6 +155,7 @@ private:
     bool m_name_is_login = false;
     bool isauto_switch = false;
     bool direct_login = false;
+    bool isChooseDev = false;
 };
 
 #endif // LOGINWINDOW_H

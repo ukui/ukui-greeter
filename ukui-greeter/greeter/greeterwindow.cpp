@@ -373,10 +373,7 @@ bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
             update();
         }
         if(m_powerWnd && !m_powerWnd->isHidden()){
-            m_powerWnd->close();
-            m_userWnd->show();
-            m_loginWnd->show();
-            update();
+            setWindowVisible();
         }
     }
     return false;
@@ -400,10 +397,7 @@ void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
     break;
     case Qt::Key_Escape:
         if(m_powerWnd && !m_powerWnd->isHidden()){
-            m_powerWnd->close();
-            m_userWnd->show();
-            m_loginWnd->show();
-            update();
+            setWindowVisible();
         }
     break;
     }
@@ -569,10 +563,14 @@ void GreeterWindow::onUserChangedByManual(const QString &userName)
 void GreeterWindow::setWindowVisible()
 {
     if(m_powerWnd && m_powerWnd->isVisible())
-        m_powerWnd->hide();
+        m_powerWnd->close();
 
-    m_loginWnd->setVisible(true);
-    m_userWnd->setVisible(true);
+    if(m_loginWnd->getIsChooseDev()){
+        m_loginWnd->setVisible(true);
+    }else{
+        m_loginWnd->setVisible(true);
+        m_userWnd->setVisible(true);
+    }
     update();
 }
 /**
@@ -584,8 +582,12 @@ void GreeterWindow::showPowerWnd()
     //如果已经打开了电源对话框则关闭
     if(m_powerWnd && !m_powerWnd->isHidden()){
         m_powerWnd->close();
-        m_userWnd->show();
-        m_loginWnd->show();
+        if(m_loginWnd->getIsChooseDev()){
+            m_loginWnd->show();
+        }else{
+            m_userWnd->show();
+            m_loginWnd->show();
+        }
         update();
         return;
     }

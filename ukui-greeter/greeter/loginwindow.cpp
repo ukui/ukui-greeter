@@ -172,13 +172,7 @@ void LoginWindow::keyReleaseEvent(QKeyEvent *event)
             {
                 showPasswordAuthWidget();
             }
-            return;
-        }
-        //返回用户列表
-        else if(m_biometricAuthWidget && m_biometricAuthWidget->isVisible())
-        {
-            m_biometricAuthWidget->stopAuth();
-            Q_EMIT back();
+            isChooseDev = false;
             return;
         }
     }
@@ -971,7 +965,7 @@ void LoginWindow::showPasswordAuthWidget()
 { 
     //m_userWidget->setVisible(true);
     m_passwdWidget->setVisible(true);
-
+    emit bioDeviceIsChoosed(true);
     if(m_biometricAuthWidget)
     {
         m_biometricAuthWidget->setVisible(false);
@@ -998,9 +992,15 @@ void LoginWindow::showPasswordAuthWidget()
     }
 }
 
+bool LoginWindow::getIsChooseDev()
+{
+    return isChooseDev;
+}
+
 void LoginWindow::showBiometricAuthWidget()
 {
     emit bioDeviceIsChoosed(true);
+    isChooseDev = false;
     m_passwdWidget->setVisible(false);
     m_messageButton->hide();
     if(m_biometricAuthWidget)
@@ -1026,7 +1026,7 @@ void LoginWindow::showBiometricAuthWidget()
 void LoginWindow::showBiometricDeviceWidget()
 {
     emit bioDeviceIsChoosed(false);
-
+    isChooseDev = true;
     m_passwdWidget->setVisible(false);
     m_messageButton->hide();
     if(m_biometricAuthWidget)
