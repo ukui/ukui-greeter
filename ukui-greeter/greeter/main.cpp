@@ -34,6 +34,7 @@
 #include <X11/Xlib.h>
 #include <X11/XKBlib.h>
 #include <X11/keysym.h>
+#include <X11/Xatom.h>
 #include <X11/cursorfont.h>
 #include <X11/extensions/Xrandr.h>
 #include "globalv.h"
@@ -109,8 +110,25 @@ void x11_get_screen_size(int *width,int *height)
 
 }
 
+void XsettingsHidpi()
+{
+    Display    *dpy;
+    int w,h;
+    x11_get_screen_size (&w, &h);
+    dpy = XOpenDisplay (NULL);
+    if(h > 2000){
+        XChangeProperty(dpy, RootWindow (dpy, 0),
+                XA_RESOURCE_MANAGER, XA_STRING, 8, PropModeReplace, (unsigned char *) "Xft.dpi:	192\n", 13);
+    }else{
+        XChangeProperty(dpy, RootWindow (dpy, 0),
+            XA_RESOURCE_MANAGER, XA_STRING, 8, PropModeReplace, (unsigned char *) "Xft.dpi:	96\n", 12);
+    }
+    XCloseDisplay (dpy);
+}
+
 int main(int argc, char *argv[])
 {
+    XsettingsHidpi ();
     qInstallMessageHandler(outputMessage);
 
 #if(QT_VERSION>=QT_VERSION_CHECK(5,6,0))
