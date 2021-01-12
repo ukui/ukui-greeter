@@ -128,7 +128,9 @@ float wScale = hScale;
 void KeyboardWidget::setIconSize()
 {
     SET_ICON_SIZE_SCALE(backspace);
+    SET_ICON_SIZE_SCALE(backspace_num);
     SET_ICON_SIZE_SCALE(enter);
+    SET_ICON_SIZE_SCALE(enter_num);
     SET_ICON_SIZE_SCALE(close);
     SET_ICON_SIZE_SCALE(super);
     SET_ICON_SIZE_SCALE(shift_l);
@@ -191,6 +193,7 @@ void KeyboardWidget::setDefaultIcon()
     ui->btn_backspace->setIcon(QIcon(":/images/images/backspace.svg"));
     ui->btn_backspace_num->setIcon(QIcon(":/images/images/backspace.svg"));
     ui->btn_enter->setIcon(QIcon(":/images/images/enter.svg"));
+    ui->btn_enter_num->setIcon(QIcon(":/images/images/enter.svg"));
     ui->btn_shift_l->setIcon(QIcon(":/images/images/capslock.svg"));
     ui->btn_shift_r->setIcon(QIcon(":/images/images/capslock.svg"));
     ui->btn_close->setIcon(QIcon(":/images/images/close.svg"));

@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1106</width>
+    <width>1132</width>
     <height>293</height>
    </rect>
   </property>
@@ -70,7 +70,7 @@
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="page_letter">
         <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -856,7 +856,7 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="0" colspan="2">
+             <item row="4" column="0">
               <widget class="QPushButton" name="btn_num_0">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
@@ -869,8 +869,21 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="2">
+             <item row="4" column="1">
               <widget class="QPushButton" name="btn_backspace_num">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="2">
+              <widget class="QPushButton" name="btn_enter_num">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
                  <horstretch>0</horstretch>
