@@ -125,7 +125,7 @@
     </message>
     <message>
         <source>Incorrect password, please input again</source>
-        <translation type="unfinished">Contraseña incorrecta, por favor ingrese nuevamente</translation>
+        <translation type="obsolete">Contraseña incorrecta, por favor ingrese nuevamente</translation>
     </message>
     <message>
         <source>Incorrect user name, please input again</source>
@@ -149,6 +149,10 @@
     </message>
     <message>
         <source>Username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Authentication failure, Please try again</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

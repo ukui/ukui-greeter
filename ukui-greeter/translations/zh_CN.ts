@@ -76,26 +76,26 @@
 <context>
     <name>GreeterWindow</name>
     <message>
-        <location filename="../greeter/greeterwindow.cpp" line="139"/>
-        <location filename="../greeter/greeterwindow.cpp" line="341"/>
+        <location filename="../greeter/greeterwindow.cpp" line="138"/>
+        <location filename="../greeter/greeterwindow.cpp" line="340"/>
         <source>Power dialog</source>
         <translation>电源对话框</translation>
     </message>
     <message>
-        <location filename="../greeter/greeterwindow.cpp" line="151"/>
-        <location filename="../greeter/greeterwindow.cpp" line="342"/>
+        <location filename="../greeter/greeterwindow.cpp" line="150"/>
+        <location filename="../greeter/greeterwindow.cpp" line="341"/>
         <source>On-screen keyboard, providing virtual keyboard function</source>
         <translation>屏幕键盘，提供虚拟键盘功能</translation>
     </message>
     <message>
-        <location filename="../greeter/greeterwindow.cpp" line="165"/>
-        <location filename="../greeter/greeterwindow.cpp" line="343"/>
+        <location filename="../greeter/greeterwindow.cpp" line="164"/>
+        <location filename="../greeter/greeterwindow.cpp" line="342"/>
         <source>Set the desktop environment for the selected user to log in.If the user is logged in, it will take effect after logging in again</source>
         <translation>设置选中用户登录后的桌面环境，如果用户已经登录，则会在重新登录后生效</translation>
     </message>
     <message>
-        <location filename="../greeter/greeterwindow.cpp" line="181"/>
-        <location filename="../greeter/greeterwindow.cpp" line="344"/>
+        <location filename="../greeter/greeterwindow.cpp" line="180"/>
+        <location filename="../greeter/greeterwindow.cpp" line="343"/>
         <source>Set the language of the selected user after logging in. If the user is logged in, it will take effect after logging in again.</source>
         <translation>设置选中用户登录后的语言，如果用户已登录，则在重新登录后生效</translation>
     </message>
@@ -103,7 +103,7 @@
 <context>
     <name>GreeterWrapper</name>
     <message>
-        <location filename="../greeter/greeterwrapper.cpp" line="112"/>
+        <location filename="../greeter/greeterwrapper.cpp" line="113"/>
         <source>failed to start session.</source>
         <translation>启动会话失败</translation>
     </message>
@@ -111,12 +111,14 @@
 <context>
     <name>IconEdit</name>
     <message>
-        <location filename="../greeter/iconedit.cpp" line="213"/>
+        <location filename="../greeter/iconedit.cpp" line="178"/>
+        <location filename="../greeter/iconedit.cpp" line="218"/>
         <source>Password: </source>
         <translation type="unfinished">密码：</translation>
     </message>
     <message>
-        <location filename="../greeter/iconedit.cpp" line="215"/>
+        <location filename="../greeter/iconedit.cpp" line="180"/>
+        <location filename="../greeter/iconedit.cpp" line="220"/>
         <source>Username</source>
         <translation type="unfinished">用户名</translation>
     </message>
@@ -132,65 +134,69 @@
 <context>
     <name>LoginWindow</name>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="345"/>
+        <location filename="../greeter/loginwindow.cpp" line="340"/>
         <source>logged in</source>
         <translation>已登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="425"/>
+        <location filename="../greeter/loginwindow.cpp" line="421"/>
         <source>login</source>
         <translation>登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="574"/>
+        <location filename="../greeter/loginwindow.cpp" line="572"/>
         <source>Incorrect user name, please input again</source>
         <translation>用户名不正确，请重新输入</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="198"/>
-        <location filename="../greeter/loginwindow.cpp" line="791"/>
+        <location filename="../greeter/loginwindow.cpp" line="192"/>
+        <location filename="../greeter/loginwindow.cpp" line="788"/>
         <source>Biometric Authentication</source>
         <translation>生物识别认证</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="201"/>
-        <location filename="../greeter/loginwindow.cpp" line="804"/>
+        <location filename="../greeter/loginwindow.cpp" line="195"/>
+        <location filename="../greeter/loginwindow.cpp" line="801"/>
         <source>Password Authentication</source>
         <translation>密码认证</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="204"/>
-        <location filename="../greeter/loginwindow.cpp" line="816"/>
+        <location filename="../greeter/loginwindow.cpp" line="198"/>
+        <location filename="../greeter/loginwindow.cpp" line="813"/>
         <source>Other Devices</source>
         <translation>其他设备</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="207"/>
-        <location filename="../greeter/loginwindow.cpp" line="617"/>
-        <location filename="../greeter/loginwindow.cpp" line="826"/>
+        <location filename="../greeter/loginwindow.cpp" line="201"/>
+        <location filename="../greeter/loginwindow.cpp" line="614"/>
+        <location filename="../greeter/loginwindow.cpp" line="823"/>
         <source>Retry</source>
         <translation>重试</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="515"/>
+        <location filename="../greeter/loginwindow.cpp" line="513"/>
         <source>Password: </source>
         <translation>密码：</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="580"/>
-        <location filename="../greeter/loginwindow.cpp" line="586"/>
-        <source>Incorrect password, please input again</source>
-        <translation type="unfinished">密码错误，请重新输入</translation>
+        <location filename="../greeter/loginwindow.cpp" line="578"/>
+        <location filename="../greeter/loginwindow.cpp" line="583"/>
+        <source>Authentication failure, Please try again</source>
+        <translation>认证失败，请重试</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="211"/>
-        <location filename="../greeter/loginwindow.cpp" line="300"/>
-        <location filename="../greeter/loginwindow.cpp" line="612"/>
+        <source>Incorrect password, please input again</source>
+        <translation type="obsolete">密码错误，请重新输入</translation>
+    </message>
+    <message>
+        <location filename="../greeter/loginwindow.cpp" line="205"/>
+        <location filename="../greeter/loginwindow.cpp" line="295"/>
+        <location filename="../greeter/loginwindow.cpp" line="609"/>
         <source>Login</source>
         <translation>登录</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="517"/>
+        <location filename="../greeter/loginwindow.cpp" line="515"/>
         <source>Username</source>
         <translation>用户名</translation>
     </message>

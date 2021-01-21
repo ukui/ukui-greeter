@@ -374,7 +374,7 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
     //设置用户名
     QString name = index.data(QLightDM::UsersModel::RealNameRole).toString();
     m_name = index.data(QLightDM::UsersModel::NameRole).toString();
-   // setUserName(name.isEmpty() ? m_name : name);
+    // setUserName(name.isEmpty() ? m_name : name);
 
     //设置头像
 //    QString facePath = index.data(QLightDM::UsersModel::ImagePathRole).toString();
@@ -412,6 +412,7 @@ void LoginWindow::startAuthentication()
 {
     prompted = false;
     unacknowledged_messages = false;
+    isloginauth = false;
     //用户认证
     if(m_name == "*guest")
     {                       //游客登录
@@ -448,6 +449,8 @@ void LoginWindow::stopWaiting()
 void LoginWindow::onLogin(const QString &str)
 {
     clearMessage();
+    unacknowledged_messages=false;
+    isloginauth = false;
     qDebug()<<m_name;
     if(m_name == "*guest")
     {
@@ -572,13 +575,12 @@ void LoginWindow::onAuthenticationComplete()
                     }
                     else{
                         if(!unacknowledged_messages)
-                            onShowMessage(tr("Incorrect password, please input again"), QLightDM::Greeter::MessageTypeError);
+                            onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeError);
                     }
-                       // m_name = "*login";
             }       
             else{
                 if(!unacknowledged_messages)
-                    onShowMessage(tr("Incorrect password, please input again"), QLightDM::Greeter::MessageTypeError);
+                    onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeError);
                 authMode = PASSWORD;
             }
             isManual = false;
@@ -789,7 +791,7 @@ void LoginWindow::initBiometricButtonWidget()
     m_biometricButton->setCursor(Qt::PointingHandCursor);
     QFontMetrics fm(m_biometricButton->font(), m_biometricButton);
     int width = fm.width(m_biometricButton->text());
-    m_biometricButton->setMaximumWidth(std::max(width + 20, 190));
+    m_biometricButton->setMaximumWidth(std::max(width + 50, 190));
     connect(m_biometricButton, &QPushButton::clicked,
             this, &LoginWindow::onBiometricButtonClicked);
 
@@ -799,7 +801,7 @@ void LoginWindow::initBiometricButtonWidget()
     m_passwordButton->setText(tr("Password Authentication"));
     fm = QFontMetrics(m_passwordButton->font(), m_passwordButton);
     width = fm.width(m_passwordButton->text());
-    m_passwordButton->setMaximumWidth(std::max(width + 20, 140));
+    m_passwordButton->setMaximumWidth(std::max(width + 50, 140));
     m_passwordButton->setSizePolicy(sizePolicy);
     m_passwordButton->setVisible(false);
     m_passwordButton->setCursor(Qt::PointingHandCursor);
@@ -810,7 +812,7 @@ void LoginWindow::initBiometricButtonWidget()
     m_otherDeviceButton->setObjectName(QStringLiteral("otherDeviceButton"));
     m_otherDeviceButton->setText(tr("Other Devices"));
     m_otherDeviceButton->setSizePolicy(sizePolicy);
-    m_otherDeviceButton->setMaximumWidth(std::max(width + 20, 140));
+    m_otherDeviceButton->setMaximumWidth(std::max(width + 50, 140));
     m_otherDeviceButton->setVisible(false);
     m_otherDeviceButton->setCursor(Qt::PointingHandCursor);
     connect(m_otherDeviceButton, &QPushButton::clicked,
