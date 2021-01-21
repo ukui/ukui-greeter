@@ -26,6 +26,7 @@
 #include <QDir>
 #include <QScreen>
 #include <QX11Info>
+#include <QByteArray>
 #include <QProcess>
 #include <QtMath>
 #include <QTimer>
@@ -34,6 +35,7 @@
 #include "common/configuration.h"
 #include "common/monitorwatcher.h"
 #include "display-switch/displayservice.h"
+#include <xcb/xcb.h>
 #include <X11/XKBlib.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
@@ -267,13 +269,15 @@ void MainWindow::screenCountEvent()
  */
 void MainWindow::onScreenCountChanged(int newCount)
 {
+
     if(newCount == m_monitorCount)
         return;
 
     if(newCount < 2) {
-        DisplayService displayService;
-        int mode = m_configuration->getValue("display-mode").toInt();
-        displayService.switchDisplayMode(DISPLAY_MODE_EXTEND);
+        QProcess enableMonitors;
+        //默认设置显示最大分辨率
+        enableMonitors.start("xrandr --auto");
+        enableMonitors.waitForFinished(-1);
     } else {
         DisplayService displayService;
         int mode = m_configuration->getValue("display-mode").toInt();
