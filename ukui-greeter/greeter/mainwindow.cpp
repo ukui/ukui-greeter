@@ -36,6 +36,7 @@
 #include "display-switch/displayservice.h"
 #include <X11/XKBlib.h>
 #include <X11/Xlib.h>
+#include <X11/extensions/Xrandr.h>
 #include <X11/keysymdef.h>
 #include <X11/keysym.h>
 
@@ -62,14 +63,20 @@ MainWindow::MainWindow(QWidget *parent)
       m_configuration(Configuration::instance()),
       m_activeScreen(nullptr),
       m_monitorWatcher(new MonitorWatcher(this)),
+      m_monitorCount(0),
       m_timer(nullptr),
       m_background(nullptr)
 {
+    setWindowFlags(Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
+
+    XRRQueryExtension(QX11Info::display(), &rr_event_base, &rr_error_base);
+    XRRSelectInput(QX11Info::display(), QX11Info::appRootWindow(), RRScreenChangeNotifyMask);
+
     QDesktopWidget *_desktop = QApplication::desktop();
     connect(_desktop, &QDesktopWidget::resized, this, &MainWindow::onScreenResized);
     /* QDesktopWidget对显示器的插拔的支持不好 */
-    connect(m_monitorWatcher, &MonitorWatcher::monitorCountChanged, this, &MainWindow::onScreenCountChanged);
-    connect(_desktop, &QDesktopWidget::screenCountChanged, this, &MainWindow::onScreenCountChanged);
+ //  connect(m_monitorWatcher, &MonitorWatcher::monitorCountChanged, this, &MainWindow::onScreenCountChanged);
+ //   connect(_desktop, &QDesktopWidget::screenCountChanged, this, &MainWindow::onScreenCountChanged);
     //设置窗口大小
     int totalWidth = 0;
     int totalHeight = 0;
@@ -125,7 +132,7 @@ MainWindow::MainWindow(QWidget *parent)
     moveToScreen(QApplication::primaryScreen());
     m_greeterWnd->initUI();
 
-    m_monitorWatcher->start();
+    //m_monitorWatcher->start();
 
     connect(m_timer, &QTimer::timeout, this, &MainWindow::onTransition);
 
@@ -143,6 +150,7 @@ MainWindow::MainWindow(QWidget *parent)
         XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, 0);
     }
 
+    qApp->installNativeEventFilter(this);
 }
 
 void MainWindow::paintEvent(QPaintEvent *e)
@@ -188,6 +196,39 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
     return QWidget::mouseMoveEvent(e);
 }
 
+void MainWindow::RRScreenChangeEvent()
+{
+    XRRScreenResources *screen;
+    screen = XRRGetScreenResources(QX11Info::display(), QX11Info::appRootWindow());
+    XRROutputInfo *info;
+    int count = 0;
+
+    for (int i = 0; i < screen->noutput; i++) {
+        info = XRRGetOutputInfo(QX11Info::display(), screen, screen->outputs[i]);
+        if (info->connection == RR_Connected) {
+            count++;
+        }
+        XRRFreeOutputInfo(info);
+    }
+
+    onScreenCountChanged(count);
+    onScreenResized();
+    XRRFreeScreenResources(screen);
+}
+
+bool MainWindow::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+{
+    if (qstrcmp(eventType, "xcb_generic_event_t") != 0) {
+        return false;
+    }
+    xcb_generic_event_t *event = reinterpret_cast<xcb_generic_event_t*>(message);
+    const uint8_t responseType = event->response_type & ~0x80;
+    if(responseType == rr_event_base + RRScreenChangeNotify){
+        RRScreenChangeEvent();
+    }
+    return false;
+}
+
 /**
  * 有屏幕分辨率发生改变,移动Greeter窗口位置
  */
@@ -226,10 +267,13 @@ void MainWindow::screenCountEvent()
  */
 void MainWindow::onScreenCountChanged(int newCount)
 {
+    if(newCount == m_monitorCount)
+        return;
+
     if(newCount < 2) {
-        QProcess enableMonitors;
-        enableMonitors.start("xrandr --auto");
-        enableMonitors.waitForFinished(-1);
+        DisplayService displayService;
+        int mode = m_configuration->getValue("display-mode").toInt();
+        displayService.switchDisplayMode(DISPLAY_MODE_EXTEND);
     } else {
         DisplayService displayService;
         int mode = m_configuration->getValue("display-mode").toInt();

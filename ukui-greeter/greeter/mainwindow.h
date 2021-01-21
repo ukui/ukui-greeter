@@ -21,6 +21,8 @@
 
 #include <QWidget>
 #include <QSharedPointer>
+#include <QAbstractNativeEventFilter>
+
 #include "screenmodel.h"
 
 
@@ -57,7 +59,7 @@ class GreeterWindow;
 class Configuration;
 class MonitorWatcher;
 class QTimer;
-class MainWindow : public QWidget
+class MainWindow : public QWidget , public QAbstractNativeEventFilter
 {
     Q_OBJECT
 public:
@@ -67,6 +69,7 @@ public:
 protected:
     void paintEvent(QPaintEvent *);
     void mouseMoveEvent(QMouseEvent *);
+    virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
 
 signals:
     void activeScreenChanged(const QRect& rect);
@@ -76,6 +79,7 @@ private slots:
     void onScreenCountChanged(int newCount);
     void onTransition();
     void screenCountEvent();
+    void RRScreenChangeEvent();
 
 private:
     void moveToScreen(QScreen *screen = nullptr);
@@ -110,6 +114,11 @@ private:
     Transition       m_transition;
 //    QPainter        *m_painter;
     BackgroundMode   m_backgroundMode;
+
+    int rr_event_base;
+    int rr_error_base;
+
+    int m_monitorCount;
 };
 
 #endif // MAINWINDOW_H
