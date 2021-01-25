@@ -220,12 +220,12 @@
     <message>
         <location filename="../greeter/powerwindow.cpp" line="206"/>
         <source>Suspend</source>
-        <translation>挂起</translation>
+        <translation>睡眠</translation>
     </message>
     <message>
         <location filename="../greeter/powerwindow.cpp" line="221"/>
         <source>Sleep</source>
-        <translation>睡眠</translation>
+        <translation>休眠</translation>
     </message>
     <message>
         <location filename="../greeter/powerwindow.cpp" line="152"/>
