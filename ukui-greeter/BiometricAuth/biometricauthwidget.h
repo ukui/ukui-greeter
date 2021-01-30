@@ -71,6 +71,7 @@ private:
     void updateImage(int type = 0);
     void setImage(const QString &path);
     void startAuth_();
+    bool getAuthDouble();
 
 private:
     QLabel          *lblNotify;
@@ -87,6 +88,7 @@ private:
     bool                beStopped;  //被强制终止
     int                 timeoutCount;
     QTimer              *retrytimer;
+    bool                usebind;
 };
 
 #endif // BIOMETRICAUTHWIDGET_H

@@ -4,12 +4,12 @@
 <context>
     <name>BiometricAuthWidget</name>
     <message>
-        <location filename="../BiometricAuth/biometricauthwidget.cpp" line="100"/>
+        <location filename="../BiometricAuth/biometricauthwidget.cpp" line="99"/>
         <source>Current device: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../BiometricAuth/biometricauthwidget.cpp" line="163"/>
+        <location filename="../BiometricAuth/biometricauthwidget.cpp" line="170"/>
         <source>Identify failed, Please retry.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -134,65 +134,71 @@
 <context>
     <name>LoginWindow</name>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="205"/>
-        <location filename="../greeter/loginwindow.cpp" line="295"/>
-        <location filename="../greeter/loginwindow.cpp" line="609"/>
+        <location filename="../greeter/loginwindow.cpp" line="208"/>
+        <location filename="../greeter/loginwindow.cpp" line="298"/>
+        <location filename="../greeter/loginwindow.cpp" line="647"/>
         <source>Login</source>
         <translation>вход</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="340"/>
+        <location filename="../greeter/loginwindow.cpp" line="343"/>
         <source>logged in</source>
         <translation>войти в систему</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="421"/>
+        <location filename="../greeter/loginwindow.cpp" line="431"/>
         <source>login</source>
         <translation>вход</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="513"/>
+        <location filename="../greeter/loginwindow.cpp" line="540"/>
+        <source>Please enter your password or enroll your fingerprint </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../greeter/loginwindow.cpp" line="542"/>
         <source>Password: </source>
         <translation>пароль: </translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="515"/>
+        <location filename="../greeter/loginwindow.cpp" line="545"/>
         <source>Username</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="572"/>
+        <location filename="../greeter/loginwindow.cpp" line="607"/>
         <source>Incorrect user name, please input again</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="578"/>
-        <location filename="../greeter/loginwindow.cpp" line="583"/>
+        <location filename="../greeter/loginwindow.cpp" line="613"/>
+        <location filename="../greeter/loginwindow.cpp" line="618"/>
+        <location filename="../greeter/loginwindow.cpp" line="967"/>
         <source>Authentication failure, Please try again</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="201"/>
-        <location filename="../greeter/loginwindow.cpp" line="614"/>
-        <location filename="../greeter/loginwindow.cpp" line="823"/>
+        <location filename="../greeter/loginwindow.cpp" line="204"/>
+        <location filename="../greeter/loginwindow.cpp" line="652"/>
+        <location filename="../greeter/loginwindow.cpp" line="890"/>
         <source>Retry</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="192"/>
-        <location filename="../greeter/loginwindow.cpp" line="788"/>
+        <location filename="../greeter/loginwindow.cpp" line="195"/>
+        <location filename="../greeter/loginwindow.cpp" line="855"/>
         <source>Biometric Authentication</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="195"/>
-        <location filename="../greeter/loginwindow.cpp" line="801"/>
+        <location filename="../greeter/loginwindow.cpp" line="198"/>
+        <location filename="../greeter/loginwindow.cpp" line="868"/>
         <source>Password Authentication</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="198"/>
-        <location filename="../greeter/loginwindow.cpp" line="813"/>
+        <location filename="../greeter/loginwindow.cpp" line="201"/>
+        <location filename="../greeter/loginwindow.cpp" line="880"/>
         <source>Other Devices</source>
         <translation type="unfinished"></translation>
     </message>

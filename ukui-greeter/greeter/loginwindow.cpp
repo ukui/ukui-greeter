@@ -43,10 +43,13 @@ LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
       authMode(UNKNOWN),
       m_deviceCount(-1),
       m_featureCount(-1),
+      isBioSuccess(false),
+      useDoubleAuth(false),
       m_biometricProxy(nullptr),
       m_biometricAuthWidget(nullptr),
       m_biometricDevicesWidget(nullptr),
       m_buttonsWidget(nullptr),
+      m_bioTimer(nullptr),
       m_biometricButton(nullptr),
       m_passwordButton(nullptr),
       m_otherDeviceButton(nullptr),
@@ -368,6 +371,13 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
     if(!index.isValid()){
         return false;
     }
+
+    if(m_biometricAuthWidget){
+        m_biometricAuthWidget->stopAuth();
+        if(m_bioTimer && m_bioTimer->isActive())
+            m_bioTimer->stop();
+    }
+
     //先清空设置
     reset();
 
@@ -485,9 +495,25 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
         {
             performBiometricAuth();
         }
+    }else if(text == BIOMETRIC_PAM_DOUBLE)
+    {
+        if(isBioSuccess){
+            m_greeter->respond(BIOMETRIC_SUCCESS);
+            return ;
+        }
+        useDoubleAuth = true;
+        if(authMode == PASSWORD)
+        {
+            skipBiometricAuth();
+        }
+        else
+        {
+            performBiometricAuth();
+        }
     }
     else
     {
+        showPasswordAuthWidget();
         m_name_is_login = false;
         qDebug()<<"m_name_is_login = false";
         stopWaiting();
@@ -509,8 +535,12 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
         prompted = true;
         unacknowledged_messages = false;
         qDebug()<<"unacknowledged_messages = false";
-        if(text == "Password: ")
+        if(text == "Password: "||text == "密码："){
+            if(useDoubleAuth)
+                 onShowMessage(tr("Please enter your password or enroll your fingerprint "), QLightDM::Greeter::MessageTypeInfo);
+
             text = tr("Password: ");
+        }
         if(text == "login:") {
             text = tr("Username");
             m_name = "*login";
@@ -544,6 +574,11 @@ void LoginWindow::onShowMessage(QString text, QLightDM::Greeter::MessageType typ
 void LoginWindow::onAuthenticationComplete()
 {
     stopWaiting();
+
+    if(m_biometricAuthWidget){
+        m_biometricAuthWidget->stopAuth();
+    }
+
     if(m_greeter->isAuthenticated()) {
         // 认证成功，启动session
         qDebug()<< "authentication success";
@@ -581,7 +616,10 @@ void LoginWindow::onAuthenticationComplete()
             else{
                 if(!unacknowledged_messages)
                     onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeError);
-                authMode = PASSWORD;
+                if(useDoubleAuth)
+                    authMode = BIOMETRIC;
+                else
+                    authMode = PASSWORD;
             }
             isManual = false;
             startAuthentication();
@@ -644,6 +682,22 @@ void LoginWindow::setDirLogin()
     direct_login = true;
 }
 
+void LoginWindow::pamBioSuccess()
+{
+     m_biometricAuthWidget->startAuth(m_deviceInfo, m_uid);
+     onShowMessage(tr("Please enter your password or enroll your fingerprint "), QLightDM::Greeter::MessageTypeInfo);
+     m_bioTimer->stop();
+}
+
+void LoginWindow::startBioAuth()
+{
+    if(!m_bioTimer){
+        m_bioTimer = new QTimer(this);
+        connect(m_bioTimer, SIGNAL(timeout()), this, SLOT(pamBioSuccess()));
+    }
+    m_bioTimer->start(1000);
+}
+
 void LoginWindow::performBiometricAuth()
 {
     if(!m_biometricProxy)
@@ -655,6 +709,7 @@ void LoginWindow::performBiometricAuth()
     if(!m_biometricProxy->isValid())
     {
         qWarning() << "An error occurs when connect to the biometric DBus";
+        useDoubleAuth = false;
         skipBiometricAuth();
         return;
     }
@@ -668,6 +723,7 @@ void LoginWindow::performBiometricAuth()
     //没有可用设备，不启用生物识别认证
     if(m_deviceCount < 1)
     {
+        useDoubleAuth = false;
         qWarning() << "No available devices";
         skipBiometricAuth();
         return;
@@ -680,19 +736,23 @@ void LoginWindow::performBiometricAuth()
     //没有可用特征，不启用生物识别认证    
     if(m_featureCount < 1)
     {
+        useDoubleAuth = false;
         skipBiometricAuth();
         return;
     }
 
     //初始化生物识别认证UI
-    initBiometricButtonWidget();
+    if(!useDoubleAuth)
+        initBiometricButtonWidget();
     initBiometricWidget();
-    clearMessage();
+
+    if(!useDoubleAuth)
+        clearMessage();
 
     //获取默认设备
     if(m_deviceName.isEmpty())
     {
-        m_deviceName = GetDefaultDevice(m_name);
+        m_deviceName = GetDefaultDevice("kylin");
     }
     qDebug() << m_deviceName;
 //    qDebug() << (m_deviceInfo ? m_deviceInfo->shortName : "");
@@ -701,6 +761,7 @@ void LoginWindow::performBiometricAuth()
     if(m_deviceName.isEmpty() && !m_deviceInfo)
     {
         qDebug() << "No default device";
+        useDoubleAuth = false;
         skipBiometricAuth();
         return;
     }
@@ -709,11 +770,19 @@ void LoginWindow::performBiometricAuth()
     {
         m_deviceInfo = m_biometricDevicesWidget->findDeviceByName(m_deviceName);
     }
+
     if(!m_deviceInfo)
     {
         qDebug() << "Device Not found: " << m_deviceName;
+        useDoubleAuth = false;
         skipBiometricAuth();
         return;
+    }
+
+    if(useDoubleAuth){
+        startBioAuth();
+        skipBiometricAuth();
+        return ;
     }
 
     authMode = BIOMETRIC;
@@ -896,12 +965,26 @@ void LoginWindow::onBiometricAuthComplete(bool result)
 {
     if(!result)
     {
-        m_retryButton->setVisible(!m_biometricAuthWidget->isHidden());
+        if(useDoubleAuth){
+               onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeInfo);
+               if(!isBioSuccess)
+                   startBioAuth();
+        }
+        else{
+            m_retryButton->setVisible(!m_biometricAuthWidget->isHidden());
+        }
     }
     else
     {
-        setDirLogin();
-        m_greeter->respond(BIOMETRIC_SUCCESS);
+        if(useDoubleAuth){
+            //onShowMessage("验证成功!", QLightDM::Greeter::MessageTypeInfo);
+            setDirLogin();
+            isBioSuccess = true;
+            onBiometricButtonClicked();
+        }else{
+            setDirLogin();
+            m_greeter->respond(BIOMETRIC_SUCCESS);
+        }
     }
 }
 
@@ -939,20 +1022,12 @@ void LoginWindow::onBiometricButtonClicked()
 void LoginWindow::onPasswordButtonClicked()
 {
     skipBiometricAuth();
-
-//    m_biometricAuthWidget->stopAuth();
 }
 
 void LoginWindow::onOtherDevicesButtonClicked()
 {
     m_biometricAuthWidget->stopAuth();
 
-//    m_backButton->hide();
-//    m_userWidget->hide();
-//    m_passwdWidget->hide();
-//    m_biometricAuthWidget->hide();
-//    m_buttonsWidget->hide();
-//    m_biometricDevicesWidget->show();
     showBiometricDeviceWidget();
 }
 

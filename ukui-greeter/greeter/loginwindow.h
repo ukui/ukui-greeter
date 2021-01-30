@@ -78,6 +78,7 @@ public slots:
     void onAuthenticationComplete();
     void setUserNotInView(const QString &userName);
     void changeEvent(QEvent *event);
+    void pamBioSuccess();
         
 private slots:
     void onLogin(const QString &str);
@@ -110,6 +111,7 @@ private:
     QPixmap PixmapToRound(const QPixmap &src, int radius);
     void show_authenticated (bool successful = true);
     void refreshTranslate();
+    void startBioAuth();
 
 private:
     GreeterWrapper      *m_greeter;
@@ -149,6 +151,7 @@ private:
     IconEdit        *m_passwordEdit;       //密码输入框
     QLabel          *m_messageLabel;         //PAM消息显示
     QPushButton     *m_messageButton;
+    QTimer          *m_bioTimer;
     bool isretry = true;
     bool prompted = false;
     bool unacknowledged_messages = false;
@@ -156,6 +159,8 @@ private:
     bool isauto_switch = false;
     bool direct_login = false;
     bool isChooseDev = false;
+    bool useDoubleAuth = false;
+    bool isBioSuccess =false;
 };
 
 #endif // LOGINWINDOW_H
