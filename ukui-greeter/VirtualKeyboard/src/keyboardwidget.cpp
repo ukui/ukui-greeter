@@ -125,16 +125,19 @@ float wScale = hScale;
 #define SET_ICON_SIZE(btn) \
     ui->btn_##btn->setIconSize(QSize(ui->btn_##btn->width(), ui->btn_##btn->height()));
 
+#define SET_ENTER_SHIFT_ICON_SIZE_SCALE(btn) \
+    ui->btn_##btn->setIconSize(QSize(ui->btn_##btn->width() * 0.4, ui->btn_##btn->height() * 0.4));
+
 void KeyboardWidget::setIconSize()
 {
     SET_ICON_SIZE_SCALE(backspace);
     SET_ICON_SIZE_SCALE(backspace_num);
-    SET_ICON_SIZE_SCALE(enter);
+    SET_ENTER_SHIFT_ICON_SIZE_SCALE(enter);
     SET_ICON_SIZE_SCALE(enter_num);
     SET_ICON_SIZE_SCALE(close);
     SET_ICON_SIZE_SCALE(super);
-    SET_ICON_SIZE_SCALE(shift_l);
-    SET_ICON_SIZE_SCALE(shift_r);
+    SET_ENTER_SHIFT_ICON_SIZE_SCALE(shift_l);
+    SET_ENTER_SHIFT_ICON_SIZE_SCALE(shift_r);
     SET_ICON_SIZE(up);
     SET_ICON_SIZE(down);
     SET_ICON_SIZE(left);
