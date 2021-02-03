@@ -69,8 +69,6 @@ MainWindow::MainWindow(QWidget *parent)
       m_timer(nullptr),
       m_background(nullptr)
 {
-    setWindowFlags(Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
-
     XRRQueryExtension(QX11Info::display(), &rr_event_base, &rr_error_base);
     XRRSelectInput(QX11Info::display(), QX11Info::appRootWindow(), RRScreenChangeNotifyMask);
 
@@ -80,14 +78,9 @@ MainWindow::MainWindow(QWidget *parent)
  //  connect(m_monitorWatcher, &MonitorWatcher::monitorCountChanged, this, &MainWindow::onScreenCountChanged);
  //   connect(_desktop, &QDesktopWidget::screenCountChanged, this, &MainWindow::onScreenCountChanged);
     //设置窗口大小
-    int totalWidth = 0;
-    int totalHeight = 0;
-    for(auto screen : QGuiApplication::screens())
-    {
-        totalWidth += screen->geometry().width();
-        totalHeight += screen->geometry().height();
-    }
-    setGeometry(0, 0, totalWidth, totalHeight);
+    QDesktopWidget *desktop = QApplication::desktop();
+    setGeometry(desktop->geometry());
+
     //设置监控鼠标移动
     setMouseTracking(true);
 
@@ -236,14 +229,9 @@ bool MainWindow::nativeEventFilter(const QByteArray &eventType, void *message, l
  */
 void MainWindow::onScreenResized()
 {
-    int totalWidth = 0;
-    int totalHeight = 0;
-    for(auto screen : QGuiApplication::screens())
-    {
-        totalWidth += screen->geometry().width();
-        totalHeight += screen->geometry().height();
-    }
-    setGeometry(0, 0, totalWidth, totalHeight);
+    QDesktopWidget *desktop = QApplication::desktop();
+    setGeometry(desktop->geometry());
+
     qDebug() << "screen resize to " << geometry();
 
     moveToScreen(QApplication::primaryScreen());
@@ -251,14 +239,9 @@ void MainWindow::onScreenResized()
 
 void MainWindow::screenCountEvent()
 {
-    int totalWidth = 0;
-    int totalHeight = 0;
-    for(auto screen : QGuiApplication::screens())
-    {
-        totalWidth += screen->geometry().width();
-        totalHeight += screen->geometry().height();
-    }
-    setGeometry(0, 0, totalWidth, totalHeight);
+    QDesktopWidget *desktop = QApplication::desktop();
+    setGeometry(desktop->geometry());
+
     moveToScreen(QApplication::primaryScreen());
     //需要重新绘制，否则背景图片大小会不正确
     repaint();

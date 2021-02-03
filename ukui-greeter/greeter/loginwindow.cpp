@@ -860,7 +860,7 @@ void LoginWindow::initBiometricButtonWidget()
     m_biometricButton->setCursor(Qt::PointingHandCursor);
     QFontMetrics fm(m_biometricButton->font(), m_biometricButton);
     int width = fm.width(m_biometricButton->text());
-    m_biometricButton->setMaximumWidth(std::max(width + 50, 190));
+    m_biometricButton->setMaximumWidth(std::max(width + 120, 190));
     connect(m_biometricButton, &QPushButton::clicked,
             this, &LoginWindow::onBiometricButtonClicked);
 
@@ -870,7 +870,7 @@ void LoginWindow::initBiometricButtonWidget()
     m_passwordButton->setText(tr("Password Authentication"));
     fm = QFontMetrics(m_passwordButton->font(), m_passwordButton);
     width = fm.width(m_passwordButton->text());
-    m_passwordButton->setMaximumWidth(std::max(width + 50, 140));
+    m_passwordButton->setMaximumWidth(std::max(width + 120, 140));
     m_passwordButton->setSizePolicy(sizePolicy);
     m_passwordButton->setVisible(false);
     m_passwordButton->setCursor(Qt::PointingHandCursor);
