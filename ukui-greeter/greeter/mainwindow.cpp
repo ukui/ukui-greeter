@@ -41,7 +41,7 @@
 #include <X11/extensions/Xrandr.h>
 #include <X11/keysymdef.h>
 #include <X11/keysym.h>
-
+#include <unistd.h>
 bool MainWindow::m_first = true;
 
 QT_BEGIN_NAMESPACE
@@ -76,7 +76,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(_desktop, &QDesktopWidget::resized, this, &MainWindow::onScreenResized);
     /* QDesktopWidget对显示器的插拔的支持不好 */
  //  connect(m_monitorWatcher, &MonitorWatcher::monitorCountChanged, this, &MainWindow::onScreenCountChanged);
- //   connect(_desktop, &QDesktopWidget::screenCountChanged, this, &MainWindow::onScreenCountChanged);
+    connect(_desktop, &QDesktopWidget::screenCountChanged, this, &MainWindow::onScreenResized);
     //设置窗口大小
     QDesktopWidget *desktop = QApplication::desktop();
     setGeometry(desktop->geometry());
@@ -207,7 +207,6 @@ void MainWindow::RRScreenChangeEvent()
     }
 
     onScreenCountChanged(count);
-    onScreenResized();
     XRRFreeScreenResources(screen);
 }
 
@@ -229,22 +228,26 @@ bool MainWindow::nativeEventFilter(const QByteArray &eventType, void *message, l
  */
 void MainWindow::onScreenResized()
 {
+    hide();
     QDesktopWidget *desktop = QApplication::desktop();
     setGeometry(desktop->geometry());
 
     qDebug() << "screen resize to " << geometry();
 
     moveToScreen(QApplication::primaryScreen());
+    show();
 }
 
 void MainWindow::screenCountEvent()
 {
+	
     QDesktopWidget *desktop = QApplication::desktop();
     setGeometry(desktop->geometry());
 
     moveToScreen(QApplication::primaryScreen());
     //需要重新绘制，否则背景图片大小会不正确
     repaint();
+
 }
 
 /**
@@ -252,9 +255,10 @@ void MainWindow::screenCountEvent()
  */
 void MainWindow::onScreenCountChanged(int newCount)
 {
-
     if(newCount == m_monitorCount)
         return;
+    
+    m_monitorCount = newCount;
 
     if(newCount < 2) {
         QProcess enableMonitors;
@@ -273,7 +277,7 @@ void MainWindow::onScreenCountChanged(int newCount)
 
     //在调用xrandr打开显示器以后，不能马上设置窗口大小，会设置不正确的
     //分辨率，延时500ms正常。
-    QTimer::singleShot(500,this,SLOT(screenCountEvent()));
+    //QTimer::singleShot(500,this,SLOT(screenCountEvent()));
 }
 
 /**
