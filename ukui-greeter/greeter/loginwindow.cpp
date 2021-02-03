@@ -604,14 +604,12 @@ void LoginWindow::onAuthenticationComplete()
             //如果用户输入了不存在的用户名导致的认证失败，让用户重新输入用户名
             if(isManual){
                     if(m_name_is_login){
-                        onShowMessage(tr("Incorrect user name, please input again"), QLightDM::Greeter::MessageTypeError);
                         m_name_is_login = false;
                         m_name = "*login";
                     }
-                    else{
-                        if(!unacknowledged_messages)
-                            onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeError);
-                    }
+                    
+		    if(!unacknowledged_messages)
+                        onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeError);
             }       
             else{
                 if(!unacknowledged_messages)
