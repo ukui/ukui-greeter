@@ -35,7 +35,7 @@ BiometricAuthWidget::BiometricAuthWidget(BiometricProxy *proxy, QWidget *parent)
     usebind = getAuthDouble();
     qDebug() << "BiometricAuthWidget::BiometricAuthWidget";
     initUI();
-    resize(400, 300);
+    resize(400, 200);
 
     if(this->proxy)
     {

@@ -108,9 +108,12 @@ void registerMetaType()
 
 QString GetDefaultDevice(const QString &userName)
 {
-    QString configPath = QString("/home/%1/" UKUI_BIOMETRIC_CONFIG_PATH).arg(userName);
-    QSettings settings(configPath, QSettings::IniFormat);
+//    QString configPath = QString("/home/%1/" UKUI_BIOMETRIC_CONFIG_PATH).arg(userName);
+//    QSettings settings(configPath, QSettings::IniFormat);
 //    qDebug() << "configure path: " << settings.fileName();
+	
+    QString configPath = QDir::homePath() + "/" + UKUI_BIOMETRIC_CONFIG_PATH; 
+    QSettings settings(configPath, QSettings::IniFormat);
 
     QString defaultDevice = settings.value("DefaultDevice").toString();
 
@@ -133,7 +136,8 @@ QString GetDefaultDevice(const QString &userName)
 static int getValueFromSettings(const QString &userName, const QString &key, int defaultValue = 3)
 {
     //从家目录下的配置文件中获取
-    QString configPath = QString("/home/%1/" UKUI_BIOMETRIC_CONFIG_PATH).arg(userName);
+//    QString configPath = QString("/home/%1/" UKUI_BIOMETRIC_CONFIG_PATH).arg(userName);
+    QString configPath = QDir::homePath() + "/" + UKUI_BIOMETRIC_CONFIG_PATH;
     QSettings settings(configPath, QSettings::IniFormat);
     QString valueStr = settings.value(key).toString();
 
