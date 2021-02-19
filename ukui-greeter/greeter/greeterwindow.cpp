@@ -280,16 +280,16 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     if(m_userWnd){
         m_userWnd->resize(CENTER_ENTRY_WIDTH*9 - ENTRY_WIDTH*4 + 240*scale, CENTER_ENTRY_HEIGHT);
         QRect userRect((width()-m_userWnd->width())/2,
-                       widgetTime->geometry().bottom() + 176*scale,
+                       height()/3,
                        m_userWnd->width(), m_userWnd->height());
         m_userWnd->setGeometry(userRect);
     }
-    if(m_loginWnd){
 
-    QRect loginRect((width()-m_loginWnd->width())/2,
-                        m_userWnd->y() + m_userWnd->height() + 46 *scale,
+    if(m_loginWnd){
+        QRect loginRect((width()-m_loginWnd->width())/2,
+                        m_userWnd->geometry().bottom(),
                         m_loginWnd->width(),
-                        height() - (m_userWnd->y() + m_userWnd->height() + 46 *scale));
+                        height() - m_userWnd->geometry().bottom());
         m_loginWnd->setGeometry(loginRect);
     }
 
