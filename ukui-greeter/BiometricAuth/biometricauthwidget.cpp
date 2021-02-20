@@ -29,7 +29,6 @@ BiometricAuthWidget::BiometricAuthWidget(BiometricProxy *proxy, QWidget *parent)
     retrytimer(nullptr),
     failedCount(0),
     usebind(false),
-    useMinImage(false),
     beStopped(false),
     timeoutCount(0)
 {
@@ -287,14 +286,9 @@ bool BiometricAuthWidget::getAuthDouble()
     return distribId;
 }
 
-void BiometricAuthWidget::setMinImage(bool val)
+void BiometricAuthWidget::setMinImage(float val)
 {
-    useMinImage = val;
-    if(useMinImage){
-        resize(400,150);
-        lblImage->setFixedSize(50, 50);
-    }else{
-        resize(400,200);
-        lblImage->setFixedSize(100, 100);
-    }
+    resize(400,100+100*val);
+    lblImage->setFixedSize(100*val, 100*val);
+
 }

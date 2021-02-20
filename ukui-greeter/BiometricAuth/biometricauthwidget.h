@@ -51,7 +51,7 @@ public:
     bool isAuthenticating()
     { return isInAuth; }
 
-    void setMinImage(bool);
+    void setMinImage(float val);
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -91,7 +91,6 @@ private:
     int                 timeoutCount;
     QTimer              *retrytimer;
     bool                usebind;
-    bool                useMinImage;//低分辨率下缩放图片
 };
 
 #endif // BIOMETRICAUTHWIDGET_H

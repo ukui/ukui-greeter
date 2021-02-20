@@ -920,10 +920,8 @@ void LoginWindow::setBiometricWidgetGeometry()
     //生物识别
     if(m_biometricAuthWidget)
     {
-        if(scale<=0.5)
-            m_biometricAuthWidget->setMinImage(true);
-        else
-            m_biometricAuthWidget->setMinImage(false);
+        if(scale>0 && scale <1)
+            m_biometricAuthWidget->setMinImage(scale);
 
         m_biometricAuthWidget->setGeometry(0, 0,
                                            width(), m_biometricAuthWidget->height());
@@ -942,7 +940,7 @@ void LoginWindow::setBiometricButtonWidgetGeometry()
     if(m_buttonsWidget)
     {
         if(scale > 0.5)
-            m_buttonsWidget->setGeometry(0, height() - 100 - m_buttonsWidget->height(),
+            m_buttonsWidget->setGeometry(0, height() - 100*scale - m_buttonsWidget->height(),
                                      width(), m_buttonsWidget->height());
         else
             m_buttonsWidget->setGeometry(0, height() - 20 - m_buttonsWidget->height(),
