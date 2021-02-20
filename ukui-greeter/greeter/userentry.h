@@ -26,13 +26,13 @@
 #define FACE_WIDTH (150 * scale)
 #define BORDER_WIDTH FACE_WIDTH
 #define IMG_WIDTH (150 * scale)
-#define ENTRY_HEIGHT (FACE_WIDTH + 50)
+#define ENTRY_HEIGHT (FACE_WIDTH + 70)
 #define ENTRY_WIDTH (150 * scale)
 
 #define CENTER_IMG_WIDTH (180 * scale)
 #define CENTER_FACE_WIDTH (180 * scale)
 #define CENTER_ENTRY_WIDTH (180 * scale )
-#define CENTER_ENTRY_HEIGHT (CENTER_FACE_WIDTH + 50)
+#define CENTER_ENTRY_HEIGHT (CENTER_FACE_WIDTH + 70)
 
 extern float scale;
 

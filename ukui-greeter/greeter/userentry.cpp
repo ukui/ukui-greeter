@@ -153,6 +153,8 @@ void UserEntry::setUserName(const QString &name)
          m_nameLabel->setToolTip(name);
      m_nameLabel->setText(str);
      m_nameLabel->setAlignment(Qt::AlignCenter);
+     m_nameLabel->adjustSize();
+     m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 32);
 }
 
 void UserEntry::setLogin(bool isLogin)

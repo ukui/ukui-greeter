@@ -142,6 +142,7 @@ void LoginWindow::initUI()
     setFocusProxy(m_passwordEdit);
 
     isloginauth = false;
+    isinput_passwd = false;
 }
 
 void LoginWindow::showEvent(QShowEvent *e)
@@ -368,6 +369,8 @@ QString LoginWindow::getPassword()
 
 bool LoginWindow::setUserIndex(const QModelIndex& index)
 {
+    isinput_passwd = false;
+
     if(!index.isValid()){
         return false;
     }
@@ -399,7 +402,7 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
 
     setChildrenGeometry();
 
-    if(!isloginauth)
+    //if(!isloginauth)
     	startAuthentication();
 
     isloginauth = false;
@@ -471,7 +474,10 @@ void LoginWindow::onLogin(const QString &str)
         isloginauth = true;
         isManual = true;
         m_name_is_login = true;
-        Q_EMIT userChangedByManual(str);
+	if (!isinput_passwd){
+		Q_EMIT userChangedByManual(str);
+		isinput_passwd = true;
+	}
         m_greeter->respond(str);
     }
     else
@@ -619,6 +625,7 @@ void LoginWindow::onAuthenticationComplete()
                 else
                     authMode = PASSWORD;
             }
+	    isinput_passwd = false;
             isManual = false;
             startAuthentication();
         }

@@ -40,6 +40,8 @@ public:
     void setCurrentUser(const QString &userName, bool entered = false);
     void pageUp();
     void pageDown();
+    /*qpair记录用户的上一个用户和下一用户的在list的位置*/
+    QList<QPair<UserEntry *, QPair<int ,int>>> userlist;
 
 protected:
   //  void keyReleaseEvent(QKeyEvent *event);
@@ -80,8 +82,6 @@ private:
 private:
     QAbstractListModel *usersModel;
     int currentUser;
-    /*qpair记录用户的上一个用户和下一用户的在list的位置*/
-    QList<QPair<UserEntry *, QPair<int ,int>>> userlist;
     SecurityUser *secUser;
     QTime lasttime;
     QTime mouseClickLast;

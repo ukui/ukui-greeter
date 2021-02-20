@@ -85,6 +85,7 @@ GreeterWindow::GreeterWindow(QWidget *parent)
     connect(m_greeter, SIGNAL(autologinTimerExpired()),this, SLOT(timedAutologin()));
     connect(m_greeter, SIGNAL(authenticationSucess()), this, SLOT(hide()));
     connect(m_greeter, SIGNAL(startSessionFailed()), this, SLOT(show()));
+    connect(m_greeter, SIGNAL(authenticationComplete()),this, SLOT(onAuthenticationComplete1()));
     installEventFilter(this);
 }
 
@@ -280,14 +281,14 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     if(m_userWnd){
         m_userWnd->resize(CENTER_ENTRY_WIDTH*9 - ENTRY_WIDTH*4 + 240*scale, CENTER_ENTRY_HEIGHT);
         QRect userRect((width()-m_userWnd->width())/2,
-                       height()/3,
+                       height()/3 - 20,
                        m_userWnd->width(), m_userWnd->height());
         m_userWnd->setGeometry(userRect);
     }
 
     if(m_loginWnd){
         QRect loginRect((width()-m_loginWnd->width())/2,
-                        m_userWnd->geometry().bottom(),
+                        m_userWnd->geometry().bottom() + 46 *scale,
                         m_loginWnd->width(),
                         height() - m_userWnd->geometry().bottom());
         m_loginWnd->setGeometry(loginRect);
@@ -514,6 +515,16 @@ void GreeterWindow::updateSession(QString userName)
 
 void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
 {
+    for(int i = 0;i<m_userWnd->userlist.count();i++)
+    {
+        uid_t uid =  index.data(QLightDM::UsersModel::UidRole).toUInt();
+        qDebug()<< "uid==" << uid;
+
+        UserEntry *entry = m_userWnd->userlist.at(i).first;
+          if(entry->userIndex().data(QLightDM::UsersModel::NameRole).toString() == "*login")
+               entry->setUserName(tr("Login"));
+    }
+
     setBackground(index);
 
     if(!m_languageHasChanged)
@@ -849,3 +860,12 @@ bool GreeterWindow::sessionIsValid(const QString &session)
     return false;
 }
 
+void GreeterWindow::onAuthenticationComplete1()
+{
+    for(int i = 0;i<m_userWnd->userlist.count();i++)
+    {
+        UserEntry *entry = m_userWnd->userlist.at(i).first;
+          if(entry->userIndex().data(QLightDM::UsersModel::NameRole).toString() == "*login")
+               entry->setUserName(tr("Login"));
+    }
+}

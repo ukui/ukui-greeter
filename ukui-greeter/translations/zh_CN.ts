@@ -99,6 +99,10 @@
         <source>Set the language of the selected user after logging in. If the user is logged in, it will take effect after logging in again.</source>
         <translation>设置选中用户登录后的语言，如果用户已登录，则在重新登录后生效</translation>
     </message>
+    <message>
+        <source>Login</source>
+        <translation>登录</translation>
+    </message>    
 </context>
 <context>
     <name>GreeterWrapper</name>

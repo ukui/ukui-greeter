@@ -53,6 +53,7 @@ protected:
 
 
 private slots:
+    void onAuthenticationComplete1();
     void onUserSelected(const QModelIndex &);
     void onCurrentUserChanged(const QModelIndex&);
     void timedAutologin();

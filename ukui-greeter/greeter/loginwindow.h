@@ -56,6 +56,7 @@ public:
     bool isloginauth;
     void setDirLogin();
     bool getIsChooseDev();
+    bool isinput_passwd;
 
 protected:
     void showEvent(QShowEvent *);

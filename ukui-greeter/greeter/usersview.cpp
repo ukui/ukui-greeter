@@ -190,6 +190,11 @@ void UsersView::setCurrentUser(const QString &userName, bool entered)
                 setCurrentRow(i);
             return ;
         }
+        else if(entry->userIndex().data(QLightDM::UsersModel::NameRole).toString() == "*login")
+        {
+            entry->setUserName(userName);
+            return ;
+       }	
     }
 }
 
