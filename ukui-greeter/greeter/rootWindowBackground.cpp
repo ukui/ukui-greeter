@@ -17,26 +17,17 @@
  * 02110-1301, USA.
 **/
 
+#include <QScreen>
+#include <QX11Info>
+#include <QRect>
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QDebug>
 #include <stdio.h>
 #include <X11/Xlib.h>
 #include <Imlib2.h>
 
 #include "rootWindowBackground.h"
-
-
-static void x11_get_screen_size(Display *display,int *width,int *height)
-{
-    if (display == NULL) {
-        fprintf(stderr, "Cannot connect to X server %s/n", "simey:0");
-    	return;
-    }
-    int screen_num;
-
-    screen_num = DefaultScreen(display);
-
-    *width = DisplayWidth(display, screen_num);
-    *height = DisplayHeight(display, screen_num);
-}
 
 void setRootWindowBackground(char *filename)
 {
@@ -57,8 +48,10 @@ void setRootWindowBackground(char *filename)
     if (!dpy)
         return ;
     int width = 0,height = 0;
-    x11_get_screen_size(dpy,&width,&height);
-    
+   
+    width = QApplication::desktop()->geometry().width();
+    height = QApplication::desktop()->geometry().height();
+ 
     scn = DefaultScreenOfDisplay(dpy);
     root = DefaultRootWindow(dpy);
 
@@ -70,7 +63,12 @@ void setRootWindowBackground(char *filename)
     imlib_context_set_colormap(DefaultColormapOfScreen(scn));
     imlib_context_set_drawable(pix);
 
-    imlib_render_image_on_drawable_at_size(0, 0, width, height);
+    for(QScreen *screen : QApplication::screens()){
+        //在每个屏幕上绘制背景
+        QRect rect = screen->geometry();
+        imlib_render_image_on_drawable_at_size(rect.x(), rect.y(), rect.width(),rect.height());
+    }
+ 
     XSetWindowBackgroundPixmap(dpy, root, pix);
     XClearWindow(dpy, root);
 
