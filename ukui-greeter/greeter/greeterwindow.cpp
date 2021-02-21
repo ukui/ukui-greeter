@@ -438,11 +438,12 @@ void GreeterWindow::setBackground(const QModelIndex &index)
     }
  
     //登录后绘制桌面背景而不是登录背景
-    m_greeter->setrootWindowBackground(backgroundPath);
+    m_greeter->setrootWindowBackground(rootWinPicture,0,backgroundPath);
 
     //读取/var/lib/lightdm-date/用户名/ukui-greeter.conf,
     //判断是否设置了该用户的登陆界面的背景图片.
-    QString userConfigurePath = m_greeter->getEnsureShareDir(index.data(QLightDM::UsersModel::NameRole).toString()) + "/ukui-greeter.conf";
+    //QString userConfigurePath = m_greeter->getEnsureShareDir(index.data(QLightDM::UsersModel::NameRole).toString()) + "/ukui-greeter.conf";
+    QString userConfigurePath = "/var/lib/lightdm-data/" + index.data(QLightDM::UsersModel::NameRole).toString() + "/ukui-greeter.conf";
     QFile backgroundFile(userConfigurePath);
     if(backgroundFile.exists()){
         QSettings settings(userConfigurePath,QSettings::IniFormat);
@@ -451,6 +452,15 @@ void GreeterWindow::setBackground(const QModelIndex &index)
             QString filepath = settings.value("backgroundPath").toString();
             if(!filepath.isEmpty() && isPicture(filepath)){
                 backgroundPath = filepath;
+            }
+        }
+        if(settings.contains("color")){
+            QString drawBackgroundColor = settings.value("color").toString();
+       	    if(drawBackgroundColor.length() == 7 && drawBackgroundColor.startsWith("#")){
+            drawBackgroundColor = drawBackgroundColor.remove(0,1);
+                bool ok;
+                int color = drawBackgroundColor.toUInt(&ok,16);
+                m_greeter->setrootWindowBackground(rootWinColor,color,NULL);
             }
         }
         settings.endGroup();

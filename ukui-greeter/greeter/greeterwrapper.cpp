@@ -32,6 +32,9 @@ GreeterWrapper::GreeterWrapper(QObject *parent) : QLightDM::Greeter(parent)
         qDebug() << "connect to Daemon failed";
         exit(1);
     }
+
+    drawBackgroundType = 0;
+    drawBackgroundColor = 0x0;
 }
 
 void GreeterWrapper::setLang(const QString &lang)
@@ -64,31 +67,31 @@ void GreeterWrapper::setUserName(const QString &userName)
     m_userName = userName;
 }
 
-void GreeterWrapper::setrootWindowBackground(QString path)
+void GreeterWrapper::setrootWindowBackground(int type,unsigned int color,QString filename)
 {
-    m_rootWindowBackground = path;
+    drawBackgroundType = type;
+    if(drawBackgroundType == rootWinPicture)
+        m_rootWindowBackground = filename;
+    else if(drawBackgroundType == rootWinColor)
+        drawBackgroundColor = color;  
 }
 
 void GreeterWrapper::setrootWindow()
 {
-     Configuration  *m_configure = Configuration::instance();
-     QString m_defaultBackgroundPath = m_configure->getDefaultBackgroundName();
-     if(m_rootWindowBackground.isEmpty())
-         m_rootWindowBackground = m_defaultBackgroundPath;
-     if(m_rootWindowBackground.isEmpty())
-         return;
-     char*  path;
-     QByteArray ba = m_rootWindowBackground.toLatin1(); // must
-     path=ba.data();
+    Configuration  *m_configure = Configuration::instance();
+    QString m_defaultBackgroundPath = m_configure->getDefaultBackgroundName();
+    if(m_rootWindowBackground.isEmpty())
+        m_rootWindowBackground = m_defaultBackgroundPath;
+    if(m_rootWindowBackground.isEmpty())
+        return;
+    char*  path;
+    QByteArray ba = m_rootWindowBackground.toLatin1(); // must
+    path=ba.data();
 
-     QDesktopWidget desktop;
-     setRootWindowBackground(path);
-
-     QString configPath = "/tmp/greeter-background.conf";
-     QSettings settings1(configPath, QSettings::IniFormat);
-     settings1.setIniCodec(QTextCodec::codecForName("UTF-8"));
-     settings1.setValue("Greeter",m_rootWindowBackground);
-     settings1.sync();
+    if(drawBackgroundType == 0)
+     	setRootWindowBackground(0,0,path);
+    else
+        setRootWindowBackground(1,drawBackgroundColor,NULL);
 }
 
 QString GreeterWrapper::getEnsureShareDir(QString username)

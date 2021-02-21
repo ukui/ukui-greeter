@@ -29,20 +29,13 @@
 
 #include "rootWindowBackground.h"
 
-void setRootWindowBackground(char *filename)
+void setRootWindowBackground(bool type,unsigned int color,char *filename)
 {
     Imlib_Image img;
     Display *dpy;
     Pixmap pix;
     Window root;
     Screen *scn;
-
-    img = imlib_load_image(filename);
-    if (!img) {
-        fprintf(stderr, "%s:Unable to load image\n", filename);
-    	return ;
-    }
-    imlib_context_set_image(img);
 
     dpy = XOpenDisplay(NULL);
     if (!dpy)
@@ -62,6 +55,28 @@ void setRootWindowBackground(char *filename)
     imlib_context_set_visual(DefaultVisualOfScreen(scn));
     imlib_context_set_colormap(DefaultColormapOfScreen(scn));
     imlib_context_set_drawable(pix);
+	
+    if(type == 0){    
+        img = imlib_load_image(filename);
+        if (!img) {
+            fprintf(stderr, "%s:Unable to load image\n", filename);
+            return ;
+        }
+	imlib_context_set_image(img);
+
+    }else if(type == 1){
+    	img = imlib_create_image(width, height);
+    	imlib_context_set_image(img);
+        int blue = color & 0xFF;
+        int green = color >> 8 & 0xFF;
+    	int red = color >> 16 & 0xFF;
+
+    	qDebug()<<"red = "<<red<<" green = "<<green<<" blue = "<<blue;
+        imlib_context_set_color(red, green,blue, 255);
+    	imlib_image_fill_rectangle(0, 0, width, height);
+    }
+
+    imlib_context_set_image(img);
 
     for(QScreen *screen : QApplication::screens()){
         //在每个屏幕上绘制背景

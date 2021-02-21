@@ -17,4 +17,4 @@
  * 02110-1301, USA.
 **/
 
-void setRootWindowBackground(char *filename);
+void setRootWindowBackground(bool type,unsigned int color,char *filename);
