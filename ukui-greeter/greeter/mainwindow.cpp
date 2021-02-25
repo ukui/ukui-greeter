@@ -133,7 +133,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     bool numlockState = true;
     numlockState = m_configuration->getLastNumLock();
-
+/*
     if(numlockState){
         //默认打开numlock需要设置两次，否则灯和效果可能不一致，原因不知
         unsigned int num_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Num_Lock);
@@ -144,7 +144,7 @@ MainWindow::MainWindow(QWidget *parent)
         XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, num_mask);
         XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, 0);
     }
-
+*/
     qApp->installNativeEventFilter(this);
 }
 
