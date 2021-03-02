@@ -474,11 +474,13 @@ void LoginWindow::onLogin(const QString &str)
         isloginauth = true;
         isManual = true;
         m_name_is_login = true;
+	
+	m_greeter->respond(str);
+	
 	if (!isinput_passwd){
 		Q_EMIT userChangedByManual(str);
 		isinput_passwd = true;
 	}
-        m_greeter->respond(str);
     }
     else
     {  //发送密码
