@@ -197,10 +197,12 @@ int main(int argc, char *argv[])
     QPoint center = w.mapFromGlobal(pt);
     QCursor::setPos(center);
 
+    /*
     DisplaySwitch ds(&w);
     ds.connect(&w, &MainWindow::activeScreenChanged, &ds, &DisplaySwitch::onPositionChanged);
     QObject::connect(XEventMonitor::instance(), SIGNAL(keyRelease(QString)),
                      &ds, SLOT(onGlobalKeyRelease(QString)));
+    */
 
     return a.exec();
 }
