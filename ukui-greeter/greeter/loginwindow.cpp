@@ -759,7 +759,7 @@ void LoginWindow::performBiometricAuth()
     //获取默认设备
     if(m_deviceName.isEmpty())
     {
-        m_deviceName = GetDefaultDevice("kylin");
+        m_deviceName = GetDefaultDevice(m_name);
     }
     qDebug() << m_deviceName;
 //    qDebug() << (m_deviceInfo ? m_deviceInfo->shortName : "");
