@@ -22,6 +22,8 @@
 #include <QWidget>
 #include <QStackedLayout>
 #include <QSharedPointer>
+#include <QTranslator>
+#include <QLocale>
 #include "loginwindow.h"
 #include "sessionwindow.h"
 #include "usersmodel.h"
@@ -44,11 +46,14 @@ public:
     void initUI();
 
 protected:
-    void resizeEvent(QResizeEvent *);
+    void resizeEvent(QResizeEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);
+    void changeEvent(QEvent *event);
+
 
 private slots:
+    void onAuthenticationComplete1();
     void onUserSelected(const QModelIndex &);
     void onCurrentUserChanged(const QModelIndex&);
     void timedAutologin();
@@ -70,6 +75,7 @@ private:
     void updateLanguage(QString userName);
     void updateSession(QString userName);
     void setUserWindowVisible(bool visible);
+    void refreshTranslate();
     QString getAccountBackground(uid_t uid);
 
     UsersView               *m_userWnd;
@@ -94,6 +100,7 @@ private:
     QWidget	    	    *widgetTime;
     QLabel		    *lblDate;
     QLabel		    *lblTime;
+    QLocale         local;
 };
 
 #endif // GREETERWINDOW_H

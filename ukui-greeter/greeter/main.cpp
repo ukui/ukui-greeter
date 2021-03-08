@@ -24,6 +24,8 @@
 #include <QResource>
 #include <QTranslator>
 #include <QLocale>
+#include <QPoint>
+#include <QCursor>
 #include <QDateTime>
 #include <QDebug>
 #include <QStandardPaths>
@@ -34,12 +36,14 @@
 #include <X11/Xlib.h>
 #include <X11/XKBlib.h>
 #include <X11/keysym.h>
+#include <X11/Xatom.h>
 #include <X11/cursorfont.h>
 #include <X11/extensions/Xrandr.h>
 #include "globalv.h"
 #include "mainwindow.h"
 #include "display-switch/displayswitch.h"
 #include "xeventmonitor.h"
+#include "configuration.h"
 
 void outputMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -108,8 +112,25 @@ void x11_get_screen_size(int *width,int *height)
 
 }
 
+void XsettingsHidpi()
+{
+    Display    *dpy;
+    int w,h;
+    x11_get_screen_size (&w, &h);
+    dpy = XOpenDisplay (NULL);
+    if(h > 2000){
+        XChangeProperty(dpy, RootWindow (dpy, 0),
+                XA_RESOURCE_MANAGER, XA_STRING, 8, PropModeReplace, (unsigned char *) "Xft.dpi:	192\n", 13);
+    }else{
+        XChangeProperty(dpy, RootWindow (dpy, 0),
+            XA_RESOURCE_MANAGER, XA_STRING, 8, PropModeReplace, (unsigned char *) "Xft.dpi:	96\n", 12);
+    }
+    XCloseDisplay (dpy);
+}
+
 int main(int argc, char *argv[])
 {
+    XsettingsHidpi ();
     qInstallMessageHandler(outputMessage);
 
 #if(QT_VERSION>=QT_VERSION_CHECK(5,6,0))
@@ -129,13 +150,14 @@ int main(int argc, char *argv[])
     language = QLocale::system().language();
     qDebug() << "current locale language: " << QLocale::languageToString(language);
 
+    Configuration *m_configuration = Configuration::instance();
     //加载翻译文件
-    QTranslator translator;
+    m_configuration->m_trans =  new QTranslator();
     QString qmFile = QM_DIR + QString("%1.qm").arg(QLocale::system().name());
-    translator.load(qmFile);
+     m_configuration->m_trans->load(qmFile);
     qDebug() << "load translation file " << qmFile;
 
-    a.installTranslator(&translator);
+    qApp->installTranslator( m_configuration->m_trans);
 
     //加载qss文件
     QFile qss(":/ukui-greeter.qss");
@@ -150,7 +172,7 @@ int main(int argc, char *argv[])
 
     //设置鼠标指针样式
     XDefineCursor(QX11Info::display(), QX11Info::appRootWindow(), XCreateFontCursor(QX11Info::display(), XC_arrow));
-
+/*
     //默认打开numlock,以及关闭caps lock,需要设置两次，否则灯和效果可能不一致，原因不知
     unsigned int num_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Num_Lock);
     XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, 0);
@@ -159,7 +181,7 @@ int main(int argc, char *argv[])
     unsigned int caps_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Caps_Lock); 
     XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, caps_mask, caps_mask);
     XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, caps_mask, 0);
-
+*/
     //等待显示器准备完毕
     /*waitMonitorsReady();
     qDebug() << "monitors ready"*/;
@@ -168,15 +190,19 @@ int main(int argc, char *argv[])
 
     MainWindow w;
 
-
     w.showFullScreen();
     //在没有窗口管理器的情况下，需要激活窗口，行为类似于用鼠标点击窗口
     w.activateWindow();
+    QPoint pt(QApplication::primaryScreen()->geometry().x() + 100,QApplication::primaryScreen()->geometry().y() + 100);
+    QPoint center = w.mapFromGlobal(pt);
+    QCursor::setPos(center);
 
+    /*
     DisplaySwitch ds(&w);
     ds.connect(&w, &MainWindow::activeScreenChanged, &ds, &DisplaySwitch::onPositionChanged);
     QObject::connect(XEventMonitor::instance(), SIGNAL(keyRelease(QString)),
                      &ds, SLOT(onGlobalKeyRelease(QString)));
+    */
 
     return a.exec();
 }

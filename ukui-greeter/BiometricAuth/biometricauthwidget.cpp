@@ -28,12 +28,14 @@ BiometricAuthWidget::BiometricAuthWidget(BiometricProxy *proxy, QWidget *parent)
     movieTimer(nullptr),
     retrytimer(nullptr),
     failedCount(0),
+    usebind(false),
     beStopped(false),
     timeoutCount(0)
 {
+    usebind = getAuthDouble();
     qDebug() << "BiometricAuthWidget::BiometricAuthWidget";
     initUI();
-    resize(400, 300);
+    resize(400, 200);
 
     if(this->proxy)
     {
@@ -62,7 +64,7 @@ void BiometricAuthWidget::initUI()
 
 void BiometricAuthWidget::resizeEvent(QResizeEvent */*event*/)
 {
-    lblNotify->setGeometry(0, 0, width(), 40);
+    lblNotify->setGeometry(0, 0, width(), 45);
     lblDevice->setGeometry(0, lblNotify->geometry().bottom()+5, width(), 30);
     lblImage->setGeometry((width() - lblImage->width()) / 2,
                            lblDevice->geometry().bottom() + 10,
@@ -89,9 +91,6 @@ void BiometricAuthWidget::startAuth(DeviceInfoPtr device, int uid)
     this->failedCount = 0;
     this->timeoutCount = 0;
     this->beStopped = false;
-
-
-    proxy->StopOps(device->id);
     startAuth_();
 }
 
@@ -130,6 +129,9 @@ void BiometricAuthWidget::stopAuth()
 
 void BiometricAuthWidget::onIdentifyComplete(QDBusPendingCallWatcher *watcher)
 {
+    if(beStopped == true)
+        return ;
+
     QDBusPendingReply<int, int> reply = *watcher;
     if(reply.isError())
     {
@@ -151,6 +153,11 @@ void BiometricAuthWidget::onIdentifyComplete(QDBusPendingCallWatcher *watcher)
     // 特征识别不匹配
     else if(result == DBUS_RESULT_NOTMATCH)
     {
+        if(usebind){
+            Q_EMIT authComplete(false);
+            return;
+        }
+
         qDebug() << "Identify failed";
         failedCount++;
         qDebug() << "max auto retry: " << GetMaxFailedAutoRetry(userName) << failedCount;
@@ -175,6 +182,11 @@ void BiometricAuthWidget::onIdentifyComplete(QDBusPendingCallWatcher *watcher)
     //识别发生错误
     else if(result == DBUS_RESULT_ERROR)
     {
+        if(usebind){
+            Q_EMIT authComplete(false);
+            return;
+        }
+
         StatusReslut ret = proxy->UpdateStatus(device->id);
         //识别操作超时
         if(ret.result == 0 && ret.opsStatus == IDENTIFY_TIMEOUT)
@@ -265,4 +277,18 @@ void BiometricAuthWidget::setImage(const QString &path)
     image = image.scaled(lblImage->width(), lblImage->height(),
                          Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     lblImage->setPixmap(image);
+}
+
+bool BiometricAuthWidget::getAuthDouble()
+{
+    QSettings settings("/etc/biometric-auth/ukui-biometric.conf", QSettings::IniFormat);
+    bool distribId = settings.value("DoubleAuth").toBool();
+    return distribId;
+}
+
+void BiometricAuthWidget::setMinImage(float val)
+{
+    resize(400,100+100*val);
+    lblImage->setFixedSize(100*val, 100*val);
+
 }

@@ -21,6 +21,7 @@
 
 #include <QObject>
 #include <QSettings>
+#include <QTranslator>
 #include <QPixmap>
 
 class Configuration : public QObject
@@ -41,12 +42,14 @@ public:
     void saveLastNumLock(bool value);
     QPixmap getLogo();
     QString getDefaultBackgroundName();
+    QTranslator             *m_trans;
 
 private:
     QSettings               *configSettings;
     QSettings               *recordSettings;
 
     static Configuration    *instance_;
+
 };
 
 #endif // CONFIGURATION_H

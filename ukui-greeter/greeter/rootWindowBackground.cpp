@@ -17,28 +17,19 @@
  * 02110-1301, USA.
 **/
 
+#include <QScreen>
+#include <QX11Info>
+#include <QRect>
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QDebug>
 #include <stdio.h>
 #include <X11/Xlib.h>
 #include <Imlib2.h>
 
 #include "rootWindowBackground.h"
 
-
-static void x11_get_screen_size(Display *display,int *width,int *height)
-{
-    if (display == NULL) {
-        fprintf(stderr, "Cannot connect to X server %s/n", "simey:0");
-    	return;
-    }
-    int screen_num;
-
-    screen_num = DefaultScreen(display);
-
-    *width = DisplayWidth(display, screen_num);
-    *height = DisplayHeight(display, screen_num);
-}
-
-void setRootWindowBackground(char *filename)
+void setRootWindowBackground(bool type,unsigned int color,char *filename)
 {
     Imlib_Image img;
     Display *dpy;
@@ -46,19 +37,14 @@ void setRootWindowBackground(char *filename)
     Window root;
     Screen *scn;
 
-    img = imlib_load_image(filename);
-    if (!img) {
-        fprintf(stderr, "%s:Unable to load image\n", filename);
-    	return ;
-    }
-    imlib_context_set_image(img);
-
     dpy = XOpenDisplay(NULL);
     if (!dpy)
         return ;
     int width = 0,height = 0;
-    x11_get_screen_size(dpy,&width,&height);
-    
+   
+    width = QApplication::desktop()->geometry().width();
+    height = QApplication::desktop()->geometry().height();
+ 
     scn = DefaultScreenOfDisplay(dpy);
     root = DefaultRootWindow(dpy);
 
@@ -69,8 +55,35 @@ void setRootWindowBackground(char *filename)
     imlib_context_set_visual(DefaultVisualOfScreen(scn));
     imlib_context_set_colormap(DefaultColormapOfScreen(scn));
     imlib_context_set_drawable(pix);
+	
+    if(type == 0){    
+        img = imlib_load_image(filename);
+        if (!img) {
+            fprintf(stderr, "%s:Unable to load image\n", filename);
+            return ;
+        }
+	imlib_context_set_image(img);
 
-    imlib_render_image_on_drawable_at_size(0, 0, width, height);
+    }else if(type == 1){
+    	img = imlib_create_image(width, height);
+    	imlib_context_set_image(img);
+        int blue = color & 0xFF;
+        int green = color >> 8 & 0xFF;
+    	int red = color >> 16 & 0xFF;
+
+    	qDebug()<<"red = "<<red<<" green = "<<green<<" blue = "<<blue;
+        imlib_context_set_color(red, green,blue, 255);
+    	imlib_image_fill_rectangle(0, 0, width, height);
+    }
+
+    imlib_context_set_image(img);
+
+    for(QScreen *screen : QApplication::screens()){
+        //在每个屏幕上绘制背景
+        QRect rect = screen->geometry();
+        imlib_render_image_on_drawable_at_size(rect.x(), rect.y(), rect.width(),rect.height());
+    }
+ 
     XSetWindowBackgroundPixmap(dpy, root, pix);
     XClearWindow(dpy, root);
 

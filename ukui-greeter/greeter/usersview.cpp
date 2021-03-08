@@ -49,7 +49,7 @@
 UsersView::UsersView(QWidget *parent) :
     QWidget(parent),
     usersModel(nullptr),
-    currentUser(0),
+    currentUser(-1),
     secUser(SecurityUser::instance()),
     lasttime(QTime::currentTime()),
     mouseClickLast(QTime::currentTime())
@@ -186,9 +186,15 @@ void UsersView::setCurrentUser(const QString &userName, bool entered)
         UserEntry *entry = userlist.at(i).first;
         if(entry->userIndex().data(QLightDM::UsersModel::NameRole).toString() == userName)
         {
-            setCurrentRow(i);
+            if(i != currentUser)
+                setCurrentRow(i);
             return ;
         }
+        else if(entry->userIndex().data(QLightDM::UsersModel::NameRole).toString() == "*login")
+        {
+            entry->setUserName(userName);
+            return ;
+       }	
     }
 }
 
@@ -196,7 +202,7 @@ void UsersView::onGlobalKeyRelease(const QString &key)
 {
     /*添加一定延时，避免按键太快*/	
     int interval = lasttime.msecsTo(QTime::currentTime());
-    if(interval < 200 && interval > -200)
+    if(interval < 300 && interval > -300)
         return ;
     lasttime = QTime::currentTime();
     if(key.compare("right",Qt::CaseInsensitive)==0)
@@ -575,7 +581,7 @@ void UsersView::rightToRight()
 void UsersView::moveAnimation(UserEntry *entry, QRect preRect, QRect nextRect)
 {
     QPropertyAnimation *pScaleAnimation = new QPropertyAnimation(entry, "geometry");
-    pScaleAnimation->setDuration(200);
+    pScaleAnimation->setDuration(300);
     pScaleAnimation->setStartValue(preRect);
     pScaleAnimation->setEndValue(nextRect);
     pScaleAnimation->setEasingCurve(QEasingCurve::InOutQuad);
@@ -589,6 +595,51 @@ void UsersView::setCurrentRow(int user)
 
     if(user < 0 || user >= userlist.count())
         user = 0;
+
+    if(currentUser == user){
+        for(int i=0;i<userlist.count();i++)
+            userlist.at(i).first->hide();
+
+            //当前用户保持居中
+        userlist.at(user).first -> setGeometry(ITEM3_X,ITEM_CENTER_Y,CENTER_ENTRY_WIDTH,CENTER_ENTRY_HEIGHT);
+        userlist.at(user).first->show();
+        userlist.at(user).first->setSelected();
+
+        int swap = currentUser;
+
+        //设置当前用户左边的用户显示
+        for(int i = 0;i<leftCount;i++){
+            swap = userlist.at(swap).second.first;
+
+            QRect rec1 = QRect(ITEM2_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT); //左边第二个用户的大小
+            QRect rec2 = QRect(ITEM1_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT); //左边第一个用户的大小
+
+            if(i == 0)
+                userlist.at(swap).first->setGeometry(rec1);
+            else if(i == 1)
+                userlist.at(swap).first->setGeometry(rec2);
+
+            userlist.at(swap).first->show();
+        }
+
+        //设置当前用户右边的用户显示
+        swap = currentUser;
+        for(int i = 0;i<rightCount;i++){
+            swap = userlist.at(swap).second.second;
+
+            QRect  rec1 = QRect(ITEM4_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT); //从右往左第二个用户
+            QRect rec2 = QRect(ITEM5_X,ITEM_Y,ENTRY_WIDTH,ENTRY_HEIGHT); //从右往左第一个用户
+
+            if(i == 0)
+                userlist.at(swap).first->setGeometry(rec1);
+            else if(i == 1)
+                userlist.at(swap).first->setGeometry(rec2);
+
+            userlist.at(swap).first->show();
+        }
+
+        return ;
+    }
 
     currentUser = user;
 

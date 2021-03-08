@@ -48,7 +48,7 @@ void BiometricDevicesWidget::initUI()
     lblPrompt = new QLabel(this);
     lblPrompt->setObjectName(QStringLiteral("lblBioetricDevicesPrompt"));
     lblPrompt->setText(tr("Please select the biometric device"));
-    lblPrompt->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    lblPrompt->setAlignment(Qt::AlignHCenter);
 
     lblDeviceType = new QLabel(this);
     lblDeviceType->setObjectName(QStringLiteral("lblDeviceType"));
@@ -89,15 +89,15 @@ void BiometricDevicesWidget::initUI()
 void BiometricDevicesWidget::resizeEvent(QResizeEvent */*event*/)
 {
     lblPrompt->setGeometry(0, 0, width(), 40);
-    lblDeviceType->setGeometry(0, lblPrompt->geometry().bottom() + 40,
+    lblDeviceType->setGeometry(100, lblPrompt->geometry().bottom() + 40,
                                120, 20);
-    cmbDeviceType->setGeometry(0, lblDeviceType->geometry().bottom() + 15,
+    cmbDeviceType->setGeometry(100, lblDeviceType->geometry().bottom() + 15,
                                300, 40);
-    lblDeviceName->setGeometry(0, cmbDeviceType->geometry().bottom() + 80,
+    lblDeviceName->setGeometry(100, cmbDeviceType->geometry().bottom() + 80,
                                120, 20);
-    cmbDeviceName->setGeometry(0, lblDeviceName->geometry().bottom() + 15,
+    cmbDeviceName->setGeometry(100, lblDeviceName->geometry().bottom() + 15,
                                300, 40);
-    btnOK->setGeometry(0, cmbDeviceName->geometry().bottom() + 80, 140, 38);
+    btnOK->setGeometry(100, cmbDeviceName->geometry().bottom() + 80, 140, 38);
 
 }
 

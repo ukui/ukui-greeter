@@ -26,6 +26,7 @@
 #include <QDir>
 #include <QScreen>
 #include <QX11Info>
+#include <QByteArray>
 #include <QProcess>
 #include <QtMath>
 #include <QTimer>
@@ -34,11 +35,13 @@
 #include "common/configuration.h"
 #include "common/monitorwatcher.h"
 #include "display-switch/displayservice.h"
+#include <xcb/xcb.h>
 #include <X11/XKBlib.h>
 #include <X11/Xlib.h>
+#include <X11/extensions/Xrandr.h>
 #include <X11/keysymdef.h>
 #include <X11/keysym.h>
-
+#include <unistd.h>
 bool MainWindow::m_first = true;
 
 QT_BEGIN_NAMESPACE
@@ -62,23 +65,22 @@ MainWindow::MainWindow(QWidget *parent)
       m_configuration(Configuration::instance()),
       m_activeScreen(nullptr),
       m_monitorWatcher(new MonitorWatcher(this)),
+      m_monitorCount(0),
       m_timer(nullptr),
       m_background(nullptr)
 {
+    XRRQueryExtension(QX11Info::display(), &rr_event_base, &rr_error_base);
+    XRRSelectInput(QX11Info::display(), QX11Info::appRootWindow(), RRScreenChangeNotifyMask);
+
     QDesktopWidget *_desktop = QApplication::desktop();
     connect(_desktop, &QDesktopWidget::resized, this, &MainWindow::onScreenResized);
     /* QDesktopWidget对显示器的插拔的支持不好 */
-    connect(m_monitorWatcher, &MonitorWatcher::monitorCountChanged, this, &MainWindow::onScreenCountChanged);
-    connect(_desktop, &QDesktopWidget::screenCountChanged, this, &MainWindow::onScreenCountChanged);
+ //  connect(m_monitorWatcher, &MonitorWatcher::monitorCountChanged, this, &MainWindow::onScreenCountChanged);
+    connect(_desktop, &QDesktopWidget::screenCountChanged, this, &MainWindow::onScreenResized);
     //设置窗口大小
-    int totalWidth = 0;
-    int totalHeight = 0;
-    for(auto screen : QGuiApplication::screens())
-    {
-        totalWidth += screen->geometry().width();
-        totalHeight += screen->geometry().height();
-    }
-    setGeometry(0, 0, totalWidth, totalHeight);
+    QDesktopWidget *desktop = QApplication::desktop();
+    setGeometry(desktop->geometry());
+
     //设置监控鼠标移动
     setMouseTracking(true);
 
@@ -125,13 +127,13 @@ MainWindow::MainWindow(QWidget *parent)
     moveToScreen(QApplication::primaryScreen());
     m_greeterWnd->initUI();
 
-    m_monitorWatcher->start();
+    //m_monitorWatcher->start();
 
     connect(m_timer, &QTimer::timeout, this, &MainWindow::onTransition);
 
     bool numlockState = true;
     numlockState = m_configuration->getLastNumLock();
-
+/*
     if(numlockState){
         //默认打开numlock需要设置两次，否则灯和效果可能不一致，原因不知
         unsigned int num_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Num_Lock);
@@ -142,7 +144,8 @@ MainWindow::MainWindow(QWidget *parent)
         XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, num_mask);
         XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, 0);
     }
-
+*/
+    qApp->installNativeEventFilter(this);
 }
 
 void MainWindow::paintEvent(QPaintEvent *e)
@@ -188,37 +191,63 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
     return QWidget::mouseMoveEvent(e);
 }
 
+void MainWindow::RRScreenChangeEvent()
+{
+    XRRScreenResources *screen;
+    screen = XRRGetScreenResources(QX11Info::display(), QX11Info::appRootWindow());
+    XRROutputInfo *info;
+    int count = 0;
+
+    for (int i = 0; i < screen->noutput; i++) {
+        info = XRRGetOutputInfo(QX11Info::display(), screen, screen->outputs[i]);
+        if (info->connection == RR_Connected) {
+            count++;
+        }
+        XRRFreeOutputInfo(info);
+    }
+
+    onScreenCountChanged(count);
+    XRRFreeScreenResources(screen);
+}
+
+bool MainWindow::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+{
+    if (qstrcmp(eventType, "xcb_generic_event_t") != 0) {
+        return false;
+    }
+    xcb_generic_event_t *event = reinterpret_cast<xcb_generic_event_t*>(message);
+    const uint8_t responseType = event->response_type & ~0x80;
+    if(responseType == rr_event_base + RRScreenChangeNotify){
+        RRScreenChangeEvent();
+    }
+    return false;
+}
+
 /**
  * 有屏幕分辨率发生改变,移动Greeter窗口位置
  */
 void MainWindow::onScreenResized()
 {
-    int totalWidth = 0;
-    int totalHeight = 0;
-    for(auto screen : QGuiApplication::screens())
-    {
-        totalWidth += screen->geometry().width();
-        totalHeight += screen->geometry().height();
-    }
-    setGeometry(0, 0, totalWidth, totalHeight);
+    hide();
+    QDesktopWidget *desktop = QApplication::desktop();
+    setGeometry(desktop->geometry());
+
     qDebug() << "screen resize to " << geometry();
 
     moveToScreen(QApplication::primaryScreen());
+    show();
 }
 
 void MainWindow::screenCountEvent()
 {
-    int totalWidth = 0;
-    int totalHeight = 0;
-    for(auto screen : QGuiApplication::screens())
-    {
-        totalWidth += screen->geometry().width();
-        totalHeight += screen->geometry().height();
-    }
-    setGeometry(0, 0, totalWidth, totalHeight);
+	
+    QDesktopWidget *desktop = QApplication::desktop();
+    setGeometry(desktop->geometry());
+
     moveToScreen(QApplication::primaryScreen());
     //需要重新绘制，否则背景图片大小会不正确
     repaint();
+
 }
 
 /**
@@ -226,8 +255,14 @@ void MainWindow::screenCountEvent()
  */
 void MainWindow::onScreenCountChanged(int newCount)
 {
+    if(newCount == m_monitorCount)
+        return;
+    
+    m_monitorCount = newCount;
+
     if(newCount < 2) {
         QProcess enableMonitors;
+        //默认设置显示最大分辨率
         enableMonitors.start("xrandr --auto");
         enableMonitors.waitForFinished(-1);
     } else {
@@ -242,7 +277,7 @@ void MainWindow::onScreenCountChanged(int newCount)
 
     //在调用xrandr打开显示器以后，不能马上设置窗口大小，会设置不正确的
     //分辨率，延时500ms正常。
-    QTimer::singleShot(500,this,SLOT(screenCountEvent()));
+    //QTimer::singleShot(500,this,SLOT(screenCountEvent()));
 }
 
 /**

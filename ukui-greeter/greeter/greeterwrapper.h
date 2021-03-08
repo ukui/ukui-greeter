@@ -21,6 +21,10 @@
 
 #include <QLightDM/Greeter>
 
+enum{
+    rootWinPicture,
+    rootWinColor
+};
 class GreeterWrapper : public QLightDM::Greeter
 {
     Q_OBJECT
@@ -34,7 +38,8 @@ public:
     QString userName();
     void setUserName(const QString &);
     void setrootWindow();
-    void setrootWindowBackground(QString);
+    //type 0代表绘制背景图片，1代表绘制背景颜色
+    void setrootWindowBackground(int type,unsigned int color,QString filename);
     QString getEnsureShareDir(QString username);
 
 private:
@@ -42,6 +47,8 @@ private:
     QString m_session;
     QString m_userName;
     QString m_rootWindowBackground;
+    int drawBackgroundType;
+    unsigned int drawBackgroundColor;
 
 signals:
     void aboutToLogin();

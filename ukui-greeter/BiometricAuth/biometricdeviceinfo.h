@@ -30,6 +30,7 @@
 #define UKUI_BIOMETRIC_CONFIG_PATH  ".biometric_auth/ukui_biometric.conf"
 #define UKUI_BIOMETRIC_SYS_CONFIG_PATH  "/etc/biometric-auth/ukui-biometric.conf"
 
+#define BIOMETRIC_PAM_DOUBLE    "BIOMETRIC_PAM_DOUBLE"
 #define BIOMETRIC_PAM       "BIOMETRIC_PAM"
 #define BIOMETRIC_IGNORE    "BIOMETRIC_IGNORE"
 #define BIOMETRIC_SUCCESS   "BIOMETRIC_SUCCESS"
