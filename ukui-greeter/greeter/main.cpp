@@ -118,7 +118,7 @@ void XsettingsHidpi()
     int w,h;
     x11_get_screen_size (&w, &h);
     dpy = XOpenDisplay (NULL);
-    if(h > 2000){
+    if(h >= 2000 || (w>2000 && h> 1500)){
         XChangeProperty(dpy, RootWindow (dpy, 0),
                 XA_RESOURCE_MANAGER, XA_STRING, 8, PropModeReplace, (unsigned char *) "Xft.dpi:	192\n", 13);
     }else{
