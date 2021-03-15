@@ -189,13 +189,16 @@ int main(int argc, char *argv[])
     XEventMonitor::instance()->start();
 
     MainWindow w;
+    QDesktopWidget *desktop = QApplication::desktop();
+    w.setGeometry(desktop->geometry());
+    w.hide();
 
-    w.showFullScreen();
+    //w.showFullScreen();
     //在没有窗口管理器的情况下，需要激活窗口，行为类似于用鼠标点击窗口
-    w.activateWindow();
-    QPoint pt(QApplication::primaryScreen()->geometry().x() + 100,QApplication::primaryScreen()->geometry().y() + 100);
-    QPoint center = w.mapFromGlobal(pt);
-    QCursor::setPos(center);
+    //w.activateWindow();
+    //QPoint pt(QApplication::primaryScreen()->geometry().x() + 100,QApplication::primaryScreen()->geometry().y() + 100);
+    //QPoint center = w.mapFromGlobal(pt);
+    //QCursor::setPos(center);
 
     /*
     DisplaySwitch ds(&w);
