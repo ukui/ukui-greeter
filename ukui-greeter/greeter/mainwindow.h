@@ -26,34 +26,9 @@
 #include "screenmodel.h"
 
 
-enum BackgroundMode
-{
-    DRAW_USER_BACKGROUND,
-    DRAW_BACKGROUND,
-    DRAW_COLOR,
-    DRAW_DEFAULT
-};
+#include "backgroundwindow.h"
+#include <QVector>
 
-enum BackgroundType
-{
-    BACKGROUND_IMAGE,
-    BACKGROUND_COLOR
-};
-
-struct Background
-{
-    BackgroundType type;
-    QColor color;
-    QString image;
-};
-
-struct Transition
-{
-    QSharedPointer<Background>  from;
-    QSharedPointer<Background>  to;
-    float       stage;
-    bool        started;
-};
 
 class GreeterWindow;
 class Configuration;
@@ -64,11 +39,8 @@ class MainWindow : public QWidget , public QAbstractNativeEventFilter
     Q_OBJECT
 public:
     explicit MainWindow(QWidget *parent = 0);
-    void setBackground(QSharedPointer<Background> &);
 
 protected:
-    void paintEvent(QPaintEvent *);
-    void mouseMoveEvent(QMouseEvent *);
     virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
 
 signals:
@@ -77,30 +49,33 @@ signals:
 private slots:
     void onScreenResized();
     void onScreenCountChanged(int newCount);
-    void onTransition();
+    //void onTransition();
     void screenCountEvent();
     void RRScreenChangeEvent();
 
+    void slotBackgroundChanged(QSharedPointer<Background> &);
+    void slotAddScreen(QScreen *);
+    void slotRemoveScreen(QScreen *);
+    //通过追踪background窗体确认当前m_activeScreen
+    void onGlobalButtonDrag(int,int);
+
 private:
     void moveToScreen(QScreen *screen = nullptr);
-    void startTransition(QSharedPointer<Background> &, QSharedPointer<Background> &);
-    void stopTransition();
-    void drawTransitionAlpha(const QRect &rect);
-    void drawBackground(QSharedPointer<Background> &, const QRect &, float alpha = 1.0);
-    QPixmap * getBackground(const QString &path, const QRect &rect);
-
+    BackGroundWindow* addBackgroundWindow(QScreen *screen);
 private:
     ScreenModel     *m_screenModel;
     GreeterWindow   *m_greeterWnd;
     Configuration   *m_configuration;
     QScreen         *m_activeScreen;
-    bool             m_drawUserBackground;
+
+    QScreen *m_curScreen;
+    //bool             m_drawUserBackground;
     QString          m_defaultBackgroundPath;
-    QString          m_backgroundPath;
-    QString          m_backgroundColor;
-    QString          m_lastBackgroundPath;
-    QPixmap          m_logo;
-    QPixmap          m_cof;
+    //QString          m_backgroundPath;
+    //QString          m_backgroundColor;
+    //QString          m_lastBackgroundPath;
+    //QPixmap          m_logo;
+    //QPixmap          m_cof;
     //QMap<QPair<m_backgroundPath, resolution>, background>
     //对每张背景图片的不同分辨率进行缓存，减少CPU占用率（这里分辨率格式：1080x960）
     QMap<QPair<QString, QString>, QPixmap*>   m_backgrounds;
@@ -119,6 +94,8 @@ private:
     int rr_error_base;
 
     int m_monitorCount;
+
+    QMap<QScreen*, BackGroundWindow*> m_backgroundwindows;
 };
 
 #endif // MAINWINDOW_H
