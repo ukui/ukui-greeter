@@ -25,9 +25,10 @@
 #include <QStyledItemDelegate>
 
 
-BiometricDevicesWidget::BiometricDevicesWidget(BiometricProxy *proxy, QWidget *parent)
+BiometricDevicesWidget::BiometricDevicesWidget(BiometricProxy *proxy,int uid, QWidget *parent)
     : QWidget(parent),
-      proxy(proxy)
+      proxy(proxy),
+      m_uid(uid)
 {
     qDebug() << "BiometricDevicesWidget::BiometricDevicesWidget";
     initUI();
@@ -101,6 +102,12 @@ void BiometricDevicesWidget::resizeEvent(QResizeEvent */*event*/)
 
 }
 
+void BiometricDevicesWidget::setUser(int uid)
+{
+    m_uid = uid;
+    updateDevice();
+}
+
 void BiometricDevicesWidget::updateDevice()
 {
     deviceMap.clear();
@@ -108,7 +115,8 @@ void BiometricDevicesWidget::updateDevice()
     for(auto pDeviceInfo : deviceList)
     {
         qDebug() << *pDeviceInfo;
-        deviceMap[pDeviceInfo->deviceType].push_back(pDeviceInfo);
+        if(proxy->GetUserDevFeatureCount(m_uid,pDeviceInfo->id) > 0)
+            deviceMap[pDeviceInfo->deviceType].push_back(pDeviceInfo);
     }
     cmbDeviceType->clear();
     for(int type : deviceMap.keys())

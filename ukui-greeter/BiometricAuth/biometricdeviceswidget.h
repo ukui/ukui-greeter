@@ -31,7 +31,7 @@ class BiometricDevicesWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit BiometricDevicesWidget(BiometricProxy *proxy, QWidget *parent = nullptr);
+    explicit BiometricDevicesWidget(BiometricProxy *proxy,int uid,QWidget *parent = nullptr);
     void setCurrentDevice(int drvid);
     void setCurrentDevice(const QString &deviceName);
     void setCurrentDevice(const DeviceInfoPtr &pDeviceInfo);
@@ -39,6 +39,7 @@ public:
     DeviceInfoPtr findDeviceByName(const QString &name);
     bool deviceExists(int drvid);
     bool deviceExists(const QString &deviceName);
+    void setUser(int uid);
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -70,6 +71,7 @@ private:
     BiometricProxy      *proxy;
     DeviceMap           deviceMap;
     DeviceInfoPtr       currentDevice;
+    int                 m_uid;
 };
 
 #endif // BIOMETRICDEVICESWIDGET_H

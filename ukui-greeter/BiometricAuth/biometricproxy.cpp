@@ -104,6 +104,45 @@ DeviceList BiometricProxy::GetDevList()
     return deviceList;
 }
 
+int BiometricProxy::GetUserDevCount(int uid)
+{
+    QDBusMessage result = call(QStringLiteral("GetDevList"));
+    if(result.type() == QDBusMessage::ErrorMessage)
+    {
+        qWarning() << "GetDevList error:" << result.errorMessage();
+        return 0;
+    }
+    auto dbusArg =  result.arguments().at(1).value<QDBusArgument>();
+    QList<QVariant> variantList;
+    DeviceList deviceList;
+    dbusArg >> variantList;
+    for(int i = 0; i < variantList.size(); i++)
+    {
+        DeviceInfoPtr pDeviceInfo = std::make_shared<DeviceInfo>();
+
+        auto arg = variantList.at(i).value<QDBusArgument>();
+        arg >> *pDeviceInfo;
+
+        int count = GetUserDevFeatureCount(uid,pDeviceInfo->id);
+
+        if(count>0)
+            deviceList.push_back(pDeviceInfo);
+    }
+
+    return deviceList.count();
+}
+
+int BiometricProxy::GetUserDevFeatureCount(int uid,int drvid)
+{
+    QDBusMessage FeatureResult = call(QStringLiteral("GetFeatureList"),drvid,uid,0,-1);
+    if(FeatureResult.type() == QDBusMessage::ErrorMessage)
+    {
+            qWarning() << "GetFeatureList error:" << FeatureResult.errorMessage();
+            return 0;
+    }
+    return FeatureResult.arguments().takeFirst().toInt();
+}
+
 int BiometricProxy::GetDevCount()
 {
     QDBusMessage result = call(QStringLiteral("GetDevList"));
