@@ -41,6 +41,11 @@
 #include "languagewidget.h"
 #include "language.h"
 
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <libintl.h>
 
 float scale;
 int fontSize;
@@ -725,7 +730,6 @@ void GreeterWindow::onLanguageChanged(const Language &language)
         return;
     }
 	
-
     qApp->removeTranslator(m_configuration->m_trans);
     delete m_configuration->m_trans;
     m_configuration->m_trans = new QTranslator();
@@ -733,10 +737,14 @@ void GreeterWindow::onLanguageChanged(const Language &language)
     if(language.code.startsWith("zh")){
         local = QLocale::Chinese;
         qmFile = QM_DIR + QString("%1.qm").arg("zh_CN");
+        setenv("LANGUAGE","zh_CN",1);
+    	setlocale(LC_ALL,"zh_CN.utf8");
     }
     else{
         local = QLocale::English;
-        qmFile = QM_DIR + QString("%1.qm").arg("en_US");
+        qmFile = QM_DIR + QString("%1.qm").arg(local.name());
+        setenv("LANGUAGE",local.name().toLatin1().data(),1);
+        setlocale(LC_ALL,"");
     }
     m_configuration->m_trans->load(qmFile);
     qApp->installTranslator(m_configuration->m_trans);

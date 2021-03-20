@@ -22,6 +22,7 @@
 #include <QApplication>
 #include <QTextCodec>
 #include <QResource>
+#include <QTextCodec>
 #include <QTranslator>
 #include <QLocale>
 #include <QPoint>
@@ -44,6 +45,11 @@
 #include "display-switch/displayswitch.h"
 #include "xeventmonitor.h"
 #include "configuration.h"
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <libintl.h>
 
 void outputMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -157,6 +163,9 @@ int main(int argc, char *argv[])
      m_configuration->m_trans->load(qmFile);
     qDebug() << "load translation file " << qmFile;
 
+    bindtextdomain("Linux-PAM","/usr/share/locale");
+    textdomain("Linux-PAM");
+
     qApp->installTranslator( m_configuration->m_trans);
 
     //加载qss文件
@@ -168,7 +177,6 @@ int main(int argc, char *argv[])
     //用于QSettings
     QApplication::setOrganizationName("Kylin");
     QApplication::setApplicationName("ukui-greeter");
-
 
     //设置鼠标指针样式
     XDefineCursor(QX11Info::display(), QX11Info::appRootWindow(), XCreateFontCursor(QX11Info::display(), XC_arrow));

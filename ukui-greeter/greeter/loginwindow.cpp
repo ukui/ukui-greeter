@@ -35,6 +35,14 @@
 #include "biometricauthwidget.h"
 #include "biometricdeviceswidget.h"
 
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <libintl.h>
+#include <locale.h>
+
+#define _(string) gettext(string)
 
 LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
     : QWidget(parent),
@@ -563,17 +571,19 @@ void LoginWindow::onShowMessage(QString text, QLightDM::Greeter::MessageType typ
 {
     qDebug()<< "message: "<< text;
 
-//    if(type == QLightDM::Greeter::MessageTypeError)
-//    {
-//        m_messageLabel->setStyleSheet("#messageLabel{color: rgb(255, 0, 0, 180);}");
-//    }
-//    else
-//    {
-//        m_messageLabel->setStyleSheet("#messageLabel{color: black;}");
-//    }
+    if(text == "密码为空，请输入密码" && qgetenv("LANGUAGE") == "en_US")
+        text = "No password received, please input password";
+
     unacknowledged_messages = true;
     qDebug()<<"unacknowledged_messages = true";
-    m_messageLabel->setText(text);
+
+    std::string texttmp = text.toStdString();
+    const char* ch = texttmp.c_str();
+
+    char str[1024];
+    sprintf(str,_(ch));
+
+    m_messageLabel->setText(QString(str));
     stopWaiting();
 }
 
