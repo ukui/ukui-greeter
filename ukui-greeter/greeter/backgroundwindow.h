@@ -56,12 +56,14 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *);
+    void resizeEvent(QResizeEvent *event);
 
 signals:
     void signalWidgetEntered();
 
 private slots:
     void onTransition();
+    void slotSizeChanged(const QRect &geometry);
 
 
 
