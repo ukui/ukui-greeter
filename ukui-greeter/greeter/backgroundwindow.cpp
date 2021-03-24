@@ -37,6 +37,7 @@ BackGroundWindow::BackGroundWindow(QWidget *parent)
 
     //setWindowTitle("baackground title");
     connect(m_timer, &QTimer::timeout, this, &BackGroundWindow::onTransition);
+    connect(m_Screen,&QScreen::geometryChanged,this,&BackGroundWindow::slotSizeChanged);
 }
 
 BackGroundWindow::~BackGroundWindow()
@@ -170,6 +171,11 @@ void BackGroundWindow::paintEvent(QPaintEvent *e)
     return QWidget::paintEvent(e);
 }
 
+void BackGroundWindow::resizeEvent(QResizeEvent *event)
+{
+    repaint();
+}
+
 void BackGroundWindow::onTransition()
 {
     m_transition.stage += 0.1;//= (1 - cos(M_PI * m_transition.stage)) / 2;
@@ -179,6 +185,12 @@ void BackGroundWindow::onTransition()
 
     repaint();
     //update();
+}
+
+void BackGroundWindow::slotSizeChanged(const QRect &geometry)
+{
+    setGeometry(geometry);
+    update();
 }
 
 void BackGroundWindow::stopTransition()
