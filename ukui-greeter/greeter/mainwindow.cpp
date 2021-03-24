@@ -25,6 +25,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QScreen>
+#include <QWindow>
 #include <QX11Info>
 #include <QByteArray>
 #include <QProcess>
@@ -42,22 +43,8 @@
 #include <X11/keysymdef.h>
 #include <X11/keysym.h>
 #include <unistd.h>
+#include "xeventmonitor.h"
 bool MainWindow::m_first = true;
-
-QT_BEGIN_NAMESPACE
-extern void qt_blurImage(QPainter *p, QImage &blurImage, qreal radius, bool quality, bool alphaOnly, int transposed = 0);
-QT_END_NAMESPACE
-
-#define BLUR_RADIUS 300
-
-QPixmap * blurPixmap(QPixmap *pixmap)
-{
-    QPainter painter(pixmap);
-    QImage srcImg = pixmap->toImage();
-    qt_blurImage(&painter, srcImg, BLUR_RADIUS, false, false);
-    painter.end();
-    return pixmap;
-}
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent),
@@ -69,6 +56,9 @@ MainWindow::MainWindow(QWidget *parent)
       m_timer(nullptr),
       m_background(nullptr)
 {
+    m_backgroundwindows.clear();
+    m_curScreen = nullptr;
+
     XRRQueryExtension(QX11Info::display(), &rr_event_base, &rr_error_base);
     XRRSelectInput(QX11Info::display(), QX11Info::appRootWindow(), RRScreenChangeNotifyMask);
 
@@ -77,59 +67,39 @@ MainWindow::MainWindow(QWidget *parent)
     /* QDesktopWidget对显示器的插拔的支持不好 */
  //  connect(m_monitorWatcher, &MonitorWatcher::monitorCountChanged, this, &MainWindow::onScreenCountChanged);
     connect(_desktop, &QDesktopWidget::screenCountChanged, this, &MainWindow::onScreenResized);
+    connect(qApp,&QApplication::screenAdded,this,&MainWindow::slotAddScreen);
+    connect(qApp,&QApplication::screenRemoved,this,&MainWindow::slotRemoveScreen);
     //设置窗口大小
     QDesktopWidget *desktop = QApplication::desktop();
+    qDebug()<<desktop->geometry();
     setGeometry(desktop->geometry());
 
     //设置监控鼠标移动
-    setMouseTracking(true);
-
+    connect(XEventMonitor::instance(), SIGNAL(buttonDrag(int,int)),
+            this, SLOT(onGlobalButtonDrag(int,int)));
     //cof
     //m_cof.load(m_configuration->getValue("cof").toString());
 
-    //背景图片 优先级：用户桌面背景、背景图片、背景颜色
-    m_defaultBackgroundPath = m_configuration->getDefaultBackgroundName();
-    bool drawUserBackground = m_configuration->getValue("draw-user-background").toBool();
-    if(drawUserBackground) {
-        m_backgroundMode = DRAW_USER_BACKGROUND;
-    } else {
-        m_background = QSharedPointer<Background>(new Background);
-        QString backgroundPath = m_configuration->getValue("background").toString();
-        if(!backgroundPath.isEmpty()) {
-            m_backgroundMode = DRAW_BACKGROUND;
-
-            m_background->type = BACKGROUND_IMAGE;
-            m_background->image = backgroundPath;
-        } else {
-            QString color = m_configuration->getValue("background-color").toString();
-            if(!color.isEmpty()) {
-                m_backgroundMode = DRAW_COLOR;
-
-                m_background->type = BACKGROUND_COLOR;
-                m_background->color = color;
-            } else {
-                m_backgroundMode = DRAW_DEFAULT;
-
-                m_background->type = BACKGROUND_IMAGE;
-                m_background->image = m_defaultBackgroundPath;
-            }
-        }
+    //draw background at different window
+    for(QScreen *screen : QApplication::screens()) {
+        BackGroundWindow *win = addBackgroundWindow(screen);
+        m_backgroundwindows[screen] = win;
+        win->show();
     }
-    qDebug() << "default background:" << m_defaultBackgroundPath;
-    if(m_background)
-        qDebug() << m_background->type << m_background->image;
-
-    m_timer = new QTimer(this);
-    m_transition.started = false;
 
     //激活屏幕(即Greeter窗口所在屏幕位置)
-    m_greeterWnd = new GreeterWindow(this);
-    moveToScreen(QApplication::primaryScreen());
+    m_greeterWnd = new GreeterWindow();
+
+    connect(m_greeterWnd, SIGNAL(signalBackgroundChanged(QSharedPointer<Background>&)),this,
+            SLOT(slotBackgroundChanged(QSharedPointer<Background>&)));
     m_greeterWnd->initUI();
+    //根据鼠标的实时位置，确定位置。
+    moveToScreen(QApplication::primaryScreen());
+
+    m_greeterWnd->show();
 
     //m_monitorWatcher->start();
-
-    connect(m_timer, &QTimer::timeout, this, &MainWindow::onTransition);
+    //connect(m_timer, &QTimer::timeout, this, &MainWindow::onTransition);
 
     bool numlockState = true;
     numlockState = m_configuration->getLastNumLock();
@@ -148,33 +118,10 @@ MainWindow::MainWindow(QWidget *parent)
     qApp->installNativeEventFilter(this);
 }
 
-void MainWindow::paintEvent(QPaintEvent *e)
-{
-    for(QScreen *screen : QApplication::screens()){
-        //在每个屏幕上绘制背景
-        QRect rect = screen->geometry();
-
-
-        if(m_transition.started)
-            drawTransitionAlpha(rect);
-        else {
-            drawBackground(m_background, rect);
-        }
-
-        QPainter painter(this);
-    }
-
-    return QWidget::paintEvent(e);
-}
-
-
-/**
- * 根据鼠标指针移动位置移动Greeter窗口所在屏幕
- */
-void MainWindow::mouseMoveEvent(QMouseEvent *e)
+void MainWindow::onGlobalButtonDrag(int x, int y)
 {
     if(QApplication::screens().count() > 1){
-        QPoint point = e->pos();
+        QPoint point(x,y);
         QScreen *curScreen = nullptr;
         for(QScreen *screen : QApplication::screens()){
             QRect screenRect = screen->geometry();
@@ -188,7 +135,6 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
             moveToScreen(curScreen);
         }
     }
-    return QWidget::mouseMoveEvent(e);
 }
 
 void MainWindow::RRScreenChangeEvent()
@@ -210,6 +156,35 @@ void MainWindow::RRScreenChangeEvent()
     XRRFreeScreenResources(screen);
 }
 
+void MainWindow::slotBackgroundChanged(QSharedPointer<Background> &background)
+{
+    for(int i =0; i< m_backgroundwindows.size(); i++) {
+        m_backgroundwindows.values().at(i)->setBackground(background);
+    }
+}
+
+void MainWindow::slotAddScreen(QScreen* screen)
+{
+    if(screen == nullptr)
+        return;
+    BackGroundWindow *win = addBackgroundWindow(screen);
+    QSharedPointer<Background> temp = m_backgroundwindows.values().at(0)->getBackground();
+    win->setBackground(temp);
+    m_backgroundwindows[screen] = win;
+    win->show();
+}
+
+void MainWindow::slotRemoveScreen(QScreen *screen)
+{
+    if(screen == nullptr)
+        return;
+    BackGroundWindow *win = m_backgroundwindows[screen];
+    m_backgroundwindows.remove(screen);
+    win->hide();
+    win->deleteLater();
+    moveToScreen(QApplication::primaryScreen());
+}
+
 bool MainWindow::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
 {
     if (qstrcmp(eventType, "xcb_generic_event_t") != 0) {
@@ -229,24 +204,23 @@ bool MainWindow::nativeEventFilter(const QByteArray &eventType, void *message, l
 void MainWindow::onScreenResized()
 {
     hide();
-    QDesktopWidget *desktop = QApplication::desktop();
-    setGeometry(desktop->geometry());
+    //QDesktopWidget *desktop = QApplication::desktop();
+    //setGeometry(desktop->geometry());
 
     qDebug() << "screen resize to " << geometry();
 
     moveToScreen(QApplication::primaryScreen());
-    show();
+    //show();
 }
 
 void MainWindow::screenCountEvent()
 {
-	
-    QDesktopWidget *desktop = QApplication::desktop();
-    setGeometry(desktop->geometry());
+    //QDesktopWidget *desktop = QApplication::desktop();
+    //setGeometry(desktop->geometry());
 
     moveToScreen(QApplication::primaryScreen());
     //需要重新绘制，否则背景图片大小会不正确
-    repaint();
+    //repaint();
 
 }
 
@@ -255,6 +229,7 @@ void MainWindow::screenCountEvent()
  */
 void MainWindow::onScreenCountChanged(int newCount)
 {
+	return ;
     if(newCount == m_monitorCount)
         return;
     
@@ -291,130 +266,19 @@ void MainWindow::moveToScreen(QScreen *screen)
     qDebug() << "moveToScreen activeScreenRect " << activeScreenRect;
     if(m_monitorWatcher->getMonitorCount() == 1)
         m_greeterWnd->setGeometry(QApplication::primaryScreen()->geometry());
-
+    
+    m_greeterWnd->hide();
+    m_greeterWnd->show();
     m_greeterWnd->setGeometry(activeScreenRect);
-    Q_EMIT activeScreenChanged(activeScreenRect);
 
-    repaint();
 }
 
-void MainWindow::setBackground(QSharedPointer<Background> &background)
+BackGroundWindow *MainWindow::addBackgroundWindow(QScreen *screen)
 {
-    if(background)
-        qDebug() << background->image;
+    BackGroundWindow *window = new BackGroundWindow(nullptr);
+    window->setScreen(screen);
+    //window->setGeometry(screen->geometry());
+    //connect(window, SIGNAL(signalWidgetEntered()), this, SLOT(slotEnterBackgroundWindow()));
 
-    if(m_backgroundMode != DRAW_USER_BACKGROUND)
-        return;
-
-    stopTransition();
-
-    if(background) {
-        if(background->image.isEmpty())
-            background->image = m_defaultBackgroundPath;
-    }
-
-    if(m_background && background &&
-       m_background->image == background->image){
-        repaint();
-        return;
-    }
-
-    //如果是第一次绘制背景，则不需要渐变
-    //现在由于绘制模糊背景，不需要渐变了
-    if(!m_background.isNull())
-        startTransition(m_background, background);
-
-    m_background = background;
-}
-
-void MainWindow::startTransition(QSharedPointer<Background> &from,
-                                 QSharedPointer<Background> &to)
-{
-    stopTransition();
-
-    m_transition.from = from;
-    m_transition.to = to;
-    m_transition.stage = 0.0;
-    m_transition.started = true;
-
-    m_timer->start(20);
-}
-
-void MainWindow::stopTransition()
-{
-    if(m_timer && m_timer->isActive())
-        m_timer->stop();
-    m_transition.stage = 1.0;
-    m_transition.started = false;
-}
-
-void MainWindow::onTransition()
-{
-    m_transition.stage += 0.1;//= (1 - cos(M_PI * m_transition.stage)) / 2;
-
-    if(m_transition.stage >= 1.0)
-        stopTransition();
-
-    //repaint();
-    update();
-}
-
-void MainWindow::drawTransitionAlpha(const QRect &rect)
-{
-    drawBackground(m_transition.from, rect, 1.0 - m_transition.stage);
-
-    drawBackground(m_transition.to, rect, m_transition.stage); 
-}
-
-void MainWindow::drawBackground(QSharedPointer<Background> &background,
-                                const QRect &rect, float alpha)
-{
-    if(background == nullptr)
-        return;
-
-    QPainter painter(this);
-   painter.setOpacity(alpha);
-
-    switch(background->type) {
-    case BACKGROUND_IMAGE:
-    {
-
-        QPixmap *pixmap = getBackground(background->image, rect);
-
-        if(pixmap->isNull())
-        {
-            QString color = m_configuration->getValue("background-color").toString();
-            QColor cor;
-            if(!color.isEmpty())
-                cor = color;
-            else
-                cor = "#035290";
-            painter.setBrush(cor);
-            painter.drawRect(rect);
-        }
-        else
-        {
-            painter.drawPixmap(rect, *pixmap);
-        }
-        break;
-    }
-    case BACKGROUND_COLOR:
-    {
-        painter.setBrush(background->color);
-        painter.drawRect(rect);
-        break;
-    }
-    }
-}
-
-QPixmap * MainWindow::getBackground(const QString &path, const QRect &rect)
-{
-    QString resolution = QString("%1x%2").arg(rect.width()).arg(rect.height());
-    QPair<QString, QString> key(path, resolution);
-
-    if(!m_backgrounds.contains(key)){
-        QPixmap *pixmap =  new QPixmap(scaledPixmap(width(), height(), path));
-        m_backgrounds[key] = blurPixmap(pixmap);
-    }
-    return m_backgrounds[key];
+    return window;
 }

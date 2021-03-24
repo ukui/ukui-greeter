@@ -45,7 +45,8 @@ SOURCES += \
     greeter/usersview.cpp \
     greeter/language.cpp \
     greeter/languagewidget.cpp \
-    greeter/rootWindowBackground.cpp
+    greeter/rootWindowBackground.cpp \
+    greeter/backgroundwindow.cpp
 
 HEADERS  += \
     greeter/greeterwindow.h \
@@ -63,7 +64,8 @@ HEADERS  += \
     greeter/usersview.h \
     greeter/language.h \
     greeter/languagewidget.h \
-    greeter/rootWindowBackground.h
+    greeter/rootWindowBackground.h \
+    greeter/backgroundwindow.h
 
 CONFIG += c++11 debug link_pkgconfig
 

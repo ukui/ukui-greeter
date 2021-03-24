@@ -1,4 +1,4 @@
-﻿/* greeterwindow.cpp
+/* greeterwindow.cpp
  * Copyright (C) 2018 Tianjin KYLIN Information Technology Co., Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -76,7 +76,8 @@ GreeterWindow::GreeterWindow(QWidget *parent)
         qDebug() << "allow manual login";
         m_usersModel->setShowManualLogin(true);
     }
-
+    setWindowFlags(Qt::WindowStaysOnTopHint|Qt::FramelessWindowHint);
+    //setWindowFlags(Qt::X11BypassWindowManagerHint);
     m_greeter->setSession(m_greeter->defaultSessionHint());
 
     for(int i = 0; i < m_usersModel->rowCount(); i++)
@@ -92,11 +93,27 @@ GreeterWindow::GreeterWindow(QWidget *parent)
     connect(m_greeter, SIGNAL(startSessionFailed()), this, SLOT(show()));
     connect(m_greeter, SIGNAL(authenticationComplete()),this, SLOT(onAuthenticationComplete1()));
     installEventFilter(this);
+
+    m_backgrounds.clear();
+    m_background = nullptr;
+}
+
+GreeterWindow::~GreeterWindow()
+{
+    if(m_timer != nullptr) {
+        delete m_timer;
+        m_timer = nullptr;
+    }
+    m_backgrounds.clear();
 }
 
 void GreeterWindow::initUI()
 {
     installEventFilter(this);
+
+    //有窗管的时候会设置失败，需要绘制背景
+    //setAttribute(Qt::WA_TranslucentBackground,true);
+    initBackground();
 
     local = QLocale::system().language();
     QDateTime dateTime = QDateTime::currentDateTime();
@@ -240,7 +257,7 @@ void GreeterWindow::initUI()
         m_userWnd->setCurrentUser(lastLoginUser);
     }
 
-    setWindowOpacity(0.5);
+    //setWindowOpacity(0.5);
 }
 
 void GreeterWindow::setUserWindowVisible(bool visible)
@@ -341,6 +358,21 @@ void GreeterWindow::changeEvent(QEvent *event)
     }
 }
 
+void GreeterWindow::paintEvent(QPaintEvent *e)
+{
+    QRect rect(0,0,this->geometry().width(),this->geometry().height());
+    if(m_transition.started) {
+        //drawTransitionAlpha(rect);
+        drawBackground(m_transition.from, rect, 1.0 - m_transition.stage);
+        drawBackground(m_transition.to, rect, m_transition.stage);
+    }
+    else {
+        drawBackground(m_background, rect);
+    }
+
+    return QWidget::paintEvent(e);
+}
+
 void GreeterWindow::refreshTranslate()
 {
     m_powerLB->setToolTip(tr("Power dialog"));
@@ -429,6 +461,45 @@ QString GreeterWindow::getAccountBackground(uid_t uid)
     return "";
 }
 
+void GreeterWindow::drawBackground(QSharedPointer<Background> &background, const QRect &rect, float alpha)
+{
+    if(background == nullptr)
+        return;
+
+    QPainter painter(this);
+    painter.setOpacity(alpha);
+
+    switch(background->type) {
+    case BACKGROUND_IMAGE:
+    {
+        QPixmap *pixmap = getBackground(background->image, rect);
+
+        if(pixmap->isNull())
+        {
+            QString color = m_configuration->getValue("background-color").toString();
+            QColor cor;
+            if(!color.isEmpty())
+                cor = color;
+            else
+                cor = "#035290";
+            painter.setBrush(cor);
+            painter.drawRect(rect);
+        }
+        else
+        {
+            painter.drawPixmap(rect, *pixmap);
+        }
+        break;
+    }
+    case BACKGROUND_COLOR:
+    {
+        painter.setBrush(background->color);
+        painter.drawRect(rect);
+        break;
+    }
+    }
+}
+
 void GreeterWindow::setBackground(const QModelIndex &index)
 {
     QString backgroundPath;
@@ -474,8 +545,10 @@ void GreeterWindow::setBackground(const QModelIndex &index)
     QSharedPointer<Background> background(new Background);
     background->type = BACKGROUND_IMAGE;
     background->image = backgroundPath;
-    static_cast<MainWindow*>(parentWidget())->setBackground(background);
+    //static_cast<MainWindow*>(parentWidget())->setBackground(background);
 
+    setBackground(background);
+    emit signalBackgroundChanged(background);
 }
 
 void GreeterWindow::onUserSelected(const QModelIndex &index)
@@ -576,6 +649,8 @@ void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
             m_languageLB->show();
         }
     }
+
+    update();
 }
 
 void GreeterWindow::onUserChangedByManual(const QString &userName)
@@ -598,6 +673,16 @@ void GreeterWindow::setWindowVisible()
         m_userWnd->setVisible(true);
     }
     update();
+}
+
+void GreeterWindow::onTransition()
+{
+    m_transition.stage += 0.1;//= (1 - cos(M_PI * m_transition.stage)) / 2;
+
+    if(m_transition.stage >= 1.0)
+        stopTransition();
+
+    repaint();
 }
 /**
  * @brief GreeterWindow::showPowerWnd
@@ -886,4 +971,99 @@ void GreeterWindow::onAuthenticationComplete1()
           if(entry->userIndex().data(QLightDM::UsersModel::NameRole).toString() == "*login")
                entry->setUserName(tr("Login"));
     }
+}
+
+QPixmap *GreeterWindow::getBackground(const QString &path, const QRect &rect)
+{
+    QString resolution = QString("%1x%2").arg(rect.width()).arg(rect.height());
+    QPair<QString, QString> key(path, resolution);
+
+    if(!m_backgrounds.contains(key)){
+        QPixmap *pixmap =  new QPixmap(scaledPixmap(width(), height(), path));
+        m_backgrounds[key] = blurPixmap(pixmap);
+    }
+    return m_backgrounds[key];
+}
+
+void GreeterWindow::setBackground(QSharedPointer<Background> &background)
+{
+    if(m_backgroundMode != DRAW_USER_BACKGROUND)
+        return;
+
+    stopTransition();
+
+    if(background) {
+        if(background->image.isEmpty())
+            background->image = m_configuration->getDefaultBackgroundName();
+    }
+
+    if(m_background && background &&
+       m_background->image == background->image){
+        repaint();
+        return;
+    }
+
+    //如果是第一次绘制背景，则不需要渐变
+    //现在由于绘制模糊背景，不需要渐变了
+    if(!m_background.isNull())
+        startTransition(m_background, background);
+
+    m_background = background;
+    update();
+}
+
+void GreeterWindow::initBackground()
+{
+    //背景图片 优先级：用户桌面背景、背景图片、背景颜色
+    bool drawUserBackground = m_configuration->getValue("draw-user-background").toBool();
+    if(drawUserBackground) {
+        m_backgroundMode = DRAW_USER_BACKGROUND;
+    } else {
+        m_background = QSharedPointer<Background>(new Background);
+        QString backgroundPath = m_configuration->getValue("background").toString();
+        if(!backgroundPath.isEmpty()) {
+            m_backgroundMode = DRAW_BACKGROUND;
+
+            m_background->type = BACKGROUND_IMAGE;
+            m_background->image = backgroundPath;
+        } else {
+            QString color = m_configuration->getValue("background-color").toString();
+            if(!color.isEmpty()) {
+                m_backgroundMode = DRAW_COLOR;
+
+                m_background->type = BACKGROUND_COLOR;
+                m_background->color = color;
+            } else {
+                m_backgroundMode = DRAW_DEFAULT;
+
+                m_background->type = BACKGROUND_IMAGE;
+                m_background->image = m_configuration->getDefaultBackgroundName();
+            }
+        }
+    }
+
+
+    m_timer = new QTimer(this);
+    m_transition.started = false;
+    connect(m_timer, &QTimer::timeout, this, &GreeterWindow::onTransition);
+}
+
+void GreeterWindow::stopTransition()
+{
+    if(m_timer && m_timer->isActive())
+        m_timer->stop();
+    m_transition.stage = 1.0;
+    m_transition.started = false;
+}
+
+void GreeterWindow::startTransition(QSharedPointer<Background> &from, QSharedPointer<Background> &to)
+{
+    stopTransition();
+
+    m_transition.from = from;
+    m_transition.to = to;
+    m_transition.stage = 0.0;
+    m_transition.started = true;
+
+    m_timer->start(20);
 }
