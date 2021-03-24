@@ -205,7 +205,11 @@ void BiometricAuthWidget::onIdentifyComplete(QDBusPendingCallWatcher *watcher)
                     }
                 });
             }
-        }
+        }else{
+	    Q_EMIT authComplete(false);
+	}
+    }else{
+    	Q_EMIT authComplete(false);
     }
     updateImage(0);
 }

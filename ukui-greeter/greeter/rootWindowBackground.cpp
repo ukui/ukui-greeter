@@ -42,9 +42,9 @@ void setRootWindowBackground(bool type,unsigned int color,char *filename)
         return ;
     int width = 0,height = 0;
    
-    width = QApplication::desktop()->geometry().width();
-    height = QApplication::desktop()->geometry().height();
- 
+    width = QApplication::desktop()->geometry().width()*qApp->devicePixelRatio();
+    height = QApplication::desktop()->geometry().height()*qApp->devicePixelRatio();
+	
     scn = DefaultScreenOfDisplay(dpy);
     root = DefaultRootWindow(dpy);
 
@@ -81,7 +81,7 @@ void setRootWindowBackground(bool type,unsigned int color,char *filename)
     for(QScreen *screen : QApplication::screens()){
         //在每个屏幕上绘制背景
         QRect rect = screen->geometry();
-        imlib_render_image_on_drawable_at_size(rect.x(), rect.y(), rect.width(),rect.height());
+        imlib_render_image_on_drawable_at_size(rect.x()*screen->devicePixelRatio(), rect.y()*screen->devicePixelRatio(), rect.width()*screen->devicePixelRatio(),rect.height()*screen->devicePixelRatio());
     }
  
     XSetWindowBackgroundPixmap(dpy, root, pix);

@@ -114,6 +114,8 @@ public Q_SLOTS:
      *                int devStatus, int opsStatus, notifyMessageId, ...>
      */
     StatusReslut UpdateStatus(int drvid);
+    int GetUserDevCount(int uid);
+    int GetUserDevFeatureCount(int uid,int drvid);
 
 Q_SIGNALS:
     /**

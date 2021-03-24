@@ -35,6 +35,14 @@
 #include "biometricauthwidget.h"
 #include "biometricdeviceswidget.h"
 
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <libintl.h>
+#include <locale.h>
+
+#define _(string) gettext(string)
 
 LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
     : QWidget(parent),
@@ -42,7 +50,6 @@ LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
       isManual(false),
       authMode(UNKNOWN),
       m_deviceCount(-1),
-      m_featureCount(-1),
       isBioSuccess(false),
       useDoubleAuth(false),
       m_biometricProxy(nullptr),
@@ -253,7 +260,6 @@ void LoginWindow::reset()
     m_passwordEdit->clear();
     m_passwordEdit->setType(QLineEdit::Password);
     m_messageButton->hide();
-    m_featureCount = 0;
     clearMessage();
     showPasswordAuthWidget();
     m_deviceCount = -1;
@@ -565,17 +571,19 @@ void LoginWindow::onShowMessage(QString text, QLightDM::Greeter::MessageType typ
 {
     qDebug()<< "message: "<< text;
 
-//    if(type == QLightDM::Greeter::MessageTypeError)
-//    {
-//        m_messageLabel->setStyleSheet("#messageLabel{color: rgb(255, 0, 0, 180);}");
-//    }
-//    else
-//    {
-//        m_messageLabel->setStyleSheet("#messageLabel{color: black;}");
-//    }
+    if(text == "密码为空，请输入密码" && qgetenv("LANGUAGE") == "en_US")
+        text = "No password received, please input password";
+
     unacknowledged_messages = true;
     qDebug()<<"unacknowledged_messages = true";
-    m_messageLabel->setText(text);
+
+    std::string texttmp = text.toStdString();
+    const char* ch = texttmp.c_str();
+
+    char str[1024];
+    sprintf(str,_(ch));
+
+    m_messageLabel->setText(QString(str));
     stopWaiting();
 }
 
@@ -724,7 +732,7 @@ void LoginWindow::performBiometricAuth()
     //初始化设备数量
     if(m_deviceCount < 0)
     {
-        m_deviceCount = m_biometricProxy->GetDevCount();
+        m_deviceCount = m_biometricProxy->GetUserDevCount(m_uid);
     }
 
     //没有可用设备，不启用生物识别认证
@@ -736,17 +744,17 @@ void LoginWindow::performBiometricAuth()
         return;
     }
 
-    //初始化用户对应特征数量    
-    m_featureCount = m_biometricProxy->GetFeatureCount(m_uid);
+//    //初始化用户对应特征数量
+//    m_featureCount = m_biometricProxy->GetFeatureCount(m_uid);
 	
-    qDebug()<<"m_featureCount = "<<m_featureCount;
-    //没有可用特征，不启用生物识别认证    
-    if(m_featureCount < 1)
-    {
-        useDoubleAuth = false;
-        skipBiometricAuth();
-        return;
-    }
+//    qDebug()<<"m_featureCount = "<<m_featureCount;
+//    //没有可用特征，不启用生物识别认证
+//    if(m_featureCount < 1)
+//    {
+//        useDoubleAuth = false;
+//        skipBiometricAuth();
+//        return;
+//    }
 
     //初始化生物识别认证UI
     if(!useDoubleAuth)
@@ -829,13 +837,14 @@ void LoginWindow::initBiometricWidget()
 {
     if(m_biometricAuthWidget)
     {
+        m_biometricDevicesWidget->setUser(m_uid);
         return;
     }
 
     m_biometricAuthWidget = new BiometricAuthWidget(m_biometricProxy, this);
     connect(m_biometricAuthWidget, &BiometricAuthWidget::authComplete,
             this, &LoginWindow::onBiometricAuthComplete);
-    m_biometricDevicesWidget = new BiometricDevicesWidget(m_biometricProxy, this);
+    m_biometricDevicesWidget = new BiometricDevicesWidget(m_biometricProxy,m_uid, this);
     connect(m_biometricDevicesWidget, &BiometricDevicesWidget::deviceChanged,
             this, &LoginWindow::onDeviceChanged);
 
@@ -1067,7 +1076,7 @@ void LoginWindow::showPasswordAuthWidget()
 
     if(m_buttonsWidget)
     {
-        if(m_deviceCount > 0 && m_featureCount > 0)
+        if(m_deviceCount > 0)
         {
             m_buttonsWidget->setVisible(true);
             m_biometricButton->setVisible(true);
