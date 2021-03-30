@@ -89,6 +89,7 @@ void KeyboardWidget::resizeEvent(QResizeEvent */*event*/)
     ui->btn_alt_r->setFixedSize(btnWidth, btnHeight);
     ui->btn_super->setFixedSize(btnWidth, btnHeight);
     ui->btn_shift_l->setFixedSize(btnWidth, btnHeight);
+    ui->btn_shift_r->setFixedHeight(btnHeight);
     ui->spacer_2->changeSize(btnWidth / 2, 20);
 
 
@@ -125,19 +126,23 @@ float wScale = hScale;
 #define SET_ICON_SIZE(btn) \
     ui->btn_##btn->setIconSize(QSize(ui->btn_##btn->width(), ui->btn_##btn->height()));
 
-#define SET_ENTER_SHIFT_ICON_SIZE_SCALE(btn) \
+#define SET_SHIFT_ICON_SIZE_SCALE(btn) \
+    ui->btn_##btn->setIconSize(QSize(ui->btn_##btn->height() * 0.4, ui->btn_##btn->height() * 0.4));
+
+#define SET_ENTER_ICON_SIZE_SCALE(btn) \
     ui->btn_##btn->setIconSize(QSize(ui->btn_##btn->width() * 0.4, ui->btn_##btn->height() * 0.4));
 
 void KeyboardWidget::setIconSize()
 {
     SET_ICON_SIZE_SCALE(backspace);
     SET_ICON_SIZE_SCALE(backspace_num);
-    SET_ENTER_SHIFT_ICON_SIZE_SCALE(enter);
+    SET_ENTER_ICON_SIZE_SCALE(enter);
     SET_ICON_SIZE_SCALE(enter_num);
     SET_ICON_SIZE_SCALE(close);
     SET_ICON_SIZE_SCALE(super);
-    SET_ENTER_SHIFT_ICON_SIZE_SCALE(shift_l);
-    SET_ENTER_SHIFT_ICON_SIZE_SCALE(shift_r);
+
+    SET_SHIFT_ICON_SIZE_SCALE(shift_l);
+    SET_SHIFT_ICON_SIZE_SCALE(shift_r);
     SET_ICON_SIZE(up);
     SET_ICON_SIZE(down);
     SET_ICON_SIZE(left);
@@ -435,11 +440,10 @@ void KeyboardWidget::switchPage()
         ui->btn_shift_l->setIcon(QIcon(":/images/images/capslock.svg"));
         ui->btn_shift_r->setIcon(QIcon(":/images/images/capslock.svg"));
     } else {
-        QString text = QString("%1/%2").arg(page).arg(SYMBOL_PAGE_COUNT - 1);
-        ui->btn_shift_l->setText(text);
-        ui->btn_shift_r->setText(text);
-        ui->btn_shift_l->setIcon(QIcon());
-        ui->btn_shift_r->setIcon(QIcon());
+    	ui->btn_shift_l->setText("");
+        ui->btn_shift_r->setText("");
+        ui->btn_shift_l->setIcon(QIcon(":/images/images/capslock.svg"));
+        ui->btn_shift_r->setIcon(QIcon(":/images/images/capslock.svg"));
     }
 
     for(int i = 0; i < SYMBOL_KEY_COUNT; i++) {

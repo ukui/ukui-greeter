@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     VirtualKeyboard *keyboard = new VirtualKeyboard;
     QObject::connect(keyboard, &VirtualKeyboard::aboutToClose, &a, &QApplication::quit);
+    keyboard->resize(400,300);
     keyboard->show();
 
     return a.exec();
