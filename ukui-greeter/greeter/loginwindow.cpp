@@ -584,7 +584,7 @@ void LoginWindow::onShowMessage(QString text, QLightDM::Greeter::MessageType typ
     const char* ch = texttmp.c_str();
 
     char str[1024];
-    sprintf(str,_(ch));
+    sprintf(str,"%s",_(ch));
 
     m_messageLabel->setText(QString(str));
     stopWaiting();
