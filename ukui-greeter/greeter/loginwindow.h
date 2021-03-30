@@ -162,6 +162,7 @@ private:
     bool isChooseDev = false;
     bool useDoubleAuth = false;
     bool isBioSuccess =false;
+    bool            useFirstDevice;
 };
 
 #endif // LOGINWINDOW_H

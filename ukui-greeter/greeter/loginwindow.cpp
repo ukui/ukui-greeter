@@ -61,7 +61,8 @@ LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
       m_passwordButton(nullptr),
       m_otherDeviceButton(nullptr),
       m_retryButton(nullptr),
-      m_nameLabel(nullptr)
+      m_nameLabel(nullptr),
+      useFirstDevice(false)
 {    
     initUI();
 
@@ -71,6 +72,8 @@ LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
             this, SLOT(onShowPrompt(QString,QLightDM::Greeter::PromptType)));
     connect(m_greeter, SIGNAL(authenticationComplete()),
             this, SLOT(onAuthenticationComplete()));
+
+    useFirstDevice = Configuration::instance()->getUseFirstDevice();
 }
 
 QPixmap LoginWindow::PixmapToRound(const QPixmap &src, int radius)
@@ -614,7 +617,6 @@ void LoginWindow::onAuthenticationComplete()
         qDebug() << "authentication failed";
         if (prompted)
         {
-
             m_passwordEdit->clear();
 
             //如果用户输入了不存在的用户名导致的认证失败，让用户重新输入用户名
@@ -776,9 +778,14 @@ void LoginWindow::performBiometricAuth()
     if(m_deviceName.isEmpty() && !m_deviceInfo)
     {
         qDebug() << "No default device";
-        useDoubleAuth = false;
-        skipBiometricAuth();
-        return;
+        if(m_deviceCount == 1 && useFirstDevice == true){
+            DeviceList deviceList = m_biometricProxy->GetDevList();
+            m_deviceInfo = deviceList.at(0);
+        }else{
+            useDoubleAuth = false;
+            skipBiometricAuth();
+            return;
+        }
     }
     //第一次，获取默认设备的设备信息，之后使用的则是从设备选择窗口传出的设备信息
     if(!m_deviceInfo)

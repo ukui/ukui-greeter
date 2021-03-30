@@ -42,6 +42,7 @@ public:
     void saveLastNumLock(bool value);
     QPixmap getLogo();
     QString getDefaultBackgroundName();
+    bool getUseFirstDevice();
     QTranslator             *m_trans;
 
 private:
