@@ -925,8 +925,10 @@ void GreeterWindow::onSessionChanged(const QString &session)
             sessionTmp = "";
         }
     }
-
+	
     QString sessionPrefix = sessionTmp.left(sessionTmp.indexOf('-'));
+    if(sessionTmp == "ukui-wayland")
+	    sessionPrefix = "ukui_wayland";
     QString sessionIcon = IMAGE_DIR + QString("badges/%1_badge.svg")
             .arg(sessionPrefix.toLower());
     QFile iconFile(sessionIcon);

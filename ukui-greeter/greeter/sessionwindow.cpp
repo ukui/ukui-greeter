@@ -95,6 +95,9 @@ void SessionWindow::onSessionMenuTrigged(QAction *action)
 QString SessionWindow::getSessionIcon(const QString &session)
 {
     QString sessionPrefix = session.left(session.indexOf('-'));
+    if(session == "ukui-wayland")
+        sessionPrefix = "ukui_wayland";
+
     QString sessionIcon = IMAGE_DIR + QString("badges/%1_badge.svg").arg(sessionPrefix.toLower());
     QFile iconFile(sessionIcon);
     if(!iconFile.exists()){
