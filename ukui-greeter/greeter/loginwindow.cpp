@@ -244,7 +244,7 @@ void LoginWindow::setChildrenGeometry()
     m_passwordEdit->setGeometry((m_passwdWidget->width() - 300)/2, 0, 300, 34);
     m_messageLabel->setGeometry((m_passwdWidget->width() - 600)/2,
                                 m_passwordEdit->geometry().bottom() + 25,
-                                600, 20);
+                                600, 25);
 
     m_messageButton->setGeometry((m_passwdWidget->width() - 200)/2, 0, 200, 40);
 
