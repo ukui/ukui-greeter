@@ -107,7 +107,7 @@ LanguagesVector& getLanguages()
 {
     static LanguagesVector languagesVector;
     if(!languagesVector.isEmpty())
-        return languagesVector;
+    	languagesVector.clear(); 
 
     QProcess process;
     QString command = "/usr/share/language-tools/language-options";

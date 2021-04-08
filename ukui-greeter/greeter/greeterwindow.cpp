@@ -836,7 +836,7 @@ void GreeterWindow::onLanguageChanged(const Language &language)
 
     m_greeter->setLang(language.code);
 
-    m_languageLB->setText(language.name);
+    m_languageLB->setText(getLanguage(language.code).name);
 
     const QFont &font = m_languageLB->font();
     QFontMetrics fm(font);
