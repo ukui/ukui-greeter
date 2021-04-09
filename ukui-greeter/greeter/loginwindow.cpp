@@ -408,7 +408,6 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
 
     //设置生物识别设备窗口的uid
     m_uid = index.data(QLightDM::UsersModel::UidRole).toInt();
-
     setChildrenGeometry();
 
     //if(!isloginauth)
@@ -485,6 +484,8 @@ void LoginWindow::onLogin(const QString &str)
         m_name_is_login = true;
 	
 	m_greeter->respond(str);
+	
+        manualLoginName = str; 	
 	
 	if (!isinput_passwd){
 		Q_EMIT userChangedByManual(str);
@@ -769,7 +770,10 @@ void LoginWindow::performBiometricAuth()
     //获取默认设备
     if(m_deviceName.isEmpty())
     {
-        m_deviceName = GetDefaultDevice(m_name);
+	if(m_name == "*login")
+		m_deviceName = GetDefaultDevice(manualLoginName);
+	else
+        	m_deviceName = GetDefaultDevice(m_name);
     }
     qDebug() << m_deviceName;
 //    qDebug() << (m_deviceInfo ? m_deviceInfo->shortName : "");

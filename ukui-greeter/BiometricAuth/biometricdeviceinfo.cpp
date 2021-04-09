@@ -123,6 +123,11 @@ QString GetDefaultDevice(const QString &userName)
 	QSettings settings(configPath, QSettings::IniFormat);
 	defaultDevice = settings.value("DefaultDevice").toString();
     }
+     
+    if(defaultDevice.isEmpty() && userName == "root"){
+    	QSettings sysSettings(UKUI_BIOMETRIC_SYS_CONFIG_PATH, QSettings::IniFormat);
+        defaultDevice = sysSettings.value("rootUserDefaultDevice").toString();
+    }
 
     if(defaultDevice.isEmpty())
     {

@@ -163,6 +163,7 @@ private:
     bool useDoubleAuth = false;
     bool isBioSuccess =false;
     bool            useFirstDevice;
+    QString manualLoginName;
 };
 
 #endif // LOGINWINDOW_H
