@@ -69,7 +69,7 @@ public Q_SLOTS:
      * @param waiting   等待时间（秒）
      * @return
      */
-    int StopOps(int drvid, int waiting = 5);
+    int StopOps(int drvid, int waiting = 3000);
     /**
      * @brief 获取当前用户已连接设备对应特征数目
      * @param uid              用户id

@@ -134,6 +134,7 @@ int BiometricProxy::GetUserDevCount(int uid)
 
 int BiometricProxy::GetUserDevFeatureCount(int uid,int drvid)
 {
+    StopOps(drvid);
     QDBusMessage FeatureResult = call(QStringLiteral("GetFeatureList"),drvid,uid,0,-1);
     if(FeatureResult.type() == QDBusMessage::ErrorMessage)
     {
