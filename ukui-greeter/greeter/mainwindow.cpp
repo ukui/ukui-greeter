@@ -268,9 +268,8 @@ void MainWindow::moveToScreen(QScreen *screen)
         m_greeterWnd->setGeometry(QApplication::primaryScreen()->geometry());
     
     m_greeterWnd->hide();
-    m_greeterWnd->show();
     m_greeterWnd->setGeometry(activeScreenRect);
-
+    m_greeterWnd->show();
 }
 
 BackGroundWindow *MainWindow::addBackgroundWindow(QScreen *screen)

@@ -320,7 +320,10 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     {
         m_languageWnd->move(m_languageLB->x(),m_languageLB->y()+m_languageWnd->height());
     }
-
+    
+    if(m_powerWnd){
+    	m_powerWnd->move((width()-m_powerWnd->width())/2,(height() - m_powerWnd->height())/2);
+    }
     //电源按钮位置,根据x，y的值进行计算，初始值为到右下角的距离
 
     int x = 39;
