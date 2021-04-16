@@ -984,7 +984,7 @@ QPixmap *GreeterWindow::getBackground(const QString &path, const QRect &rect)
     QPair<QString, QString> key(path, resolution);
 
     if(!m_backgrounds.contains(key)){
-        QPixmap *pixmap =  new QPixmap(scaledPixmap(width(), height(), path));
+        QPixmap *pixmap =  new QPixmap(scaledPixmap(width()+1, height()+1, path));
         m_backgrounds[key] = blurPixmap(pixmap);
     }
     return m_backgrounds[key];
