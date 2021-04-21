@@ -158,7 +158,7 @@ void GreeterWindow::initUI()
     m_powerLB->setFixedSize(48, 48);
     m_powerLB->setCursor(Qt::PointingHandCursor);
     m_powerLB->installEventFilter(this);
-    m_powerLB->setToolTip(tr("Power dialog"));
+    //m_powerLB->setToolTip(tr("Power dialog"));
     connect(m_powerLB, &QPushButton::clicked, this, &GreeterWindow::showPowerWnd);
 
     //虚拟键盘启动按钮
@@ -170,7 +170,7 @@ void GreeterWindow::initUI()
     m_keyboardLB->setFixedSize(48, 48);
     m_keyboardLB->setCursor(Qt::PointingHandCursor);
     m_keyboardLB->installEventFilter(this);
-    m_keyboardLB->setToolTip(tr("On-screen keyboard, providing virtual keyboard function"));
+    //m_keyboardLB->setToolTip(tr("On-screen keyboard, providing virtual keyboard function"));
     connect(m_keyboardLB, &QPushButton::clicked,
             this, &GreeterWindow::showVirtualKeyboard);
 
@@ -184,7 +184,7 @@ void GreeterWindow::initUI()
         m_sessionLB->setFixedSize(48, 48);
         m_sessionLB->setCursor(Qt::PointingHandCursor);
         m_sessionLB->installEventFilter(this);
-        m_sessionLB->setToolTip(tr("Set the desktop environment for the selected user to log in.If the user is logged in, it will take effect after logging in again"));
+        //m_sessionLB->setToolTip(tr("Set the desktop environment for the selected user to log in.If the user is logged in, it will take effect after logging in again"));
         m_sessionLB->setIcon(QIcon(IMAGE_DIR + QString("badges/unknown_badge.svg")));
         onSessionChanged(m_greeter->defaultSessionHint());
         connect(m_sessionLB, &QPushButton::clicked, this, &GreeterWindow::showSessionWnd);
@@ -200,7 +200,7 @@ void GreeterWindow::initUI()
         m_languageLB->setFixedHeight(48);
         m_languageLB->setCursor(Qt::PointingHandCursor);
         m_languageLB->installEventFilter(this);
-        m_languageLB->setToolTip(tr("Set the language of the selected user after logging in. If the user is logged in, it will take effect after logging in again."));
+        //m_languageLB->setToolTip(tr("Set the language of the selected user after logging in. If the user is logged in, it will take effect after logging in again."));
 
         m_languageLB->setText(defaultLang.at(0).name);
         m_languageLB->adjustSize();
@@ -378,10 +378,10 @@ void GreeterWindow::paintEvent(QPaintEvent *e)
 
 void GreeterWindow::refreshTranslate()
 {
-    m_powerLB->setToolTip(tr("Power dialog"));
-    m_keyboardLB->setToolTip(tr("On-screen keyboard, providing virtual keyboard function"));
-    m_sessionLB->setToolTip(tr("Set the desktop environment for the selected user to log in.If the user is logged in, it will take effect after logging in again"));
-    m_languageLB->setToolTip(tr("Set the language of the selected user after logging in. If the user is logged in, it will take effect after logging in again."));
+//    m_powerLB->setToolTip(tr("Power dialog"));
+//    m_keyboardLB->setToolTip(tr("On-screen keyboard, providing virtual keyboard function"));
+//    m_sessionLB->setToolTip(tr("Set the desktop environment for the selected user to log in.If the user is logged in, it will take effect after logging in again"));
+//    m_languageLB->setToolTip(tr("Set the language of the selected user after logging in. If the user is logged in, it will take effect after logging in again."));
 }
 
 void GreeterWindow::setVirkeyboardPos()
