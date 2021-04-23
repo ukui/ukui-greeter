@@ -521,8 +521,7 @@ void GreeterWindow::setBackground(const QModelIndex &index)
 
     //读取/var/lib/lightdm-date/用户名/ukui-greeter.conf,
     //判断是否设置了该用户的登陆界面的背景图片.
-    //QString userConfigurePath = m_greeter->getEnsureShareDir(index.data(QLightDM::UsersModel::NameRole).toString()) + "/ukui-greeter.conf";
-    QString userConfigurePath = "/var/lib/lightdm-data/" + index.data(QLightDM::UsersModel::NameRole).toString() + "/ukui-greeter.conf";
+    QString userConfigurePath = m_greeter->getEnsureShareDir(index.data(QLightDM::UsersModel::NameRole).toString()) + "/ukui-greeter.conf";
     QFile backgroundFile(userConfigurePath);
     if(backgroundFile.exists()){
         QSettings settings(userConfigurePath,QSettings::IniFormat);
@@ -543,6 +542,14 @@ void GreeterWindow::setBackground(const QModelIndex &index)
             }
         }
         settings.endGroup();
+    }else{
+    	QSettings settingsbak(userConfigurePath,QSettings::IniFormat);
+        settingsbak.beginGroup("greeter");
+        settingsbak.setValue("backgroundPath","/usr/share/backgrounds/warty-final-ubuntukylin.jpg");
+        settingsbak.endGroup();
+        settingsbak.sync();
+        QFile file(userConfigurePath);
+        file.setPermissions(QFile::WriteOther | QFile::ReadOther);
     }
 
     QSharedPointer<Background> background(new Background);
