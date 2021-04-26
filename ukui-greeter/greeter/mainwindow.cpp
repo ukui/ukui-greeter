@@ -264,12 +264,13 @@ void MainWindow::moveToScreen(QScreen *screen)
     QRect activeScreenRect = m_activeScreen->geometry();
 
     qDebug() << "moveToScreen activeScreenRect " << activeScreenRect;
-    if(m_monitorWatcher->getMonitorCount() == 1)
-        m_greeterWnd->setGeometry(QApplication::primaryScreen()->geometry());
-    
     m_greeterWnd->hide();
-    m_greeterWnd->setGeometry(activeScreenRect);
     m_greeterWnd->show();
+    m_greeterWnd->windowHandle()->setScreen(screen);
+    m_greeterWnd->setGeometry(activeScreenRect);
+    //m_greeterWnd->move(activeScreenRect.topLeft());
+  //  m_greeterWnd->move(activeScreenRect.topLeft());
+  //  qApp->processEvents();
 }
 
 BackGroundWindow *MainWindow::addBackgroundWindow(QScreen *screen)
