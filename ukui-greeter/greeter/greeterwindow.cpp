@@ -571,6 +571,7 @@ void GreeterWindow::onUserSelected(const QModelIndex &index)
 void GreeterWindow::updateLanguage(QString userName)
 {
     QString language;
+    QString formatsLocale;
     QDBusInterface iface("org.freedesktop.Accounts", "/org/freedesktop/Accounts",
                          "org.freedesktop.Accounts",QDBusConnection::systemBus());
     QDBusReply<QDBusObjectPath> userPath = iface.call("FindUserByName", userName);
@@ -588,6 +589,22 @@ void GreeterWindow::updateLanguage(QString userName)
                     onLanguageChanged(getLanguage(language));
              }
         }
+
+        QDBusReply<QDBusVariant> fomatsLocalReply = userIface.call("Get", "org.freedesktop.Accounts.User", "FormatsLocale");
+        if(!fomatsLocalReply.isValid())
+            qWarning() << "Get User's language error" << languageReply.error();
+        else {
+            formatsLocale = fomatsLocalReply.value().variant().toString();
+            if(!formatsLocale.isEmpty()){
+                if(formatsLocale.startsWith("zh")){
+                    local = QLocale::Chinese;
+                }
+                else{
+                    local = QLocale::English;
+                }
+            }
+        }
+
     }
 }
 
@@ -830,13 +847,11 @@ void GreeterWindow::onLanguageChanged(const Language &language)
     m_configuration->m_trans = new QTranslator();
     QString qmFile;
     if(language.code.startsWith("zh")){
-        local = QLocale::Chinese;
         qmFile = QM_DIR + QString("%1.qm").arg("zh_CN");
         setenv("LANGUAGE","zh_CN",1);
     	setlocale(LC_ALL,"zh_CN.utf8");
     }
     else{
-        local = QLocale::English;
         qmFile = QM_DIR + QString("%1.qm").arg(local.name());
         setenv("LANGUAGE",local.name().toLatin1().data(),1);
         setlocale(LC_ALL,"");
