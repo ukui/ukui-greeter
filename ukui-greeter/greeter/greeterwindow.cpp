@@ -506,12 +506,16 @@ void GreeterWindow::drawBackground(QSharedPointer<Background> &background, const
 void GreeterWindow::setBackground(const QModelIndex &index)
 {
     QString backgroundPath;
+    QString accountBackground; //记录来自accountsservice的背景图片
 
     backgroundPath = index.data(QLightDM::UsersModel::BackgroundPathRole).toString();
+    accountBackground = backgroundPath;
+
     if(backgroundPath.isEmpty())
     {
         uid_t uid = index.data(QLightDM::UsersModel::UidRole).toUInt();
         backgroundPath = getAccountBackground(uid);
+        accountBackground = backgroundPath;
         if(backgroundPath.isEmpty())
             backgroundPath = m_configuration->getDefaultBackgroundName();
     }
@@ -532,7 +536,7 @@ void GreeterWindow::setBackground(const QModelIndex &index)
                 backgroundPath = filepath;
             }
         }
-        if(settings.contains("color")){
+        if(accountBackground.isEmpty() && settings.contains("color")){
             QString drawBackgroundColor = settings.value("color").toString();
        	    if(drawBackgroundColor.length() == 7 && drawBackgroundColor.startsWith("#")){
             drawBackgroundColor = drawBackgroundColor.remove(0,1);
@@ -598,10 +602,14 @@ void GreeterWindow::updateLanguage(QString userName)
             if(!formatsLocale.isEmpty()){
                 if(formatsLocale.startsWith("zh")){
                     local = QLocale::Chinese;
+		    QString date = local.toString(QDate::currentDate(),"yyyy/MM/dd ddd");
+                    lblDate->setText(date);
                 }
                 else{
                     local = QLocale::English;
-                }
+                    QString date = local.toString(QDate::currentDate(),"yyyy/MM/dd ddd");
+                    lblDate->setText(date);
+		}
             }
         }
 
