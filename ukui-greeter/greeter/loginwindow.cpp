@@ -98,33 +98,33 @@ void LoginWindow::initUI()
 {
     setFixedWidth(500);
 
-//    m_userWidget = new QWidget(this);
-//    m_userWidget->setObjectName(QStringLiteral("userWidget"));
+    //    m_userWidget = new QWidget(this);
+    //    m_userWidget->setObjectName(QStringLiteral("userWidget"));
 
     /* 头像 */
-//    m_faceLabel = new QLabel(m_userWidget);
-//    m_faceLabel->setObjectName(QStringLiteral("faceLabel"));
-//    m_faceLabel->setFocusPolicy(Qt::NoFocus);
+    //    m_faceLabel = new QLabel(m_userWidget);
+    //    m_faceLabel->setObjectName(QStringLiteral("faceLabel"));
+    //    m_faceLabel->setFocusPolicy(Qt::NoFocus);
 
     /* 返回按钮 */
-//    m_backButton = new QPushButton(m_userWidget);
-//    m_backButton->setObjectName(QStringLiteral("backButton"));
-//    m_backButton->setFocusPolicy(Qt::NoFocus);
-//    m_backButton->show();
-//    connect(m_backButton, &QPushButton::clicked,
-//            this, &LoginWindow::onBackButtonClicked);
+    //    m_backButton = new QPushButton(m_userWidget);
+    //    m_backButton->setObjectName(QStringLiteral("backButton"));
+    //    m_backButton->setFocusPolicy(Qt::NoFocus);
+    //    m_backButton->show();
+    //    connect(m_backButton, &QPushButton::clicked,
+    //            this, &LoginWindow::onBackButtonClicked);
 
-//    /* 用户名 */
-//    m_nameLabel = new QLabel(m_userWidget);
-//    m_nameLabel->setObjectName(QStringLiteral("login_nameLabel"));
-//    m_nameLabel->setFocusPolicy(Qt::NoFocus);
-//    m_nameLabel->setAlignment(Qt::AlignCenter);
+    //    /* 用户名 */
+    //    m_nameLabel = new QLabel(m_userWidget);
+    //    m_nameLabel->setObjectName(QStringLiteral("login_nameLabel"));
+    //    m_nameLabel->setFocusPolicy(Qt::NoFocus);
+    //    m_nameLabel->setAlignment(Qt::AlignCenter);
 
-//    /* 是否已登录 */
-//    m_isLoginLabel = new QLabel(m_userWidget);
-//    m_isLoginLabel->setObjectName(QStringLiteral("isLoginLabel"));
-//    m_isLoginLabel->setFocusPolicy(Qt::NoFocus);
-//    m_isLoginLabel->setAlignment(Qt::AlignCenter);
+    //    /* 是否已登录 */
+    //    m_isLoginLabel = new QLabel(m_userWidget);
+    //    m_isLoginLabel->setObjectName(QStringLiteral("isLoginLabel"));
+    //    m_isLoginLabel->setFocusPolicy(Qt::NoFocus);
+    //    m_isLoginLabel->setAlignment(Qt::AlignCenter);
 
     /* 密码框所在窗口 */
     m_passwdWidget = new QWidget(this);
@@ -132,7 +132,7 @@ void LoginWindow::initUI()
 
     /* 密码框 */
     m_passwordEdit = new IconEdit(m_passwdWidget);
-    m_passwordEdit->setObjectName(QStringLiteral("passwordEdit"));   
+    m_passwordEdit->setObjectName(QStringLiteral("passwordEdit"));
     m_passwordEdit->setIcon(QIcon(":/images/login-button.png"));
     m_passwordEdit->setFocusPolicy(Qt::StrongFocus);
     m_passwordEdit->installEventFilter(this);
@@ -172,7 +172,7 @@ void LoginWindow::resizeEvent(QResizeEvent *)
 #include <QKeyEvent>
 void LoginWindow::keyReleaseEvent(QKeyEvent *event)
 {
-//    qDebug() << event->key();
+    //    qDebug() << event->key();
     if(event->key() == Qt::Key_Escape)
     {
         //退出设备选择
@@ -223,17 +223,17 @@ void LoginWindow::refreshTranslate()
 void LoginWindow::setChildrenGeometry()
 {
     // 用户信息显示位置
-//    m_userWidget->setGeometry(0, (height() - 240 - 150) / 2,
-//                              width(), 240);
+    //    m_userWidget->setGeometry(0, (height() - 240 - 150) / 2,
+    //                              width(), 240);
 
-//    m_faceLabel->setGeometry((width() - 130) / 2, 0, 130, 130);
-//    m_backButton->setGeometry(m_faceLabel->geometry().left() - 30 - 32,
-//                              m_faceLabel->geometry().top() + (m_faceLabel->height() - 32) / 2,
-//                              32, 32);
-//    m_nameLabel->setGeometry(0, m_faceLabel->geometry().bottom() + 25,
-//                             width(), 30);
-//    m_isLoginLabel->setGeometry(0, m_nameLabel->geometry().bottom() + 10,
-//                                width(), 15);
+    //    m_faceLabel->setGeometry((width() - 130) / 2, 0, 130, 130);
+    //    m_backButton->setGeometry(m_faceLabel->geometry().left() - 30 - 32,
+    //                              m_faceLabel->geometry().top() + (m_faceLabel->height() - 32) / 2,
+    //                              32, 32);
+    //    m_nameLabel->setGeometry(0, m_faceLabel->geometry().bottom() + 25,
+    //                             width(), 30);
+    //    m_isLoginLabel->setGeometry(0, m_nameLabel->geometry().bottom() + 10,
+    //                                width(), 15);
 
     // 密码框和提示信息显示位置
 
@@ -258,8 +258,8 @@ void LoginWindow::setChildrenGeometry()
  */
 void LoginWindow::reset()
 {
-//    m_nameLabel->clear();
-//    m_isLoginLabel->clear();
+    //    m_nameLabel->clear();
+    //    m_isLoginLabel->clear();
     m_passwordEdit->clear();
     m_passwordEdit->setType(QLineEdit::Password);
     m_messageButton->hide();
@@ -399,19 +399,19 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
     // setUserName(name.isEmpty() ? m_name : name);
 
     //设置头像
-//    QString facePath = index.data(QLightDM::UsersModel::ImagePathRole).toString();
-//    setFace(facePath);
+    //    QString facePath = index.data(QLightDM::UsersModel::ImagePathRole).toString();
+    //    setFace(facePath);
 
     //显示是否已经登录
-//    bool isLoggedIn = index.data(QLightDM::UsersModel::LoggedInRole).toBool();
-//    setLoggedIn(isLoggedIn);
+    //    bool isLoggedIn = index.data(QLightDM::UsersModel::LoggedInRole).toBool();
+    //    setLoggedIn(isLoggedIn);
 
     //设置生物识别设备窗口的uid
     m_uid = index.data(QLightDM::UsersModel::UidRole).toInt();
     setChildrenGeometry();
 
     //if(!isloginauth)
-    	startAuthentication();
+    startAuthentication();
 
     isloginauth = false;
 
@@ -482,15 +482,15 @@ void LoginWindow::onLogin(const QString &str)
         isloginauth = true;
         isManual = true;
         m_name_is_login = true;
-	
-	m_greeter->respond(str);
-	
-        manualLoginName = str; 	
-	
-	if (!isinput_passwd){
-		Q_EMIT userChangedByManual(str);
-		isinput_passwd = true;
-	}
+
+        m_greeter->respond(str);
+
+        manualLoginName = str;
+
+        if (!isinput_passwd){
+            Q_EMIT userChangedByManual(str);
+            isinput_passwd = true;
+        }
     }
     else
     {  //发送密码
@@ -546,8 +546,8 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
         }
         else if(isauto_switch)
         {
-             m_passwordEdit->setType(QLineEdit::Password);
-             isauto_switch = false;
+            m_passwordEdit->setType(QLineEdit::Password);
+            isauto_switch = false;
         }
 
         prompted = true;
@@ -555,7 +555,7 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
         qDebug()<<"unacknowledged_messages = false";
         if(text == "Password: "||text == "密码："){
             if(useDoubleAuth)
-                 onShowMessage(tr("Please enter your password or enroll your fingerprint "), QLightDM::Greeter::MessageTypeInfo);
+                onShowMessage(tr("Please enter your password or enroll your fingerprint "), QLightDM::Greeter::MessageTypeInfo);
 
             text = tr("Password: ");
         }
@@ -622,14 +622,14 @@ void LoginWindow::onAuthenticationComplete()
 
             //如果用户输入了不存在的用户名导致的认证失败，让用户重新输入用户名
             if(isManual){
-                    if(m_name_is_login){
-                        m_name_is_login = false;
-                        m_name = "*login";
-                    }
-                    
-		    if(!unacknowledged_messages)
-                        onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeError);
-            }       
+                if(m_name_is_login){
+                    m_name_is_login = false;
+                    m_name = "*login";
+                }
+
+                if(!unacknowledged_messages)
+                    onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeError);
+            }
             else{
                 if(!unacknowledged_messages)
                     onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeError);
@@ -638,7 +638,7 @@ void LoginWindow::onAuthenticationComplete()
                 else
                     authMode = PASSWORD;
             }
-	    isinput_passwd = false;
+            isinput_passwd = false;
             isManual = false;
             startAuthentication();
         }
@@ -661,12 +661,12 @@ void LoginWindow::show_authenticated(bool successful)
     if(successful)
     {
         isretry = false;
-      //  m_greeter->startSession();
+        //  m_greeter->startSession();
         m_messageButton->setText(tr("Login"));
     }
     else
     {
-	isretry = true;
+        isretry = true;
         m_messageButton->setText(tr("Retry"));
     }
 }
@@ -683,8 +683,8 @@ void LoginWindow::onMessageButtonClicked()
     else
     {
         m_messageButton->hide();
-      //  m_passwordEdit->show();
-      //  m_passwordEdit->clear();
+        //  m_passwordEdit->show();
+        //  m_passwordEdit->clear();
 
         authMode = PASSWORD;
 
@@ -702,9 +702,9 @@ void LoginWindow::setDirLogin()
 
 void LoginWindow::pamBioSuccess()
 {
-     m_biometricAuthWidget->startAuth(m_deviceInfo, m_uid);
-     onShowMessage(tr("Please enter your password or enroll your fingerprint "), QLightDM::Greeter::MessageTypeInfo);
-     m_bioTimer->stop();
+    m_biometricAuthWidget->startAuth(m_deviceInfo, m_uid);
+    onShowMessage(tr("Please enter your password or enroll your fingerprint "), QLightDM::Greeter::MessageTypeInfo);
+    m_bioTimer->stop();
 }
 
 void LoginWindow::startBioAuth()
@@ -747,17 +747,17 @@ void LoginWindow::performBiometricAuth()
         return;
     }
 
-//    //初始化用户对应特征数量
-//    m_featureCount = m_biometricProxy->GetFeatureCount(m_uid);
-	
-//    qDebug()<<"m_featureCount = "<<m_featureCount;
-//    //没有可用特征，不启用生物识别认证
-//    if(m_featureCount < 1)
-//    {
-//        useDoubleAuth = false;
-//        skipBiometricAuth();
-//        return;
-//    }
+    //    //初始化用户对应特征数量
+    //    m_featureCount = m_biometricProxy->GetFeatureCount(m_uid);
+
+    //    qDebug()<<"m_featureCount = "<<m_featureCount;
+    //    //没有可用特征，不启用生物识别认证
+    //    if(m_featureCount < 1)
+    //    {
+    //        useDoubleAuth = false;
+    //        skipBiometricAuth();
+    //        return;
+    //    }
 
     //初始化生物识别认证UI
     if(!useDoubleAuth)
@@ -770,13 +770,13 @@ void LoginWindow::performBiometricAuth()
     //获取默认设备
     if(m_deviceName.isEmpty())
     {
-	if(m_name == "*login")
-		m_deviceName = GetDefaultDevice(manualLoginName);
-	else
-        	m_deviceName = GetDefaultDevice(m_name);
+        if(m_name == "*login")
+            m_deviceName = GetDefaultDevice(manualLoginName);
+        else
+            m_deviceName = GetDefaultDevice(m_name);
     }
     qDebug() << m_deviceName;
-//    qDebug() << (m_deviceInfo ? m_deviceInfo->shortName : "");
+    //    qDebug() << (m_deviceInfo ? m_deviceInfo->shortName : "");
 
     //如果默认设备为空的话，第一次不启动生物识别认证
     if(m_deviceName.isEmpty() && !m_deviceInfo)
@@ -815,12 +815,12 @@ void LoginWindow::performBiometricAuth()
 
     m_biometricAuthWidget->startAuth(m_deviceInfo, m_uid);
 
-//    m_biometricAuthWidget->show();
-//    m_passwdWidget->hide();
-//    m_biometricButton->hide();
-//    m_passwordButton->setVisible(true);
-//    m_otherDeviceButton->setVisible(m_deviceCount > 1);
-//    m_retryButton->setVisible(false);
+    //    m_biometricAuthWidget->show();
+    //    m_passwdWidget->hide();
+    //    m_biometricButton->hide();
+    //    m_passwordButton->setVisible(true);
+    //    m_otherDeviceButton->setVisible(m_deviceCount > 1);
+    //    m_retryButton->setVisible(false);
     showBiometricAuthWidget();
 }
 
@@ -830,17 +830,17 @@ void LoginWindow::skipBiometricAuth()
 
     showPasswordAuthWidget();
 
-//    if(m_biometricAuthWidget)
-//    {
-//        m_biometricAuthWidget->hide();
-//    }
-//    if(m_buttonsWidget)
-//    {
-//        m_biometricButton->setVisible(true);
-//        m_passwordButton->setVisible(false);
-//        m_otherDeviceButton->setVisible(false);
-//       m_retryButton->setVisible(false);
-//    }
+    //    if(m_biometricAuthWidget)
+    //    {
+    //        m_biometricAuthWidget->hide();
+    //    }
+    //    if(m_buttonsWidget)
+    //    {
+    //        m_biometricButton->setVisible(true);
+    //        m_passwordButton->setVisible(false);
+    //        m_otherDeviceButton->setVisible(false);
+    //       m_retryButton->setVisible(false);
+    //    }
     m_passwdWidget->show();
 }
 
@@ -963,10 +963,10 @@ void LoginWindow::setBiometricButtonWidgetGeometry()
     {
         if(scale > 0.5)
             m_buttonsWidget->setGeometry(0, height() - 100*scale - m_buttonsWidget->height(),
-                                     width(), m_buttonsWidget->height());
+                                         width(), m_buttonsWidget->height());
         else
             m_buttonsWidget->setGeometry(0, height() - 20 - m_buttonsWidget->height(),
-                                     width(), m_buttonsWidget->height());
+                                         width(), m_buttonsWidget->height());
     }
 }
 
@@ -976,22 +976,22 @@ void LoginWindow::onDeviceChanged(const DeviceInfoPtr &deviceInfo)
     m_deviceInfo = deviceInfo;
 
     if(authMode != BIOMETRIC){
-     	authMode = BIOMETRIC;
-    	startAuthentication();
+        authMode = BIOMETRIC;
+        startAuthentication();
     }
     else
         m_biometricAuthWidget->startAuth(m_deviceInfo, m_uid);
 
-//    m_backButton->show();
-//    m_userWidget->show();
-//    m_passwdWidget->hide();
-//    m_biometricAuthWidget->show();
-//    m_buttonsWidget->show();
-//    m_biometricDevicesWidget->hide();
-//    m_biometricButton->hide();
-//    m_passwordButton->show();
-//    m_otherDeviceButton->show();
-//    m_retryButton->hide();
+    //    m_backButton->show();
+    //    m_userWidget->show();
+    //    m_passwdWidget->hide();
+    //    m_biometricAuthWidget->show();
+    //    m_buttonsWidget->show();
+    //    m_biometricDevicesWidget->hide();
+    //    m_biometricButton->hide();
+    //    m_passwordButton->show();
+    //    m_otherDeviceButton->show();
+    //    m_retryButton->hide();
     showBiometricAuthWidget();
 }
 
@@ -1000,9 +1000,9 @@ void LoginWindow::onBiometricAuthComplete(bool result)
     if(!result)
     {
         if(useDoubleAuth){
-               onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeInfo);
-               if(!isBioSuccess)
-                   startBioAuth();
+            onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeInfo);
+            if(!isBioSuccess)
+                startBioAuth();
         }
         else{
             m_retryButton->setVisible(!m_biometricAuthWidget->isHidden());
