@@ -74,6 +74,14 @@ LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
             this, SLOT(onAuthenticationComplete()));
 
     useFirstDevice = Configuration::instance()->getUseFirstDevice();
+
+    QDBusInterface *iface = new QDBusInterface("org.freedesktop.login1",
+                                               "/org/freedesktop/login1",
+                                               "org.freedesktop.login1.Manager",
+                                               QDBusConnection::systemBus(),
+                                               this);
+    connect(iface, SIGNAL(PrepareForSleep(bool)), this, SLOT(onPrepareForSleep(bool)));
+    maxFailedTimes = GetFailedTimes();
 }
 
 QPixmap LoginWindow::PixmapToRound(const QPixmap &src, int radius)
@@ -554,9 +562,10 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
         unacknowledged_messages = false;
         qDebug()<<"unacknowledged_messages = false";
         if(text == "Password: "||text == "密码："){
-            if(useDoubleAuth)
-                onShowMessage(tr("Please enter your password or enroll your fingerprint "), QLightDM::Greeter::MessageTypeInfo);
-
+            if(useDoubleAuth){
+        if(!m_failMap.contains(m_uid) || m_failMap[m_uid] < maxFailedTimes)
+	        onShowMessage(tr("Please enter your password or enroll your fingerprint "), QLightDM::Greeter::MessageTypeInfo);
+	    }
             text = tr("Password: ");
         }
         if(text == "login:") {
@@ -695,6 +704,36 @@ void LoginWindow::onMessageButtonClicked()
 
 }
 
+void LoginWindow::restartBioAuth()
+{
+    //pamBioSuccess();
+    startBioAuth();
+}
+
+void LoginWindow::onPrepareForSleep(bool sleep)
+{
+    ///系统休眠时，会关闭总线，导致设备不可用，发生错误
+    ///在系统休眠之前停止认证，在系统唤醒后重新开始认证
+    if(sleep)
+    {
+        if(useDoubleAuth){
+            if(m_biometricAuthWidget){
+                manualStopBio = true;
+                m_biometricAuthWidget->stopAuth();
+                if(m_bioTimer && m_bioTimer->isActive())
+                    m_bioTimer->stop();
+            }
+        }
+    }
+    else
+    {
+        if(useDoubleAuth){
+            manualStopBio = false;
+            restartBioAuth();
+        }
+    }
+}
+
 void LoginWindow::setDirLogin()
 {
     direct_login = true;
@@ -723,6 +762,13 @@ void LoginWindow::performBiometricAuth()
         m_biometricProxy = new BiometricProxy(this);
     }
 
+    //已经错误超过3次
+    if(m_failMap.contains(m_uid) && m_failMap[m_uid] >=maxFailedTimes)
+    {
+        useDoubleAuth = false;
+        skipBiometricAuth();
+        return;
+    }
     //服务没启动，或者打开DBus连接出错
     if(!m_biometricProxy->isValid())
     {
@@ -1000,6 +1046,23 @@ void LoginWindow::onBiometricAuthComplete(bool result)
     if(!result)
     {
         if(useDoubleAuth){
+            if(manualStopBio){
+                manualStopBio = false;
+                return;
+            }
+
+            if(m_failMap.contains(m_uid)){
+                m_failMap[m_uid] = m_failMap[m_uid] + 1;
+            }else{
+                m_failMap[m_uid] = 1;
+            }
+
+            if(m_failMap[m_uid] >= maxFailedTimes){
+                onShowMessage(tr("Too many unsuccessful attempts,please enter password."),QLightDM::Greeter::MessageTypeInfo);
+                useDoubleAuth = false;
+                return ;
+            }
+
             onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeInfo);
             if(!isBioSuccess)
                 startBioAuth();

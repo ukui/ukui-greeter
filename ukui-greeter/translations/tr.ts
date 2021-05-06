@@ -17,22 +17,22 @@
 <context>
     <name>BiometricDevicesWidget</name>
     <message>
-        <location filename="../BiometricAuth/biometricdeviceswidget.cpp" line="50"/>
+        <location filename="../BiometricAuth/biometricdeviceswidget.cpp" line="51"/>
         <source>Please select the biometric device</source>
         <translation>Lütfen biyometrik cihazı seçin</translation>
     </message>
     <message>
-        <location filename="../BiometricAuth/biometricdeviceswidget.cpp" line="55"/>
+        <location filename="../BiometricAuth/biometricdeviceswidget.cpp" line="56"/>
         <source>Device type:</source>
         <translation>Atgıt türü:</translation>
     </message>
     <message>
-        <location filename="../BiometricAuth/biometricdeviceswidget.cpp" line="72"/>
+        <location filename="../BiometricAuth/biometricdeviceswidget.cpp" line="73"/>
         <source>Device name:</source>
         <translation>Aygıt Adı:</translation>
     </message>
     <message>
-        <location filename="../BiometricAuth/biometricdeviceswidget.cpp" line="82"/>
+        <location filename="../BiometricAuth/biometricdeviceswidget.cpp" line="83"/>
         <source>OK</source>
         <translation>Tamam</translation>
     </message>
@@ -76,34 +76,16 @@
 <context>
     <name>GreeterWindow</name>
     <message>
-        <location filename="../greeter/greeterwindow.cpp" line="138"/>
-        <location filename="../greeter/greeterwindow.cpp" line="340"/>
-        <source>Power dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../greeter/greeterwindow.cpp" line="150"/>
-        <location filename="../greeter/greeterwindow.cpp" line="341"/>
-        <source>On-screen keyboard, providing virtual keyboard function</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../greeter/greeterwindow.cpp" line="164"/>
-        <location filename="../greeter/greeterwindow.cpp" line="342"/>
-        <source>Set the desktop environment for the selected user to log in.If the user is logged in, it will take effect after logging in again</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../greeter/greeterwindow.cpp" line="180"/>
-        <location filename="../greeter/greeterwindow.cpp" line="343"/>
-        <source>Set the language of the selected user after logging in. If the user is logged in, it will take effect after logging in again.</source>
-        <translation type="unfinished"></translation>
+        <location filename="../greeter/greeterwindow.cpp" line="648"/>
+        <location filename="../greeter/greeterwindow.cpp" line="1007"/>
+        <source>Login</source>
+        <translation type="unfinished">Giriş</translation>
     </message>
 </context>
 <context>
     <name>GreeterWrapper</name>
     <message>
-        <location filename="../greeter/greeterwrapper.cpp" line="113"/>
+        <location filename="../greeter/greeterwrapper.cpp" line="116"/>
         <source>failed to start session.</source>
         <translation>Oturum başlatılamadı.</translation>
     </message>
@@ -134,60 +116,65 @@
 <context>
     <name>LoginWindow</name>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="343"/>
+        <location filename="../greeter/loginwindow.cpp" line="353"/>
         <source>logged in</source>
         <translation>Giriş</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="431"/>
+        <location filename="../greeter/loginwindow.cpp" line="442"/>
         <source>login</source>
         <translation>Giriş</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="607"/>
         <source>Incorrect user name, please input again</source>
-        <translation>Yanlış kullanıcı adı, lütfen tekrar girin</translation>
+        <translation type="vanished">Yanlış kullanıcı adı, lütfen tekrar girin</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="195"/>
-        <location filename="../greeter/loginwindow.cpp" line="855"/>
+        <location filename="../greeter/loginwindow.cpp" line="206"/>
+        <location filename="../greeter/loginwindow.cpp" line="891"/>
         <source>Biometric Authentication</source>
         <translation>Biyometrik Kimlik Doğrulama</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="198"/>
-        <location filename="../greeter/loginwindow.cpp" line="868"/>
+        <location filename="../greeter/loginwindow.cpp" line="209"/>
+        <location filename="../greeter/loginwindow.cpp" line="904"/>
         <source>Password Authentication</source>
         <translation>Şifre Doğrulama</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="201"/>
-        <location filename="../greeter/loginwindow.cpp" line="880"/>
+        <location filename="../greeter/loginwindow.cpp" line="212"/>
+        <location filename="../greeter/loginwindow.cpp" line="916"/>
         <source>Other Devices</source>
         <translation>Diğer Aygıtlar</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="204"/>
-        <location filename="../greeter/loginwindow.cpp" line="652"/>
-        <location filename="../greeter/loginwindow.cpp" line="890"/>
+        <location filename="../greeter/loginwindow.cpp" line="215"/>
+        <location filename="../greeter/loginwindow.cpp" line="670"/>
+        <location filename="../greeter/loginwindow.cpp" line="926"/>
         <source>Retry</source>
         <translation>Yeniden Dene</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="540"/>
+        <location filename="../greeter/loginwindow.cpp" line="558"/>
+        <location filename="../greeter/loginwindow.cpp" line="706"/>
         <source>Please enter your password or enroll your fingerprint </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="542"/>
+        <location filename="../greeter/loginwindow.cpp" line="560"/>
         <source>Password: </source>
         <translation>Parola: </translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="613"/>
-        <location filename="../greeter/loginwindow.cpp" line="618"/>
-        <location filename="../greeter/loginwindow.cpp" line="967"/>
+        <location filename="../greeter/loginwindow.cpp" line="631"/>
+        <location filename="../greeter/loginwindow.cpp" line="635"/>
+        <location filename="../greeter/loginwindow.cpp" line="1020"/>
         <source>Authentication failure, Please try again</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../greeter/loginwindow.cpp" line="1017"/>
+        <source>Too many unsuccessful attempts,please enter password.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -195,14 +182,14 @@
         <translation type="vanished">Parola yanlış, lütfen tekrar deneyin</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="208"/>
-        <location filename="../greeter/loginwindow.cpp" line="298"/>
-        <location filename="../greeter/loginwindow.cpp" line="647"/>
+        <location filename="../greeter/loginwindow.cpp" line="219"/>
+        <location filename="../greeter/loginwindow.cpp" line="308"/>
+        <location filename="../greeter/loginwindow.cpp" line="665"/>
         <source>Login</source>
         <translation>Giriş</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="545"/>
+        <location filename="../greeter/loginwindow.cpp" line="563"/>
         <source>Username</source>
         <translation>Kullanıcı Adı</translation>
     </message>

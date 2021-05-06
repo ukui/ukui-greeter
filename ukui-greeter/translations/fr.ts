@@ -64,20 +64,8 @@
 <context>
     <name>GreeterWindow</name>
     <message>
-        <source>Power dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>On-screen keyboard, providing virtual keyboard function</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set the language of the selected user after logging in. If the user is logged in, it will take effect after logging in again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set the desktop environment for the selected user to log in.If the user is logged in, it will take effect after logging in again</source>
-        <translation type="unfinished"></translation>
+        <source>Login</source>
+        <translation type="unfinished">S&apos;identifier</translation>
     </message>
 </context>
 <context>
@@ -128,10 +116,6 @@
         <translation type="obsolete">Mot de passe incorrect, veuillez saisir à nouveau</translation>
     </message>
     <message>
-        <source>Incorrect user name, please input again</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Retry</source>
         <translation type="unfinished"></translation>
     </message>
@@ -157,6 +141,10 @@
     </message>
     <message>
         <source>Please enter your password or enroll your fingerprint </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many unsuccessful attempts,please enter password.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

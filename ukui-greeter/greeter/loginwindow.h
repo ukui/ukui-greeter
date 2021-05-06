@@ -20,6 +20,7 @@
 #define LOGINWINDOW_H
 
 #include <QWidget>
+#include <QMap>
 #include <QLightDM/Greeter>
 #include <QLightDM/UsersModel>
 
@@ -58,6 +59,7 @@ public:
     bool getIsChooseDev();
     bool isinput_passwd;
 
+
 protected:
     void showEvent(QShowEvent *);
     void resizeEvent(QResizeEvent *);
@@ -91,6 +93,7 @@ private slots:
     void onDeviceChanged(const DeviceInfoPtr &deviceInfo);
     void onBiometricAuthComplete(bool result);
     void onMessageButtonClicked();
+    void onPrepareForSleep(bool sleep);
 
 private:
     void initUI();
@@ -113,6 +116,7 @@ private:
     void show_authenticated (bool successful = true);
     void refreshTranslate();
     void startBioAuth();
+    void restartBioAuth();
 
 private:
     GreeterWrapper      *m_greeter;
@@ -153,6 +157,7 @@ private:
     QLabel          *m_messageLabel;         //PAM消息显示
     QPushButton     *m_messageButton;
     QTimer          *m_bioTimer;
+
     bool isretry = true;
     bool prompted = false;
     bool unacknowledged_messages = false;
@@ -161,9 +166,13 @@ private:
     bool direct_login = false;
     bool isChooseDev = false;
     bool useDoubleAuth = false;
-    bool isBioSuccess =false;
-    bool            useFirstDevice;
-    QString manualLoginName;
+    bool isBioSuccess = false;
+    bool manualStopBio = false;
+    bool useFirstDevice;
+
+    QMap<qint32,int>    m_failMap;
+    int                 maxFailedTimes;
+    QString             manualLoginName;
 };
 
 #endif // LOGINWINDOW_H

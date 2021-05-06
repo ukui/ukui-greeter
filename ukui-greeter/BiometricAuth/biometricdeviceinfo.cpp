@@ -162,6 +162,15 @@ static int getValueFromSettings(const QString &userName, const QString &key, int
     return value;
 }
 
+int GetFailedTimes()
+{
+    QSettings sysSettings(UKUI_BIOMETRIC_SYS_CONFIG_PATH, QSettings::IniFormat);
+    if(sysSettings.contains("MaxFailedTime"))
+        return sysSettings.value("MaxFailedTime").toInt();
+    else
+        return 3;
+}
+
 int GetMaxFailedAutoRetry(const QString &userName)
 {
     return getValueFromSettings(userName, "MaxFailedAutoRetry");
