@@ -81,7 +81,7 @@ LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
                                                QDBusConnection::systemBus(),
                                                this);
     connect(iface, SIGNAL(PrepareForSleep(bool)), this, SLOT(onPrepareForSleep(bool)));
-    maxFailedTimes = GetFailedTimes();
+
 }
 
 QPixmap LoginWindow::PixmapToRound(const QPixmap &src, int radius)
@@ -760,6 +760,8 @@ void LoginWindow::performBiometricAuth()
     if(!m_biometricProxy)
     {
         m_biometricProxy = new BiometricProxy(this);
+        maxFailedTimes = GetFailedTimes();
+        isHiddenSwitchButton = GetHiddenSwitchButton();
     }
 
     //已经错误超过3次
@@ -1153,7 +1155,8 @@ void LoginWindow::showPasswordAuthWidget()
         if(m_deviceCount > 0)
         {
             m_buttonsWidget->setVisible(true);
-            m_biometricButton->setVisible(true);
+            if(!isHiddenSwitchButton)
+                m_biometricButton->setVisible(true);
             m_passwordButton->setVisible(false);
             m_otherDeviceButton->setVisible(false);
             m_retryButton->setVisible(false);
@@ -1187,7 +1190,8 @@ void LoginWindow::showBiometricAuthWidget()
     {
         m_buttonsWidget->setVisible(true);
         m_biometricButton->setVisible(false);
-        m_passwordButton->setVisible(true);
+        if(!isHiddenSwitchButton)
+            m_passwordButton->setVisible(true);
         m_otherDeviceButton->setVisible(m_deviceCount > 1);
         m_retryButton->setVisible(!m_biometricAuthWidget->isAuthenticating());
     }

@@ -146,6 +146,7 @@ QString GetDefaultDevice(const QString &userName);
  */
 int GetMaxFailedAutoRetry(const QString &userName);
 int GetFailedTimes();
+bool GetHiddenSwitchButton();
 /**
  * @brief 获取超时后自动重新开始的最大次数
  * @param userName

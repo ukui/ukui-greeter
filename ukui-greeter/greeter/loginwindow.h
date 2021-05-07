@@ -172,6 +172,7 @@ private:
 
     QMap<qint32,int>    m_failMap;
     int                 maxFailedTimes;
+    bool                isHiddenSwitchButton;
     QString             manualLoginName;
 };
 

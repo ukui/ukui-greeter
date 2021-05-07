@@ -162,6 +162,15 @@ static int getValueFromSettings(const QString &userName, const QString &key, int
     return value;
 }
 
+bool GetHiddenSwitchButton()
+{
+    QSettings sysSettings(UKUI_BIOMETRIC_SYS_CONFIG_PATH, QSettings::IniFormat);
+    if(sysSettings.contains("HiddenSwitchButton"))
+        return sysSettings.value("HiddenSwitchButton").toBool();
+    else
+        return false;
+}
+
 int GetFailedTimes()
 {
     QSettings sysSettings(UKUI_BIOMETRIC_SYS_CONFIG_PATH, QSettings::IniFormat);
