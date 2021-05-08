@@ -82,7 +82,7 @@ bool IconEdit::eventFilter(QObject *obj, QEvent *event)
     if(obj == m_edit){
         if(event->type() == QEvent::KeyPress){
             QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-            if(keyEvent->key()==80 &&keyEvent->modifiers() ==(Qt::MetaModifier)){
+            if(keyEvent->matches(QKeySequence::Copy) || keyEvent->matches(QKeySequence::Cut) || keyEvent->matches(QKeySequence::Paste)){
                 event->ignore();
                 return true;
             }
