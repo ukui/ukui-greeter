@@ -66,11 +66,10 @@ private slots:
     void timedAutologin();
     void showPowerWnd();
     void showVirtualKeyboard();
-    void onLanguageChanged(const Language &language);
+    void onLanguageChanged(QString languageCode);
     void showSessionWnd();
     void onSessionChanged(const QString &session);
     void onUserChangedByManual(const QString &userName);
-    void showLanguageWnd();
     void setWindowVisible();
 
     void onTransition();
@@ -102,15 +101,12 @@ private:
     QPushButton             *m_keyboardLB;
     QPushButton             *m_powerLB;
     QPushButton             *m_sessionLB;
-    QPushButton             *m_languageLB;
     VirtualKeyboard         *m_virtualKeyboard;
-    LanguageWidget          *m_languageWnd;
 
     GreeterWrapper          *m_greeter;
     UsersModel              *m_usersModel;
     QAbstractItemModel      *m_sessionsModel;
     Configuration           *m_configuration;
-    bool                     m_languageHasChanged;
     bool                     m_sessionHasChanged;
 
     QTimer 		    *timer;

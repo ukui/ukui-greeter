@@ -103,10 +103,6 @@ void GreeterWrapper::startSession()
 {
     if(isAuthenticated())
         Q_EMIT authenticationSucess();
-    //设置language
-    if(!m_language.isEmpty()) {
-        setLanguage(m_language);
-    }
 
     //启动session
     setrootWindow();

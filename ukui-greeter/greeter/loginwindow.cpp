@@ -222,6 +222,7 @@ void LoginWindow::refreshTranslate()
     if(m_retryButton){
         m_retryButton->setText(tr("Retry"));
     }
+
     if(m_nameLabel){
         if(m_nameLabel->text() == "Login" || m_nameLabel->text() == "登录")
             m_nameLabel->text() == tr("Login");

@@ -57,14 +57,11 @@ GreeterWindow::GreeterWindow(QWidget *parent)
       m_sessionWnd(nullptr),
       m_powerWnd(nullptr),
       m_sessionLB(nullptr),
-      m_languageLB(nullptr),
       m_virtualKeyboard(nullptr),
-      m_languageWnd(nullptr),
       m_greeter(new GreeterWrapper()),
       m_usersModel(new UsersModel(m_greeter->hideUsersHint())),
       m_sessionsModel(new QLightDM::SessionsModel(QLightDM::SessionsModel::LocalSessions)),
       m_configuration(Configuration::instance()),
-      m_languageHasChanged(false),
       m_sessionHasChanged(false)
 {
     scale = 1.0;
@@ -190,23 +187,6 @@ void GreeterWindow::initUI()
         connect(m_sessionLB, &QPushButton::clicked, this, &GreeterWindow::showSessionWnd);
     }
 
-    //语言选择按钮
-    LanguagesVector defaultLang = getLanguages();
-    if(defaultLang.count()>0){
-        m_languageLB = new QPushButton(this);
-        m_languageLB->setObjectName(QStringLiteral("languageButton"));
-        m_languageLB->setFocusPolicy(Qt::NoFocus);
-        m_languageLB->setFont(QFont("Ubuntu", 16));
-        m_languageLB->setFixedHeight(48);
-        m_languageLB->setCursor(Qt::PointingHandCursor);
-        m_languageLB->installEventFilter(this);
-        //m_languageLB->setToolTip(tr("Set the language of the selected user after logging in. If the user is logged in, it will take effect after logging in again."));
-
-        m_languageLB->setText(defaultLang.at(0).name);
-        m_languageLB->adjustSize();
-        connect(m_languageLB, &QPushButton::clicked, this, &GreeterWindow::showLanguageWnd);
-    }
-
     //用户列表
     m_userWnd = new UsersView(this);
     connect(m_userWnd, &UsersView::currentUserChanged, this, &GreeterWindow::onCurrentUserChanged);
@@ -315,11 +295,6 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
                         height() - m_userWnd->geometry().bottom());
         m_loginWnd->setGeometry(loginRect);
     }
-
-    if(m_languageWnd)
-    {
-        m_languageWnd->move(m_languageLB->x(),m_languageLB->y()+m_languageWnd->height());
-    }
     
     if(m_powerWnd){
     	m_powerWnd->move((width()-m_powerWnd->width())/2,(height() - m_powerWnd->height())/2);
@@ -343,12 +318,6 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
         m_sessionLB->move(this->width() - x, height() - y);
     }
 
-    //语言选择按钮位置
-    if(m_languageLB){
-        x += (m_languageLB->width() + 10); //10为间隔
-        m_languageLB->move(this->width() - x, height() - y);
-    }
-
     //虚拟键盘位置
     setVirkeyboardPos();
 
@@ -356,9 +325,7 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
 
 void GreeterWindow::changeEvent(QEvent *event)
 {
-    if(event->type() == QEvent::LanguageChange){
-        refreshTranslate();
-    }
+
 }
 
 void GreeterWindow::paintEvent(QPaintEvent *e)
@@ -378,10 +345,7 @@ void GreeterWindow::paintEvent(QPaintEvent *e)
 
 void GreeterWindow::refreshTranslate()
 {
-//    m_powerLB->setToolTip(tr("Power dialog"));
-//    m_keyboardLB->setToolTip(tr("On-screen keyboard, providing virtual keyboard function"));
-//    m_sessionLB->setToolTip(tr("Set the desktop environment for the selected user to log in.If the user is logged in, it will take effect after logging in again"));
-//    m_languageLB->setToolTip(tr("Set the language of the selected user after logging in. If the user is logged in, it will take effect after logging in again."));
+
 }
 
 void GreeterWindow::setVirkeyboardPos()
@@ -398,19 +362,13 @@ void GreeterWindow::setVirkeyboardPos()
 bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
 {
     if(event->type() == QEvent::MouseButtonPress){
-        if(obj == m_sessionLB || obj == m_languageLB || obj == m_powerLB)
+        if(obj == m_sessionLB || obj == m_powerLB)
             return false;
 
         if(m_sessionWnd && m_sessionWnd->isVisible())
         {
             m_sessionWnd->close();
             m_sessionWnd = nullptr;
-            update();
-        }
-        if(m_languageWnd && m_languageWnd->isVisible())
-        {
-            m_languageWnd->close();
-            m_languageWnd = nullptr;
             update();
         }
         if(m_powerWnd && !m_powerWnd->isHidden()){
@@ -424,10 +382,6 @@ void GreeterWindow::keyReleaseEvent(QKeyEvent *e)
 {
     switch(e->key())
     {
-    case Qt::Key_L:
-        if((e->modifiers() & Qt::ControlModifier) && m_languageLB)
-            m_languageLB->click();
-    break;
     case Qt::Key_K:
         if(e->modifiers() & Qt::ControlModifier)
             m_keyboardLB->click();
@@ -590,7 +544,7 @@ void GreeterWindow::updateLanguage(QString userName)
         else {
             language = languageReply.value().variant().toString();
             if(!language.isEmpty()){
-                    onLanguageChanged(getLanguage(language));
+                    onLanguageChanged(language);
              }
         }
 
@@ -602,14 +556,14 @@ void GreeterWindow::updateLanguage(QString userName)
             if(!formatsLocale.isEmpty()){
                 if(formatsLocale.startsWith("zh")){
                     local = QLocale::Chinese;
-		    QString date = local.toString(QDate::currentDate(),"yyyy/MM/dd ddd");
+            QString date = local.toString(QDate::currentDate(),"yyyy/MM/dd ddd");
                     lblDate->setText(date);
                 }
                 else{
                     local = QLocale::English;
                     QString date = local.toString(QDate::currentDate(),"yyyy/MM/dd ddd");
                     lblDate->setText(date);
-		}
+        }
             }
         }
 
@@ -638,11 +592,11 @@ void GreeterWindow::updateSession(QString userName)
 
 void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
 {
+    uid_t uid =  index.data(QLightDM::UsersModel::UidRole).toUInt();
+    qDebug()<< "uid==" << uid;
+
     for(int i = 0;i<m_userWnd->userlist.count();i++)
     {
-        uid_t uid =  index.data(QLightDM::UsersModel::UidRole).toUInt();
-        qDebug()<< "uid==" << uid;
-
         UserEntry *entry = m_userWnd->userlist.at(i).first;
           if(entry->userIndex().data(QLightDM::UsersModel::NameRole).toString() == "*login")
                entry->setUserName(tr("Login"));
@@ -650,39 +604,32 @@ void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
 
     setBackground(index);
 
-    if(!m_languageHasChanged)
-    {
-        //获取用户的session语言
-        QString language;
-        QString realName = index.data(QLightDM::UsersModel::NameRole).toString();
-        if(realName == "*guest" || realName == "*login")
-            return;
-        updateLanguage(realName);
-    }
-
-    if(!m_sessionHasChanged && m_sessionsModel->rowCount() > 1)
-    {
-        QString session = index.data(QLightDM::UsersModel::SessionRole).toString();
-        onSessionChanged(session);
-    }
-
+    //获取用户的session语言
+    QString language;
+    QString realName = index.data(QLightDM::UsersModel::NameRole).toString();
     bool islogin = index.data(QLightDM::UsersModel::LoggedInRole).toBool();
-    QString name = index.data(QLightDM::UsersModel::NameRole).toString();
-    if(islogin || name == "*login" || name == "*guest"){
+
+    if(islogin || realName == "*login" || realName == "*guest"){
         if(m_sessionLB){
             m_sessionLB->hide();
-        }
-        if(m_languageLB){
-            m_languageLB->hide();
         }
     }
     else{
         if(m_sessionLB){
             m_sessionLB->show();
         }
-        if(m_languageLB){
-            m_languageLB->show();
-        }
+    }
+
+
+    if(realName == "*guest" || realName == "*login")
+        return;
+
+    updateLanguage(realName);
+
+    if(!m_sessionHasChanged && m_sessionsModel->rowCount() > 1)
+    {
+        QString session = index.data(QLightDM::UsersModel::SessionRole).toString();
+        onSessionChanged(session);
     }
 
     update();
@@ -790,33 +737,6 @@ void GreeterWindow::timedAutologin()
         m_greeter->authenticateAutologin();
 }
 
-/**
- * @brief GreeterWindow::showLanguageWnd
- * 显示语言选择窗口
- */
-void GreeterWindow::showLanguageWnd()
-{
-    if(!m_languageWnd){
-        m_languageWnd = new LanguageWidget(this);
-        m_languageWnd->setObjectName("languageWnd");
-
-        connect(m_languageWnd, &LanguageWidget::languageChanged,
-            this, &GreeterWindow::onLanguageChanged);
-    }
-    m_languageHasChanged = true;
-    if(m_languageWnd->isVisible()){
-        m_languageWnd->close();
-        m_languageWnd = nullptr;
-        setFocus();
-    }
-    else{
-        m_languageWnd->show();
-        m_languageWnd->setFocus();
-        m_languageWnd->move(m_languageLB->x(),m_languageLB->y()-m_languageWnd->height() - 3);
-    }
-    update();
-}
-
 void GreeterWindow::setWindowPos(QWidget *widget, Qt::Alignment align)
 {
     QRect rect;
@@ -837,68 +757,37 @@ void GreeterWindow::setWindowPos(QWidget *widget, Qt::Alignment align)
     widget->setGeometry(rect);
 }
 
-void GreeterWindow::onLanguageChanged(const Language &language)
+void GreeterWindow::onLanguageChanged(QString languageCode)
 {
-    if(!m_languageLB)
+
+    if(languageCode == "")
         return ;
 
-    if(language.code == "" || language.name == "")
-        return ;
-
-    if(m_greeter->lang() == language.code)
+    if(m_greeter->lang() == languageCode)
     {
         return;
     }
-	
+
     qApp->removeTranslator(m_configuration->m_trans);
     delete m_configuration->m_trans;
     m_configuration->m_trans = new QTranslator();
     QString qmFile;
-    if(language.code.startsWith("zh")){
+
+    if(languageCode.startsWith("zh")){
         qmFile = QM_DIR + QString("%1.qm").arg("zh_CN");
         setenv("LANGUAGE","zh_CN",1);
-    	setlocale(LC_ALL,"zh_CN.utf8");
+        setlocale(LC_ALL,"zh_CN.utf8");
     }
     else{
-        qmFile = QM_DIR + QString("%1.qm").arg(local.name());
-        setenv("LANGUAGE",local.name().toLatin1().data(),1);
+        qmFile = QM_DIR + QString("%1.qm").arg(languageCode);
+        setenv("LANGUAGE",languageCode.toLatin1().data(),1);
         setlocale(LC_ALL,"");
     }
     m_configuration->m_trans->load(qmFile);
     qApp->installTranslator(m_configuration->m_trans);
 
-    m_greeter->setLang(language.code);
+    m_greeter->setLang(languageCode);
 
-    m_languageLB->setText(getLanguage(language.code).name);
-
-    const QFont &font = m_languageLB->font();
-    QFontMetrics fm(font);
-    int pixelWidth = fm.width(language.name);
-//根据语言文字的长度计算按钮的宽度，并加上文字距离按钮两边的间距
-    m_languageLB->setFixedWidth(pixelWidth + 14);
-
-    int x,y;
-    if(m_sessionLB)
-    {
-        x = m_sessionLB->geometry().left();
-        y = m_sessionLB->y();
-    }
-    else
-    {
-        x = m_keyboardLB->geometry().left();
-        y = m_keyboardLB->y();
-    }
-//10为距离左边按钮的距离
-     m_languageLB->move(x - 10 - m_languageLB->width() , y);
-
-    if(m_userWnd && !m_userWnd->isHidden())
-    {
-        m_userWnd->setFocus();
-    }
-    if(m_languageWnd){
-        m_languageWnd->close();
-        m_languageWnd = nullptr;
-    }
 }
 
 void GreeterWindow::showSessionWnd()
@@ -924,10 +813,7 @@ void GreeterWindow::showSessionWnd()
         setFocus();
     }
     else{
-        if(m_languageLB)
-            m_sessionWnd->move(m_languageLB->x(),m_languageLB->y()-m_sessionWnd->height() - 3);
-        else
-            m_sessionWnd->move(m_sessionLB->x(),m_sessionLB->y()-m_sessionWnd->height() - 3);
+        m_sessionWnd->move(m_sessionLB->x(),m_sessionLB->y()-m_sessionWnd->height() - 3);
         m_sessionWnd->show();
         m_sessionWnd->setFocus();
     }
