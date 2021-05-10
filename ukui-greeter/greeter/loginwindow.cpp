@@ -1066,7 +1066,8 @@ void LoginWindow::onBiometricAuthComplete(bool result)
                 return ;
             }
 
-            onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeInfo);
+            onShowMessage(tr("Fingerprint authentication failed, you still have %1 verification opportunities")\
+                          .arg(maxFailedTimes - m_failMap[m_uid]), QLightDM::Greeter::MessageTypeInfo);
             if(!isBioSuccess)
                 startBioAuth();
         }
