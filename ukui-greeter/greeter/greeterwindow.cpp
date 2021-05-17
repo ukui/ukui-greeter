@@ -523,7 +523,6 @@ void GreeterWindow::onUserSelected(const QModelIndex &index)
 {
     qDebug() << index.data(QLightDM::UsersModel::NameRole).toString() << "selected";
     m_loginWnd->setUserIndex(index);
-
 }
 
 void GreeterWindow::updateLanguage(QString userName)

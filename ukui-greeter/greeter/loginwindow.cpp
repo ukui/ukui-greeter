@@ -394,6 +394,7 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
     }
 
     if(m_biometricAuthWidget){
+        doubleBioStarted = false;
         m_biometricAuthWidget->stopAuth();
         if(m_bioTimer && m_bioTimer->isActive())
             m_bioTimer->stop();
@@ -563,10 +564,18 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
         unacknowledged_messages = false;
         qDebug()<<"unacknowledged_messages = false";
         if(text == "Password: "||text == "密码："){
-            if(useDoubleAuth){
-        if(!m_failMap.contains(m_uid) || m_failMap[m_uid] < maxFailedTimes)
-	        onShowMessage(tr("Please enter your password or enroll your fingerprint "), QLightDM::Greeter::MessageTypeInfo);
-	    }
+            if(useDoubleAuth && doubleBioStarted){
+                if(!m_failMap.contains(m_uid) || m_failMap[m_uid] < maxFailedTimes){
+                    if(m_messageLabel->text().isEmpty()){
+                        onShowMessage(tr("Please enter your password or enroll your fingerprint "), QLightDM::Greeter::MessageTypeInfo);
+                    }
+                    else{
+                        QTimer::singleShot(1000, [&]{
+                            onShowMessage(tr("Please enter your password or enroll your fingerprint "), QLightDM::Greeter::MessageTypeInfo);
+                        });
+                    }
+                }
+            }
             text = tr("Password: ");
         }
         if(text == "login:") {
@@ -749,6 +758,7 @@ void LoginWindow::pamBioSuccess()
 
 void LoginWindow::startBioAuth()
 {
+    doubleBioStarted = true;
     if(!m_bioTimer){
         m_bioTimer = new QTimer(this);
         connect(m_bioTimer, SIGNAL(timeout()), this, SLOT(pamBioSuccess()));
@@ -857,6 +867,7 @@ void LoginWindow::performBiometricAuth()
     if(useDoubleAuth){
         startBioAuth();
         skipBiometricAuth();
+        doubleBioStarted = true;
         return ;
     }
 
@@ -1049,6 +1060,7 @@ void LoginWindow::onBiometricAuthComplete(bool result)
     if(!result)
     {
         if(useDoubleAuth){
+            doubleBioStarted = false;
             if(manualStopBio){
                 manualStopBio = false;
                 return;
@@ -1078,6 +1090,7 @@ void LoginWindow::onBiometricAuthComplete(bool result)
     else
     {
         if(useDoubleAuth){
+            doubleBioStarted = false;
             //onShowMessage("验证成功!", QLightDM::Greeter::MessageTypeInfo);
             setDirLogin();
             isBioSuccess = true;

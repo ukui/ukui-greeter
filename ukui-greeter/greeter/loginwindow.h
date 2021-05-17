@@ -169,6 +169,7 @@ private:
     bool isBioSuccess = false;
     bool manualStopBio = false;
     bool useFirstDevice;
+    bool doubleBioStarted = false;
 
     QMap<qint32,int>    m_failMap;
     int                 maxFailedTimes;
