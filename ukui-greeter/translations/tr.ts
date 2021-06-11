@@ -79,25 +79,25 @@
         <location filename="../greeter/greeterwindow.cpp" line="138"/>
         <location filename="../greeter/greeterwindow.cpp" line="340"/>
         <source>Power dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Güç iletişim kutusu</translation>
     </message>
     <message>
         <location filename="../greeter/greeterwindow.cpp" line="150"/>
         <location filename="../greeter/greeterwindow.cpp" line="341"/>
         <source>On-screen keyboard, providing virtual keyboard function</source>
-        <translation type="unfinished"></translation>
+        <translation>Sanal klavye işlevi sağlayan ekran klavyesi</translation>
     </message>
     <message>
         <location filename="../greeter/greeterwindow.cpp" line="164"/>
         <location filename="../greeter/greeterwindow.cpp" line="342"/>
         <source>Set the desktop environment for the selected user to log in.If the user is logged in, it will take effect after logging in again</source>
-        <translation type="unfinished"></translation>
+        <translation>Seçilen kullanıcının oturum açması için masaüstü ortamını ayarlayın. Kullanıcı oturum açtıysa, tekrar oturum açtıktan sonra geçerlilik kazanacaktır</translation>
     </message>
     <message>
         <location filename="../greeter/greeterwindow.cpp" line="180"/>
         <location filename="../greeter/greeterwindow.cpp" line="343"/>
         <source>Set the language of the selected user after logging in. If the user is logged in, it will take effect after logging in again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Oturum açtıktan sonra seçilen kullanıcının dilini ayarlayın. Kullanıcı oturum açtıysa, tekrar oturum açtıktan sonra geçerlilik kazanacaktır.</translation>
     </message>
 </context>
 <context>
@@ -114,13 +114,13 @@
         <location filename="../greeter/iconedit.cpp" line="178"/>
         <location filename="../greeter/iconedit.cpp" line="218"/>
         <source>Password: </source>
-        <translation type="unfinished">Parola: </translation>
+        <translation>Parola: </translation>
     </message>
     <message>
         <location filename="../greeter/iconedit.cpp" line="180"/>
         <location filename="../greeter/iconedit.cpp" line="220"/>
         <source>Username</source>
-        <translation type="unfinished">Kullanıcı Adı</translation>
+        <translation>Kullanıcı Adı</translation>
     </message>
 </context>
 <context>
@@ -176,7 +176,7 @@
     <message>
         <location filename="../greeter/loginwindow.cpp" line="540"/>
         <source>Please enter your password or enroll your fingerprint </source>
-        <translation type="unfinished"></translation>
+        <translation>Lütfen şifrenizi girin veya parmak izinizi kaydedin </translation>
     </message>
     <message>
         <location filename="../greeter/loginwindow.cpp" line="542"/>
@@ -188,7 +188,7 @@
         <location filename="../greeter/loginwindow.cpp" line="618"/>
         <location filename="../greeter/loginwindow.cpp" line="967"/>
         <source>Authentication failure, Please try again</source>
-        <translation type="unfinished"></translation>
+        <translation>Kimlik doğrulama hatası, Lütfen tekrar deneyin</translation>
     </message>
     <message>
         <source>Incorrect password, please input again</source>
