@@ -34,11 +34,13 @@ UserEntry::UserEntry(const QString &name, const QString &facePath, bool isLogin,
     : QWidget(parent),
       id(count++)
 {
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~用户头像创建";
     initUI();
 
     setUserName(name);
     setFace(facePath);
     setLogin(isLogin);
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~用户头像创建完成";
 }
 
 UserEntry::UserEntry(QWidget *parent)

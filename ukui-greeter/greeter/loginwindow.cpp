@@ -22,6 +22,8 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QListWidget>
+#include <QtConcurrent/QtConcurrentRun>
+#include <QKeyEvent>
 #include <QGridLayout>
 #include <QAbstractItemModel>
 #include <QPainter>
@@ -50,20 +52,18 @@ LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
       isManual(false),
       authMode(UNKNOWN),
       m_deviceCount(-1),
-      isBioSuccess(false),
-      useDoubleAuth(false),
       m_biometricProxy(nullptr),
       m_biometricAuthWidget(nullptr),
       m_biometricDevicesWidget(nullptr),
       m_buttonsWidget(nullptr),
-      m_bioTimer(nullptr),
       m_biometricButton(nullptr),
       m_passwordButton(nullptr),
       m_otherDeviceButton(nullptr),
       m_retryButton(nullptr),
       m_nameLabel(nullptr),
-      useFirstDevice(false)
+      m_bioTimer(nullptr)
 {    
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~loginwind begin";
     initUI();
 
     connect(m_greeter, SIGNAL(showMessage(QString,QLightDM::Greeter::MessageType)),
@@ -72,15 +72,7 @@ LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
             this, SLOT(onShowPrompt(QString,QLightDM::Greeter::PromptType)));
     connect(m_greeter, SIGNAL(authenticationComplete()),
             this, SLOT(onAuthenticationComplete()));
-
-    useFirstDevice = Configuration::instance()->getUseFirstDevice();
-
-    QDBusInterface *iface = new QDBusInterface("org.freedesktop.login1",
-                                               "/org/freedesktop/login1",
-                                               "org.freedesktop.login1.Manager",
-                                               QDBusConnection::systemBus(),
-                                               this);
-    connect(iface, SIGNAL(PrepareForSleep(bool)), this, SLOT(onPrepareForSleep(bool)));
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~loginwind end";
 
 }
 
@@ -104,63 +96,40 @@ QPixmap LoginWindow::PixmapToRound(const QPixmap &src, int radius)
 
 void LoginWindow::initUI()
 {
-    setFixedWidth(500);
-
-    //    m_userWidget = new QWidget(this);
-    //    m_userWidget->setObjectName(QStringLiteral("userWidget"));
-
-    /* 头像 */
-    //    m_faceLabel = new QLabel(m_userWidget);
-    //    m_faceLabel->setObjectName(QStringLiteral("faceLabel"));
-    //    m_faceLabel->setFocusPolicy(Qt::NoFocus);
-
-    /* 返回按钮 */
-    //    m_backButton = new QPushButton(m_userWidget);
-    //    m_backButton->setObjectName(QStringLiteral("backButton"));
-    //    m_backButton->setFocusPolicy(Qt::NoFocus);
-    //    m_backButton->show();
-    //    connect(m_backButton, &QPushButton::clicked,
-    //            this, &LoginWindow::onBackButtonClicked);
-
-    //    /* 用户名 */
-    //    m_nameLabel = new QLabel(m_userWidget);
-    //    m_nameLabel->setObjectName(QStringLiteral("login_nameLabel"));
-    //    m_nameLabel->setFocusPolicy(Qt::NoFocus);
-    //    m_nameLabel->setAlignment(Qt::AlignCenter);
-
-    //    /* 是否已登录 */
-    //    m_isLoginLabel = new QLabel(m_userWidget);
-    //    m_isLoginLabel->setObjectName(QStringLiteral("isLoginLabel"));
-    //    m_isLoginLabel->setFocusPolicy(Qt::NoFocus);
-    //    m_isLoginLabel->setAlignment(Qt::AlignCenter);
-
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~创建密码框";
     /* 密码框所在窗口 */
     m_passwdWidget = new QWidget(this);
-    m_passwdWidget->setObjectName(QStringLiteral("passwordWidget"));
 
     /* 密码框 */
     m_passwordEdit = new IconEdit(m_passwdWidget);
-    m_passwordEdit->setObjectName(QStringLiteral("passwordEdit"));
-    m_passwordEdit->setIcon(QIcon(":/images/login-button.png"));
-    m_passwordEdit->setFocusPolicy(Qt::StrongFocus);
-    m_passwordEdit->installEventFilter(this);
-    m_passwordEdit->hide(); //收到请求密码的prompt才显示出来
-    connect(m_passwordEdit, SIGNAL(clicked(const QString&)),
-            this, SLOT(onLogin(const QString&)));
 
     /* 密码认证信息显示列表 */
     m_messageLabel = new QLabel(m_passwdWidget);
-    m_messageLabel->setObjectName(QStringLiteral("messageLabel"));
-    m_messageLabel->setAlignment(Qt::AlignCenter);
 
     m_messageButton = new QPushButton(m_passwdWidget);
-    m_messageButton->setObjectName(QStringLiteral("messageButton"));
-    m_messageButton->hide();
 
-    setFocusProxy(m_passwordEdit);
+    
+    QtConcurrent::run([=](){
+        m_passwdWidget->setObjectName(QStringLiteral("passwordWidget"));
+        m_passwordEdit->setObjectName(QStringLiteral("passwordEdit"));
+        m_messageLabel->setObjectName(QStringLiteral("messageLabel"));
+        m_messageLabel->setAlignment(Qt::AlignCenter);
+        m_messageButton->setObjectName(QStringLiteral("messageButton"));
+        m_messageButton->hide();
 
-    isloginauth = false;
+        m_passwordEdit->setIcon(QIcon(":/images/login-button.png"));
+        m_passwordEdit->setFocusPolicy(Qt::StrongFocus);
+        m_passwordEdit->installEventFilter(this);
+        m_passwordEdit->hide(); //收到请求密码的prompt才显示出来
+        connect(m_passwordEdit, SIGNAL(clicked(const QString&)),
+                this, SLOT(onLogin(const QString&)));
+
+        setFocusProxy(m_passwordEdit);
+
+    });
+
     isinput_passwd = false;
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~密码框创建完成";
 }
 
 void LoginWindow::showEvent(QShowEvent *e)
@@ -177,7 +146,6 @@ void LoginWindow::resizeEvent(QResizeEvent *)
     setChildrenGeometry();
 }
 
-#include <QKeyEvent>
 void LoginWindow::keyReleaseEvent(QKeyEvent *event)
 {
     //    qDebug() << event->key();
@@ -199,13 +167,6 @@ void LoginWindow::keyReleaseEvent(QKeyEvent *event)
         }
     }
     QWidget::keyReleaseEvent(event);
-}
-
-void LoginWindow::changeEvent(QEvent *event)
-{
-    if(event->type() == QEvent::LanguageChange){
-        refreshTranslate();
-    }
 }
 
 void LoginWindow::refreshTranslate()
@@ -248,6 +209,8 @@ void LoginWindow::setChildrenGeometry()
 
     if(scale < 0.5)
         setFixedWidth(300);
+    else
+        setFixedWidth(500);
 
     m_passwdWidget->setGeometry(0, 0, width(), 150);
     m_passwordEdit->setGeometry((m_passwdWidget->width() - 300)/2, 0, 300, 34);
@@ -394,16 +357,12 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
     }
 
     if(m_biometricAuthWidget){
-        doubleBioStarted = false;
         m_biometricAuthWidget->stopAuth();
         if(m_bioTimer && m_bioTimer->isActive())
             m_bioTimer->stop();
     }
 
     //先清空设置
-    reset();
-
-    //设置用户名
     QString name = index.data(QLightDM::UsersModel::RealNameRole).toString();
     m_name = index.data(QLightDM::UsersModel::NameRole).toString();
     // setUserName(name.isEmpty() ? m_name : name);
@@ -420,10 +379,10 @@ bool LoginWindow::setUserIndex(const QModelIndex& index)
     m_uid = index.data(QLightDM::UsersModel::UidRole).toInt();
     setChildrenGeometry();
 
-    //if(!isloginauth)
     startAuthentication();
+    reset();
 
-    isloginauth = false;
+    //设置用户名
 
     return true;
 }
@@ -564,18 +523,10 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
         unacknowledged_messages = false;
         qDebug()<<"unacknowledged_messages = false";
         if(text == "Password: "||text == "密码："){
-            if(useDoubleAuth && doubleBioStarted){
-                if(!m_failMap.contains(m_uid) || m_failMap[m_uid] < maxFailedTimes){
-                    if(m_messageLabel->text().isEmpty()){
-                        onShowMessage(tr("Please enter your password or enroll your fingerprint "), QLightDM::Greeter::MessageTypeInfo);
-                    }
-                    else{
-                        QTimer::singleShot(1000, [&]{
-                            onShowMessage(tr("Please enter your password or enroll your fingerprint "), QLightDM::Greeter::MessageTypeInfo);
-                        });
-                    }
-                }
-            }
+            if(useDoubleAuth){
+        if(!m_failMap.contains(m_uid) || m_failMap[m_uid] < maxFailedTimes)
+	        onShowMessage(tr("Please enter your password or enroll your fingerprint "), QLightDM::Greeter::MessageTypeInfo);
+	    }
             text = tr("Password: ");
         }
         if(text == "login:") {
@@ -592,6 +543,7 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
 
 void LoginWindow::onShowMessage(QString text, QLightDM::Greeter::MessageType type)
 {
+    Q_UNUSED(type);
     qDebug()<< "message: "<< text;
 
     if(text == "密码为空，请输入密码" && qgetenv("LANGUAGE") == "en_US")
@@ -621,7 +573,7 @@ void LoginWindow::onAuthenticationComplete()
     if(m_greeter->isAuthenticated()) {
         // 认证成功，启动session
         qDebug()<< "authentication success";
-        if(prompted && !unacknowledged_messages ||direct_login){
+        if((prompted && !unacknowledged_messages )||direct_login){
             direct_login = false;
             Configuration::instance()->saveLastLoginUser(m_name);
             m_greeter->startSession();
@@ -758,7 +710,6 @@ void LoginWindow::pamBioSuccess()
 
 void LoginWindow::startBioAuth()
 {
-    doubleBioStarted = true;
     if(!m_bioTimer){
         m_bioTimer = new QTimer(this);
         connect(m_bioTimer, SIGNAL(timeout()), this, SLOT(pamBioSuccess()));
@@ -867,7 +818,6 @@ void LoginWindow::performBiometricAuth()
     if(useDoubleAuth){
         startBioAuth();
         skipBiometricAuth();
-        doubleBioStarted = true;
         return ;
     }
 
@@ -1060,7 +1010,6 @@ void LoginWindow::onBiometricAuthComplete(bool result)
     if(!result)
     {
         if(useDoubleAuth){
-            doubleBioStarted = false;
             if(manualStopBio){
                 manualStopBio = false;
                 return;
@@ -1078,8 +1027,7 @@ void LoginWindow::onBiometricAuthComplete(bool result)
                 return ;
             }
 
-            onShowMessage(tr("Fingerprint authentication failed, you still have %1 verification opportunities")\
-                          .arg(maxFailedTimes - m_failMap[m_uid]), QLightDM::Greeter::MessageTypeInfo);
+            onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeInfo);
             if(!isBioSuccess)
                 startBioAuth();
         }
@@ -1090,7 +1038,6 @@ void LoginWindow::onBiometricAuthComplete(bool result)
     else
     {
         if(useDoubleAuth){
-            doubleBioStarted = false;
             //onShowMessage("验证成功!", QLightDM::Greeter::MessageTypeInfo);
             setDirLogin();
             isBioSuccess = true;
@@ -1109,18 +1056,9 @@ void LoginWindow::onBiometricButtonClicked()
     {
         if(m_deviceCount == 1)
         {
-            DeviceList deviceList = m_biometricProxy->GetDevList();
-            m_deviceInfo = deviceList.at(0);
-            if(!m_deviceInfo)
-            {
-                m_otherDeviceButton->click();
-            }
-            else
-            {
-                authMode = BIOMETRIC;
-                startAuthentication();
-            }
-        }
+            if(m_biometricDevicesWidget)
+                m_biometricDevicesWidget->onOKButtonClicked();
+	}
         else
         {
             m_otherDeviceButton->click();

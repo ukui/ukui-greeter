@@ -35,7 +35,6 @@ class UsersView : public QWidget
 public:
     explicit UsersView(QWidget *parent = 0);
     ~UsersView();
-    void initUI();
     void setModel(QAbstractListModel *);
     void setCurrentUser(const QString &userName, bool entered = false);
     void pageUp();

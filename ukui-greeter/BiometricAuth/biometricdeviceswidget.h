@@ -48,9 +48,11 @@ signals:
     void deviceChanged(const DeviceInfoPtr &pDeviceInfo);
     void deviceCountChanged(int newCount);
 
+public slots:
+    void onOKButtonClicked();
+
 private slots:
     void onCmbDeviceTypeCurrentIndexChanged(int index);
-    void onOKButtonClicked();
     void onUSBDeviceHotPlug(int drvid, int action, int devNum);
 
 private:

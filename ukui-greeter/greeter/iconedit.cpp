@@ -20,61 +20,68 @@
 #include <QHBoxLayout>
 #include <QWidget>
 #include <QPainter>
+#include <QtConcurrent/QtConcurrentRun>
 #include <QFile>
 #include <QKeyEvent>
 #include <QSettings>
 #include <QDir>
 #include <QDebug>
 #include <QTimer>
-#include "common/configuration.h"
 #include "xeventmonitor.h"
-
+#include "common/configuration.h"
 
 IconEdit::IconEdit(QWidget *parent)
     : QWidget(parent),
-	  m_configuration(Configuration::instance()),
-      m_timer(nullptr)
+      m_timer(nullptr),
+      m_configuration(Configuration::instance())
 {
     m_edit = new QLineEdit(this);
     m_edit->setObjectName(QStringLiteral("passwdEdit"));
-    m_edit->setAttribute(Qt::WA_InputMethodEnabled, false); //禁用输入法
-    m_edit->setContextMenuPolicy(Qt::NoContextMenu);    //禁用右键菜单
-    m_edit->installEventFilter(this);
-    m_edit->setMaxLength(1000);
 
     m_capsIcon = new QLabel(this);
     m_capsIcon->setObjectName(QStringLiteral("capsIconLabel"));
 
     m_iconButton = new QPushButton(this);
     m_iconButton->setObjectName(QStringLiteral("loginButton"));
-    m_iconButton->setFocusPolicy(Qt::NoFocus);
-    m_iconButton->setCursor(QCursor(Qt::PointingHandCursor));
-    m_iconButton->installEventFilter(this);
+
 
     m_modeButton = new QPushButton(this);
     m_modeButton->setObjectName(QStringLiteral("echoModeButton"));
-    m_modeButton->setCheckable(true);
-    m_modeButton->setFocusPolicy(Qt::NoFocus);
-    m_modeButton->setCursor(Qt::PointingHandCursor);
-    connect(m_modeButton, &QPushButton::clicked, this, [&](bool checked){
-        setType(checked ? QLineEdit::Normal : QLineEdit::Password);
-    });
 
     QHBoxLayout *layout = new QHBoxLayout(this);
-    layout->setContentsMargins(1, 1, 1, 1);
-    layout->setSpacing(0);
-    layout->addStretch();
-    layout->addWidget(m_capsIcon);
-    layout->addWidget(m_modeButton);
-    layout->addWidget(m_iconButton);
 
-    connect(m_edit, &QLineEdit::returnPressed, this, &IconEdit::clicked_cb);
-    connect(m_iconButton, &QPushButton::clicked, this, &IconEdit::clicked_cb);
-    connect(XEventMonitor::instance(), SIGNAL(keyRelease(const QString &)),
-            this, SLOT(onGlobalKeyRelease(const QString &)));
+    QtConcurrent::run([=](){
+        layout->setContentsMargins(1, 1, 1, 1);
+        layout->setSpacing(0);
+        layout->addStretch();
+        layout->addWidget(m_capsIcon);
+        layout->addWidget(m_modeButton);
+        layout->addWidget(m_iconButton);
 
-    setFocusProxy(m_edit);
-    setCapsState(checkCapsState());
+        m_edit->setAttribute(Qt::WA_InputMethodEnabled, false); //禁用输入法
+        m_edit->setContextMenuPolicy(Qt::NoContextMenu);    //禁用右键菜单
+        m_edit->installEventFilter(this);
+        m_edit->setMaxLength(1000);
+
+        m_iconButton->setFocusPolicy(Qt::NoFocus);
+        m_iconButton->setCursor(QCursor(Qt::PointingHandCursor));
+        m_iconButton->installEventFilter(this);
+
+        m_modeButton->setCheckable(true);
+        m_modeButton->setFocusPolicy(Qt::NoFocus);
+        m_modeButton->setCursor(Qt::PointingHandCursor);
+        connect(m_modeButton, &QPushButton::clicked, this, [&](bool checked){
+            setType(checked ? QLineEdit::Normal : QLineEdit::Password);
+        });
+
+        connect(m_edit, &QLineEdit::returnPressed, this, &IconEdit::clicked_cb);
+        connect(m_iconButton, &QPushButton::clicked, this, &IconEdit::clicked_cb);
+        connect(XEventMonitor::instance(), SIGNAL(keyRelease(const QString &)),
+                this, SLOT(onGlobalKeyRelease(const QString &)));
+
+        setFocusProxy(m_edit);
+        setCapsState(checkCapsState());
+    });
 }
 
 bool IconEdit::eventFilter(QObject *obj, QEvent *event)
@@ -203,13 +210,6 @@ void IconEdit::startWaiting()
     m_iconButton->setIconSize(m_iconButton->size());
     m_iconButton->setIcon(QIcon(m_waitingPixmap));
     m_timer->start();
-}
-
-void IconEdit::changeEvent(QEvent *event)
-{
-    if(event->type() == QEvent::LanguageChange){
-        refreshTranslate();
-    }
 }
 
 void IconEdit::refreshTranslate()

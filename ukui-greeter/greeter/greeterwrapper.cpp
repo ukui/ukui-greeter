@@ -27,14 +27,17 @@
 
 GreeterWrapper::GreeterWrapper(QObject *parent) : QLightDM::Greeter(parent)
 {
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ greeterwrapper begin";
     //连接到lightdm
     if(!connectToDaemonSync()){
         qDebug() << "connect to Daemon failed";
         exit(1);
     }
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~连接到lightdm";
 
     drawBackgroundType = 0;
     drawBackgroundColor = 0x0;
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ greeterwrapper end";
 }
 
 void GreeterWrapper::setLang(const QString &lang)
@@ -76,8 +79,14 @@ void GreeterWrapper::setrootWindowBackground(int type,unsigned int color,QString
         drawBackgroundColor = color;  
 }
 
+bool GreeterWrapper::getdrawBackgroundIsStarted()
+{
+    return drawBackgroundIsStarted;
+}
+
 void GreeterWrapper::setrootWindow()
 {
+    drawBackgroundIsStarted = true;
     Configuration  *m_configure = Configuration::instance();
     QString m_defaultBackgroundPath = m_configure->getDefaultBackgroundName();
     if(m_rootWindowBackground.isEmpty())
@@ -92,6 +101,7 @@ void GreeterWrapper::setrootWindow()
      	setRootWindowBackground(0,0,path);
     else
         setRootWindowBackground(1,drawBackgroundColor,NULL);
+    drawBackgroundIsStarted = false;
 }
 
 QString GreeterWrapper::getEnsureShareDir(QString username)
@@ -105,7 +115,8 @@ void GreeterWrapper::startSession()
         Q_EMIT authenticationSucess();
 
     //启动session
-    setrootWindow();
+    //setrootWindow();
+    draw_background();
     qDebug()<<"start session";
     if(!startSessionSync(m_session)) {
         Q_EMIT startSessionFailed();

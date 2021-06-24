@@ -38,6 +38,7 @@ public:
     QString userName();
     void setUserName(const QString &);
     void setrootWindow();
+    bool getdrawBackgroundIsStarted();
     //type 0代表绘制背景图片，1代表绘制背景颜色
     void setrootWindowBackground(int type,unsigned int color,QString filename);
     QString getEnsureShareDir(QString username);
@@ -49,6 +50,7 @@ private:
     QString m_rootWindowBackground;
     int drawBackgroundType;
     unsigned int drawBackgroundColor;
+    bool drawBackgroundIsStarted = false;
 
 signals:
     void aboutToLogin();

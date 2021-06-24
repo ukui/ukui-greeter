@@ -174,8 +174,8 @@ bool GetHiddenSwitchButton()
 int GetFailedTimes()
 {
     QSettings sysSettings(UKUI_BIOMETRIC_SYS_CONFIG_PATH, QSettings::IniFormat);
-    if(sysSettings.contains("MaxFailedTimes"))
-        return sysSettings.value("MaxFailedTimes").toInt();
+    if(sysSettings.contains("MaxFailedTime"))
+        return sysSettings.value("MaxFailedTime").toInt();
     else
         return 3;
 }

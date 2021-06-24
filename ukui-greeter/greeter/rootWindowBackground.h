@@ -18,3 +18,4 @@
 **/
 
 void setRootWindowBackground(bool type,unsigned int color,char *filename);
+void draw_background();

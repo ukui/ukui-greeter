@@ -76,8 +76,8 @@
 <context>
     <name>GreeterWindow</name>
     <message>
-        <location filename="../greeter/greeterwindow.cpp" line="602"/>
-        <location filename="../greeter/greeterwindow.cpp" line="893"/>
+        <location filename="../greeter/greeterwindow.cpp" line="648"/>
+        <location filename="../greeter/greeterwindow.cpp" line="1007"/>
         <source>Login</source>
         <translation type="unfinished">Giriş</translation>
     </message>
@@ -85,7 +85,7 @@
 <context>
     <name>GreeterWrapper</name>
     <message>
-        <location filename="../greeter/greeterwrapper.cpp" line="112"/>
+        <location filename="../greeter/greeterwrapper.cpp" line="116"/>
         <source>failed to start session.</source>
         <translation>Oturum başlatılamadı.</translation>
     </message>
@@ -116,12 +116,12 @@
 <context>
     <name>LoginWindow</name>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="362"/>
+        <location filename="../greeter/loginwindow.cpp" line="353"/>
         <source>logged in</source>
         <translation>Giriş</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="451"/>
+        <location filename="../greeter/loginwindow.cpp" line="442"/>
         <source>login</source>
         <translation>Giriş</translation>
     </message>
@@ -130,55 +130,51 @@
         <translation type="vanished">Yanlış kullanıcı adı, lütfen tekrar girin</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="214"/>
-        <location filename="../greeter/loginwindow.cpp" line="933"/>
+        <location filename="../greeter/loginwindow.cpp" line="206"/>
+        <location filename="../greeter/loginwindow.cpp" line="891"/>
         <source>Biometric Authentication</source>
         <translation>Biyometrik Kimlik Doğrulama</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="217"/>
-        <location filename="../greeter/loginwindow.cpp" line="946"/>
+        <location filename="../greeter/loginwindow.cpp" line="209"/>
+        <location filename="../greeter/loginwindow.cpp" line="904"/>
         <source>Password Authentication</source>
         <translation>Şifre Doğrulama</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="220"/>
-        <location filename="../greeter/loginwindow.cpp" line="958"/>
+        <location filename="../greeter/loginwindow.cpp" line="212"/>
+        <location filename="../greeter/loginwindow.cpp" line="916"/>
         <source>Other Devices</source>
         <translation>Diğer Aygıtlar</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="223"/>
-        <location filename="../greeter/loginwindow.cpp" line="680"/>
-        <location filename="../greeter/loginwindow.cpp" line="968"/>
+        <location filename="../greeter/loginwindow.cpp" line="215"/>
+        <location filename="../greeter/loginwindow.cpp" line="670"/>
+        <location filename="../greeter/loginwindow.cpp" line="926"/>
         <source>Retry</source>
         <translation>Yeniden Dene</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="568"/>
-        <location filename="../greeter/loginwindow.cpp" line="746"/>
+        <location filename="../greeter/loginwindow.cpp" line="558"/>
+        <location filename="../greeter/loginwindow.cpp" line="706"/>
         <source>Please enter your password or enroll your fingerprint </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="570"/>
+        <location filename="../greeter/loginwindow.cpp" line="560"/>
         <source>Password: </source>
         <translation>Parola: </translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="641"/>
-        <location filename="../greeter/loginwindow.cpp" line="645"/>
+        <location filename="../greeter/loginwindow.cpp" line="631"/>
+        <location filename="../greeter/loginwindow.cpp" line="635"/>
+        <location filename="../greeter/loginwindow.cpp" line="1020"/>
         <source>Authentication failure, Please try again</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="1064"/>
+        <location filename="../greeter/loginwindow.cpp" line="1017"/>
         <source>Too many unsuccessful attempts,please enter password.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../greeter/loginwindow.cpp" line="1069"/>
-        <source>Fingerprint authentication failed, you still have %1 verification opportunities</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -186,14 +182,14 @@
         <translation type="vanished">Parola yanlış, lütfen tekrar deneyin</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="228"/>
-        <location filename="../greeter/loginwindow.cpp" line="317"/>
-        <location filename="../greeter/loginwindow.cpp" line="675"/>
+        <location filename="../greeter/loginwindow.cpp" line="219"/>
+        <location filename="../greeter/loginwindow.cpp" line="308"/>
+        <location filename="../greeter/loginwindow.cpp" line="665"/>
         <source>Login</source>
         <translation>Giriş</translation>
     </message>
     <message>
-        <location filename="../greeter/loginwindow.cpp" line="573"/>
+        <location filename="../greeter/loginwindow.cpp" line="563"/>
         <source>Username</source>
         <translation>Kullanıcı Adı</translation>
     </message>

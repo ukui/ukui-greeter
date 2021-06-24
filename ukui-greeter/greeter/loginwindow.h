@@ -80,7 +80,6 @@ public slots:
     void onShowPrompt(QString text, QLightDM::Greeter::PromptType type);
     void onAuthenticationComplete();
     void setUserNotInView(const QString &userName);
-    void changeEvent(QEvent *event);
     void pamBioSuccess();
         
 private slots:
@@ -168,8 +167,7 @@ private:
     bool useDoubleAuth = false;
     bool isBioSuccess = false;
     bool manualStopBio = false;
-    bool useFirstDevice;
-    bool doubleBioStarted = false;
+    bool useFirstDevice = false;
 
     QMap<qint32,int>    m_failMap;
     int                 maxFailedTimes;

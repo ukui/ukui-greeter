@@ -50,6 +50,8 @@ UsersView::UsersView(QWidget *parent) :
     QWidget(parent),
     usersModel(nullptr),
     currentUser(-1),
+    prevArrow(nullptr),
+    nextArrow(nullptr),
     secUser(SecurityUser::instance()),
     lasttime(QTime::currentTime()),
     mouseClickLast(QTime::currentTime())
@@ -58,12 +60,15 @@ UsersView::UsersView(QWidget *parent) :
     scale = QString::number(size.width() / 1920.0, 'f', 1).toFloat();
 
     if(scale > 1)
-	    scale = 1;
+        scale = 1;
 // CENTER_ENTRY_WIDTH*5 +4* (CENTER_ENTRY_WIDTH - ENTRY_WIDTH*) +CENTER_ENTRY_WIDTH 
 // 计算头像列表的宽度，宽度计算公式为5个大头像的宽加上四个间距，再加上两边左右箭头的
 // 宽度
     resize(CENTER_ENTRY_WIDTH*9 - ENTRY_WIDTH*4 + 240*scale , CENTER_ENTRY_HEIGHT);
-    initUI();
+
+    setFocusPolicy(Qt::NoFocus);
+    connect(XEventMonitor::instance(), SIGNAL(keyPress(const QString &)),
+            this, SLOT(onGlobalKeyRelease(const QString &)));
 
 }
 
@@ -71,37 +76,12 @@ UsersView::~UsersView()
 {
 }
 
-
-void UsersView::initUI()
-{
-    setFocusPolicy(Qt::NoFocus);
-    connect(XEventMonitor::instance(), SIGNAL(keyRelease(const QString &)),
-            this, SLOT(onGlobalKeyRelease(const QString &)));
-
-    prevArrow = new QPushButton(this);
-    prevArrow->setObjectName("prevArrow");
-    prevArrow->setIconSize(QSize(19*scale,52*scale));
-    prevArrow->setGeometry(LEFT_ARROW_X,CENTER_ENTRY_WIDTH - ENTRY_WIDTH + (ENTRY_WIDTH - 52*scale)/2,19*scale,52*scale);
-    prevArrow->hide();
-    connect(prevArrow,&QPushButton::clicked,this,[this](){
-        leftKeyPressed(true);
-    });
-
-    nextArrow = new QPushButton(this);
-    nextArrow->setObjectName("nextArrow");
-    nextArrow->setIconSize(QSize(19*scale,52*scale));
-    nextArrow->setGeometry(RIGHT_ARROW_X,CENTER_ENTRY_WIDTH - ENTRY_WIDTH + (ENTRY_WIDTH - 52*scale)/2,19*scale,52*scale);
-    nextArrow->hide();
-    connect(nextArrow,&QPushButton::clicked,this,[this](){
-        rightKeyPressed(true);
-    });
-
-}
-
 void UsersView::resizeEvent(QResizeEvent *)
 {
-    prevArrow->setGeometry(LEFT_ARROW_X,CENTER_ENTRY_WIDTH - ENTRY_WIDTH + (ENTRY_WIDTH - 52*scale)/2,19*scale,52*scale);
-    nextArrow->setGeometry(RIGHT_ARROW_X,CENTER_ENTRY_WIDTH - ENTRY_WIDTH + (ENTRY_WIDTH - 52*scale)/2,19*scale,52*scale);
+    if(prevArrow)
+        prevArrow->setGeometry(LEFT_ARROW_X,CENTER_ENTRY_WIDTH - ENTRY_WIDTH + (ENTRY_WIDTH - 52*scale)/2,19*scale,52*scale);
+    if(nextArrow)
+        nextArrow->setGeometry(RIGHT_ARROW_X,CENTER_ENTRY_WIDTH - ENTRY_WIDTH + (ENTRY_WIDTH - 52*scale)/2,19*scale,52*scale);
     setCurrentRow(currentUser);
 }
 
@@ -167,14 +147,13 @@ void UsersView::setModel(QAbstractListModel *model)
     connect(usersModel, &QAbstractListModel::rowsRemoved, this, &UsersView::onUserRemoved);
     connect(usersModel, &QAbstractListModel::dataChanged, this, &UsersView::onUserChanged);
     
-    
     for(int i = 0; i < usersModel->rowCount(); i++){
         QString name = usersModel->index(i).data(QLightDM::UsersModel::NameRole).toString();
         if(secUser->isSecrityUser(name))
             insertUserEntry(i);
     }
 
-    setCurrentRow(0);
+    //setCurrentRow(0);
 }
 
 void UsersView::setCurrentUser(const QString &userName, bool entered)
@@ -200,6 +179,7 @@ void UsersView::setCurrentUser(const QString &userName, bool entered)
 
 void UsersView::onGlobalKeyRelease(const QString &key)
 {
+    qDebug()<<"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk";
     /*添加一定延时，避免按键太快*/	
     int interval = lasttime.msecsTo(QTime::currentTime());
     if(interval < 300 && interval > -300)
@@ -306,31 +286,50 @@ void UsersView::insertUserEntry(int row)
     userlist.append(pair);
 
     /*记录当前用户两边可显示的用户数量*/
-    int usersCount = userlist.count();
-       switch (usersCount) {
-       case 0:
-           return;
-           break;
-       case 1:
-           leftCount = rightCount = 0;
-           break;
-       case 2:
-           leftCount = 0;
-           rightCount = 1;
-           break;
-       case 3:
-           leftCount = rightCount = 1;
-           break;
-       case 4:
-           leftCount = 1;
-           rightCount = 2;
-           break;
-       default:
-            leftCount = rightCount = 2;
-           break;
-       }
+    switch (userlist.count()) {
+    case 0:
+        return;
+        break;
+    case 1:
+        leftCount = rightCount = 0;
+        break;
+    case 2:
+        leftCount = 0;
+        rightCount = 1;
+        break;
+    case 3:
+        leftCount = rightCount = 1;
+        break;
+    case 4:
+        leftCount = 1;
+        rightCount = 2;
+        break;
+    default:
+        leftCount = rightCount = 2;
+        break;
+    }
 
     if(userlist.count() > 5){
+        if(!prevArrow){
+            prevArrow = new QPushButton(this);
+            prevArrow->setObjectName("prevArrow");
+            prevArrow->setIconSize(QSize(19*scale,52*scale));
+            prevArrow->setGeometry(LEFT_ARROW_X,CENTER_ENTRY_WIDTH - ENTRY_WIDTH + (ENTRY_WIDTH - 52*scale)/2,19*scale,52*scale);
+            connect(prevArrow,&QPushButton::clicked,this,[this](){
+                leftKeyPressed(true);
+            });
+        }
+
+        if(!nextArrow){
+            nextArrow = new QPushButton(this);
+            nextArrow->setObjectName("nextArrow");
+            nextArrow->setIconSize(QSize(19*scale,52*scale));
+            nextArrow->setGeometry(RIGHT_ARROW_X,CENTER_ENTRY_WIDTH - ENTRY_WIDTH + (ENTRY_WIDTH - 52*scale)/2,19*scale,52*scale);
+            connect(nextArrow,&QPushButton::clicked,this,[this](){
+                rightKeyPressed(true);
+            });
+        }
+
         prevArrow->show();
         nextArrow->show();
     }

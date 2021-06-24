@@ -147,10 +147,6 @@
         <source>Too many unsuccessful attempts,please enter password.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Fingerprint authentication failed, you still have %1 verification opportunities</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>MainWindow</name>

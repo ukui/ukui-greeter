@@ -29,24 +29,29 @@
 
 #include "rootWindowBackground.h"
 
+Pixmap pix;
+Display *dpy = NULL;
+Window root = NULL;
+Screen *scn = NULL;
 void setRootWindowBackground(bool type,unsigned int color,char *filename)
 {
     Imlib_Image img;
-    Display *dpy;
-    Pixmap pix;
-    Window root;
-    Screen *scn;
 
-    dpy = XOpenDisplay(NULL);
-    if (!dpy)
-        return ;
+    if (!dpy){
+        dpy = XOpenDisplay(NULL);
+        if(!dpy)
+	    return;
+    }
+
     int width = 0,height = 0;
    
     width = QApplication::desktop()->geometry().width()*qApp->devicePixelRatio();
     height = QApplication::desktop()->geometry().height()*qApp->devicePixelRatio();
-	
-    scn = DefaultScreenOfDisplay(dpy);
-    root = DefaultRootWindow(dpy);
+
+    if(!scn)    
+        scn = DefaultScreenOfDisplay(dpy);
+    if(!root)
+        root = DefaultRootWindow(dpy);
 
     pix = XCreatePixmap(dpy, root, width, height,
         DefaultDepthOfScreen(scn));
@@ -83,7 +88,12 @@ void setRootWindowBackground(bool type,unsigned int color,char *filename)
         QRect rect = screen->geometry();
         imlib_render_image_on_drawable_at_size(rect.x()*screen->devicePixelRatio(), rect.y()*screen->devicePixelRatio(), rect.width()*screen->devicePixelRatio(),rect.height()*screen->devicePixelRatio());
     }
- 
+
+    imlib_free_image();
+}
+
+void draw_background()
+{
     XSetWindowBackgroundPixmap(dpy, root, pix);
     XClearWindow(dpy, root);
 
@@ -92,7 +102,7 @@ void setRootWindowBackground(bool type,unsigned int color,char *filename)
         XNextEvent(dpy, &ev);
     }
     XFreePixmap(dpy, pix);
-    imlib_free_image();
     XCloseDisplay(dpy);
-    return ;
 }
+
+

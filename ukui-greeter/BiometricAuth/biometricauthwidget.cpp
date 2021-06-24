@@ -136,7 +136,6 @@ void BiometricAuthWidget::onIdentifyComplete(QDBusPendingCallWatcher *watcher)
     if(reply.isError())
     {
         qWarning() << "Identify error: " << reply.error().message();
-	isInAuth = false;
         Q_EMIT authComplete(false);
         updateImage(0);
         return;
@@ -155,7 +154,6 @@ void BiometricAuthWidget::onIdentifyComplete(QDBusPendingCallWatcher *watcher)
     else if(result == DBUS_RESULT_NOTMATCH)
     {
         if(usebind){
-	    isInAuth = false;
             Q_EMIT authComplete(false);
             return;
         }
@@ -185,7 +183,6 @@ void BiometricAuthWidget::onIdentifyComplete(QDBusPendingCallWatcher *watcher)
     else if(result == DBUS_RESULT_ERROR)
     {
         if(usebind){
-	    isInAuth = false;
             Q_EMIT authComplete(false);
             return;
         }

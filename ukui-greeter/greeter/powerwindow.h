@@ -66,7 +66,6 @@ private:
 
 private Q_SLOTS:
     void powerClicked(QListWidgetItem *item);
-    void changeEvent(QEvent *event);
 
 Q_SIGNALS:
     void switchToUser();

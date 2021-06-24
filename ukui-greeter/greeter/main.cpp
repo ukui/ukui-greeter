@@ -123,96 +123,58 @@ void XsettingsHidpi()
     Display    *dpy;
     int w,h;
     x11_get_screen_size (&w, &h);
-    dpy = XOpenDisplay (NULL);
     if(h >= 2000 || (w>2560 && h> 1500)){
+	dpy = XOpenDisplay (NULL);
         XChangeProperty(dpy, RootWindow (dpy, 0),
-                XA_RESOURCE_MANAGER, XA_STRING, 8, PropModeReplace, (unsigned char *) "Xft.dpi:	192\n", 13);
-    }else{
-        XChangeProperty(dpy, RootWindow (dpy, 0),
-            XA_RESOURCE_MANAGER, XA_STRING, 8, PropModeReplace, (unsigned char *) "Xft.dpi:	96\n", 12);
+        XA_RESOURCE_MANAGER, XA_STRING, 8, PropModeReplace, (unsigned char *) "Xft.dpi:	192\n", 13);
+        XCloseDisplay (dpy);
     }
-    XCloseDisplay (dpy);
 }
 
 int main(int argc, char *argv[])
 {
-    XsettingsHidpi ();
-    qInstallMessageHandler(outputMessage);
+    QDateTime dateTime = QDateTime::currentDateTime();
+    QByteArray time = QString("[%1] ").arg(dateTime.toString("MM-dd hh:mm:ss.zzz")).toLocal8Bit();
+    fprintf(stderr, "%s Debug:  %s\n", time.constData(),"--------------------------------------------------------开始，main函数开始执行");
+    
+    XsettingsHidpi (); //设置dpi
+    qInstallMessageHandler(outputMessage); //打印信息处理
 
+    //设置支持缩放属性
 #if(QT_VERSION>=QT_VERSION_CHECK(5,6,0))
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
-
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 进入qapplication初始化";
     QApplication a(argc, argv);
-    a.setQuitOnLastWindowClosed(true);
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~qapplication初始化完成";
+
 
     QResource::registerResource("image.qrc");
 
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QTextCodec::setCodecForLocale(codec);
 
-    QLocale::Language language;
-    language = QLocale::system().language();
-    qDebug() << "current locale language: " << QLocale::languageToString(language);
-
     Configuration *m_configuration = Configuration::instance();
     //加载翻译文件
     m_configuration->m_trans =  new QTranslator();
-    QString qmFile = QM_DIR + QString("%1.qm").arg(QLocale::system().name());
-     m_configuration->m_trans->load(qmFile);
-    qDebug() << "load translation file " << qmFile;
-
-    bindtextdomain("Linux-PAM","/usr/share/locale");
-    textdomain("Linux-PAM");
+    m_configuration->m_trans->load(QM_DIR + QString("%1.qm").arg(QLocale::system().name()));
 
     qApp->installTranslator( m_configuration->m_trans);
-
+    
     //加载qss文件
     QFile qss(":/ukui-greeter.qss");
     qss.open(QFile::ReadOnly);
     a.setStyleSheet(qss.readAll());
-    qss.close();
 
-    //用于QSettings
-    QApplication::setOrganizationName("Kylin");
-    QApplication::setApplicationName("ukui-greeter");
-
-    //设置鼠标指针样式
-    XDefineCursor(QX11Info::display(), QX11Info::appRootWindow(), XCreateFontCursor(QX11Info::display(), XC_arrow));
-
-    //由于有时候numlock键的点亮状态和实际效果可能不一致，所以这里先获取状态，然后重新设置一次
-    if(checkNumLockState()){
-    	unsigned int num_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Num_Lock);
-    	XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, 0);
-    	XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, num_mask);
-    }else{
-    	unsigned int num_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Num_Lock);
-        XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, num_mask);
-        XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, 0);
-    }
- 	
-    if(checkCapsState()){ 
-    	unsigned int caps_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Caps_Lock); 
-    	XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, caps_mask, 0);
-	XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, caps_mask, caps_mask);
-    }else{
-    	unsigned int caps_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Caps_Lock);
-	XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, caps_mask, caps_mask);
-        XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, caps_mask, 0);
-    }
     //等待显示器准备完毕
     /*waitMonitorsReady();
     qDebug() << "monitors ready"*/;
-
-    XEventMonitor::instance()->start();
-
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~开始创建mainwindow";
     MainWindow w;
-    QDesktopWidget *desktop = QApplication::desktop();
-    w.setGeometry(desktop->geometry());
-    w.hide();
-
-    //w.showFullScreen();
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~mainwindow创建完成，调用show函数";
+    w.show();
+    qDebug()<<"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++show函数调用完成";
     //在没有窗口管理器的情况下，需要激活窗口，行为类似于用鼠标点击窗口
     //w.activateWindow();
     //QPoint pt(QApplication::primaryScreen()->geometry().x() + 100,QApplication::primaryScreen()->geometry().y() + 100);
@@ -225,6 +187,6 @@ int main(int argc, char *argv[])
     QObject::connect(XEventMonitor::instance(), SIGNAL(keyRelease(QString)),
                      &ds, SLOT(onGlobalKeyRelease(QString)));
     */
-
+    qss.close();
     return a.exec();
 }

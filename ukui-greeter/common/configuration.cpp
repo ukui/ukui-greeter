@@ -34,11 +34,13 @@ Configuration::Configuration(QObject *parent)
     : QObject(parent),
       m_trans(nullptr)
 {
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~configuration begin";
     QString recodfile = QDir::homePath() + "/.cache/ukui-greeter.conf";
     qDebug() << recodfile;
 
     configSettings = new QSettings(CONFIG_FILE, QSettings::IniFormat, this);
     recordSettings = new QSettings(recodfile, QSettings::IniFormat, this);
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~configuration end";
 }
 
 Configuration* Configuration::instance(QObject *parent)

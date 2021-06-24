@@ -139,13 +139,6 @@ void PowerManager::hibernateWidgetClicked()
     }
 }
 
-void PowerManager::changeEvent(QEvent *event)
-{
-    if(event->type() == QEvent::LanguageChange){
-        refreshTranslate();
-    }
-}
-
 void PowerManager::refreshTranslate()
 {
       switchLabel->setText(tr("Switch User"));

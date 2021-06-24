@@ -46,7 +46,6 @@ public:
 protected:
     void resizeEvent(QResizeEvent *) Q_DECL_OVERRIDE;
     bool eventFilter(QObject *obj, QEvent *event);
-    void changeEvent(QEvent *event);
 
 private:
     void updatePixmap();

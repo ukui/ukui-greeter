@@ -22,13 +22,14 @@
 #include <QWidget>
 #include <QStackedLayout>
 #include <QSharedPointer>
+#include <QtConcurrent/QtConcurrentRun>
 #include <QTranslator>
 #include <QLocale>
+#include <QTimer>
 #include "loginwindow.h"
 #include "sessionwindow.h"
 #include "usersmodel.h"
 #include "greeterwrapper.h"
-#include "backgroundwindow.h"
 
 class UsersView;
 class PowerManager;
@@ -39,26 +40,18 @@ class VirtualKeyboard;
 class LanguageWidget;
 class Language;
 
-extern QPixmap* blurPixmap(QPixmap *pixmap);
-
 class GreeterWindow : public QWidget
 {
     Q_OBJECT
 public:
     GreeterWindow(QWidget *parent = 0);
-    ~GreeterWindow();
     void initUI();
-
-signals:
-    void signalBackgroundChanged(QSharedPointer<Background> &);
+    QString guessBackground();
 
 protected:
     void resizeEvent(QResizeEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
-    bool eventFilter(QObject *obj, QEvent *event);
-    void changeEvent(QEvent *event);
 
-    void paintEvent(QPaintEvent *);
 private slots:
     void onAuthenticationComplete1();
     void onUserSelected(const QModelIndex &);
@@ -72,8 +65,6 @@ private slots:
     void onUserChangedByManual(const QString &userName);
     void setWindowVisible();
 
-    void onTransition();
-
 private:
     void switchWnd(int);
     void setBackground(const QModelIndex &index);
@@ -84,15 +75,8 @@ private:
     void updateSession(QString userName);
     void setUserWindowVisible(bool visible);
     void refreshTranslate();
+    void drawBackground();
     QString getAccountBackground(uid_t uid);
-
-    void drawBackground(QSharedPointer<Background> &, const QRect &, float alpha = 1.0);
-    QPixmap * getBackground(const QString &path, const QRect &rect);
-    void setBackground(QSharedPointer<Background> &);
-    void initBackground();
-    void stopTransition();
-    void startTransition(QSharedPointer<Background> &, QSharedPointer<Background> &);
-
 
     UsersView               *m_userWnd;
     LoginWindow             *m_loginWnd;
@@ -114,13 +98,8 @@ private:
     QLabel		    *lblDate;
     QLabel		    *lblTime;
     QLocale         local;
-
-    QTimer          *m_timer;
-    Transition       m_transition;
-    QMap<QPair<QString, QString>, QPixmap*>   m_backgrounds;
-    QSharedPointer<Background> m_background;
-    BackgroundMode   m_backgroundMode;
-
+    QString         currentUser;
+    QFuture<void>         future;
 };
 
 #endif // GREETERWINDOW_H
