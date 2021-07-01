@@ -126,7 +126,7 @@ MainWindow::MainWindow(QWidget *parent)
         QString resolution = QString("%1x%2").arg(QApplication::primaryScreen()->geometry().width()).arg(QApplication::primaryScreen()->geometry().height());
         QPair<QString, QString> key(backgroundname, resolution);
         if(!m_backgrounds.contains(key)){
-            QPixmap *pixmap =  new QPixmap(scaledPixmap(width(), height(), backgroundname));
+            QPixmap *pixmap =  new QPixmap(scaledPixmap(QApplication::primaryScreen()->geometry().width(), QApplication::primaryScreen()->geometry().height(), backgroundname));
             m_backgrounds[key] = blurPixmap(pixmap);
         }
     });
@@ -444,24 +444,19 @@ void MainWindow::drawBackground(QSharedPointer<Background> &background,
 
 QPixmap * MainWindow::getBackground(const QString &path, const QRect &rect)
 {
-    qDebug()<<"111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"<<path<<m_backgrounds.count();
     QString resolution = QString("%1x%2").arg(rect.width()).arg(rect.height());
     QPair<QString, QString> key(path, resolution);
 
     if(m_backgrounds.isEmpty()&&future.isRunning()){
-        qDebug()<<"333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333";
             future.waitForFinished();
     }else{
         if(!future.isFinished() && future.isStarted()){
-            qDebug()<<"44444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444";
             future.waitForFinished();
         }
     }
     if(!m_backgrounds.contains(key)){
-	    qDebug()<<"5555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555";
         QPixmap *pixmap =  new QPixmap(scaledPixmap(width(), height(), path));
         m_backgrounds[key] = blurPixmap(pixmap);
     }
-    qDebug()<<"22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222";
     return m_backgrounds[key];
 }

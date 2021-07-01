@@ -116,6 +116,7 @@ private:
     void refreshTranslate();
     void startBioAuth();
     void restartBioAuth();
+    void waitBiometricServiceStatus();
 
 private:
     GreeterWrapper      *m_greeter;

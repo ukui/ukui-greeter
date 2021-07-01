@@ -524,9 +524,9 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
         qDebug()<<"unacknowledged_messages = false";
         if(text == "Password: "||text == "密码："){
             if(useDoubleAuth){
-        if(!m_failMap.contains(m_uid) || m_failMap[m_uid] < maxFailedTimes)
-	        onShowMessage(tr("Please enter your password or enroll your fingerprint "), QLightDM::Greeter::MessageTypeInfo);
-	    }
+                if(!m_failMap.contains(m_uid) || m_failMap[m_uid] < maxFailedTimes)
+                    onShowMessage(tr("Please enter your password or enroll your fingerprint "), QLightDM::Greeter::MessageTypeInfo);
+            }
             text = tr("Password: ");
         }
         if(text == "login:") {
@@ -717,10 +717,54 @@ void LoginWindow::startBioAuth()
     m_bioTimer->start(1000);
 }
 
+void LoginWindow::waitBiometricServiceStatus()
+{
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~` get biometric status";
+    QDBusInterface iface("org.freedesktop.systemd1", "/org/freedesktop/systemd1",
+                         "org.freedesktop.systemd1.Manager",QDBusConnection::systemBus());
+
+    QDBusReply<QDBusObjectPath> bioPath = iface.call("GetUnit","biometric-authentication.service");
+    if(!bioPath.isValid()){
+        return ;
+    }
+
+    QDBusInterface bioface("org.freedesktop.systemd1", bioPath.value().path(),
+                           "org.freedesktop.DBus.Properties", QDBusConnection::systemBus());
+    QDBusReply<QDBusVariant> sessionReply = bioface.call("Get", "org.freedesktop.systemd1.Unit", "UnitFileState");
+    if(!sessionReply.isValid())
+        qWarning() << sessionReply.error();
+    else {
+        QString res = sessionReply.value().variant().toString();
+        if(res == "disable")
+            return;
+    }
+
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   get activeState";
+    int times = 0;
+    while(times<20){
+        QDBusReply<QDBusVariant> sessionReply = bioface.call("Get", "org.freedesktop.systemd1.Unit", "ActiveState");
+        if(!sessionReply.isValid()){
+            qWarning() << sessionReply.error();
+            return ;
+        }
+        else {
+            QString res = sessionReply.value().variant().toString();
+            if(res == "activating"){
+                times ++;
+                usleep(100000);
+            }else{
+                break;
+            }
+        }
+    }
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ times = "<<times;
+}
+
 void LoginWindow::performBiometricAuth()
 {
     if(!m_biometricProxy)
     {
+        waitBiometricServiceStatus();
         m_biometricProxy = new BiometricProxy(this);
         maxFailedTimes = GetFailedTimes();
         isHiddenSwitchButton = GetHiddenSwitchButton();
@@ -1058,7 +1102,7 @@ void LoginWindow::onBiometricButtonClicked()
         {
             if(m_biometricDevicesWidget)
                 m_biometricDevicesWidget->onOKButtonClicked();
-	}
+        }
         else
         {
             m_otherDeviceButton->click();
