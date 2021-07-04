@@ -72,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
       m_background(nullptr),
       m_monitorCount(0)
 {
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~` mainwindow begin";
+    setWindowFlags(Qt::X11BypassWindowManagerHint);
     XRRQueryExtension(QX11Info::display(), &rr_event_base, &rr_error_base);
     XRRSelectInput(QX11Info::display(), QX11Info::appRootWindow(), RRScreenChangeNotifyMask);
 
@@ -81,9 +81,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(_desktop, &QDesktopWidget::screenCountChanged, this, &MainWindow::onScreenResized);
     //设置窗口大小
     qDebug()<<_desktop->geometry();
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 绑定信号";
     setGeometry(_desktop->geometry());
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~设置大小";
     //设置监控鼠标移动
     setMouseTracking(true);
     //背景图片 优先级：用户桌面背景、背景图片、背景颜色
@@ -117,10 +115,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_transition.started = false;
 
-    //激活屏幕(即Greeter窗口所在屏幕位置)
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~创建greeterwind 窗口";
     m_greeterWnd = new GreeterWindow(this);
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~greeterwind窗口创建完成";
     future = QtConcurrent::run([=](){
         QString backgroundname = m_greeterWnd->guessBackground();
         QString resolution = QString("%1x%2").arg(QApplication::primaryScreen()->geometry().width()).arg(QApplication::primaryScreen()->geometry().height());
@@ -131,17 +126,31 @@ MainWindow::MainWindow(QWidget *parent)
         }
     });
 
-    moveToScreen(QApplication::primaryScreen());
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~greeterwind转移到主屏幕";
+    //登录界面移动到鼠标所在的屏幕上
+    if(QApplication::screens().count() > 1){
+        QPoint point = QCursor::pos();
+        QScreen *curScreen = nullptr;
+        for(QScreen *screen : QApplication::screens()){
+            QRect screenRect = screen->geometry();
+            if(screenRect.contains(point)) {
+                curScreen = screen;
+                break;
+            }
+        }
+        if(curScreen != m_activeScreen && curScreen != nullptr){
+            qDebug() << "active screen: from " << m_activeScreen << "to " << curScreen;
+            moveToScreen(curScreen);
+        }
+    }else{
+        moveToScreen(QApplication::primaryScreen());
+    }
+
     m_greeterWnd->initUI();
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~greeterwindow初始化界面完成";
+
     qApp->installNativeEventFilter(this);
 
-    //   QFuture < void > future2 = QtConcurrent::run([=](){
-    //     qDebug() << __FUNCTION__  << QThread::currentThreadId() << QThread::currentThread();
     showLater();
-    //  });
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ mainWindow end";
+
 }
 
 void MainWindow::paintEvent(QPaintEvent *e)

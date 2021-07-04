@@ -52,11 +52,11 @@ public:
     void setFace(const QString& faceFile);
     void setLoggedIn(bool isLoggedIn);
     void setPrompt(const QString& text);
+    void setChildrenGeometry();
     QString getPassword();
     void reset();
     bool isloginauth;
     void setDirLogin();
-    bool getIsChooseDev();
     bool isinput_passwd;
 
 
@@ -66,9 +66,6 @@ protected:
     void keyReleaseEvent(QKeyEvent *event);
 
 signals:
-    void back();
-    void bioDeviceIsChoosed(bool);
-
     /**
      * @brief 手动输入用户名
      * @param userName 用户名
@@ -84,7 +81,6 @@ public slots:
         
 private slots:
     void onLogin(const QString &str);
-    void onBackButtonClicked();
     void onBiometricButtonClicked();
     void onPasswordButtonClicked();
     void onOtherDevicesButtonClicked();
@@ -98,7 +94,6 @@ private:
     void initUI();
     void initBiometricWidget();
     void initBiometricButtonWidget();
-    void setChildrenGeometry();
     void setBiometricWidgetGeometry();
     void setBiometricButtonWidgetGeometry();
     void startAuthentication();
@@ -124,39 +119,39 @@ private:
     qint32      m_uid;      //用户id
     //手动输入用户标记，设置该标记的原因是判断是不是手动输入用户，
     //如果输入了无法登录的用户，就会一直输出密码错误信息
-    bool        isManual;
+    bool        isManual = false;
     //密码错误标记，设置该标志的原因是，在有生物识别模块的情况下用户选择了密码登录，输入了错误的密码，
     //此时应该直接进入密码登录，而不是再次进入登录生物识别设备选择界面
 //    bool        isPasswordError;
 
     enum AuthMode { PASSWORD, BIOMETRIC, UNKNOWN };
 
-    AuthMode authMode;
+    AuthMode authMode = UNKNOWN;
     // 生物识别认证
-    int                     m_deviceCount;
-    int			    m_featureCount;
+    int                     m_deviceCount = -1;
+    int                     m_featureCount;
     QString                 m_deviceName;
     DeviceInfoPtr           m_deviceInfo;
-    BiometricProxy          *m_biometricProxy;
-    BiometricAuthWidget     *m_biometricAuthWidget;
-    BiometricDevicesWidget  *m_biometricDevicesWidget;
-    QWidget                 *m_buttonsWidget;
-    QPushButton             *m_biometricButton;
-    QPushButton             *m_passwordButton;
-    QPushButton             *m_otherDeviceButton;
-    QPushButton             *m_retryButton;
+    BiometricProxy          *m_biometricProxy = nullptr;
+    BiometricAuthWidget     *m_biometricAuthWidget = nullptr;
+    BiometricDevicesWidget  *m_biometricDevicesWidget = nullptr;
+    QWidget                 *m_buttonsWidget = nullptr;
+    QPushButton             *m_biometricButton = nullptr;
+    QPushButton             *m_passwordButton = nullptr;
+    QPushButton             *m_otherDeviceButton = nullptr;
+    QPushButton             *m_retryButton = nullptr;
 
     // UI
-    QPushButton     *m_backButton;         //返回用户列表
-    QLabel          *m_faceLabel;         //头像
-    QLabel          *m_nameLabel;         //用户名
-    QLabel          *m_isLoginLabel;      //提示是否已登录
+    QWidget         *m_userWidget = nullptr;          //放置用户信息Label
+    QLabel          *m_faceLabel = nullptr;         //头像
+    QLabel          *m_nameLabel = nullptr;         //用户名
+    QLabel          *m_isLoginLabel = nullptr;      //提示是否已登录
 
     QWidget         *m_passwdWidget;        //放置密码输入框和信息列表
     IconEdit        *m_passwordEdit;       //密码输入框
     QLabel          *m_messageLabel;         //PAM消息显示
     QPushButton     *m_messageButton;
-    QTimer          *m_bioTimer;
+    QTimer          *m_bioTimer = nullptr;
 
     bool isretry = true;
     bool prompted = false;
@@ -174,6 +169,7 @@ private:
     int                 maxFailedTimes;
     bool                isHiddenSwitchButton;
     QString             manualLoginName;
+    QString             m_face;
 };
 
 #endif // LOGINWINDOW_H

@@ -53,61 +53,6 @@ QLabel{
     font-size: 16px;
 }
 
-/***************** 垂直滚动条 ********************/
-QScrollBar:vertical
-{
-    width:15px;
-    background:rgba(255, 255, 255, 15%);
-    margin:0px,0px,0px,0px;
-    padding-top:15px;
-    padding-bottom:15px;
-}
-QScrollBar::handle:vertical
-{
-    width:15px;
-    background:rgba(255, 255, 255, 25%);
-}
-QScrollBar::handle:vertical:hover
-{
-    background:rgba(255, 255, 255, 45%);
-}
-/* 向下的箭头 */
-QScrollBar::add-line:vertical
-{
-    width:15px;
-    height:15px;
-    border-image:url(:/images/scrollbar_down.png);
-    subcontrol-position:bottom;
-}
-QScrollBar::add-line:vertical:hover
-{
-    border-image:url(:/images/scrollbar_down_hover.png);
-    subcontrol-position:bottom;
-}
-QScrollBar::add-line:vertical:pressed
-{
-    border-image:url(:/images/scrollbar_down_clicked.png);
-    subcontrol-position:bottom;
-}
-/* 向上的箭头 */
-QScrollBar::sub-line:vertical
-{
-    width:15px;
-    height:15px;
-    border-image:url(:/images/scrollbar_up.png);
-    subcontrol-position:top;
-}
-QScrollBar::sub-line:vertical:hover
-{
-    border-image:url(:/images/scrollbar_up_hover.png);
-    subcontrol-position:top;
-}
-QScrollBar::sub-line:vertical:pressed
-{
-    border-image:url(:/images/scrollbar_up_clicked.png);
-    subcontrol-position:top;
-}
-
 
 /********************** 下拉选项 *************************/
 
@@ -174,7 +119,7 @@ QListWidget{
 /******************** 主界面顶部按钮 *********************/
 
 #powerButton, #keyboardButton,
-#sessionButton, #languageButton
+#sessionButton, #languageButton,#btnSwitchUser
 {
     border-radius: 4px;
 }
@@ -221,7 +166,7 @@ QListWidget{
      border-radius: 75;
 }
 #login_nameLabel{
-    font-size: 28px;
+    font-size: 24px;
 /*  background: rgba(255, 255, 255, 30%);*/
 }
 #isLoginLabel{

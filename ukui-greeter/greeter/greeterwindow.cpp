@@ -21,9 +21,11 @@
 #include <QDebug>
 #include <QApplication>
 #include <QProcess>
+#include <QLayout>
 #include <QTranslator>
 #include <QStandardPaths>
 #include <QPainter>
+#include <QScrollBar>
 #include <QResizeEvent>
 #include <QWindow>
 #include <QtDBus/QDBusInterface>
@@ -65,7 +67,6 @@ GreeterWindow::GreeterWindow(QWidget *parent)
       m_configuration(Configuration::instance()),
       m_sessionHasChanged(false)
 {
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~m_greeterwnd begin";
     scale = 1.0;
     if(m_greeter->hasGuestAccountHint()){    //允许游客登录
         qDebug() << "allow guest";
@@ -81,12 +82,20 @@ GreeterWindow::GreeterWindow(QWidget *parent)
     connect(m_greeter, SIGNAL(autologinTimerExpired()),this, SLOT(timedAutologin()));
     connect(m_greeter, SIGNAL(authenticationComplete()),this, SLOT(onAuthenticationComplete1()));
     installEventFilter(this);
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`m_greeter end";
+}
+
+bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if(event->type() == QEvent::MouseButtonPress && obj == this){
+        if(m_powerWnd && m_powerWnd->isVisible()){
+            m_powerWnd->close();
+            switchWnd(1);
+        }
+    }
 }
 
 void GreeterWindow::initUI()
 {
-qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ greeterwnd begin";
     installEventFilter(this);
 
     widgetTime = new QWidget(this);
@@ -98,24 +107,22 @@ qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //虚拟键盘启动按钮
     m_keyboardLB = new QPushButton(this);
+
+    //切换用户按钮
+    m_btnSwitchUser = new QPushButton(this);
+
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [&]{
                 lblTime->setText(local.toString(QDateTime::currentDateTime(),"hh:mm"));
                 lblDate->setText(local.toString(QDate::currentDate(),"yyyy/MM/dd ddd"));
     });
     timer->start(1000);
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~开始初始化时间日期以及右下角图标";
     QtConcurrent::run([=](){
         local = QLocale::system().language();
         QDateTime dateTime = QDateTime::currentDateTime();
         QString strFormat = "dd.MM.yyyy, ddd MMMM d yy, hh:mm:ss.zzz, h:m:s ap";
         QString strDateTime = local.toString(dateTime, strFormat);
-/*
-        connect(timer, &QTimer::timeout, this, [&]{
-                lblTime->setText(local.toString(QDateTime::currentDateTime(),"hh:mm"));
-                lblDate->setText(local.toString(QDate::currentDate(),"yyyy/MM/dd ddd"));
-        });
-*/
+
         widgetlayout->addWidget(lblTime);
         widgetlayout->addWidget(lblDate);
 
@@ -125,11 +132,11 @@ qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         lblDate->setText(local.toString(QDate::currentDate(),"yyyy/MM/dd ddd"));
         lblDate->setStyleSheet("QLabel{color:white; font-size: 16px;}");
 
-//        timer->start(1000);
+        widgetTime->adjustSize();
 
         m_powerLB->setObjectName(QStringLiteral("powerButton"));
         m_powerLB->setIcon(QPixmap(":/images/power.png"));
-        m_powerLB->setIconSize(QSize(39, 39));
+        m_powerLB->setIconSize(QSize(30, 30));
         m_powerLB->setFocusPolicy(Qt::NoFocus);
         m_powerLB->setFixedSize(48, 48);
         m_powerLB->setCursor(Qt::PointingHandCursor);
@@ -145,6 +152,24 @@ qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         m_keyboardLB->installEventFilter(this);
         connect(m_keyboardLB, &QPushButton::clicked,
                 this, &GreeterWindow::showVirtualKeyboard);
+
+        m_btnSwitchUser->setObjectName(QStringLiteral("btnSwitchUser"));
+        m_btnSwitchUser->setIcon(QIcon(":/images/switchUser.png"));
+        m_btnSwitchUser->setIconSize(QSize(24, 24));
+        m_btnSwitchUser->setFocusPolicy(Qt::NoFocus);
+        m_btnSwitchUser->setFixedSize(48, 48);
+        m_btnSwitchUser->setCursor(Qt::PointingHandCursor);
+        m_btnSwitchUser->installEventFilter(this);
+        connect(m_btnSwitchUser, &QPushButton::clicked,
+                this, [&]{
+            if(m_powerWnd && m_powerWnd->isVisible())
+                m_powerWnd->close();
+
+            if(scrollArea->isVisible())
+                switchWnd(1);
+            else
+                switchWnd(0);
+        });
     });
 
     //桌面环境选择按钮
@@ -157,36 +182,37 @@ qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         m_sessionLB->setFixedSize(48, 48);
         m_sessionLB->setCursor(Qt::PointingHandCursor);
         m_sessionLB->installEventFilter(this);
-        //m_sessionLB->setToolTip(tr("Set the desktop environment for the selected user to log in.If the user is logged in, it will take effect after logging in again"));
         m_sessionLB->setIcon(QIcon(IMAGE_DIR + QString("badges/unknown_badge.svg")));
-        //onSessionChanged(m_greeter->defaultSessionHint());
         connect(m_sessionLB, &QPushButton::clicked, this, &GreeterWindow::showSessionWnd);
     }
 
     //用户列表
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~用户头像窗口创建";
-    m_userWnd = new UsersView(this);
-     qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~用户头像窗口创建完成";
+    scrollArea = new QScrollArea(this);
+    scrollArea->setAttribute(Qt::WA_TranslucentBackground);
+    scrollArea->viewport()->setAttribute(Qt::WA_TranslucentBackground);
+    scrollArea->setStyleSheet("QScrollArea {background-color:transparent;}");
+    scrollArea->viewport()->setStyleSheet("background-color:transparent;");
+    scrollArea->verticalScrollBar()->setProperty("drawScrollBarGroove", false);
+    scrollArea->verticalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
+    scrollContents = new QWidget(scrollArea);
+    scrollArea->setWidget(scrollContents);
+
+    m_userWnd = new UsersView(scrollContents);
     connect(m_userWnd, &UsersView::currentUserChanged, this, &GreeterWindow::onCurrentUserChanged);
     connect(m_userWnd, &UsersView::userSelected, this, &GreeterWindow::onUserSelected);
+    scrollArea->hide();
 
     //登录窗口
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`登录密码窗口创建";
     m_loginWnd = new LoginWindow(m_greeter, this);
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~登录密码窗口创建完成";
+    m_loginWnd->hide();
     connect(m_loginWnd, &LoginWindow::userChangedByManual,
             this, &GreeterWindow::onUserChangedByManual);
-    connect(m_loginWnd, &LoginWindow::bioDeviceIsChoosed,
-            this, &GreeterWindow::setUserWindowVisible);
 
     connect(m_userWnd, &UsersView::userNotFound, m_loginWnd, &LoginWindow::setUserNotInView);
 
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~开始往用户头像列表添加数据";
     m_userWnd->setModel(m_usersModel);
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~头像列表数据添加完成";
     setFocusProxy(m_loginWnd);
     QtConcurrent::run([=](){
-        qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~设置默认用户头像";
         //显示lightdm传过来的被选中的用户且自动进入认证界面 -- SwitchToUser()
         QString selectedUser = m_greeter->selectUserHint();
 
@@ -220,13 +246,33 @@ qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             QString lastLoginUser = Configuration::instance()->getLastLoginUser();
             m_userWnd->setCurrentUser(lastLoginUser);
         }
-	setWindowOpacity(0.5);
+        setWindowOpacity(0.5);
     });
 
-qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~设置默认用户头像完成";
-qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ end";
 }
 
+void GreeterWindow::switchWnd(int index)
+{
+    if(m_userWnd)
+        scrollArea->hide();
+    if(m_loginWnd)
+        m_loginWnd->hide();
+
+    repaint();
+
+    switch (index) {
+    case 0:
+        if(m_userWnd)
+            scrollArea->show();
+        break;
+    case 1:
+        if(m_loginWnd)
+            m_loginWnd->show();
+        break;
+    default:
+        break;
+    }
+}
 
 QString GreeterWindow::guessBackground()
 {
@@ -278,26 +324,6 @@ QString GreeterWindow::guessBackground()
     }
 }
 
-void GreeterWindow::setUserWindowVisible(bool visible)
-{
-	//对距离进行缩放
-    if(m_userWnd)
-        m_userWnd->setVisible(visible);
-    if(!visible){
-        QRect loginRect((width()-m_loginWnd->width())/2,
-                        widgetTime->y() + widgetTime->height() + 176*scale,
-                        m_loginWnd->width(),
-                        m_loginWnd->height());
-        m_loginWnd->setGeometry(loginRect);
-    }
-    else{
-        QRect loginRect((width()-m_loginWnd->width())/2,
-                        m_userWnd->y() + m_userWnd->height() + 46 *scale,
-                        m_loginWnd->width(),
-                        height() - (m_userWnd->y() + m_userWnd->height() + 46 *scale));
-        m_loginWnd->setGeometry(loginRect);
-    }
-}
 /**
  * @brief GreeterWindow::resizeEvent
  * @param event
@@ -318,20 +344,32 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
 //对距离进行缩放
     widgetTime->move((width()-widgetTime->geometry().width())/2, 59*scale); //距离顶部59*scale的距离
 
+    if(scrollArea){
+        QRect userRect(0.05*width(),
+                       0.2*height(),
+                       width()*0.9, height()*0.6);
+        scrollArea->setGeometry(userRect);
+    }
+
+    if(scrollContents){
+        scrollContents->setFixedWidth(scrollArea->width()-20);
+    }
+
     if(m_userWnd){
-        m_userWnd->resize(CENTER_ENTRY_WIDTH*9 - ENTRY_WIDTH*4 + 240*scale, CENTER_ENTRY_HEIGHT);
-        QRect userRect((width()-m_userWnd->width())/2,
-                       height()/3 - 20,
-                       m_userWnd->width(), m_userWnd->height());
-        m_userWnd->setGeometry(userRect);
+        m_userWnd->resize(m_userWnd->getSize());
+        if(m_userWnd->height() + 2*30*scale  < scrollArea->height()){
+            m_userWnd->move((scrollArea->width()-m_userWnd->width())/2,(scrollArea->height() - m_userWnd->height())/2);
+        }else{
+            m_userWnd->move((scrollArea->width()-m_userWnd->width())/2,30*scale);
+        }
+        scrollContents->setFixedHeight(m_userWnd->height() + m_userWnd->y() );
     }
 
     if(m_loginWnd){
-        QRect loginRect((width()-m_loginWnd->width())/2,
-                        m_userWnd->geometry().bottom() + 46 *scale,
-                        m_loginWnd->width(),
-                        height() - m_userWnd->geometry().bottom());
-        m_loginWnd->setGeometry(loginRect);
+        //m_loginWnd->setFixedHeight(height());
+        m_loginWnd->setChildrenGeometry();
+        m_loginWnd->setGeometry((width()-m_loginWnd->geometry().width())/2,height()/3, \
+                                m_loginWnd->width(), height()*2/3);
     }
     
     if(m_powerWnd){
@@ -352,6 +390,12 @@ void GreeterWindow::resizeEvent(QResizeEvent *event)
     if(m_keyboardLB){
         x += (m_keyboardLB->width() + 10); //10为间隔
         m_keyboardLB->move(this->width() - x, height() - y);
+    }
+
+    //切换用户按钮位置
+    if(m_btnSwitchUser){
+        x += (m_btnSwitchUser->width() + 10); //10为间隔
+        m_btnSwitchUser->move(this->width() - x, height() - y);
     }
 
     //桌面环境选择按钮位置
@@ -433,15 +477,13 @@ void GreeterWindow::setBackground(const QModelIndex &index)
         if(backgroundPath.isEmpty())
             backgroundPath = m_configuration->getDefaultBackgroundName();
     }
- 
-    qDebug()<<"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+
     //登录后绘制桌面背景而不是登录背景
     m_greeter->setrootWindowBackground(rootWinPicture,0,backgroundPath);
 
     //读取/var/lib/lightdm-date/用户名/ukui-greeter.conf,
     //判断是否设置了该用户的登陆界面的背景图片.
     QString userConfigurePath = m_greeter->getEnsureShareDir(index.data(QLightDM::UsersModel::NameRole).toString()) + "/ukui-greeter.conf";
-    qDebug()<<">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
     QFile backgroundFile(userConfigurePath);
     if(backgroundFile.exists()){
         QSettings settings(userConfigurePath,QSettings::IniFormat);
@@ -483,6 +525,8 @@ void GreeterWindow::onUserSelected(const QModelIndex &index)
 {
     qDebug() << index.data(QLightDM::UsersModel::NameRole).toString() << "selected";
     m_loginWnd->setUserIndex(index);
+
+    switchWnd(1);
 
 }
 
@@ -554,7 +598,7 @@ void GreeterWindow::onCurrentUserChanged(const QModelIndex &index)
 {
     for(int i = 0;i<m_userWnd->userlist.count();i++)
     {
-        UserEntry *entry = m_userWnd->userlist.at(i).first;
+        UserEntry *entry = m_userWnd->userlist.at(i);
           if(entry->userIndex().data(QLightDM::UsersModel::NameRole).toString() == "*login")
                entry->setUserName(tr("Login"));
     }
@@ -616,12 +660,7 @@ void GreeterWindow::setWindowVisible()
     if(m_powerWnd && m_powerWnd->isVisible())
         m_powerWnd->close();
 
-    if(m_loginWnd->getIsChooseDev()){
-        m_loginWnd->setVisible(true);
-    }else{
-        m_loginWnd->setVisible(true);
-        m_userWnd->setVisible(true);
-    }
+    switchWnd(1);
     update();
 }
 /**
@@ -633,17 +672,12 @@ void GreeterWindow::showPowerWnd()
     //如果已经打开了电源对话框则关闭
     if(m_powerWnd && !m_powerWnd->isHidden()){
         m_powerWnd->close();
-        if(m_loginWnd->getIsChooseDev()){
-            m_loginWnd->show();
-        }else{
-            m_userWnd->show();
-            m_loginWnd->show();
-        }
+        switchWnd(1);
         update();
         return;
     }
 
-    m_userWnd->hide();
+    scrollArea->hide();
     m_loginWnd->hide();
 
     m_powerWnd = new PowerManager(this);
@@ -654,8 +688,16 @@ void GreeterWindow::showPowerWnd()
     m_powerWnd->setFixedSize(m_powerWnd->windowSize());
     m_powerWnd->move((width()-m_powerWnd->width())/2,(height() - m_powerWnd->height())/2);
 
-    connect(m_powerWnd,SIGNAL(switchToUser())
-            ,this,SLOT(setWindowVisible()));
+//    connect(m_powerWnd,SIGNAL(switchToUser())
+//            ,this,SLOT(setWindowVisible()));
+    connect(m_powerWnd, &PowerManager::switchToUser, this,
+            [this]() {
+        if(m_powerWnd && m_powerWnd->isVisible())
+            m_powerWnd->close();
+
+        switchWnd(0);
+    });
+
     m_powerWnd->setObjectName(QStringLiteral("powerWnd"));
     m_powerWnd->show();
     update();
@@ -846,7 +888,7 @@ void GreeterWindow::onAuthenticationComplete1()
 {
     for(int i = 0;i<m_userWnd->userlist.count();i++)
     {
-        UserEntry *entry = m_userWnd->userlist.at(i).first;
+        UserEntry *entry = m_userWnd->userlist.at(i);
           if(entry->userIndex().data(QLightDM::UsersModel::NameRole).toString() == "*login")
                entry->setUserName(tr("Login"));
     }

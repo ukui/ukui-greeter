@@ -25,6 +25,7 @@
 #include <QtConcurrent/QtConcurrentRun>
 #include <QTranslator>
 #include <QLocale>
+#include <QScrollArea>
 #include <QTimer>
 #include "loginwindow.h"
 #include "sessionwindow.h"
@@ -51,6 +52,7 @@ public:
 protected:
     void resizeEvent(QResizeEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:
     void onAuthenticationComplete1();
@@ -84,8 +86,11 @@ private:
     PowerManager             *m_powerWnd;
     QPushButton             *m_keyboardLB;
     QPushButton             *m_powerLB;
+    QPushButton             *m_btnSwitchUser = nullptr;
     QPushButton             *m_sessionLB;
     VirtualKeyboard         *m_virtualKeyboard;
+    QScrollArea             *scrollArea = nullptr;
+    QWidget                 *scrollContents = nullptr;
 
     GreeterWrapper          *m_greeter;
     UsersModel              *m_usersModel;
