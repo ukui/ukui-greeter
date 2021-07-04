@@ -150,7 +150,10 @@ void GreeterWindow::initUI()
         m_keyboardLB->setFixedSize(48, 48);
         m_keyboardLB->setCursor(Qt::PointingHandCursor);
         m_keyboardLB->installEventFilter(this);
-        connect(m_keyboardLB, &QPushButton::clicked,
+        if(m_usersModel->rowCount() < 2){
+            m_btnSwitchUser->hide();
+        }
+	connect(m_keyboardLB, &QPushButton::clicked,
                 this, &GreeterWindow::showVirtualKeyboard);
 
         m_btnSwitchUser->setObjectName(QStringLiteral("btnSwitchUser"));
