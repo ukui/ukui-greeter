@@ -290,7 +290,6 @@ void MainWindow::screenCountEvent()
  */
 void MainWindow::onScreenCountChanged(int newCount)
 {
-	return ;
     if(newCount == m_monitorCount)
         return;
     
