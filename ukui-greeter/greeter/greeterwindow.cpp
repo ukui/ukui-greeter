@@ -92,6 +92,7 @@ bool GreeterWindow::eventFilter(QObject *obj, QEvent *event)
             switchWnd(1);
         }
     }
+    return false;
 }
 
 void GreeterWindow::initUI()
