@@ -170,6 +170,8 @@ private:
     bool                isHiddenSwitchButton;
     QString             manualLoginName;
     QString             m_face;
+	QString             m_preStrMessage;
+    int                 m_preStrMessageType;
 };
 
 #endif // LOGINWINDOW_H

@@ -206,9 +206,9 @@ void LoginWindow::setChildrenGeometry()
                              width(), 40);
 
     if(scale < 0.5)
-        setFixedWidth(300);
+        setFixedWidth(360);
     else
-        setFixedWidth(500);
+        setFixedWidth(600);
 
 
     m_passwdWidget->setGeometry(0, m_nameLabel->geometry().bottom() + 45*scale, width(), 150);
@@ -244,6 +244,8 @@ void LoginWindow::reset()
 void LoginWindow::clearMessage()
 {
     m_messageLabel->clear();
+    m_preStrMessage = "";
+    m_preStrMessageType = -1;
 }
 
 /**
@@ -512,6 +514,7 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
 
         prompted = true;
         unacknowledged_messages = false;
+        m_preStrMessage = "";
         qDebug()<<"unacknowledged_messages = false";
         if(text == "Password: "||text == "密码："){
             if(useDoubleAuth){
@@ -535,21 +538,43 @@ void LoginWindow::onShowPrompt(QString text, QLightDM::Greeter::PromptType type)
 void LoginWindow::onShowMessage(QString text, QLightDM::Greeter::MessageType type)
 {
     Q_UNUSED(type);
-    qDebug()<< "message: "<< text;
+    QString strDisplay = "";//显示的pam返回字符串
+    qDebug()<< "message: "<< text<<"type = "<<type;
 
     if(text == "密码为空，请输入密码" && qgetenv("LANGUAGE") == "en_US")
         text = "No password received, please input password";
 
     unacknowledged_messages = true;
+    if (!m_preStrMessage.isEmpty() && m_preStrMessageType != type && m_preStrMessageType != -1)
+    {
+        text = m_preStrMessage + "," + text;
+    }
+    
+    // text = m_preStrMessage + "\n" + text;
     qDebug()<<"unacknowledged_messages = true";
 
-    std::string texttmp = text.toStdString();
-    const char* ch = texttmp.c_str();
+    // std::string texttmp = text.toStdString();
+    // const char* ch = texttmp.c_str();
 
-    char str[1024];
-    sprintf(str,"%s",_(ch));
+    // char str[1024];
+    // sprintf(str,"%s",_(ch));
+    
 
-    m_messageLabel->setText(QString(str));
+    strDisplay = text;
+    //设置完整字符串的tooltip
+    m_messageLabel->setToolTip(text);
+    QFontMetrics font(m_messageLabel->font());
+    int font_size = font.width(strDisplay);
+    //当字符宽度大于75，不再显示完整信息
+    if(font_size > 75)
+    {
+        //返回字符串末尾带省略号的字符串
+        strDisplay = font.elidedText(text, Qt::ElideRight, 600);
+    }
+    m_messageLabel->setText(strDisplay);
+
+    m_preStrMessage = text;
+    m_preStrMessageType = type;
     stopWaiting();
 }
 
