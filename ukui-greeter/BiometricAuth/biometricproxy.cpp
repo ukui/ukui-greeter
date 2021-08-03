@@ -79,6 +79,26 @@ int BiometricProxy::StopOps(int drvid, int waiting)
     return reply.value();
 }
 
+int BiometricProxy::GetFrameFd(int drvid)
+{
+    QDBusInterface *interface = new QDBusInterface("org.demo.pictureshow",
+                                                   "/org/demo/pictureshow",
+                                                   "org.demo.pictureshow",
+                                                   QDBusConnection::sessionBus());
+
+    QDBusReply<QDBusUnixFileDescriptor> reply = interface->call("SendFrame");
+
+    //QDBusReply<QDBusUnixFileDescriptor> reply = call(QStringLiteral("GetFrameFd"), drvid);
+    if(!reply.isValid())
+    {
+        qWarning() << "StopOps error:" << reply.error();
+        return -1;
+    }else{
+        qDebug()<<"111111111111111111111111111111111111111111"<<reply.value().fileDescriptor();
+        return reply.value().fileDescriptor();
+    }
+}
+
 DeviceList BiometricProxy::GetDevList()
 {
     QDBusMessage result = call(QStringLiteral("GetDevList"));
