@@ -69,7 +69,7 @@ CONFIG += c++11 debug link_pkgconfig
 
 QMAKE_CXXFLAGS += -Wdeprecated-declarations
 
-PKGCONFIG += liblightdm-qt5-3 x11 xrandr xtst imlib2
+PKGCONFIG += liblightdm-qt5-3 x11 xrandr xtst imlib2 opencv4 gio-2.0
 
 RESOURCES += image.qrc \
     qss.qrc
