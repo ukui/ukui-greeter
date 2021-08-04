@@ -272,6 +272,7 @@ void MainWindow::onScreenResized()
 
     moveToScreen(QApplication::primaryScreen());
     show();
+    m_greeterWnd->setRootWindow();
 }
 
 void MainWindow::screenCountEvent()
@@ -300,19 +301,19 @@ void MainWindow::onScreenCountChanged(int newCount)
         //默认设置显示最大分辨率
         enableMonitors.start("xrandr --auto");
         enableMonitors.waitForFinished(-1);
+	QTimer::singleShot(600, [&]{
+	     enableMonitors.start(QString("xrandr --output %1 --auto").arg(QApplication::primaryScreen()->name()));
+	     enableMonitors.waitForFinished(-1);
+	});
     } else {
         DisplayService displayService;
         int mode = m_configuration->getValue("display-mode").toInt();
         displayService.switchDisplayMode((DisplayMode)mode);
     }
-//    if(m_first){
-//        show();
-//        activateWindow();
-//    }
 
     //在调用xrandr打开显示器以后，不能马上设置窗口大小，会设置不正确的
     //分辨率，延时500ms正常。
-    //QTimer::singleShot(500,this,SLOT(screenCountEvent()));
+    QTimer::singleShot(500,this,SLOT(screenCountEvent()));
 }
 
 /**
