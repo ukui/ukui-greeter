@@ -48,6 +48,7 @@ public:
     GreeterWindow(QWidget *parent = 0);
     void initUI();
     QString guessBackground();
+    void setRootWindow(); 
 
 protected:
     void resizeEvent(QResizeEvent *event);

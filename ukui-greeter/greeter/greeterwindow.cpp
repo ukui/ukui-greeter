@@ -255,6 +255,11 @@ void GreeterWindow::initUI()
 
 }
 
+void GreeterWindow::setRootWindow()
+{
+    m_greeter->setrootWindow();
+}
+
 void GreeterWindow::switchWnd(int index)
 {
     if(m_userWnd)
