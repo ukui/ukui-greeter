@@ -42,6 +42,7 @@ public:
     void startWaiting();
     void stopWaiting();
     void setCapsState(bool capsState);
+    void clearText();
 
 protected:
     void resizeEvent(QResizeEvent *) Q_DECL_OVERRIDE;

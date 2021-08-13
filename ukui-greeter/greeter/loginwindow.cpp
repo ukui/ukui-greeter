@@ -43,15 +43,19 @@
 #include <pwd.h>
 #include <libintl.h>
 #include <locale.h>
+#include "pam-tally.h"
 
 #define _(string) gettext(string)
 
 LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
     : QWidget(parent),
+      m_timer(nullptr),
+      isLockingFlg(false),
       m_greeter(greeter)
 {    
     initUI();
 
+    pam_tally_init();  //
     connect(m_greeter, SIGNAL(showMessage(QString,QLightDM::Greeter::MessageType)),
             this, SLOT(onShowMessage(QString,QLightDM::Greeter::MessageType)));
     connect(m_greeter, SIGNAL(showPrompt(QString,QLightDM::Greeter::PromptType)),
@@ -541,6 +545,24 @@ void LoginWindow::onShowMessage(QString text, QLightDM::Greeter::MessageType typ
     QString strDisplay = "";//显示的pam返回字符串
     qDebug()<< "message: "<< text<<"type = "<<type;
 
+    //账户锁定倒计时
+    if (text.indexOf("account locked") != -1 || text.indexOf("账户已锁定") != -1 
+        || text.indexOf("Account locked") != -1 || text.indexOf("永久锁定") != -1)
+    {
+        if(!m_timer){
+            m_timer = new QTimer(this);
+            m_timer->setInterval(800);
+            connect(m_timer, &QTimer::timeout, this, &LoginWindow::unlock_countdown);
+        }
+        m_timer->start();
+        return;
+    }
+    else if (text.indexOf("No password received, please input password") != -1){//空密码
+        m_messageLabel->setText(tr("Password cannot be empty"));
+        m_messageLabel->setToolTip(tr("Password cannot be empty"));
+        return;
+    }
+
     if(text == "密码为空，请输入密码" && qgetenv("LANGUAGE") == "en_US")
         text = "No password received, please input password";
 
@@ -613,17 +635,22 @@ void LoginWindow::onAuthenticationComplete()
                     m_name_is_login = false;
                     m_name = "*login";
                 }
-
-                if(!unacknowledged_messages)
-                    onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeError);
+                //qDebug() << "authentication failed--isManual";
+                // if(!unacknowledged_messages)
+                //     onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeError);
             }
             else{
-                if(!unacknowledged_messages)
-                    onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeError);
-                if(useDoubleAuth)
+                // if(!unacknowledged_messages)
+                //     onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeError);
+                if(useDoubleAuth){
                     authMode = BIOMETRIC;
-                else
+                    //qDebug() << "authentication failed--useDoubleAuth";
+                }
+                else{
+                    //qDebug() << "authentication failed--else";
                     authMode = PASSWORD;
+                }
+                    
             }
             isinput_passwd = false;
             isManual = false;
@@ -1043,7 +1070,7 @@ void LoginWindow::onBiometricAuthComplete(bool result)
                 return ;
             }
 
-            onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeInfo);
+            // onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeInfo);
             if(!isBioSuccess)
                 startBioAuth();
         }
@@ -1159,6 +1186,130 @@ void LoginWindow::showBiometricAuthWidget()
     {
         m_buttonsWidget->setVisible(false);
     }
+}
+
+void LoginWindow::unlock_countdown()
+{
+    int failed_count = 0;
+    int time_left = 0;
+    int deny = 0;
+    int fail_time =0;
+    int unlock_time = 0;
+    
+    
+    if (NULL == m_name.toLatin1().data())
+    {
+        qDebug() << "get user info failed." ;
+        return;
+    }
+    
+    struct passwd* user = NULL;
+    user = getpwnam(m_name.toLatin1().data());
+
+    pam_tally_unlock_time_left(user->pw_uid, &failed_count, &time_left, &deny,&fail_time,&unlock_time);
+
+    // qDebug() << "failed_count:" << failed_count << "time_left:" <<time_left <<"deny:"<<deny<<"fail_time:"<< fail_time<<"unlock_time:" << unlock_time;
+    if(time_left/60 > 0)//请多少分钟后重试
+    {
+        char ch[100]={0};
+        int nMinute = time_left/60 + 1;
+        m_messageLabel->setText(tr("Please try again in %1 minutes.").arg(nMinute));
+        m_messageLabel->setToolTip(tr("Please try again in %1 minutes.").arg(nMinute));
+        m_passwordEdit->clearText();
+        m_passwordEdit->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else if(time_left > 0)//请多少秒后重试
+    {
+        char ch[100]={0};
+        m_messageLabel->setText(tr("Please try again in %1 seconds.").arg(time_left%60));
+        m_messageLabel->setToolTip(tr("Please try again in %1 seconds.").arg(time_left%60));
+        m_passwordEdit->clearText();
+        m_passwordEdit->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else if (failed_count == 0xFFFF)//账号被永久锁定
+    {
+        m_messageLabel->setText(tr("Account locked permanently."));
+        m_messageLabel->setToolTip(tr("Account locked permanently."));
+        m_passwordEdit->clearText();
+        m_passwordEdit->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else
+    {
+        if(m_passwordEdit){
+            m_passwordEdit->setDisabled(false);
+            m_passwordEdit->setFocus();
+        }
+        //    qDebug() << "清理 1 clearMessage";
+        if (isLockingFlg)
+        {
+            m_messageLabel->setText("");
+        }
+            
+        m_timer->stop();
+    }
+    return ;
+}
+
+void LoginWindow::root_unlock_countdown()
+{
+    int failed_count = 0;
+    int time_left = 0;
+    int deny = 0;
+    if (NULL == m_name.toLatin1().data())
+    {
+        qDebug() << "get user info failed." ;
+        return;
+    }
+    
+    struct passwd* user = NULL;
+    user = getpwnam(m_name.toLatin1().data());
+    pam_tally_root_unlock_time_left(user->pw_uid, &failed_count, &time_left, &deny);
+    if(time_left/60 > 0)//请多少分钟后重试
+    {
+        char ch[100]={0};
+        int nMinute = time_left/60 + 1;
+        m_messageLabel->setText(tr("Please try again in %1 minutes.").arg(nMinute));
+        m_messageLabel->setToolTip(tr("Please try again in %1 minutes.").arg(nMinute));
+        m_passwordEdit->clearText();
+        m_passwordEdit->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else if(time_left > 0)//请多少秒后重试
+    {
+        char ch[100]={0};
+        m_messageLabel->setText(tr("Please try again in %1 seconds.").arg(time_left%60));
+        m_messageLabel->setToolTip(tr("Please try again in %1 seconds.").arg(time_left%60));
+        m_passwordEdit->clearText();
+        m_passwordEdit->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else if (failed_count == 0xFFFF)//账号被永久锁定
+    {
+        m_messageLabel->setText(tr("Account locked permanently."));
+        m_messageLabel->setToolTip(tr("Account locked permanently."));
+        m_passwordEdit->clearText();
+        m_passwordEdit->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else
+    {
+            if(m_passwordEdit){
+                m_passwordEdit->setDisabled(false);
+                m_passwordEdit->setFocus();
+            }
+            m_messageLabel->setText("");
+            m_timer->stop();
+    }
+    return ;
 }
 
 void LoginWindow::showBiometricDeviceWidget()

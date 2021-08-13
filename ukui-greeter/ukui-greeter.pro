@@ -46,10 +46,13 @@ SOURCES += \
     greeter/language.cpp \
     greeter/languagewidget.cpp \
     greeter/rootWindowBackground.cpp \
+    greeter/pam-tally.c  \
+    
 
 HEADERS  += \
     greeter/greeterwindow.h \
     greeter/iconedit.h \
+    greeter/pam-tally.h \
     greeter/loginwindow.h \
     greeter/securityuser.h \
     greeter/usersmodel.h \
@@ -66,6 +69,8 @@ HEADERS  += \
     greeter/rootWindowBackground.h \
 
 CONFIG += c++11 debug link_pkgconfig
+
+LIBS += -lrt
 
 QMAKE_CXXFLAGS += -Wdeprecated-declarations
 

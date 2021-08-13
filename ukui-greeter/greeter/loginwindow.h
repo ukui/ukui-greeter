@@ -25,6 +25,7 @@
 #include <QLightDM/UsersModel>
 
 #include "biometricdeviceinfo.h"
+#include "pam-tally.h"
 
 class QTimer;
 class QLabel;
@@ -113,6 +114,9 @@ private:
     void restartBioAuth();
     void waitBiometricServiceStatus();
 
+    void root_unlock_countdown();
+    void unlock_countdown();
+
 private:
     GreeterWrapper      *m_greeter;
     QString     m_name;     //m_nameLabel显示的是全名(显示的),m_name保存的是真名(用于登录的)
@@ -172,6 +176,9 @@ private:
     QString             m_face;
 	QString             m_preStrMessage;
     int                 m_preStrMessageType;
+
+    bool            isLockingFlg;   //判断当前是否正在锁定倒计时
+    QTimer *m_timer;
 };
 
 #endif // LOGINWINDOW_H

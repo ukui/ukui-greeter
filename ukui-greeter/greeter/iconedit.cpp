@@ -120,6 +120,10 @@ void IconEdit::setType(QLineEdit::EchoMode type)
 
 }
 
+void IconEdit::clearText()
+{
+    m_edit->setText("");
+}
 
 void IconEdit::resizeEvent(QResizeEvent *)
 {
