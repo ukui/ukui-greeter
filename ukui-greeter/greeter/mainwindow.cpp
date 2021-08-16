@@ -337,7 +337,6 @@ void MainWindow::moveToScreen(QScreen *screen)
 
 void MainWindow::setBackground(QSharedPointer<Background> &background)
 {
-    qDebug()<<"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     if(background)
         qDebug() << background->image;
 

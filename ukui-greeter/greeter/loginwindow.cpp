@@ -635,13 +635,13 @@ void LoginWindow::onAuthenticationComplete()
                     m_name_is_login = false;
                     m_name = "*login";
                 }
-                //qDebug() << "authentication failed--isManual";
-                // if(!unacknowledged_messages)
-                //     onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeError);
+                // qDebug() << "authentication failed--isManual";
+                if(!unacknowledged_messages && !isLockingFlg)
+                    onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeError);
             }
             else{
-                // if(!unacknowledged_messages)
-                //     onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeError);
+                if(!unacknowledged_messages && !isLockingFlg)
+                    onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeError);
                 if(useDoubleAuth){
                     authMode = BIOMETRIC;
                     //qDebug() << "authentication failed--useDoubleAuth";
@@ -1070,7 +1070,7 @@ void LoginWindow::onBiometricAuthComplete(bool result)
                 return ;
             }
 
-            // onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeInfo);
+            onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeInfo);
             if(!isBioSuccess)
                 startBioAuth();
         }
@@ -1248,7 +1248,8 @@ void LoginWindow::unlock_countdown()
         //    qDebug() << "清理 1 clearMessage";
         if (isLockingFlg)
         {
-            m_messageLabel->setText("");
+            onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeInfo);
+            isLockingFlg = false;
         }
             
         m_timer->stop();
@@ -1302,12 +1303,16 @@ void LoginWindow::root_unlock_countdown()
     }
     else
     {
-            if(m_passwordEdit){
-                m_passwordEdit->setDisabled(false);
-                m_passwordEdit->setFocus();
-            }
-            m_messageLabel->setText("");
-            m_timer->stop();
+        if(m_passwordEdit){
+            m_passwordEdit->setDisabled(false);
+            m_passwordEdit->setFocus();
+        }
+        if (isLockingFlg)
+        {
+            onShowMessage(tr("Authentication failure, Please try again"), QLightDM::Greeter::MessageTypeInfo);
+            isLockingFlg = false;
+        }
+        m_timer->stop();
     }
     return ;
 }
