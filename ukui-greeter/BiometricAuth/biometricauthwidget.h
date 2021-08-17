@@ -67,6 +67,7 @@ private Q_SLOTS:
     void onIdentifyComplete(QDBusPendingCallWatcher *watcher);
     void onStatusChanged(int drvid, int status);
     void onMoviePixmapUpdate();
+    void onFrameWritten(int drvid);
 
 private:
     void initUI();
@@ -91,6 +92,8 @@ private:
     int                 timeoutCount;
     QTimer              *retrytimer;
     bool                usebind;
+    int                 fd = -1;
+    int                 dup_fd = -1;
 };
 
 #endif // BIOMETRICAUTHWIDGET_H

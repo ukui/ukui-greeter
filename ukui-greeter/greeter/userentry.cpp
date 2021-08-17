@@ -34,13 +34,11 @@ UserEntry::UserEntry(const QString &name, const QString &facePath, bool isLogin,
     : QWidget(parent),
       id(count++)
 {
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~用户头像创建";
     initUI();
 
     setUserName(name);
     setFace(facePath);
     setLogin(isLogin);
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~用户头像创建完成";
 }
 
 UserEntry::UserEntry(QWidget *parent)
@@ -120,20 +118,20 @@ void UserEntry::setFace(const QString &facePath)
     if(!faceFile.exists())
         this->m_face = ":/images/default_face.png";
 
-    if(id == selectedId){
+//    if(id == selectedId){
         const QString SheetStyle = QString("border-radius: %1px;  border:0px   solid white;").arg(CENTER_IMG_WIDTH/2);
         m_faceLabel->setStyleSheet(SheetStyle);
         userface = scaledPixmap(CENTER_IMG_WIDTH, CENTER_IMG_WIDTH, m_face);
         userface =  PixmapToRound(userface, CENTER_IMG_WIDTH/2);
         m_faceLabel->setPixmap(PixmapToOpacity(userface,1));
-    }
-    else{
-        const QString SheetStyle = QString("border-radius: %1px;  border:0px   solid white;").arg(IMG_WIDTH/2);
-        m_faceLabel->setStyleSheet(SheetStyle);
-        userface = scaledPixmap(IMG_WIDTH, IMG_WIDTH, m_face);
-        userface =  PixmapToRound(userface, IMG_WIDTH/2);
-        m_faceLabel->setPixmap(PixmapToOpacity(userface,0.8));
-    }
+//   }
+//    else{
+//        const QString SheetStyle = QString("border-radius: %1px;  border:0px   solid white;").arg(IMG_WIDTH/2);
+//        m_faceLabel->setStyleSheet(SheetStyle);
+//        userface = scaledPixmap(IMG_WIDTH, IMG_WIDTH, m_face);
+//        userface =  PixmapToRound(userface, IMG_WIDTH/2);
+//        m_faceLabel->setPixmap(PixmapToOpacity(userface,0.8));
+//    }
 
     m_faceLabel->setAlignment(Qt::AlignCenter);
 
@@ -171,8 +169,8 @@ void UserEntry::setLogin(bool isLogin)
 
 void UserEntry::setEnterEvent(bool isEnter)
 {
-    if(id == selectedId)
-        return;
+//    if(id == selectedId)
+//        return;
 
 //    QRect faceRect,nameRect,loginRect;
 
@@ -241,30 +239,30 @@ void UserEntry::setResize()
 
     m_loginLabel->setGeometry(m_faceLabel->x() + m_faceLabel->width() - 24,m_faceLabel->y(),24,24);
 
-    if(id == selectedId)
-    {
-        QFont font = m_nameLabel->font();
-        font.setPixelSize(16);
-        m_nameLabel->setFont(font);
-        setUserName(m_name);
-        m_nameLabel->adjustSize();
-	//距离头像保持25距离
-        m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 25);
-        m_faceLabel->setPixmap(PixmapToOpacity(userface,1));
+//    if(id == selectedId)
+//    {
+//        QFont font = m_nameLabel->font();
+//        font.setPixelSize(16);
+//        m_nameLabel->setFont(font);
+//        setUserName(m_name);
+//        m_nameLabel->adjustSize();
+//        //距离头像保持25距离
+//        m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 25);
+//        m_faceLabel->setPixmap(PixmapToOpacity(userface,1));
 
-    }
-    else
-    {
+//    }
+//    else
+//    {
         QFont font = m_nameLabel->font();
         font.setPixelSize(14);
         m_nameLabel->setFont(font);
-	//当前头像，用户名距离头像保持32距离
+        //当前头像，用户名距离头像保持32距离
         setUserName(m_name);
         m_nameLabel->adjustSize();
         m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 32);
         m_faceLabel->setPixmap(PixmapToOpacity(userface,0.8));
 
-    }
+  //  }
 }
 
 void UserEntry::setSelected(bool selected)

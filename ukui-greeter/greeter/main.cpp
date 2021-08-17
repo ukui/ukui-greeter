@@ -133,6 +133,8 @@ void XsettingsHidpi()
 
 int main(int argc, char *argv[])
 {
+    qputenv("QT_QPA_PLATFORMTHEME",QByteArray("ukui"));
+
     QDateTime dateTime = QDateTime::currentDateTime();
     QByteArray time = QString("[%1] ").arg(dateTime.toString("MM-dd hh:mm:ss.zzz")).toLocal8Bit();
     fprintf(stderr, "%s Debug:  %s\n", time.constData(),"--------------------------------------------------------开始，main函数开始执行");
@@ -145,10 +147,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 进入qapplication初始化";
+     qputenv("QT_QPA_PLATFORMTHEME",QByteArray("ukui"));
     QApplication a(argc, argv);
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~qapplication初始化完成";
-
+    qputenv("QT_QPA_PLATFORMTHEME",QByteArray("ukui"));
 
     QResource::registerResource("image.qrc");
 
@@ -167,26 +168,12 @@ int main(int argc, char *argv[])
     qss.open(QFile::ReadOnly);
     a.setStyleSheet(qss.readAll());
 
-    //等待显示器准备完毕
-    /*waitMonitorsReady();
-    qDebug() << "monitors ready"*/;
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~开始创建mainwindow";
     MainWindow w;
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~mainwindow创建完成，调用show函数";
-    w.show();
-    qDebug()<<"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++show函数调用完成";
-    //在没有窗口管理器的情况下，需要激活窗口，行为类似于用鼠标点击窗口
-    //w.activateWindow();
-    //QPoint pt(QApplication::primaryScreen()->geometry().x() + 100,QApplication::primaryScreen()->geometry().y() + 100);
-    //QPoint center = w.mapFromGlobal(pt);
-    //QCursor::setPos(center);
 
-    /*
-    DisplaySwitch ds(&w);
-    ds.connect(&w, &MainWindow::activeScreenChanged, &ds, &DisplaySwitch::onPositionChanged);
-    QObject::connect(XEventMonitor::instance(), SIGNAL(keyRelease(QString)),
-                     &ds, SLOT(onGlobalKeyRelease(QString)));
-    */
+    w.show();
+    w.activateWindow();
+
+
     qss.close();
     return a.exec();
 }

@@ -27,17 +27,14 @@
 
 GreeterWrapper::GreeterWrapper(QObject *parent) : QLightDM::Greeter(parent)
 {
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ greeterwrapper begin";
     //连接到lightdm
     if(!connectToDaemonSync()){
         qDebug() << "connect to Daemon failed";
         exit(1);
     }
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~连接到lightdm";
 
     drawBackgroundType = 0;
     drawBackgroundColor = 0x0;
-    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ greeterwrapper end";
 }
 
 void GreeterWrapper::setLang(const QString &lang)
@@ -93,6 +90,7 @@ void GreeterWrapper::setrootWindow()
         m_rootWindowBackground = m_defaultBackgroundPath;
     if(m_rootWindowBackground.isEmpty())
         return;
+
     char*  path;
     QByteArray ba = m_rootWindowBackground.toLatin1(); // must
     path=ba.data();

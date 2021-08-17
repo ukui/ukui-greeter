@@ -92,6 +92,9 @@ bool IconEdit::eventFilter(QObject *obj, QEvent *event)
             if(keyEvent->matches(QKeySequence::Copy) || keyEvent->matches(QKeySequence::Cut) || keyEvent->matches(QKeySequence::Paste)){
                 event->ignore();
                 return true;
+            }else if((keyEvent->modifiers() & Qt::MetaModifier) || (keyEvent->modifiers() & Qt::AltModifier)){//当meta或者alt键被按下时，忽略按键事件
+                event->ignore();
+                return true;
             }
         }
     }
@@ -120,6 +123,10 @@ void IconEdit::setType(QLineEdit::EchoMode type)
 
 }
 
+void IconEdit::clearText()
+{
+    m_edit->setText("");
+}
 
 void IconEdit::resizeEvent(QResizeEvent *)
 {

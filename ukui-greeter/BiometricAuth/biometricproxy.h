@@ -116,6 +116,7 @@ public Q_SLOTS:
     StatusReslut UpdateStatus(int drvid);
     int GetUserDevCount(int uid);
     int GetUserDevFeatureCount(int uid,int drvid);
+    int GetFrameFd(int drvid);
 
 Q_SIGNALS:
     /**
@@ -131,6 +132,7 @@ Q_SIGNALS:
      * @param deviceNum 插拔动作后该驱动拥有的设备数量
      */
     void USBDeviceHotPlug(int drvid, int action, int deviceNum);
+    void FrameWritten(int drvid);
 };
 
 #endif // BIOMETRICPROXY_H

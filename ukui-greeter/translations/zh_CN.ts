@@ -189,6 +189,25 @@
         <translation>认证失败，请重试</translation>
     </message>
     <message>
+        <location filename="../src/authdialog.cpp" line="185"/>
+        <source>Please try again in %1 minutes.</source>
+        <translation>请%1分钟后再试</translation>
+    </message>
+    <message>
+        <location filename="../src/authdialog.cpp" line="195"/>
+        <source>Please try again in %1 seconds.</source>
+        <translation>请%1秒后再试</translation>
+    </message>
+    <message>
+        <location filename="../src/authdialog.cpp" line="195"/>
+        <source>Account locked permanently.</source>
+        <translation>账号已被永久锁定</translation>
+    </message>
+    <message>
+        <source>Password cannot be empty</source>
+        <translation>密码不能为空</translation>
+    </message>
+    <message>
         <location filename="../greeter/loginwindow.cpp" line="1017"/>
         <source>Too many unsuccessful attempts,please enter password.</source>
         <translation>指纹验证失败达最大次数，请使用密码解锁</translation>

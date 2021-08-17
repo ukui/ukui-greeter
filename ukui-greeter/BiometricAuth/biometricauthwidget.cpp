@@ -20,6 +20,11 @@
 #include <QLabel>
 #include <QDebug>
 #include <pwd.h>
+#include <unistd.h>
+
+#include <opencv2/opencv.hpp>
+#include "biometricdeviceinfo.h"
+#include "giodbus.h"
 
 BiometricAuthWidget::BiometricAuthWidget(BiometricProxy *proxy, QWidget *parent) :
     QWidget(parent),
@@ -35,12 +40,15 @@ BiometricAuthWidget::BiometricAuthWidget(BiometricProxy *proxy, QWidget *parent)
     usebind = getAuthDouble();
     qDebug() << "BiometricAuthWidget::BiometricAuthWidget";
     initUI();
-    resize(400, 200);
+    resize(400, 260);
 
     if(this->proxy)
     {
         connect(this->proxy, &BiometricProxy::StatusChanged,
                 this, &BiometricAuthWidget::onStatusChanged);
+
+        connect(this->proxy, &BiometricProxy::FrameWritten,
+                this, &BiometricAuthWidget::onFrameWritten);
     }
 }
 
@@ -101,6 +109,7 @@ void BiometricAuthWidget::startAuth_()
     qDebug().noquote() << QString("Identify:[drvid: %1, uid: %2]").arg(device->id).arg(uid);
 
     isInAuth = true;
+    dup_fd = -1;
 
     QDBusPendingCall call = proxy->Identify(device->id, uid);
     QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
@@ -214,6 +223,38 @@ void BiometricAuthWidget::onIdentifyComplete(QDBusPendingCallWatcher *watcher)
     updateImage(0);
 }
 
+void BiometricAuthWidget::onFrameWritten(int drvid)
+{
+
+    if(dup_fd == -1){
+        dup_fd = get_server_gvariant_stdout(drvid);
+    }
+
+    if(dup_fd <= 0)
+        return ;
+
+    cv::Mat img;
+    lseek(dup_fd, 0, SEEK_SET);
+    char base64_bufferData[1024*1024];
+    int rc = read(dup_fd, base64_bufferData, 1024*1024);
+    printf("rc = %d\n", rc);
+
+    cv::Mat mat2(1, sizeof(base64_bufferData), CV_8U, base64_bufferData);
+    img = cv::imdecode(mat2, cv::IMREAD_COLOR);
+
+    QImage srcQImage = QImage((uchar*)(img.data), img.cols, img.rows, QImage::Format_RGB888);
+    lblImage->setFixedSize(160,160);
+    lblImage->setGeometry((width() - lblImage->width()) / 2,
+                           lblDevice->geometry().bottom() + 10,
+                           lblImage->width(), lblImage->height());
+    lblImage->setPixmap(QPixmap::fromImage(srcQImage).scaled(lblImage->size()));
+    //lblImage->setPixmap(QPixmap::fromImage(srcQImage));
+//    QPixmap image = QPixmap::fromImage(srcQImage);
+//    image = image.scaled(lblImage->width(), lblImage->height(),
+//                         Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+//    lblImage->setPixmap(image);
+}
+
 void BiometricAuthWidget::onStatusChanged(int drvid, int status)
 {
     if(!isInAuth)
@@ -236,6 +277,9 @@ void BiometricAuthWidget::onStatusChanged(int drvid, int status)
 static int count = 0;
 void BiometricAuthWidget::updateImage(int type)
 {
+    if(device->deviceType == DeviceType::Type::Face)
+        return ;
+
     if(type == 0)
     {
         if(movieTimer && movieTimer->isActive())

@@ -46,10 +46,13 @@ SOURCES += \
     greeter/language.cpp \
     greeter/languagewidget.cpp \
     greeter/rootWindowBackground.cpp \
+    greeter/pam-tally.c  \
+    
 
 HEADERS  += \
     greeter/greeterwindow.h \
     greeter/iconedit.h \
+    greeter/pam-tally.h \
     greeter/loginwindow.h \
     greeter/securityuser.h \
     greeter/usersmodel.h \
@@ -67,9 +70,11 @@ HEADERS  += \
 
 CONFIG += c++11 debug link_pkgconfig
 
+LIBS += -lrt
+
 QMAKE_CXXFLAGS += -Wdeprecated-declarations
 
-PKGCONFIG += liblightdm-qt5-3 x11 xrandr xtst imlib2
+PKGCONFIG += liblightdm-qt5-3 x11 xrandr xtst imlib2 opencv4 gio-2.0
 
 RESOURCES += image.qrc \
     qss.qrc

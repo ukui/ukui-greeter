@@ -38,6 +38,7 @@ public:
 
     QString getLastLoginUser();
     void saveLastLoginUser(const QString &);
+    void saveLastLoginUser1(const QString &);
     bool getLastNumLock();
     void saveLastNumLock(bool value);
     QPixmap getLogo();

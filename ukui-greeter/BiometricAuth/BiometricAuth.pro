@@ -26,12 +26,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         biometricauthwidget.cpp \
-    biometricproxy.cpp \
-    biometricdeviceswidget.cpp
+        biometricproxy.cpp \
+        biometricdeviceswidget.cpp \
+	giodbus.cpp
 
 HEADERS += \
         biometricauthwidget.h \
-    biometricproxy.h \
-    biometricdeviceswidget.h
+        biometricproxy.h \
+        biometricdeviceswidget.h \
+	giodbus.h
 
 FORMS +=
