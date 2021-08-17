@@ -63,6 +63,7 @@ LoginWindow::LoginWindow(GreeterWrapper *greeter, QWidget *parent)
     connect(m_greeter, SIGNAL(authenticationComplete()),
             this, SLOT(onAuthenticationComplete()));
 
+    Configuration::instance()->saveLastLoginUser1("");
 }
 
 QPixmap LoginWindow::PixmapToRound(const QPixmap &src, int radius)
@@ -614,6 +615,7 @@ void LoginWindow::onAuthenticationComplete()
         if((prompted && !unacknowledged_messages )||direct_login){
             direct_login = false;
             Configuration::instance()->saveLastLoginUser(m_name);
+            Configuration::instance()->saveLastLoginUser1(m_name);
             m_greeter->startSession();
         }
         else
@@ -691,6 +693,7 @@ void LoginWindow::onMessageButtonClicked()
     {
         m_messageButton->hide();
         Configuration::instance()->saveLastLoginUser(m_name);
+        Configuration::instance()->saveLastLoginUser1(m_name);
         m_greeter->startSession();
     }
     else

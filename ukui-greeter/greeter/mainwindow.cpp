@@ -301,10 +301,6 @@ void MainWindow::onScreenCountChanged(int newCount)
         //默认设置显示最大分辨率
         enableMonitors.start("xrandr --auto");
         enableMonitors.waitForFinished(-1);
-	QTimer::singleShot(600, [&]{
-	     enableMonitors.start(QString("xrandr --output %1 --auto").arg(QApplication::primaryScreen()->name()));
-	     enableMonitors.waitForFinished(-1);
-	});
     } else {
         DisplayService displayService;
         int mode = m_configuration->getValue("display-mode").toInt();

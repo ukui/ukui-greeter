@@ -80,6 +80,14 @@ void Configuration::saveLastLoginUser(const QString &userRealName)
     recordSettings->sync();
 }
 
+void Configuration::saveLastLoginUser1(const QString &userRealName)
+{
+    recordSettings->beginGroup("Greeter");
+    recordSettings->setValue("lastLoginUser1", userRealName);
+    recordSettings->endGroup();
+    recordSettings->sync();
+}
+
 bool Configuration::getLastNumLock()
 {
     recordSettings->beginGroup("Greeter");
