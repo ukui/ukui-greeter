@@ -1,8 +1,8 @@
-ukui-greeter (3.0.2-1~0802) focal; urgency=medium
+ukui-greeter (3.0.2-1) unstable; urgency=medium
 
   * New upstream release.
 
- -- handsome_feng <jianfengli@ubuntukylin.com>  Mon, 02 Aug 2021 19:31:56 +0800
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Tue, 17 Aug 2021 19:52:49 +0800
 
 ukui-greeter (3.0.0-1) unstable; urgency=medium
 
