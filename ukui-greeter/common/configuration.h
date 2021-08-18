@@ -35,6 +35,7 @@ public:
 
     QVariant getValue(const QString &);
     void setValue(const QString&, const QVariant &);
+    bool hasValue(const QString &);
 
     QString getLastLoginUser();
     void saveLastLoginUser(const QString &);

@@ -198,7 +198,16 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
 
 void MainWindow::showLater()
 {
-    if(checkNumLockState()){
+    if(m_configuration->hasValue("numlock") && m_configuration->getValue("numlock").toBool()){
+        unsigned int num_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Num_Lock);
+        XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, 0);
+        XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, num_mask);
+    }else if(m_configuration->hasValue("numlock") && !m_configuration->getValue("numlock").toBool()){
+        unsigned int num_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Num_Lock);
+        XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, num_mask);
+        XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, 0);
+    }
+    else if(checkNumLockState()){
         unsigned int num_mask = XkbKeysymToModifiers (QX11Info::display(), XK_Num_Lock);
         XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, 0);
         XkbLockModifiers (QX11Info::display(), XkbUseCoreKbd, num_mask, num_mask);
