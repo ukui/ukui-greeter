@@ -33,13 +33,6 @@ PowerManager::PowerManager(QWidget *parent)
    m_power(new QLightDM::PowerInterface(this)),
    lasttime(QTime::currentTime())
 {
-    if(m_power->canSuspend() && m_power->canHibernate())
-        resize(ITEM_WIDTH*5, ITEM_HEIGHT);
-    else if(m_power->canSuspend() || m_power->canHibernate())
-        resize(ITEM_WIDTH*4, ITEM_HEIGHT);
-    else
-        resize(ITEM_WIDTH*3, ITEM_HEIGHT);
-
     setFlow(QListWidget::LeftToRight);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -47,18 +40,13 @@ PowerManager::PowerManager(QWidget *parent)
 
     QObject::connect(this,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(powerClicked(QListWidgetItem*)));
     initUI();
-
 }
 
 QSize PowerManager::windowSize()
 {
-    if(m_power->canSuspend() && m_power->canHibernate())
-        return QSize(ITEM_WIDTH*5, ITEM_HEIGHT);
-    else if(m_power->canSuspend() || m_power->canHibernate())
-        return QSize(ITEM_WIDTH*4, ITEM_HEIGHT);
-    else
-        return QSize(ITEM_WIDTH*3, ITEM_HEIGHT);
+    return QSize(ITEM_WIDTH*this->count(), ITEM_HEIGHT);
 }
+
 
 void PowerManager::powerClicked(QListWidgetItem *item)
 {
@@ -66,7 +54,7 @@ void PowerManager::powerClicked(QListWidgetItem *item)
     if(interval < 200 && interval > -200)
         return ;
     lasttime = QTime::currentTime();
-
+/*
     int x = row(item);
 
     switch (x) {
@@ -91,6 +79,19 @@ void PowerManager::powerClicked(QListWidgetItem *item)
     default:
         break;
     }
+*/
+    QString name = itemWidget(item)->objectName();
+    if(name == switchWidget->objectName())
+        switchWidgetClicked();
+    else if(name == rebootWidget->objectName())
+        rebootWidgetClicked();
+    else if(name == shutdownWidget->objectName())
+        shutdownWidgetClicked();
+    else if(suspendWidget &&  name == suspendWidget->objectName())
+        suspendWidgetClicked();
+    else if(hibernateWidget && name == hibernateWidget->objectName())
+        hibernateWidgetClicked();
+
 }
 
 void PowerManager::switchWidgetClicked()
@@ -119,7 +120,7 @@ void PowerManager::rebootWidgetClicked()
     }
 }
 
-void PowerManager::suspendWidgetCliced()
+void PowerManager::suspendWidgetClicked()
 {
     try{
         emit switchToUser();
@@ -205,7 +206,7 @@ void PowerManager::initUI()
 
     if(m_power->canHibernate()) {
         hibernateWidget = new QWidget(this);
-        hibernateWidget->setObjectName("suspendWidget");
+        hibernateWidget->setObjectName("hibernateWidget");
         QLabel *hibernateFace = new QLabel(this);
         QLabel *hibernateLabel = new QLabel(this);
         hibernateFace->setAlignment(Qt::AlignCenter);
@@ -217,38 +218,36 @@ void PowerManager::initUI()
         hibernatelayout->addWidget(hibernateFace);
         hibernatelayout->addWidget(hibernateLabel);
     }
-
+   
     QListWidgetItem *item0 = new QListWidgetItem();
     item0->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
-    insertItem(0, item0);
+    insertItem(this->count(), item0);
     setItemWidget(item0, switchWidget);
-
-    QListWidgetItem *item1 = new QListWidgetItem();
-    item1->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
-    insertItem(1, item1);
-    setItemWidget(item1, rebootWidget);
-
-    QListWidgetItem *item2 = new QListWidgetItem();
-    item2->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
-    insertItem(2, item2);
-    setItemWidget(item2, shutdownWidget);
+ 
+    if(m_power->canHibernate()){
+        QListWidgetItem *item = new QListWidgetItem();
+        item->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
+        insertItem(this->count(), item);
+        setItemWidget(item,hibernateWidget);
+    }
 
     if(m_power->canSuspend()){
         QListWidgetItem *item3 = new QListWidgetItem();
         item3->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
-        insertItem(3, item3);
+        insertItem(this->count(), item3);
         setItemWidget(item3, suspendWidget);
     }
-	
-    if(m_power->canHibernate()){
-        QListWidgetItem *item = new QListWidgetItem();
-        item->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
-        if(m_power->canSuspend())
-            insertItem(4, item);
-        else
-            insertItem(3, item);
-        setItemWidget(item,hibernateWidget);
-    }
+
+    QListWidgetItem *item1 = new QListWidgetItem();
+    item1->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
+    insertItem(this->count(), item1);
+    setItemWidget(item1, rebootWidget);
+
+    QListWidgetItem *item2 = new QListWidgetItem();
+    item2->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
+    insertItem(this->count(), item2);
+    setItemWidget(item2, shutdownWidget);
+
     adjustSize();
 
 }

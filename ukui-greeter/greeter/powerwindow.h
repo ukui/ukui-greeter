@@ -58,7 +58,7 @@ private:
 private:
     void lockWidgetClicked();
     void switchWidgetClicked();
-    void suspendWidgetCliced();
+    void suspendWidgetClicked();
     void rebootWidgetClicked();
     void shutdownWidgetClicked();
     void hibernateWidgetClicked();
