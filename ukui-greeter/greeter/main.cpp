@@ -193,9 +193,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
-     qputenv("QT_QPA_PLATFORMTHEME",QByteArray("ukui"));
     QApplication a(argc, argv);
-    qputenv("QT_QPA_PLATFORMTHEME",QByteArray("ukui"));
 
     QResource::registerResource("image.qrc");
 

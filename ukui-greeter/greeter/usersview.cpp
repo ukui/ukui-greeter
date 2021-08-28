@@ -232,6 +232,26 @@ void UsersView::onUserChanged(const QModelIndex &topLeft, const QModelIndex &bot
     }
 }
 
+bool UsersView::getIsUser(QString username)
+{
+    for(int i = 0; i < usersModel->rowCount(); i++){
+        QString name = usersModel->index(i).data(QLightDM::UsersModel::NameRole).toString();
+    	if(name == username)
+	    return true;
+    }
+    return false;
+}
+
+bool UsersView::getLoginStaus(QString username)
+{
+    for(int i = 0; i < usersModel->rowCount(); i++){
+        QString name = usersModel->index(i).data(QLightDM::UsersModel::NameRole).toString();
+        if(name == username){
+ 	    return usersModel->index(i).data(QLightDM::UsersModel::LoggedInRole).toBool();	
+	}
+    }
+}
+
 QSize UsersView::getSize()
 {
     int w,h;

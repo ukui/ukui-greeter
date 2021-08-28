@@ -117,7 +117,7 @@ void LoginWindow::initUI()
     m_messageButton = new QPushButton(m_passwdWidget);
 
     
-    QtConcurrent::run([=](){
+    //QtConcurrent::run([=](){
         m_passwdWidget->setObjectName(QStringLiteral("passwordWidget"));
         m_passwordEdit->setObjectName(QStringLiteral("passwordEdit"));
         m_messageLabel->setObjectName(QStringLiteral("messageLabel"));
@@ -134,7 +134,7 @@ void LoginWindow::initUI()
 
         setFocusProxy(m_passwordEdit);
 
-    });
+    //});
 
     isinput_passwd = false;
 }
@@ -460,8 +460,11 @@ void LoginWindow::onLogin(const QString &str)
         }
     }
     else
-    {  //发送密码
-        m_greeter->respond(str);
+    {  //当密码长度超过1000多时，lightm会出异常，这里暂时先截断
+        if(str.length()>1000)
+            m_greeter->respond(str.mid(0,1000));
+        else
+            m_greeter->respond(str);
         startWaiting();
         m_passwordEdit->setEnabled(false);
     }
