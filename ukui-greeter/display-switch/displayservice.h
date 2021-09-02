@@ -36,6 +36,7 @@ class DisplayService : public QObject
 public:
     explicit DisplayService(QObject *parent = nullptr);
     bool switchDisplayMode(DisplayMode targetMode);
+    QString getFirstDisplayXrandrCmd();//获取第一个设备名称，并组装命令
 
 private:
     void getMonitors();

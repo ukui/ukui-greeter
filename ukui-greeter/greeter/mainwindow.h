@@ -81,6 +81,7 @@ private slots:
     void onTransition();
     void screenCountEvent();
     void RRScreenChangeEvent();
+    QString findTouchScreen();
 
 private:
     void moveToScreen(QScreen *screen = nullptr);

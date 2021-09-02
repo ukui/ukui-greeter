@@ -74,7 +74,7 @@ LIBS += -lrt
 
 QMAKE_CXXFLAGS += -Wdeprecated-declarations
 
-PKGCONFIG += liblightdm-qt5-3 x11 xrandr xtst imlib2 opencv4 gio-2.0
+PKGCONFIG += liblightdm-qt5-3 x11 xrandr xtst imlib2 opencv4 gio-2.0 xi
 
 RESOURCES += image.qrc \
     qss.qrc

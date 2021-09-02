@@ -44,6 +44,8 @@
 #include <X11/keysymdef.h>
 #include <X11/cursorfont.h>
 #include <X11/keysym.h>
+#include <X11/extensions/XInput2.h>
+#include <X11/Xutil.h>
 #include <libintl.h>
 #include <unistd.h>
 #include "xeventmonitor.h"
@@ -141,6 +143,19 @@ MainWindow::MainWindow(QWidget *parent)
             qDebug() << "active screen: from " << m_activeScreen << "to " << curScreen;
             moveToScreen(curScreen);
         }
+
+        //多屏时，触屏和显示接口映射，由于无法智能，选择主屏幕作为触屏映射，如果多个触屏也会像windows一样出现异常
+        QString strScreenName = QApplication::primaryScreen()->name();
+        QProcess enableMonitors;
+        QString strDevID = findTouchScreen();
+        if (false == strDevID.isEmpty())//有触屏设备才做映射
+        {
+            //设置映射关系  示例 xinput map-to-output 7 HDMI-1 
+            QString xinputCmd = "xinput map-to-output " + strDevID + "  " + strScreenName;
+            qDebug() << "find touchscreen " << strDevID << " " << strScreenName;
+            enableMonitors.start(xinputCmd);
+            enableMonitors.waitForFinished(-1);
+        }
     }else{
         moveToScreen(QApplication::primaryScreen());
     }
@@ -151,6 +166,36 @@ MainWindow::MainWindow(QWidget *parent)
 
     showLater();
 
+}
+
+//识别触摸屏设备，并获取第一个设备id
+QString MainWindow::findTouchScreen(){
+
+    int  ndevices = 0;
+    Display *dpy = XOpenDisplay(NULL);
+    XIDeviceInfo *info = XIQueryDevice(dpy, XIAllDevices, &ndevices);
+    QString devicesid="";
+
+    for (int i = 0; i < ndevices; i++)
+    {
+        XIDeviceInfo* dev = &info[i];
+        // 判断当前设备是不是触摸屏
+        if(dev->use != XISlavePointer) continue;
+        if(!dev->enabled) continue;
+        for (int j = 0; j < dev->num_classes; j++)
+        {
+            if (dev->classes[j]->type == XITouchClass)
+            {
+                devicesid = tr("%1").arg(dev->deviceid);
+                break;//获取第一个触屏设备id
+            }
+        }
+    }
+
+    XIFreeDeviceInfo(info);
+    XCloseDisplay(dpy);
+
+    return devicesid;
 }
 
 void MainWindow::paintEvent(QPaintEvent *e)
@@ -305,20 +350,36 @@ void MainWindow::onScreenCountChanged(int newCount)
     
     m_monitorCount = newCount;
 
+    DisplayService displayService;
     if(newCount < 2) {
         QProcess enableMonitors;
         //默认设置显示最大分辨率
-        enableMonitors.start("xrandr --auto");
+        // enableMonitors.start("xrandr --auto");
+        QString  strXrandr = displayService.getFirstDisplayXrandrCmd();
+        enableMonitors.start(strXrandr);
         enableMonitors.waitForFinished(-1);
+        
     } else {
-        DisplayService displayService;
         int mode = m_configuration->getValue("display-mode").toInt();
         displayService.switchDisplayMode((DisplayMode)mode);
+
+        //多屏时，触屏和显示接口映射，由于无法智能，选择主屏幕作为触屏映射，如果多个触屏也会像windows一样出现异常
+        QString strScreenName = QApplication::primaryScreen()->name();
+        QProcess enableMonitors;
+        QString strDevID = findTouchScreen();
+        if (false == strDevID.isEmpty())//有触屏设备才做映射
+        {
+            //设置映射关系  示例 xinput map-to-output 7 HDMI-1 
+            QString xinputCmd = "xinput map-to-output " + strDevID + "  " + strScreenName;
+            qDebug() << "find touchscreen " << strDevID << " " << strScreenName;
+            enableMonitors.start(xinputCmd);
+            enableMonitors.waitForFinished(-1);
+        }
     }
 
     //在调用xrandr打开显示器以后，不能马上设置窗口大小，会设置不正确的
-    //分辨率，延时500ms正常。
-    QTimer::singleShot(500,this,SLOT(screenCountEvent()));
+    //分辨率，延时1000ms正常。
+    QTimer::singleShot(1000,this,SLOT(screenCountEvent()));
 }
 
 /**

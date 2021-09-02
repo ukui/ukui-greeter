@@ -103,6 +103,15 @@ bool DisplayService::switchDisplayMode(DisplayMode targetMode)
     }
 }
 
+QString DisplayService::getFirstDisplayXrandrCmd()
+{
+    //获取显示器列表
+    getMonitors();
+    //组装第一个设备名显示命令
+    QString firstXrandrCmd = "xrandr --output " + monitorNames[0] + " --auto";
+    return firstXrandrCmd;
+}
+
 
 void DisplayService::getMonitors()
 {
