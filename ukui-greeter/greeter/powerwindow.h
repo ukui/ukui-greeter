@@ -45,12 +45,12 @@ private:
     void initUI();
     QListWidget *list;
     QWidget *lockWidget;
-    QWidget *switchWidget;
+    QWidget *switchWidget = nullptr;
     QWidget *suspendWidget;
     QWidget *rebootWidget;
     QWidget *shutdownWidget;
     QWidget *hibernateWidget;
-    QLabel *switchLabel;
+    QLabel *switchLabel = nullptr;
     QLabel *rebootLabel;
     QLabel *shutdownLabel;
     QLightDM::PowerInterface *m_power;

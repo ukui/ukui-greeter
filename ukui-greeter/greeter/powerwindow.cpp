@@ -82,7 +82,7 @@ void PowerManager::powerClicked(QListWidgetItem *item)
     }
 */
     QString name = itemWidget(item)->objectName();
-    if(name == switchWidget->objectName())
+    if(switchWidget && name == switchWidget->objectName())
         switchWidgetClicked();
     else if(name == rebootWidget->objectName())
         rebootWidgetClicked();
