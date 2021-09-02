@@ -25,6 +25,7 @@
 #include <QEvent>
 #include <QException>
 #include <QDebug>
+#include <QDBusReply>
 #include <QDBusInterface>
 #include "powerwindow.h"
 
@@ -149,20 +150,38 @@ void PowerManager::refreshTranslate()
 
 void PowerManager::initUI()
 {
+    actService = new QDBusInterface("org.freedesktop.Accounts",
+                                    "/org/freedesktop/Accounts",
+                                    "org.freedesktop.Accounts",
+                                    QDBusConnection::systemBus());
 
-    switchWidget = new QWidget(this);
-    switchWidget->setObjectName("switchWidget");
-    QLabel *switchFace = new QLabel(this);
-    switchLabel =  new QLabel(this);
-    switchFace->setAlignment(Qt::AlignCenter);
-    switchLabel->setAlignment(Qt::AlignCenter);
-    switchFace->setPixmap(QPixmap(":/images/avatar.png").scaled(58,58));
-    switchLabel->setText(tr("Switch User"));
-    switchWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
-    QVBoxLayout *switchlayout = new QVBoxLayout(switchWidget);
-    switchlayout->addWidget(switchFace);
-    switchlayout->addWidget(switchLabel);
-
+    QDBusMessage ret = actService->call("ListCachedUsers");
+    QList<QVariant> outArgs = ret.arguments();
+    QVariant first = outArgs.at(0);
+    const QDBusArgument &dbusArgs = first.value<QDBusArgument>();
+    dbusArgs.beginArray();
+    QDBusObjectPath path;
+    int userCount =0;
+    while (!dbusArgs.atEnd())
+    {
+        userCount++;
+        dbusArgs >> path;
+    }
+    dbusArgs.endArray();
+    if(userCount > 1){
+        switchWidget = new QWidget(this);
+        switchWidget->setObjectName("switchWidget");
+        QLabel *switchFace = new QLabel(this);
+        switchLabel =  new QLabel(this);
+        switchFace->setAlignment(Qt::AlignCenter);
+        switchLabel->setAlignment(Qt::AlignCenter);
+        switchFace->setPixmap(QPixmap(":/images/avatar.png").scaled(58,58));
+        switchLabel->setText(tr("Switch User"));
+        switchWidget->setFixedSize(ITEM_WIDTH,ITEM_HEIGHT);
+        QVBoxLayout *switchlayout = new QVBoxLayout(switchWidget);
+        switchlayout->addWidget(switchFace);
+        switchlayout->addWidget(switchLabel);
+    }
     rebootWidget = new QWidget(this);
     rebootWidget->setObjectName("rebootWidget");
     QLabel *rebootFace = new QLabel(this);
@@ -218,12 +237,12 @@ void PowerManager::initUI()
         hibernatelayout->addWidget(hibernateFace);
         hibernatelayout->addWidget(hibernateLabel);
     }
-   
-    QListWidgetItem *item0 = new QListWidgetItem();
-    item0->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
-    insertItem(this->count(), item0);
-    setItemWidget(item0, switchWidget);
- 
+   if(userCount>1){
+        QListWidgetItem *item0 = new QListWidgetItem();
+        item0->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
+        insertItem(this->count(), item0);
+        setItemWidget(item0, switchWidget);
+    }
     if(m_power->canHibernate()){
         QListWidgetItem *item = new QListWidgetItem();
         item->setSizeHint(QSize(ITEM_WIDTH, ITEM_HEIGHT));
