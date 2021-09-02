@@ -555,7 +555,7 @@ void LoginWindow::onShowMessage(QString text, QLightDM::Greeter::MessageType typ
     {
         if(!m_timer){
             m_timer = new QTimer(this);
-            m_timer->setInterval(800);
+            m_timer->setInterval(400);
             connect(m_timer, &QTimer::timeout, this, &LoginWindow::unlock_countdown);
         }
         m_timer->start();
