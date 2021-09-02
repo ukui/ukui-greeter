@@ -15,6 +15,7 @@ Build-Depends: debhelper-compat (=12),
                libglib2.0-dev,
                libopencv-dev,
                qttools5-dev-tools,
+               libxi-dev,
                libimlib2-dev
 Standards-Version: 4.5.0
 Rules-Requires-Root: no

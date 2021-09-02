@@ -1,33 +1,477 @@
-ukui-greeter (3.0.0-1) unstable; urgency=medium
+ukui-greeter (1.2.7-9) v101; urgency=medium
 
-  * New upstream release.
-  * debian: update watch file.
+  * bug号： 74562 75760 75346
+  * 需求号：无
+  * 其他修改：无
 
- -- handsome_feng <jianfengli@ubuntukylin.com>  Wed, 29 Jul 2020 07:58:12 +0000
+ -- lilin <lilin@kylinos.cn>  Thu, 02 Sep 2021 09:55:29 +0800
 
-ukui-greeter (1.2.6-1) unstable; urgency=medium
+ukui-greeter (1.2.7-8) v101; urgency=medium
 
-  * New upstream release. (Closes: #964642)
+  * bug号： 75219【需求-锁定倒计时-7167】登录页面密码锁定后，秒倒计时时快时慢
+  * 需求号：无
+  * 其他修改：无
 
- -- handsome_feng <jianfengli@ubuntukylin.com>  Tue, 21 Jul 2020 09:00:28 +0000
+ -- lilin <lilin@kylinos.cn>  Mon, 30 Aug 2021 13:47:12 +0800
 
-ukui-greeter (1.2.5-1) unstable; urgency=medium
+ukui-greeter (1.2.7-7) v101; urgency=medium
 
-  * New upstream bugfix release:
-    - Fix the problem on highdpi screen.
-  * debian/watch: update to monitor the upstream orig.tar.gz.
+  * bug#77112 安装系统设置中勾选开机自动登录，成功登录后新建一个用户，切换用户必现屏幕白屏
+  * bug#71883 输入框可输入字符，登录密码长度最大值太大且达到最大值无提示，屏锁界面密码长度无最大值  
 
- -- handsome_feng <jianfengli@ubuntukylin.com>  Tue, 07 Apr 2020 14:43:43 +0800
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Sat, 28 Aug 2021 11:01:48 +0800
 
-ukui-greeter (1.2.4-1) unstable; urgency=medium
+ukui-greeter (1.2.7-6) v101; urgency=medium
 
-  * New upstream bugfix release:
-    - Fixed that the user avatar needs to be clicked twice to select it.
-    - Fixed that the popup menu will not be hidden when lose focus.
-    * Fix incomplete display when user name is long.
-    * Fix that the user avatar list is displayed incorrectly.
+  * bug#75698
 
- -- handsome_feng <jianfengli@ubuntukylin.com>  Mon, 30 Mar 2020 19:39:17 +0800
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Tue, 24 Aug 2021 14:41:31 +0800
+
+ukui-greeter (1.2.7-5) v101; urgency=medium
+
+  * bug#71522
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Sat, 21 Aug 2021 10:45:00 +0800
+
+ukui-greeter (1.2.7-4) v101; urgency=medium
+
+  * bug#60250 
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Thu, 19 Aug 2021 15:36:22 +0800
+
+ukui-greeter (1.2.7-3) v101; urgency=medium
+
+  * task:47264 默认启动numlock小键盘，并做成可以配置是否自动开启
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Wed, 18 Aug 2021 09:46:44 +0800
+
+ukui-greeter (1.2.7-2) v101; urgency=medium
+
+  * 需求号:7468
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Tue, 17 Aug 2021 01:30:29 +0800
+
+ukui-greeter (1.2.7-1kylin1) v101; urgency=medium
+
+  * bug号：无
+  * 需求号：无
+  * 其他修改：更改版本号为：1.2.7-1kylin1
+
+ -- lilin <lilin@kylinos.cn>  Mon, 16 Aug 2021 21:00:35 +0800
+
+ukui-greeter (1.2.6c04) v101; urgency=medium
+
+  * bug号：1、62362【双屏】锁屏时，按win+p会在输入框输入字符
+  * 2、59963【锁屏】锁屏界面按快捷键F9，输入框会输入字符“l”
+  * 需求号：
+  * 其他修改：去掉了一些代码日志打印 
+
+ -- lilin <lilin@kylinos.cn>  Mon, 16 Aug 2021 14:15:40 +0800
+
+ukui-greeter (1.2.6c03) v101; urgency=medium
+
+  * bug号：无
+  * 需求号：7167倒计时功能
+  * 其他修改：无 
+
+ -- lilin <lilin@kylinos.cn>  Fri, 13 Aug 2021 19:52:51 +0800
+
+ukui-greeter (1.2.6c02) v101; urgency=medium
+
+  * bug号:63476
+  * 其他改动说明：添加人脸透传功能 
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Wed, 04 Aug 2021 20:33:36 +0800
+
+ukui-greeter (1.2.6c01) v101; urgency=medium
+
+  * bug号:bug#61469 【账户管理】设置密码时效后登录失败的提示信息一闪而过，无法看清具体提示 
+  * 需求号:无
+  * 其他修改:同步gitlab的代码
+ -- lilin <lilin@kylinos.cn>  Fri, 16 Jul 2021 14:10:05 +0800
+
+ukui-greeter (1.2.5-2+0713) v101; urgency=medium
+
+  * 修复启动时段错误 
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Tue, 13 Jul 2021 16:05:34 +0800
+
+ukui-greeter (1.2.5-2+0704) v101; urgency=medium
+
+  * task:41651
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Sun, 04 Jul 2021 18:51:06 +0800
+
+ukui-greeter (1.2.5-2+0703) v101; urgency=medium
+
+  * 需求号:6897 
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Sat, 03 Jul 2021 17:46:02 +0800
+
+ukui-greeter (1.2.5-2+0701) v101; urgency=medium
+
+  * 等待生物识别框架启动 
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Thu, 01 Jul 2021 10:37:29 +0800
+
+ukui-greeter (1.2.5-1kylin5~63) v101; urgency=medium
+
+  * 启动优化 
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Wed, 16 Jun 2021 20:02:51 +0800
+
+ukui-greeter (1.2.5-1kylin5~60) v101; urgency=medium
+
+  * bug号:51257
+  * 需求号：
+  * 改动说明：去掉登录界面的设置语言功能
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Mon, 10 May 2021 09:15:26 +0800
+
+ukui-greeter (1.2.5-1kylin5~59) v101; urgency=medium
+
+  * bug号:51684 
+  * 需求号：无
+  * 其他改动说明：无
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Fri, 07 May 2021 15:30:03 +0800
+
+ukui-greeter (1.2.5-1kylin5~58) v101; urgency=medium
+
+  * 解决bug#43270 接入双屏，开机鼠标在主副屏幕移动时，登录界面移动概率性不生效
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Mon, 26 Apr 2021 09:32:05 +0800
+
+ukui-greeter (1.2.5-1kylin5~57) v101; urgency=medium
+
+  * 其它改动说明：配合控制面板默认打开“显示锁屏壁纸在登录页面”进行的改动.
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Fri, 23 Apr 2021 09:26:14 +0800
+
+ukui-greeter (1.2.5-1kylin5~56) v101; urgency=medium
+
+  * 去掉右下角按钮的tooltip提示
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Wed, 21 Apr 2021 15:48:11 +0800
+
+ukui-greeter (1.2.5-1kylin5~55) v101; urgency=medium
+
+  * 解决bug#41840 改变桌面壁纸，注销系统，登录界面底部无模糊效果 
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Fri, 16 Apr 2021 17:09:44 +0800
+
+ukui-greeter (1.2.5-1kylin5~54) v101; urgency=medium
+
+  * bug#47929 两个屏幕分辨率不同，在锁屏或登录界面点击关机按钮，鼠标在两个屏幕间来回滑动，几个图标没有居中
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Tue, 13 Apr 2021 17:08:27 +0800
+
+ukui-greeter (1.2.5-1kylin5~53) v101; urgency=medium
+
+  * 解决bug#46079 多个用户已录入指纹，切换登录用户，出现有的用户不能使用指纹登录
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Tue, 13 Apr 2021 15:23:42 +0800
+
+ukui-greeter (1.2.5-1kylin5~52) v101; urgency=medium
+
+  * bug#45461 切换用户界面小键盘数字无法输入
+  * bug#36602 开启三权分立安全，勾选默认设备后，登录界面默认使用方式仍为密码认证
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Fri, 09 Apr 2021 10:43:16 +0800
+
+ukui-greeter (1.2.5-1kylin5~51) v101; urgency=medium
+
+  * bug#36407 【系统安装】英文安装的系统，登录界面的切换语言选项未汉化
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Thu, 08 Apr 2021 16:01:24 +0800
+
+ukui-greeter (1.2.5-1kylin5~50) v101; urgency=medium
+
+  * bug#45648 英文系统下，登录界面输入错误的密码时，提示信息截断 
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Fri, 02 Apr 2021 14:21:38 +0800
+
+ukui-greeter (1.2.5-1kylin5~49) v101; urgency=medium
+
+  * rebuild
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Mon, 22 Mar 2021 14:09:18 +0800
+
+ukui-greeter (1.2.5-1kylin5~48) v101; urgency=medium
+
+  * bug#40493 未输入密码直接登录，报错信息未汉化
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Sat, 20 Mar 2021 14:58:45 +0800
+
+ukui-greeter (1.2.5-1kylin5~46) v101; urgency=medium
+
+  * bug#31124 不存在虹膜特征时，提权窗口选择“更多”后，仍有虹膜选项，且可以进入虹膜识别
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Thu, 18 Mar 2021 09:59:10 +0800
+
+ukui-greeter (1.2.5-1kylin5~45) v101; urgency=medium
+
+  * bug#41992 笔记本连接4K屏后，注销系统再次登录，查看系统桌面闪现一块黑色的方框
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Thu, 11 Mar 2021 19:08:42 +0800
+
+ukui-greeter (1.2.5-1kylin5~44) v101; urgency=medium
+
+  * bug#42055 【登录】重启系统登录后，登录生物认证超时后，无重试按钮
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Tue, 09 Mar 2021 19:03:26 +0800
+
+ukui-greeter (1.2.5-1kylin5~43) v101; urgency=medium
+
+  * bug#36602 开启三权分立安全，勾选默认设备后，登录界面默认使用方式仍为密码认证 
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Thu, 04 Mar 2021 16:53:30 +0800
+
+ukui-greeter (1.2.5-1kylin5~42) v101; urgency=medium
+
+  * 去掉登录界面的win+p功能
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Wed, 03 Mar 2021 16:23:54 +0800
+
+ukui-greeter (1.2.5-1kylin5~41) v101; urgency=medium
+
+  * bug#40437 严格模式时，在登录界面输入kylin或非root用户名，然后回车时，都会提示认证失败，请重试
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Tue, 02 Mar 2021 19:37:53 +0800
+
+ukui-greeter (1.2.5-1kylin5~40) v101; urgency=medium
+
+  * 去掉小键盘的默认打开和关闭设置 
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Thu, 25 Feb 2021 09:20:17 +0800
+
+ukui-greeter (1.2.5-1kylin5~39) v101; urgency=medium
+
+  * bug#19390 控制面板设置桌面背景为颜色，注销或登录时会先闪过默认壁纸 
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Mon, 22 Feb 2021 09:11:19 +0800
+
+ukui-greeter (1.2.5-1kylin5~38) v101; urgency=medium
+
+  * bug#21019 开机、注销和重启后登录进入桌面时显示异常 
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Sat, 20 Feb 2021 20:11:54 +0800
+
+ukui-greeter (1.2.5-1kylin5~37) v101; urgency=medium
+
+  * bug#34356 大屏登录界面用户名和密码输入框没有居中
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Sat, 20 Feb 2021 11:51:19 +0800
+
+ukui-greeter (1.2.5-1kylin5~36) v101; urgency=medium
+
+  * bug#34356 大屏登录界面用户名和密码输入框没有居中
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Fri, 19 Feb 2021 18:28:58 +0800
+
+ukui-greeter (1.2.5-1kylin5~35) v101; urgency=medium
+
+  * 解决BUG #20701，strict模式下，登录界面点击“登录”，输入root用户名后回车，“登录”不显示为“root”的问题
+    - patches/resolve_manual_login_username_not_show.patch
+
+ -- quankang <quankang@kylinos.cn>  Fri, 19 Feb 2021 14:52:12 +0800
+
+ukui-greeter (1.2.5-1kylin5~34) v101; urgency=medium
+
+  * bug#38525 在登录界面输错指纹后，点击“重试”和“密码认证”无效
+  * bug#38521 英文系统--登录界面的“Biometric Authentication”显示不全
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Fri, 19 Feb 2021 09:24:27 +0800
+
+ukui-greeter (1.2.5-1kylin5~33) v101; urgency=medium
+
+  * bug#36663 图形端root登录时，提示用户名不正确 
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Wed, 03 Feb 2021 20:24:11 +0800
+
+ukui-greeter (1.2.5-1kylin5~32) v101; urgency=medium
+
+  * bug#36682 切换显示为“拓展屏”时，副屏出现白屏
+  * bug#36380 桌面为镜像模式，切换到锁屏界面后，变为仅主屏模式
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Wed, 03 Feb 2021 14:12:11 +0800
+
+ukui-greeter (1.2.5-1kylin5~31) v101; urgency=medium
+
+  * bug#34244 登录后自带的HDMI接口连接外显，在主屏上注销恢复到登陆界面鼠标停留在外显
+  * bug#31256 连接4k屏时，登录界面的背景从中间被分成了两份
+  * bug#33150 英文模式下，生物特征登录，文字显示不全 
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Wed, 03 Feb 2021 09:18:49 +0800
+
+ukui-greeter (1.2.5-1kylin5~30) v101; urgency=medium
+
+  * 添加登录界面双因子认证支持
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Sat, 30 Jan 2021 11:10:56 +0800
+
+ukui-greeter (1.2.5-1kylin5~29) v101; urgency=medium
+
+  * bug#35843 睡眠和挂起未统一名称
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Mon, 25 Jan 2021 20:16:41 +0800
+
+ukui-greeter (1.2.5-1kylin5~28) v101; urgency=medium
+
+  * bug#33150 】英文模式下，生物特征登录，文字显示不全 
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Thu, 21 Jan 2021 20:37:15 +0800
+
+ukui-greeter (1.2.5-1kylin5~27) v101; urgency=medium
+
+  * bug#33150 】英文模式下，生物特征登录，文字显示不全
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Thu, 21 Jan 2021 17:31:16 +0800
+
+ukui-greeter (1.2.5-1kylin5~26) v101; urgency=medium
+
+  * bug#34332 开机时不接显示器，待开机之后再接显示器无显示
+  * bug#31817 登录界面输入密码后鼠标切换屏幕，已输入的密码不保留
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Thu, 21 Jan 2021 10:18:10 +0800
+
+ukui-greeter (1.2.5-1kylin5~25) v101; urgency=medium
+
+  * 解决在录入指纹且设置默认设备后，登录界面不能默认使用生物认证的问题
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Thu, 14 Jan 2021 19:23:38 +0800
+
+ukui-greeter (1.2.5-1kylin5~24) v101; urgency=medium
+
+  * bug#31360 建议登录和锁屏的界面的屏幕键盘的数字界面添加enter按钮
+  * bug#31387 建议屏幕键盘的数字界面的删除按钮的图标尺寸再大点
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Tue, 12 Jan 2021 21:27:20 +0800
+
+ukui-greeter (1.2.5-1kylin5~23) v101; urgency=medium
+
+  * bug#31279 偶发用户登录界面与选择生物特征设备界面出现重叠，输入框跑到用户头像上方
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Mon, 04 Jan 2021 13:50:27 +0800
+
+ukui-greeter (1.2.5-1kylin5~22) v101; urgency=medium
+
+  * bug#31294 开启生物特征认证，验证失败的提示信息的文字显示不全
+  * bug#24633 注销系统后，选择生物识别认证，查看系统界面提示信息显示不全
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Sun, 03 Jan 2021 16:33:47 +0800
+
+ukui-greeter (1.2.5-1kylin5~21) v101; urgency=medium
+
+  * bug#22471 设置为英语的情况下，登录界面出现中文字样，未完全英语化
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Fri, 25 Dec 2020 11:06:16 +0800
+
+ukui-greeter (1.2.5-1kylin5~20) v101; urgency=medium
+
+  * 解决登录界面没有背景的问题
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Thu, 24 Dec 2020 10:40:41 +0800
+
+ukui-greeter (1.2.5-1kylin5~19) v101; urgency=medium
+
+  * 添加黑名单白名单配置方法，配置哪些用户可以显示在登录界面上
+  * 输入用户名界面和游客登录界面隐藏设置语言，桌面环境按钮
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Sat, 05 Dec 2020 03:40:52 +0800
+
+ukui-greeter (1.2.5-1kylin5~18) v101; urgency=medium
+
+  * bug#25272 密码输错后，等到下一次认证开始后才可以重新输入
+  * 修改登录后绘制背景为桌面背景
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Fri, 27 Nov 2020 01:04:37 +0800
+
+ukui-greeter (1.2.5-1kylin5~17) v101; urgency=medium
+
+  * bug#23718 切换用户时，如果用户是登录状态，则登录界面不显示设置
+  * 语言和设置会话选项 
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Thu, 19 Nov 2020 02:56:43 +0800
+
+ukui-greeter (1.2.5-1kylin5~16) v101; urgency=medium
+
+  * bug#20528 输错几次密码锁定后，仍会提示“密码错误，请重新输入”
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Thu, 29 Oct 2020 21:00:00 +0800
+
+ukui-greeter (1.2.5-1kylin5~15) v101; urgency=medium
+
+  * 避免写入qsettings乱码
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Wed, 28 Oct 2020 11:51:59 +0800
+
+ukui-greeter (1.2.5-1kylin5~14) v101; urgency=medium
+
+  * bug#21840
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Mon, 26 Oct 2020 17:23:52 +0800
+
+ukui-greeter (1.2.5-1kylin5~13) v101; urgency=medium
+
+  * bug#20411 当用户名太长时添加悬浮提示，鼠标移到用户名上，显示
+  * 完整用户名提示
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Fri, 23 Oct 2020 10:40:49 +0800
+
+ukui-greeter (1.2.5-1kylin5~12) v101; urgency=medium
+
+  * 添加右下角按钮悬浮提示
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Thu, 24 Sep 2020 15:41:40 +0800
+
+ukui-greeter (1.2.5-1kylin5~11) v101; urgency=medium
+
+  * 保存登陆背景的图片路径到配置文件 
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Tue, 22 Sep 2020 16:13:00 +0800
+
+ukui-greeter (1.2.5-1kylin5~10) v101; urgency=medium
+
+  * 同步github最新版
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Sat, 29 Aug 2020 14:51:38 +0800
+
+ukui-greeter (1.2.5-1kylin5~9) v101; urgency=medium
+
+  * 同步github最新版
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Tue, 18 Aug 2020 12:49:00 +0800
+
+ukui-greeter (1.2.5-1kylin5~8) v101; urgency=medium
+
+  * 同步v10 3.0 ukui-greeter 1.2.5-1kylin~8.
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Mon, 20 Jul 2020 11:34:13 +0800
+
+ukui-greeter (1.2.5-1kylin4) v101; urgency=medium
+
+  * 同步ukui3.0 v10 最新
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Fri, 03 Jul 2020 07:47:46 +0800
+
+ukui-greeter (1.2.5-1kylin3) v101; urgency=medium
+
+  * 同步github最新版
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Wed, 17 Jun 2020 17:04:06 +0800
+
+ukui-greeter (1.2.5-1kylin2) v101; urgency=medium
+
+  * 同步github最新版
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Wed, 17 Jun 2020 10:15:00 +0800
+
+ukui-greeter (1.2.5-1kylin1) v101; urgency=medium
+
+  * release
+
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Thu, 07 May 2020 22:32:43 +0800
 
 ukui-greeter (1.2.3-1) unstable; urgency=medium
 
