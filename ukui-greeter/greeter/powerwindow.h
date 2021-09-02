@@ -32,6 +32,7 @@
 
 class QListWidget;
 class QListWidgetItem;
+class QDBusInterface;
 class PowerManager:public QListWidget
 {
     Q_OBJECT
@@ -54,7 +55,7 @@ private:
     QLabel *shutdownLabel;
     QLightDM::PowerInterface *m_power;
     QTime lasttime;
-
+    QDBusInterface      *actService;
 private:
     void lockWidgetClicked();
     void switchWidgetClicked();
