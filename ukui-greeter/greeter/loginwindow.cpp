@@ -259,9 +259,20 @@ void LoginWindow::clearMessage()
  *
  * 设置用户名
  */
-void LoginWindow::setUserName(const QString& userName)
+void LoginWindow::setUserName(const QString& name)
 {
-    m_nameLabel->setText(userName);
+    //m_nameLabel->setText(userName);
+    if(m_nameLabel->text() == name)
+        return ; 
+    QFont font;
+    font.setPixelSize(24);
+     QString str = ElideText(font,500,name);
+     if(name != str)
+         m_nameLabel->setToolTip(name);
+     m_nameLabel->setText(str);
+     m_nameLabel->setAlignment(Qt::AlignCenter);
+     m_nameLabel->adjustSize();
+     m_nameLabel->move((width() - m_nameLabel->width())/2,m_faceLabel->y() + m_faceLabel->height() + 32);
 }
 
 /**

@@ -148,7 +148,9 @@ void UserEntry::setUserName(const QString &name)
     if(m_name != name)
         m_name = name;
 
-     QString str = ElideText(m_nameLabel->font(),IMG_WIDTH,name);
+    QFont font;
+    font.setPixelSize(16);
+     QString str = ElideText(font,IMG_WIDTH,name);
      if(name != str)
          m_nameLabel->setToolTip(name);
      m_nameLabel->setText(str);
