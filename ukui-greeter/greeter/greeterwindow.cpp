@@ -163,6 +163,11 @@ void GreeterWindow::initUI()
         m_btnSwitchUser->setFocusPolicy(Qt::NoFocus);
         m_btnSwitchUser->setFixedSize(48, 48);
         m_btnSwitchUser->setCursor(Qt::PointingHandCursor);
+        bool isHideUser = m_configuration->getValue("hide-switchuser-button").toBool();
+        if(isHideUser)
+        {
+            m_btnSwitchUser->hide();
+        }
         m_btnSwitchUser->installEventFilter(this);
         connect(m_btnSwitchUser, &QPushButton::clicked,
                 this, [&]{
