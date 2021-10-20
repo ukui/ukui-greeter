@@ -43,6 +43,8 @@ public:
     /*qpair记录用户的上一个用户和下一用户的在list的位置*/
     //QList<QPair<UserEntry *, QPair<int ,int>>> userlist;
     QList<UserEntry *> userlist;
+    bool getIsUser(QString username);
+    bool getLoginStaus(QString username);
 
 protected:
   //  void keyReleaseEvent(QKeyEvent *event);

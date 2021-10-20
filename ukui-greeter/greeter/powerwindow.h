@@ -32,6 +32,7 @@
 
 class QListWidget;
 class QListWidgetItem;
+class QDBusInterface;
 class PowerManager:public QListWidget
 {
     Q_OBJECT
@@ -44,21 +45,21 @@ private:
     void initUI();
     QListWidget *list;
     QWidget *lockWidget;
-    QWidget *switchWidget;
+    QWidget *switchWidget = nullptr;
     QWidget *suspendWidget;
     QWidget *rebootWidget;
     QWidget *shutdownWidget;
     QWidget *hibernateWidget;
-    QLabel *switchLabel;
+    QLabel *switchLabel = nullptr;
     QLabel *rebootLabel;
     QLabel *shutdownLabel;
     QLightDM::PowerInterface *m_power;
     QTime lasttime;
-
+    QDBusInterface      *actService;
 private:
     void lockWidgetClicked();
     void switchWidgetClicked();
-    void suspendWidgetCliced();
+    void suspendWidgetClicked();
     void rebootWidgetClicked();
     void shutdownWidgetClicked();
     void hibernateWidgetClicked();

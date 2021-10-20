@@ -118,16 +118,63 @@ void x11_get_screen_size(int *width,int *height)
 
 }
 
-void XsettingsHidpi()
+void setXresources(int dpi)
+{
+    Display    *dpy;
+    QString str = QString("Xft.dpi:\t%1\n")
+            .arg(dpi);
+
+    dpy = XOpenDisplay (NULL);
+    XChangeProperty(dpy, RootWindow (dpy, 0),
+                    XA_RESOURCE_MANAGER, XA_STRING, 8, PropModeReplace, (unsigned char *) str.toLatin1().data(), str.length());
+
+    XCloseDisplay (dpy);
+}
+
+/* 判断文件是否存在 */
+bool isFileExist(QString XresourcesFile)
+{
+    QFileInfo fileInfo(XresourcesFile);
+    if(fileInfo.isFile()){
+        qDebug()<<"file is true";
+        return true;
+    }
+    qDebug()<<"file is false";
+    return false;
+}
+/* 写配置文件并设置DPI和鼠标大小*/
+void WriteXresourcesFile(QString XresourcesFile,int dpi)
+{
+    QFile file(XresourcesFile);
+    QString content = QString("Xft.dpi:%1\n").arg(dpi);
+    file.open(QIODevice::ReadWrite | QIODevice::Text);
+    QByteArray str = content.toLatin1().data();
+    file.write(str);
+    file.close();
+}
+
+/* 配置新装系统、新建用户第一次登陆时，4K缩放功能*/
+void Set4KScreenScale()
 {
     Display    *dpy;
     int w,h;
     x11_get_screen_size (&w, &h);
+
+    bool res;
+    QString homePath = getenv("HOME");
+    QString XresourcesFile = homePath+"/.config/xresources";
+    res = isFileExist(XresourcesFile);
+    if(!res){
+	if(h >= 2000 || (w>2560 && h> 1500)){
+            WriteXresourcesFile(XresourcesFile,192);
+	}else{
+	    WriteXresourcesFile(XresourcesFile,96);
+	}
+    }
     if(h >= 2000 || (w>2560 && h> 1500)){
-	dpy = XOpenDisplay (NULL);
-        XChangeProperty(dpy, RootWindow (dpy, 0),
-        XA_RESOURCE_MANAGER, XA_STRING, 8, PropModeReplace, (unsigned char *) "Xft.dpi:	192\n", 13);
-        XCloseDisplay (dpy);
+        setXresources(192); 
+    }else{
+        setXresources(96);
     }
 }
 
@@ -139,17 +186,14 @@ int main(int argc, char *argv[])
     QByteArray time = QString("[%1] ").arg(dateTime.toString("MM-dd hh:mm:ss.zzz")).toLocal8Bit();
     fprintf(stderr, "%s Debug:  %s\n", time.constData(),"--------------------------------------------------------开始，main函数开始执行");
     
-    XsettingsHidpi (); //设置dpi
     qInstallMessageHandler(outputMessage); //打印信息处理
-
+    Set4KScreenScale();
     //设置支持缩放属性
 #if(QT_VERSION>=QT_VERSION_CHECK(5,6,0))
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
-     qputenv("QT_QPA_PLATFORMTHEME",QByteArray("ukui"));
     QApplication a(argc, argv);
-    qputenv("QT_QPA_PLATFORMTHEME",QByteArray("ukui"));
 
     QResource::registerResource("image.qrc");
 

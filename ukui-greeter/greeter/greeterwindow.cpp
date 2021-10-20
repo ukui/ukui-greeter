@@ -118,7 +118,7 @@ void GreeterWindow::initUI()
                 lblDate->setText(local.toString(QDate::currentDate(),"yyyy/MM/dd ddd"));
     });
     timer->start(1000);
-    QtConcurrent::run([=](){
+    //QtConcurrent::run([=](){
         local = QLocale::system().language();
         QDateTime dateTime = QDateTime::currentDateTime();
         QString strFormat = "dd.MM.yyyy, ddd MMMM d yy, hh:mm:ss.zzz, h:m:s ap";
@@ -163,6 +163,11 @@ void GreeterWindow::initUI()
         m_btnSwitchUser->setFocusPolicy(Qt::NoFocus);
         m_btnSwitchUser->setFixedSize(48, 48);
         m_btnSwitchUser->setCursor(Qt::PointingHandCursor);
+        bool isHideUser = m_configuration->getValue("hide-switchuser-button").toBool();
+        if(isHideUser)
+        {
+            m_btnSwitchUser->hide();
+        }
         m_btnSwitchUser->installEventFilter(this);
         connect(m_btnSwitchUser, &QPushButton::clicked,
                 this, [&]{
@@ -174,7 +179,7 @@ void GreeterWindow::initUI()
             else
                 switchWnd(0);
         });
-    });
+    //});
 
     //桌面环境选择按钮
     if(m_sessionsModel->rowCount() > 1)
@@ -216,7 +221,7 @@ void GreeterWindow::initUI()
 
     m_userWnd->setModel(m_usersModel);
     setFocusProxy(m_loginWnd);
-    QtConcurrent::run([=](){
+  //  QtConcurrent::run([=](){
         //显示lightdm传过来的被选中的用户且自动进入认证界面 -- SwitchToUser()
         QString selectedUser = m_greeter->selectUserHint();
 
@@ -246,12 +251,22 @@ void GreeterWindow::initUI()
         }
         else
         {
-            //选中上一次登录的用户，但不进入认证界面
             QString lastLoginUser = Configuration::instance()->getLastLoginUser();
-            m_userWnd->setCurrentUser(lastLoginUser);
+            if(m_userWnd->getIsUser(lastLoginUser)) {
+                if( m_userWnd->getLoginStaus(lastLoginUser)){
+                    m_userWnd->setCurrentUser(lastLoginUser);
+                    switchWnd(0);
+                }
+                else{
+                    m_userWnd->setCurrentUser(lastLoginUser);
+                }
+            }else{
+                QString userName = m_usersModel->index(0, 0).data(QLightDM::UsersModel::NameRole).toString();
+                m_userWnd->setCurrentUser(userName);
+            }
         }
         setWindowOpacity(0.5);
-    });
+    //});
 
 }
 

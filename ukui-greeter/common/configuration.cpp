@@ -64,6 +64,15 @@ void Configuration::setValue(const QString &key, const QVariant &value)
     configSettings->endGroup();
 }
 
+bool Configuration::hasValue(const QString &key)
+{
+    configSettings->beginGroup("Greeter");
+    bool value = configSettings->contains(key);
+    configSettings->endGroup();
+
+    return value;
+}
+
 QString Configuration::getLastLoginUser()
 {
     recordSettings->beginGroup("Greeter");
