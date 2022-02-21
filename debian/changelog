@@ -2,7 +2,7 @@ ukui-greeter (3.0.3-1) unstable; urgency=medium
 
   * New upstream release.
 
- -- Allen <zouchang@kylinos.cn>  Thu, 04 Nov 2021 17:08:11 +0800
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Mon, 21 Feb 2022 15:13:49 +0800
 
 ukui-greeter (3.0.2-1) unstable; urgency=medium
 
@@ -12,11 +12,34 @@ ukui-greeter (3.0.2-1) unstable; urgency=medium
 
 ukui-greeter (3.0.0-1) unstable; urgency=medium
 
-  * bug号： 74562 75760 75346
-  * 需求号：无
-  * 其他修改：无
+  * New upstream release.
+  * debian: update watch file.
 
- -- lilin <lilin@kylinos.cn>  Thu, 02 Sep 2021 09:55:29 +0800
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Wed, 29 Jul 2020 07:58:12 +0000
+
+ukui-greeter (1.2.6-1) unstable; urgency=medium
+
+  * New upstream release. (Closes: #964642)
+
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Tue, 21 Jul 2020 09:00:28 +0000
+
+ukui-greeter (1.2.5-1) unstable; urgency=medium
+
+  * New upstream bugfix release:
+    - Fix the problem on highdpi screen.
+  * debian/watch: update to monitor the upstream orig.tar.gz.
+
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Tue, 07 Apr 2020 14:43:43 +0800
+
+ukui-greeter (1.2.4-1) unstable; urgency=medium
+
+  * New upstream bugfix release:
+    - Fixed that the user avatar needs to be clicked twice to select it.
+    - Fixed that the popup menu will not be hidden when lose focus.
+    * Fix incomplete display when user name is long.
+    * Fix that the user avatar list is displayed incorrectly.
+
+ -- handsome_feng <jianfengli@ubuntukylin.com>  Mon, 30 Mar 2020 19:39:17 +0800
 
 ukui-greeter (1.2.3-1) unstable; urgency=medium
 
